@@ -1,0 +1,29 @@
+// https://docs.gradle.org/6.1.1/userguide/java_library_plugin.html
+
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation 'net.portswigger.burp.extender:burp-extender-api:2.1'
+    runtimeOnly files('C:\\Program Files\\BurpSuiteCommunity\\burpsuite_community.jar') // set your local path to burpsuite jar
+
+    implementation 'com.google.guava:guava:28.1-jre'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+}
+
+test {
+    useJUnitPlatform()
+}
