@@ -4,12 +4,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import javax.swing.JSplitPane;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
+import okuken.iste.view.option.TestPanel;
 
 public class SuitePanel extends JPanel {
 
@@ -61,16 +60,10 @@ public class SuitePanel extends JPanel {
 		
 		JPanel optionsPanel = new JPanel();
 		tabbedPane.addTab(Captions.TAB_OPTIONS, null, optionsPanel, null);
-		GroupLayout gl_optionsPanel = new GroupLayout(optionsPanel);
-		gl_optionsPanel.setHorizontalGroup(
-			gl_optionsPanel.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 445, Short.MAX_VALUE)
-		);
-		gl_optionsPanel.setVerticalGroup(
-			gl_optionsPanel.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 273, Short.MAX_VALUE)
-		);
-		optionsPanel.setLayout(gl_optionsPanel);
+		optionsPanel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel_1 = new TestPanel();
+		optionsPanel.add(panel_1, BorderLayout.NORTH);
 
 	}
 }

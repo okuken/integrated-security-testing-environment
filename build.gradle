@@ -17,7 +17,10 @@ repositories {
 
 dependencies {
     implementation 'net.portswigger.burp.extender:burp-extender-api:2.1'
-    runtimeOnly files('C:\\Program Files\\BurpSuiteCommunity\\burpsuite_community.jar') // set your local path to burpsuite jar
+    runtimeOnly files('C:\\Program Files\\BurpSuitePro\\burpsuite_pro.jar') // set your local path to burpsuite jar
+
+	implementation 'org.mybatis:mybatis:3.5.5'
+	implementation 'org.xerial:sqlite-jdbc:3.32.3'
 
     implementation 'com.google.guava:guava:28.1-jre'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'

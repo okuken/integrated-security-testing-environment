@@ -27,6 +27,10 @@ public class BurpUtil {
 		return getCallbacks().getHelpers();
 	}
 
+	public static void printEventLog(String msg) {
+		burpExtenderCallbacks.issueAlert(msg);
+	}
+
 	public static void printStderr(Exception e) {
 		e.printStackTrace(new PrintWriter(burpExtenderCallbacks.getStderr(), true));
 	}

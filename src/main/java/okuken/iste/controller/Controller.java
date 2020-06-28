@@ -4,6 +4,7 @@ import javax.swing.JTable;
 
 import burp.IHttpRequestResponse;
 import burp.IMessageEditor;
+import okuken.iste.logic.MessageLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuiteTab;
 import okuken.iste.view.message.table.MessageTableModel;
@@ -43,8 +44,9 @@ public class Controller {
 
 
 	public void sendMessagesToSuiteTab(IHttpRequestResponse[] messages) {
-		this.messageTableModel.addRows(messages);
 		BurpUtil.highlightTab(suiteTab);
+		this.messageTableModel.addRows(messages);
+		MessageLogic.getInstance().saveMessages(messages);
 	}
 
 	public boolean judgeIsMessageSelected() {
@@ -58,6 +60,12 @@ public class Controller {
 		IHttpRequestResponse message = getSelectedMessage();
 		this.requestMessageEditor.setMessage(message.getRequest(), true);
 		this.responseMessageEditor.setMessage(message.getResponse(), false);
+	}
+
+
+//For test
+	public void test1() {
+		MessageLogic.getInstance().loadMessages();
 	}
 
 }
