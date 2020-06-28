@@ -59,6 +59,7 @@ public class MessageEditorPanel extends JPanel {
 				requestMessageEditor.getComponent(),
 				responseMessageEditor.getComponent()
 			);
+		splitPane.setResizeWeight(0.5);
 
 		add(splitPane);
 	}
