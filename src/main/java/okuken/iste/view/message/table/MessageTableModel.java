@@ -7,6 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import com.google.common.collect.Lists;
 
 import burp.IHttpRequestResponse;
+import okuken.iste.dto.MessageDto;
 
 public class MessageTableModel extends AbstractTableModel {
 
@@ -22,16 +23,13 @@ public class MessageTableModel extends AbstractTableModel {
 			MessageTableColumn.MIME_TYPE,
 			MessageTableColumn.COOKIES};
 
-	private List<MessageTableModelRow> rows = Lists.newArrayList();
+	private List<MessageDto> rows = Lists.newArrayList();
 
 	public MessageTableModel() {
 	}
 
-	public void addRows(IHttpRequestResponse[] messages) {
-		for(IHttpRequestResponse message: messages) {
-			this.rows.add(MessageTableModelRow.create(message, message.getComment()));
-		}
-		
+	public void addRows(List<MessageDto> messageDtos) {
+		this.rows.addAll(messageDtos);
 		int insertedRowIndex = getRowCount() - 1;
 		fireTableRowsInserted(insertedRowIndex, insertedRowIndex);
 	}
@@ -78,7 +76,7 @@ public class MessageTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		return getColumnValue(rows.get(rowIndex), columnIndex);
 	}
-	private String getColumnValue(MessageTableModelRow row, int columnIndex) {
+	private String getColumnValue(MessageDto row, int columnIndex) {
 		switch(COLUMNS[columnIndex]) {
 			case NAME: {
 				return row.getName();

@@ -1,4 +1,4 @@
-package okuken.iste.view.message.table;
+package okuken.iste.dto;
 
 import java.util.stream.Collectors;
 
@@ -8,7 +8,7 @@ import burp.IRequestInfo;
 import burp.IResponseInfo;
 import okuken.iste.util.BurpUtil;
 
-public class MessageTableModelRow {
+public class MessageDto {
 
 	private String name;
 
@@ -16,10 +16,10 @@ public class MessageTableModelRow {
 	private IRequestInfo requestInfo;
 	private IResponseInfo responseInfo;
 
-	private MessageTableModelRow() {}
-	public static MessageTableModelRow create(IHttpRequestResponse message, String name) {
+	private MessageDto() {}
+	public static MessageDto create(IHttpRequestResponse message, String name) {
 
-		MessageTableModelRow ret = new MessageTableModelRow();
+		MessageDto ret = new MessageDto();
 		ret.message = message;
 		ret.name = name;
 

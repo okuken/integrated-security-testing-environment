@@ -1,9 +1,12 @@
 package okuken.iste.controller;
 
+import java.util.List;
+
 import javax.swing.JTable;
 
 import burp.IHttpRequestResponse;
 import burp.IMessageEditor;
+import okuken.iste.dto.MessageDto;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuiteTab;
@@ -45,8 +48,9 @@ public class Controller {
 
 	public void sendMessagesToSuiteTab(IHttpRequestResponse[] messages) {
 		BurpUtil.highlightTab(suiteTab);
-		this.messageTableModel.addRows(messages);
-		MessageLogic.getInstance().saveMessages(messages);
+		List<MessageDto> messageDtos = MessageLogic.getInstance().convertHttpRequestResponsesToDtos(messages);
+		this.messageTableModel.addRows(messageDtos);
+		MessageLogic.getInstance().saveMessages(messageDtos);
 	}
 
 	public boolean judgeIsMessageSelected() {

@@ -1,5 +1,6 @@
 package okuken.iste.dao;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -10,6 +11,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+
+import com.google.common.reflect.ClassPath;
 
 public class DatabaseManager {
 
@@ -45,8 +48,19 @@ public class DatabaseManager {
 	private SqlSessionFactory createSqlSessionFactory() {
 		Configuration configuration = new Configuration(
 				new Environment("prod", new JdbcTransactionFactory(), this.dataSource));
-		configuration.addMapper(MessageMapper.class); // TODO: auto load
+		addAllMappers(configuration);
 		return new SqlSessionFactoryBuilder().build(configuration);
+	}
+	private void addAllMappers(Configuration configuration) {
+		try {
+			ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			ClassPath.from(loader).getTopLevelClasses("okuken.iste.dao").stream()
+					.filter(classInfo -> classInfo.getName().endsWith("Mapper"))
+					.map(classInfo -> classInfo.load())
+					.forEach(clazz -> configuration.addMapper(clazz));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private boolean judgeIsNeedInitDatabase() {
