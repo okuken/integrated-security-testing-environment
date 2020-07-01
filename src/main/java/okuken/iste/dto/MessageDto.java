@@ -1,5 +1,6 @@
 package okuken.iste.dto;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import burp.IExtensionHelpers;
@@ -16,6 +17,8 @@ public class MessageDto {
 	private IRequestInfo requestInfo;
 	private IResponseInfo responseInfo;
 
+	private List<MessageParamDto> messageParamList;
+
 	private MessageDto() {}
 	public static MessageDto create(IHttpRequestResponse message, String name) {
 
@@ -26,6 +29,9 @@ public class MessageDto {
 		IExtensionHelpers helpers = BurpUtil.getHelpers();
 		ret.requestInfo = helpers.analyzeRequest(message);
 		ret.responseInfo = helpers.analyzeResponse(message.getResponse());
+
+		ret.messageParamList = ret.requestInfo.getParameters().stream()
+				.map(parameter -> MessageParamDto.create(parameter)).collect(Collectors.toList());
 
 		return ret;
 	}
@@ -56,14 +62,14 @@ public class MessageDto {
 	public String getUrl() {
 		return this.requestInfo.getUrl().toExternalForm();
 	}
-	public String getParams() {
-		return Integer.toString(this.requestInfo.getParameters().size());
+	public Integer getParams() {
+		return this.requestInfo.getParameters().size();
 	}
-	public String getStatus() {
-		return Short.toString(this.responseInfo.getStatusCode());
+	public Short getStatus() {
+		return this.responseInfo.getStatusCode();
 	}
-	public String getLength() {
-		return Integer.toString(this.message.getResponse().length);
+	public Integer getLength() {
+		return this.message.getResponse().length;
 	}
 	public String getMimeType() {
 		return this.responseInfo.getStatedMimeType();
@@ -75,6 +81,10 @@ public class MessageDto {
 		return this.responseInfo.getCookies().stream()
 				.map(cookie -> String.format("%s=%s;", cookie.getName(), cookie.getValue()))
 				.collect(Collectors.joining("; "));
+	}
+
+	public List<MessageParamDto> getMessageParamList() {
+		return messageParamList;
 	}
 
 }

@@ -5,3 +5,7 @@
 
 build
 bin
+
+*Mapper.java
+*DynamicSqlSupport.java
+**/entity/*.java

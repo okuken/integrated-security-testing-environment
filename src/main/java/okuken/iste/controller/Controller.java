@@ -49,8 +49,8 @@ public class Controller {
 	public void sendMessagesToSuiteTab(IHttpRequestResponse[] messages) {
 		BurpUtil.highlightTab(suiteTab);
 		List<MessageDto> messageDtos = MessageLogic.getInstance().convertHttpRequestResponsesToDtos(messages);
-		this.messageTableModel.addRows(messageDtos);
 		MessageLogic.getInstance().saveMessages(messageDtos);
+		this.messageTableModel.addRows(messageDtos);
 	}
 
 	public boolean judgeIsMessageSelected() {

@@ -5,13 +5,13 @@
     <jdbcConnection connectionURL="jdbc:sqlite:C:/work/iste.db" driverClass="org.sqlite.JDBC" />
     <javaModelGenerator targetPackage="okuken.iste.entity" targetProject="integrated-security-testing-environment/src/main/java/" />
     <javaClientGenerator targetPackage="okuken.iste.dao" targetProject="integrated-security-testing-environment/src/main/java/" type="XMLMAPPER" />
-    <table tableName="ISTE_USER" domainObjectName="User" />
-    <table tableName="ISTE_PROJECT" domainObjectName="Project" />
-    <table tableName="ISTE_MSG_RAW" domainObjectName="MessageRaw" />
-    <table tableName="ISTE_MSG" domainObjectName="Message" />
-    <table tableName="ISTE_MSG_PARAM" domainObjectName="MessageParam" />
-    <table tableName="ISTE_MEMO_PROJECT" domainObjectName="MemoProject" />
-    <table tableName="ISTE_MEMO_MSG" domainObjectName="MemoMessage" />
-    <table tableName="ISTE_MEMO_MSG_PARAM" domainObjectName="MemoMessageParam" />
+    <table tableName="ISTE_%">
+        <generatedKey column="ID" sqlStatement="SELECT LAST_INSERT_ROWID()" identity="true" />
+        <domainObjectRenamingRule searchString="^Iste" />
+        <!-- columnOverride column="ID" javaType="Long" / -->
+        <columnOverride column="PRC_DATE" javaType="java.sql.Date" />
+        <columnOverride column="REQUEST"  javaType="byte[]" jdbcType="BLOB" />
+        <columnOverride column="RESPONSE" javaType="byte[]" jdbcType="BLOB" />
+    </table>
   </context>
 </generatorConfiguration>

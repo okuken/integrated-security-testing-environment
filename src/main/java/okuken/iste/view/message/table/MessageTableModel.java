@@ -88,13 +88,13 @@ public class MessageTableModel extends AbstractTableModel {
 				return row.getUrl();
 			}
 			case PARAMS: {
-				return row.getParams();
+				return Integer.toString(row.getParams());
 			}
 			case STATUS: {
-				return row.getStatus();
+				return Short.toString(row.getStatus());
 			}
 			case LENGTH: {
-				return row.getLength();
+				return Integer.toString(row.getLength());
 			}
 			case MIME_TYPE: {
 				return row.getMimeType();

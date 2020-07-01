@@ -9,7 +9,6 @@ import burp.IBurpExtenderCallbacks;
 import burp.IExtensionStateListener;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
-import okuken.iste.dao.DatabaseManager;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.ContextMenuFactory;
 import okuken.iste.view.SuiteTab;

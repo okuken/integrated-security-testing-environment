@@ -1,4 +1,4 @@
-package okuken.iste.dao;
+package okuken.iste;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -64,7 +64,7 @@ public class DatabaseManager {
 	}
 
 	private boolean judgeIsNeedInitDatabase() {
-		return true; //TODO:impl
+		return false; //TODO:impl
 	}
 	private void initDatabase() throws SQLException {
 		//TODO: impl
