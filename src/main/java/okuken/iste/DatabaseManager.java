@@ -53,7 +53,7 @@ public class DatabaseManager {
 	}
 	private void addAllMappers(Configuration configuration) {
 		try {
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			ClassLoader loader = this.getClass().getClassLoader();
 			ClassPath.from(loader).getTopLevelClasses("okuken.iste.dao").stream()
 					.filter(classInfo -> classInfo.getName().endsWith("Mapper"))
 					.map(classInfo -> classInfo.load())
