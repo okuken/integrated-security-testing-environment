@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+  <context id="context1">
+    <jdbcConnection connectionURL="jdbc:sqlite:C:/work/iste.db" driverClass="org.sqlite.JDBC" />
+    <javaModelGenerator targetPackage="okuken.iste.entity" targetProject="integrated-security-testing-environment/src/main/java/" />
+    <javaClientGenerator targetPackage="okuken.iste.dao" targetProject="integrated-security-testing-environment/src/main/java/" type="XMLMAPPER" />
+    <table tableName="ISTE_USER" domainObjectName="User" />
+    <table tableName="ISTE_PROJECT" domainObjectName="Project" />
+    <table tableName="ISTE_MSG_RAW" domainObjectName="MessageRaw" />
+    <table tableName="ISTE_MSG" domainObjectName="Message" />
+    <table tableName="ISTE_MSG_PARAM" domainObjectName="MessageParam" />
+    <table tableName="ISTE_MEMO_PROJECT" domainObjectName="MemoProject" />
+    <table tableName="ISTE_MEMO_MSG" domainObjectName="MemoMessage" />
+    <table tableName="ISTE_MEMO_MSG_PARAM" domainObjectName="MemoMessageParam" />
+  </context>
+</generatorConfiguration>

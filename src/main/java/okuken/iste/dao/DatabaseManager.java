@@ -45,7 +45,7 @@ public class DatabaseManager {
 	private SqlSessionFactory createSqlSessionFactory() {
 		Configuration configuration = new Configuration(
 				new Environment("prod", new JdbcTransactionFactory(), this.dataSource));
-		configuration.addMapper(MessageDao.class); // TODO: auto load
+		configuration.addMapper(MessageMapper.class); // TODO: auto load
 		return new SqlSessionFactoryBuilder().build(configuration);
 	}
 

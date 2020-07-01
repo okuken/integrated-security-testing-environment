@@ -1,10 +1,11 @@
 package okuken.iste.logic;
 
 import org.apache.ibatis.session.SqlSession;
+import org.mybatis.dynamic.sql.select.CountDSLCompleter;
 
 import burp.IHttpRequestResponse;
 import okuken.iste.dao.DatabaseManager;
-import okuken.iste.dao.MessageDao;
+import okuken.iste.dao.MessageMapper;
 import okuken.iste.util.BurpUtil;
 
 public class MessageLogic {
@@ -22,8 +23,8 @@ public class MessageLogic {
 	public void loadMessages() {
 		//TODO:impl
 		try (SqlSession session = DatabaseManager.getInstance().getSessionFactory().openSession()) {
-			  MessageDao messageDao = session.getMapper(MessageDao.class);
-			  BurpUtil.printEventLog("hoge" + messageDao.getCount());
+			MessageMapper messageMapper = session.getMapper(MessageMapper.class);
+			BurpUtil.printEventLog("hoge" + messageMapper.count(CountDSLCompleter.allRows())); // or c->c
 		}
 	}
 
