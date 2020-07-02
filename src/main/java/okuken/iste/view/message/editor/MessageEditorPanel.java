@@ -26,11 +26,11 @@ public class MessageEditorPanel extends JPanel {
 		IMessageEditor requestMessageEditor = callbacks.createMessageEditor(new IMessageEditorController() {
 			@Override
 			public IHttpService getHttpService() {
-				return Controller.getInstance().getSelectedMessage().getHttpService();
+				return Controller.getInstance().getSelectedMessage().getMessage().getHttpService();
 			}
 			@Override
 			public byte[] getRequest() {
-				return Controller.getInstance().getSelectedMessage().getRequest();
+				return Controller.getInstance().getSelectedMessage().getMessage().getRequest();
 			}
 			@Override
 			public byte[] getResponse() {
@@ -42,7 +42,7 @@ public class MessageEditorPanel extends JPanel {
 		IMessageEditor responseMessageEditor = callbacks.createMessageEditor(new IMessageEditorController() {
 			@Override
 			public IHttpService getHttpService() {
-				return Controller.getInstance().getSelectedMessage().getHttpService();
+				return Controller.getInstance().getSelectedMessage().getMessage().getHttpService();
 			}
 			@Override
 			public byte[] getRequest() {
@@ -50,7 +50,7 @@ public class MessageEditorPanel extends JPanel {
 			}
 			@Override
 			public byte[] getResponse() {
-				return Controller.getInstance().getSelectedMessage().getResponse();
+				return Controller.getInstance().getSelectedMessage().getMessage().getResponse();
 			}
 		}, false);
 		Controller.getInstance().setResponseMessageEditor(responseMessageEditor);

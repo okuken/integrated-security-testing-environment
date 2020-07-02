@@ -6,7 +6,6 @@ import javax.swing.table.AbstractTableModel;
 
 import com.google.common.collect.Lists;
 
-import burp.IHttpRequestResponse;
 import okuken.iste.dto.MessageDto;
 
 public class MessageTableModel extends AbstractTableModel {
@@ -34,8 +33,8 @@ public class MessageTableModel extends AbstractTableModel {
 		fireTableRowsInserted(insertedRowIndex, insertedRowIndex);
 	}
 
-	public IHttpRequestResponse getRowMessage(int rowIndex) {
-		return rows.get(rowIndex).getHttpRequestResponse();
+	public MessageDto getRow(int rowIndex) {
+		return rows.get(rowIndex);
 	}
 
 	@Override
@@ -98,9 +97,6 @@ public class MessageTableModel extends AbstractTableModel {
 			}
 			case MIME_TYPE: {
 				return row.getMimeType();
-			}
-			case COMMENT: {
-				return row.getComment();
 			}
 			case COOKIES: {
 				return row.getCookies();

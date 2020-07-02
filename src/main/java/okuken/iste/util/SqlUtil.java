@@ -3,14 +3,17 @@ package okuken.iste.util;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.apache.ibatis.session.SqlSession;
 
 public class SqlUtil {
 
-	public static final java.sql.Date now() {
-		return new java.sql.Date(Calendar.getInstance().getTimeInMillis());
+	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+	public static final String now() {
+		return timestampFormat.format(Calendar.getInstance().getTime());
 	}
 
 	public static final int loadGeneratedId(SqlSession session) {

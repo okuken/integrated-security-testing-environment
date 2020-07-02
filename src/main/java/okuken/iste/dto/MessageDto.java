@@ -1,90 +1,107 @@
 package okuken.iste.dto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import burp.IExtensionHelpers;
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
-import okuken.iste.util.BurpUtil;
 
 public class MessageDto {
 
 	private String name;
 
+	private String method;
+	private String url;
+	private Integer params;
+	private Short status;
+	private Integer length;
+	private String mimeType;
+	private String cookies;
+
+	private List<MessageParamDto> messageParamList;
+
+	private Integer messageRawId;
 	private IHttpRequestResponse message;
 	private IRequestInfo requestInfo;
 	private IResponseInfo responseInfo;
 
-	private List<MessageParamDto> messageParamList;
-
-	private MessageDto() {}
-	public static MessageDto create(IHttpRequestResponse message, String name) {
-
-		MessageDto ret = new MessageDto();
-		ret.message = message;
-		ret.name = name;
-
-		IExtensionHelpers helpers = BurpUtil.getHelpers();
-		ret.requestInfo = helpers.analyzeRequest(message);
-		ret.responseInfo = helpers.analyzeResponse(message.getResponse());
-
-		ret.messageParamList = ret.requestInfo.getParameters().stream()
-				.map(parameter -> MessageParamDto.create(parameter)).collect(Collectors.toList());
-
-		return ret;
+	public String getName() {
+		return name;
 	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public IHttpRequestResponse getHttpRequestResponse() {
-		return this.message;
-	}
-	public IRequestInfo getRequestInfo() {
-		return this.requestInfo;
-	}
-	public IResponseInfo getResponseInfo() {
-		return this.responseInfo;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-	public String getHost() {
-		return this.requestInfo.getUrl().getHost();
-	}
 	public String getMethod() {
-		return this.requestInfo.getMethod();
+		return method;
+	}
+	public void setMethod(String method) {
+		this.method = method;
 	}
 	public String getUrl() {
-		return this.requestInfo.getUrl().toExternalForm();
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	public Integer getParams() {
-		return this.requestInfo.getParameters().size();
+		return params;
+	}
+	public void setParams(Integer params) {
+		this.params = params;
 	}
 	public Short getStatus() {
-		return this.responseInfo.getStatusCode();
+		return status;
+	}
+	public void setStatus(Short status) {
+		this.status = status;
 	}
 	public Integer getLength() {
-		return this.message.getResponse().length;
+		return length;
+	}
+	public void setLength(Integer length) {
+		this.length = length;
 	}
 	public String getMimeType() {
-		return this.responseInfo.getStatedMimeType();
+		return mimeType;
 	}
-	public String getComment() {
-		return this.message.getComment();
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
 	}
 	public String getCookies() {
-		return this.responseInfo.getCookies().stream()
-				.map(cookie -> String.format("%s=%s;", cookie.getName(), cookie.getValue()))
-				.collect(Collectors.joining("; "));
+		return cookies;
 	}
-
+	public void setCookies(String cookies) {
+		this.cookies = cookies;
+	}
 	public List<MessageParamDto> getMessageParamList() {
 		return messageParamList;
+	}
+	public void setMessageParamList(List<MessageParamDto> messageParamList) {
+		this.messageParamList = messageParamList;
+	}
+	public Integer getMessageRawId() {
+		return messageRawId;
+	}
+	public void setMessageRawId(Integer messageRawId) {
+		this.messageRawId = messageRawId;
+	}
+	public IHttpRequestResponse getMessage() {
+		return message;
+	}
+	public void setMessage(IHttpRequestResponse message) {
+		this.message = message;
+	}
+	public IRequestInfo getRequestInfo() {
+		return requestInfo;
+	}
+	public void setRequestInfo(IRequestInfo requestInfo) {
+		this.requestInfo = requestInfo;
+	}
+	public IResponseInfo getResponseInfo() {
+		return responseInfo;
+	}
+	public void setResponseInfo(IResponseInfo responseInfo) {
+		this.responseInfo = responseInfo;
 	}
 
 }

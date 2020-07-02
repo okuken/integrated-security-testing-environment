@@ -1,6 +1,9 @@
 package okuken.iste.controller;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import javax.swing.JTable;
 
@@ -48,7 +51,9 @@ public class Controller {
 
 	public void sendMessagesToSuiteTab(IHttpRequestResponse[] messages) {
 		BurpUtil.highlightTab(suiteTab);
-		List<MessageDto> messageDtos = MessageLogic.getInstance().convertHttpRequestResponsesToDtos(messages);
+		List<MessageDto> messageDtos = Arrays.stream(messages)
+				.map(message -> MessageLogic.getInstance().convertHttpRequestResponseToDto(message))
+				.collect(Collectors.toList());
 		MessageLogic.getInstance().saveMessages(messageDtos);
 		this.messageTableModel.addRows(messageDtos);
 	}
@@ -56,20 +61,30 @@ public class Controller {
 	public boolean judgeIsMessageSelected() {
 		return this.messageTable.getSelectedRow() >= 0;
 	}
-	public IHttpRequestResponse getSelectedMessage() {
-		return this.messageTableModel.getRowMessage(this.messageTable.getSelectedRow());
+	public MessageDto getSelectedMessage() {
+		return this.messageTableModel.getRow(this.messageTable.getSelectedRow());
 	}
 
-	public void refreshRequestDetailPanel() {
-		IHttpRequestResponse message = getSelectedMessage();
-		this.requestMessageEditor.setMessage(message.getRequest(), true);
-		this.responseMessageEditor.setMessage(message.getResponse(), false);
+	public void refreshRequestDetailPanel() {//TODO: ***synchronize or loading block***
+		MessageDto dto = getSelectedMessage();
+
+		if(dto.getMessage() != null) {
+			this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
+			this.responseMessageEditor.setMessage(dto.getMessage().getResponse(), false);
+			return;
+		}
+
+		Executors.newSingleThreadExecutor().submit(() -> {
+			MessageLogic.getInstance().loadMessageDetail(dto);
+			this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
+			this.responseMessageEditor.setMessage(dto.getMessage().getResponse(), false);
+		});
 	}
 
 
 //For test
 	public void test1() {
-		MessageLogic.getInstance().loadMessages();
+		this.messageTableModel.addRows(MessageLogic.getInstance().loadMessages());
 	}
 
 }

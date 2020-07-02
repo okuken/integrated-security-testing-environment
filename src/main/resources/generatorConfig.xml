@@ -9,9 +9,9 @@
         <generatedKey column="ID" sqlStatement="SELECT LAST_INSERT_ROWID()" identity="true" />
         <domainObjectRenamingRule searchString="^Iste" />
         <!-- columnOverride column="ID" javaType="Long" / -->
-        <columnOverride column="PRC_DATE" javaType="java.sql.Date" />
-        <columnOverride column="REQUEST"  javaType="byte[]" jdbcType="BLOB" />
-        <columnOverride column="RESPONSE" javaType="byte[]" jdbcType="BLOB" />
+        <!-- columnOverride column="PRC_DATE" javaType="java.sql.Date" / -->
+        <columnOverride column="REQUEST"  javaType="byte[]" jdbcType="BINARY" />
+        <columnOverride column="RESPONSE" javaType="byte[]" jdbcType="BINARY" />
     </table>
   </context>
 </generatorConfiguration>
