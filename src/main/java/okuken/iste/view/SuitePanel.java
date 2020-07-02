@@ -9,6 +9,7 @@ import okuken.iste.consts.Captions;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.option.TestPanel;
+import okuken.iste.view.option.UserOptionsPanel;
 
 public class SuitePanel extends JPanel {
 
@@ -61,6 +62,9 @@ public class SuitePanel extends JPanel {
 		JPanel optionsPanel = new JPanel();
 		tabbedPane.addTab(Captions.TAB_OPTIONS, null, optionsPanel, null);
 		optionsPanel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel userOptionsPanel = new UserOptionsPanel();
+		optionsPanel.add(userOptionsPanel, BorderLayout.CENTER);
 		
 		JPanel panel_1 = new TestPanel();
 		optionsPanel.add(panel_1, BorderLayout.NORTH);

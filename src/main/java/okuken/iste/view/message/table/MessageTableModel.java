@@ -33,6 +33,14 @@ public class MessageTableModel extends AbstractTableModel {
 		fireTableRowsInserted(insertedRowIndex, insertedRowIndex);
 	}
 
+	public void clearRows() {
+		int rowCount = getRowCount();
+		if(rowCount > 0) {
+			this.rows.clear();
+			fireTableRowsDeleted(0, rowCount - 1);
+		}
+	}
+
 	public MessageDto getRow(int rowIndex) {
 		return rows.get(rowIndex);
 	}

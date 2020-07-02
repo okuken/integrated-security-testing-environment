@@ -81,6 +81,17 @@ public class Controller {
 		});
 	}
 
+	public void loadDatabase() {
+		this.messageTableModel.addRows(MessageLogic.getInstance().loadMessages());
+	}
+
+	public void reloadDatabase() {
+		this.messageTableModel.clearRows();
+		this.requestMessageEditor.setMessage(new byte[] {}, true);
+		this.responseMessageEditor.setMessage(new byte[] {}, false);
+
+		loadDatabase();
+	}
 
 //For test
 	public void test1() {

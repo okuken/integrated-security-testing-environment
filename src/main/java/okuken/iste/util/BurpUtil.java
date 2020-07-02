@@ -1,9 +1,13 @@
 package okuken.iste.util;
 
+import java.awt.Frame;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
+import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
 import burp.IBurpExtenderCallbacks;
@@ -52,6 +56,12 @@ public class BurpUtil {
 			}
 		}
 		throw new IllegalStateException();
+	}
+
+	public static JFrame getBurpSuiteJFrame() {
+		return (JFrame) Arrays.stream(Frame.getFrames())
+				.filter(frame -> frame.isVisible() && frame.getTitle().startsWith(("Burp Suite")))
+				.collect(Collectors.toList()).get(0);
 	}
 
 }

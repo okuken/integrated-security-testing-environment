@@ -28,7 +28,7 @@ public class DatabaseManager {
 
 	public void setupDatabase(String sqliteDbFilePath) {
 		try {
-			this.dataSource = createDataSource(sqliteDbFilePath);
+			this.dataSource = createDataSource(sqliteDbFilePath.replaceAll("\\\\", "/"));
 			this.sqlSessionFactory = createSqlSessionFactory();
 			if (judgeIsNeedInitDatabase()) {
 				initDatabase();
@@ -74,6 +74,11 @@ public class DatabaseManager {
 						"CREATE TABLE IF NOT EXISTS STM_MSG (ID INTEGER, NAME TEXT, URL TEXT)");
 			}
 		}
+	}
+
+	public void changeDatabase(String sqliteDbFilePath) {
+		unloadDatabase();
+		setupDatabase(sqliteDbFilePath);
 	}
 
 	public void unloadDatabase() {
