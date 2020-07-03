@@ -8,7 +8,6 @@ import org.mybatis.dynamic.sql.SqlBuilder;
 import org.mybatis.dynamic.sql.select.SelectDSLCompleter;
 
 import burp.IHttpRequestResponse;
-import burp.IHttpService;
 import burp.IParameter;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dao.MessageMapper;
@@ -17,6 +16,8 @@ import okuken.iste.dao.MessageRawDynamicSqlSupport;
 import okuken.iste.dao.MessageRawMapper;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageParamDto;
+import okuken.iste.dto.burp.HttpRequestResponseMock;
+import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.entity.Message;
 import okuken.iste.entity.MessageParam;
 import okuken.iste.entity.MessageRaw;
@@ -157,17 +158,10 @@ public class MessageLogic {
 						.get();
 			}
 
-			IHttpRequestResponse httpRequestResponse = BurpUtil.getCallbacks().makeHttpRequest(
-					new IHttpService() {
-						@Override
-						public String getProtocol() { return messageRaw.getProtocol();}
-						@Override
-						public int getPort() {return messageRaw.getPort();}
-						@Override
-						public String getHost() {return messageRaw.getHost();}
-					},
-					messageRaw.getRequest());
-			httpRequestResponse.setResponse(messageRaw.getResponse());
+			IHttpRequestResponse httpRequestResponse = new HttpRequestResponseMock(
+					messageRaw.getRequest(),
+					messageRaw.getResponse(),
+					new HttpServiceMock(messageRaw.getHost(), messageRaw.getPort(), messageRaw.getProtocol()));
 
 			dto.setMessage(httpRequestResponse);
 			dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(httpRequestResponse)); //TODO: share implementation...

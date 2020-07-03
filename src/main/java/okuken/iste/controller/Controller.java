@@ -2,7 +2,6 @@ package okuken.iste.controller;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import javax.swing.JTable;
@@ -65,20 +64,14 @@ public class Controller {
 		return this.messageTableModel.getRow(this.messageTable.getSelectedRow());
 	}
 
-	public void refreshRequestDetailPanel() {//TODO: ***synchronize or loading block***
+	public void refreshRequestDetailPanel() {
 		MessageDto dto = getSelectedMessage();
-
-		if(dto.getMessage() != null) {
-			this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
-			this.responseMessageEditor.setMessage(dto.getMessage().getResponse(), false);
-			return;
+		if(dto.getMessage() == null) {
+			MessageLogic.getInstance().loadMessageDetail(dto);
 		}
 
-		Executors.newSingleThreadExecutor().submit(() -> {
-			MessageLogic.getInstance().loadMessageDetail(dto);
-			this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
-			this.responseMessageEditor.setMessage(dto.getMessage().getResponse(), false);
-		});
+		this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
+		this.responseMessageEditor.setMessage(dto.getMessage().getResponse(), false);
 	}
 
 	public void loadDatabase() {
