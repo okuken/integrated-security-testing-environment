@@ -12,6 +12,9 @@ public class Captions {
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";
 
+	public static final String SELECT_PROJECT_NEW = "** Create new project **";
+
 	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose a SQLite database file for IntegratedSecurityTestEnvironment(ISTE).";
+	public static final String MESSAGE_SELECT_PROJECT = "Select a project for IntegratedSecurityTestEnvironment(ISTE).";
 
 }

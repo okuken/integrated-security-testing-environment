@@ -5,11 +5,11 @@ import java.util.stream.Collectors;
 
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.dynamic.sql.SqlBuilder;
-import org.mybatis.dynamic.sql.select.SelectDSLCompleter;
 
 import burp.IHttpRequestResponse;
 import burp.IParameter;
 import okuken.iste.DatabaseManager;
+import okuken.iste.dao.MessageDynamicSqlSupport;
 import okuken.iste.dao.MessageMapper;
 import okuken.iste.dao.MessageParamMapper;
 import okuken.iste.dao.MessageRawDynamicSqlSupport;
@@ -84,7 +84,7 @@ public class MessageLogic {
 
 					//TODO: auto convert
 					Message message = new Message();
-					message.setFkProjectId(1);//TODO
+					message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
 					message.setFkMessageRawId(messageRawId);
 					message.setName(dto.getName());
 					message.setUrl(dto.getUrl());
@@ -125,7 +125,8 @@ public class MessageLogic {
 			List<Message> messages;
 			try (SqlSession session = DatabaseManager.getInstance().getSessionFactory().openSession()) {
 				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
-				messages = messageMapper.select(SelectDSLCompleter.allRows());//TODO: where fk_project_id = XXXX
+				messages = messageMapper.select(c -> c.where(MessageDynamicSqlSupport.fkProjectId,
+						SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
 			}
 
 			return messages.stream().map(message -> { //TODO:converter

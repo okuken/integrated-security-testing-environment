@@ -7,6 +7,7 @@ import okuken.iste.DatabaseManager;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.logic.ProjectLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 
@@ -78,6 +79,7 @@ public class UserOptionsPanel extends JPanel {
 				String dbFilePath = dbFileTextField.getText();
 				ConfigLogic.getInstance().saveDbFilePath(dbFilePath);
 				DatabaseManager.getInstance().changeDatabase(dbFilePath);
+				ProjectLogic.getInstance().selectProject();
 				Controller.getInstance().reloadDatabase();
 			}
 		});

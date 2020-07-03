@@ -3,6 +3,8 @@ package okuken.iste.logic;
 import java.io.File;
 import java.util.Optional;
 
+import okuken.iste.dto.ProcessOptionsDto;
+import okuken.iste.dto.ProjectDto;
 import okuken.iste.dto.UserOptionsDto;
 import okuken.iste.util.BurpUtil;
 
@@ -14,6 +16,7 @@ public class ConfigLogic {
 	private static final String CONFIG_KEY_DB_FILE_PATH = "dbFilePath";
 
 	private UserOptionsDto configDto;
+	private ProcessOptionsDto processOptionsDto = new ProcessOptionsDto();
 
 	private ConfigLogic() {}
 	public static ConfigLogic getInstance() {
@@ -46,6 +49,19 @@ public class ConfigLogic {
 	public void saveDbFilePath(String dbFilePath) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_DB_FILE_PATH, dbFilePath);
 		getUserOptions().setDbFilePath(dbFilePath);
+	}
+
+
+
+	public ProcessOptionsDto getProcessOptions() {
+		return processOptionsDto;
+	}
+	public Integer getProjectId() {
+		return getProcessOptions().getProjectDto().getId();
+	}
+
+	public void setProject(ProjectDto projectDto) {
+		this.processOptionsDto.setProjectDto(projectDto);
 	}
 
 }

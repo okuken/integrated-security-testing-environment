@@ -11,6 +11,7 @@ import burp.IExtensionStateListener;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.logic.ProjectLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.view.ContextMenuFactory;
@@ -20,24 +21,30 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 	@Override
 	public void registerExtenderCallbacks(IBurpExtenderCallbacks burpExtenderCallbacks) {
 		BurpUtil.init(burpExtenderCallbacks);
+		try {
+			burpExtenderCallbacks.setExtensionName(Captions.EXTENSION_NAME);
 
-		burpExtenderCallbacks.setExtensionName(Captions.EXTENSION_NAME);
+			burpExtenderCallbacks.registerContextMenuFactory(ContextMenuFactory.create());
 
-		burpExtenderCallbacks.registerContextMenuFactory(ContextMenuFactory.create());
+			burpExtenderCallbacks.registerExtensionStateListener(this);
 
-		burpExtenderCallbacks.registerExtensionStateListener(this);
+			setupDatabase();
+			ProjectLogic.getInstance().selectProject();
 
-		setupDatabase();
+			SwingUtilities.invokeLater(() -> {
+				SuiteTab suiteTab = new SuiteTab();
 
-		SwingUtilities.invokeLater(() -> {
-			SuiteTab suiteTab = new SuiteTab();
+				Controller controller = Controller.getInstance();
+				controller.setSuiteTab(suiteTab);
+				controller.loadDatabase();
 
-			Controller controller = Controller.getInstance();
-			controller.setSuiteTab(suiteTab);
-			controller.loadDatabase();
+				burpExtenderCallbacks.addSuiteTab(suiteTab);
+			});
 
-			burpExtenderCallbacks.addSuiteTab(suiteTab);
-		});
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void setupDatabase() {
