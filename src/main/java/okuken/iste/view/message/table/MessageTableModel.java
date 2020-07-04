@@ -78,6 +78,7 @@ public class MessageTableModel extends AbstractTableModel {
 				MessageDto dto = rows.get(rowIndex); 
 				dto.setName((String)val);
 				MessageLogic.getInstance().updateMessage(dto);
+				break;
 			}
 			default:
 				throw new IllegalArgumentException();
@@ -107,16 +108,16 @@ public class MessageTableModel extends AbstractTableModel {
 				return Integer.toString(row.getParams());
 			}
 			case STATUS: {
-				return Short.toString(row.getStatus());
+				return row.getStatus() != null ? Short.toString(row.getStatus()) : "";
 			}
 			case LENGTH: {
-				return Integer.toString(row.getLength());
+				return row.getLength() != null ? Integer.toString(row.getLength()) : "";
 			}
 			case MIME_TYPE: {
-				return row.getMimeType();
+				return row.getMimeType() != null ? row.getMimeType() : "";
 			}
 			case COOKIES: {
-				return row.getCookies();
+				return row.getCookies() != null ? row.getCookies() : "";
 			}
 			default: {
 				return "";

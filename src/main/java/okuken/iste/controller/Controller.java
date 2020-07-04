@@ -1,6 +1,5 @@
 package okuken.iste.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,9 +47,9 @@ public class Controller {
 	}
 
 
-	public void sendMessagesToSuiteTab(IHttpRequestResponse[] messages) {
+	public void sendMessagesToSuiteTab(List<IHttpRequestResponse> messages) {
 		BurpUtil.highlightTab(suiteTab);
-		List<MessageDto> messageDtos = Arrays.stream(messages)
+		List<MessageDto> messageDtos = messages.stream()
 				.map(message -> MessageLogic.getInstance().convertHttpRequestResponseToDto(message))
 				.collect(Collectors.toList());
 		MessageLogic.getInstance().saveMessages(messageDtos);
@@ -71,7 +70,9 @@ public class Controller {
 		}
 
 		this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
-		this.responseMessageEditor.setMessage(dto.getMessage().getResponse(), false);
+		this.responseMessageEditor.setMessage(
+				dto.getMessage().getResponse() != null ? dto.getMessage().getResponse() : new byte[] {},
+				false);
 	}
 
 	public void loadDatabase() {

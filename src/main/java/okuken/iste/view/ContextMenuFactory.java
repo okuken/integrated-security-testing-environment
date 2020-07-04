@@ -3,6 +3,7 @@ package okuken.iste.view;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JMenuItem;
 
@@ -32,8 +33,10 @@ public class ContextMenuFactory implements IContextMenuFactory {
 	private JMenuItem createSendToMenu(IHttpRequestResponse[] selectedMessages) {
 		JMenuItem ret = new JMenuItem(Captions.CONTEXT_MENU_SEND_TO);
 
-		ret.addActionListener((ActionEvent e)->{
-			Controller.getInstance().sendMessagesToSuiteTab(selectedMessages);
+		ret.addActionListener((ActionEvent e) -> {
+			Controller.getInstance().sendMessagesToSuiteTab(Arrays.stream(selectedMessages)
+					.filter(message -> message.getRequest() != null)
+					.collect(Collectors.toList()));
 		});
 
 		return ret;

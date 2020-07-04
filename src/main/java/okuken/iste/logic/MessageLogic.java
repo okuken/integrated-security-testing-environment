@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.mybatis.dynamic.sql.SqlBuilder;
 
 import burp.IHttpRequestResponse;
+import burp.IHttpService;
 import burp.IParameter;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dao.MessageDynamicSqlSupport;
@@ -32,27 +33,45 @@ public class MessageLogic {
 		return instance;
 	}
 
-	public MessageDto convertHttpRequestResponseToDto(IHttpRequestResponse message) { //TODO: externalize to converter
+	public MessageDto convertHttpRequestResponseToDto(IHttpRequestResponse httpRequestResponse) { //TODO: externalize to converter
+
+		IHttpRequestResponse message = convertOriginalToMock(httpRequestResponse);
+
 		MessageDto dto = new MessageDto();
 		dto.setMessage(message);
 		dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(message));
-		dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(message.getResponse()));
 
 		dto.setName(message.getComment());
 		dto.setMethod(dto.getRequestInfo().getMethod());
 		dto.setUrl(dto.getRequestInfo().getUrl().toExternalForm());
 		dto.setParams(dto.getRequestInfo().getParameters().size());
-		dto.setStatus(dto.getResponseInfo().getStatusCode());
-		dto.setLength(dto.getMessage().getResponse().length);
-		dto.setMimeType(dto.getResponseInfo().getStatedMimeType());
-		dto.setCookies(dto.getResponseInfo().getCookies().stream()
-				.map(cookie -> String.format("%s=%s;", cookie.getName(), cookie.getValue()))
-				.collect(Collectors.joining("; ")));
 
 		dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
 				.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
 
+		if(message.getResponse() != null) {
+			dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(message.getResponse()));
+			dto.setStatus(dto.getResponseInfo().getStatusCode());
+			dto.setLength(dto.getMessage().getResponse().length);
+			dto.setMimeType(dto.getResponseInfo().getStatedMimeType());
+			dto.setCookies(dto.getResponseInfo().getCookies().stream()
+					.map(cookie -> String.format("%s=%s;", cookie.getName(), cookie.getValue()))
+					.collect(Collectors.joining("; ")));
+		}
+
 		return dto;
+	}
+	private IHttpRequestResponse convertOriginalToMock(IHttpRequestResponse httpRequestResponse) {
+		IHttpService httpService = httpRequestResponse.getHttpService();
+		IHttpRequestResponse ret = new HttpRequestResponseMock(
+				httpRequestResponse.getRequest(),
+				httpRequestResponse.getResponse(),
+				new HttpServiceMock(httpService.getHost(), httpService.getPort(), httpService.getProtocol()));
+
+		ret.setComment(httpRequestResponse.getComment());
+		ret.setHighlight(httpRequestResponse.getHighlight());
+
+		return ret;
 	}
 
 	public MessageParamDto convertParameterToDto(IParameter parameter) { //TODO: externalize to converter
@@ -90,7 +109,7 @@ public class MessageLogic {
 					message.setUrl(dto.getUrl());
 					message.setMethod(dto.getMethod());
 					message.setParams(dto.getParams());
-					message.setStatus(dto.getStatus().intValue());
+					message.setStatus(dto.getStatus());
 					message.setLength(dto.getLength());
 					message.setMimeType(dto.getMimeType());
 					message.setCookies(dto.getCookies());
@@ -164,7 +183,7 @@ public class MessageLogic {
 				dto.setUrl(message.getUrl());
 				dto.setMethod(message.getMethod());
 				dto.setParams(message.getParams());
-				dto.setStatus(message.getStatus().shortValue());
+				dto.setStatus(message.getStatus());
 				dto.setLength(message.getLength());
 				dto.setMimeType(message.getMimeType());
 				dto.setCookies(message.getCookies());
@@ -195,7 +214,9 @@ public class MessageLogic {
 
 			dto.setMessage(httpRequestResponse);
 			dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(httpRequestResponse)); //TODO: share implementation...
-			dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(httpRequestResponse.getResponse()));
+			if(httpRequestResponse.getResponse() != null) {
+				dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(httpRequestResponse.getResponse()));
+			}
 
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);
