@@ -5,6 +5,7 @@ import java.util.List;
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
+import okuken.iste.logic.MessageLogic;
 
 public class MessageDto {
 
@@ -94,6 +95,9 @@ public class MessageDto {
 		this.messageRawId = messageRawId;
 	}
 	public IHttpRequestResponse getMessage() {
+		if(message == null) {
+			MessageLogic.getInstance().loadMessageDetail(this);
+		}
 		return message;
 	}
 	public void setMessage(IHttpRequestResponse message) {

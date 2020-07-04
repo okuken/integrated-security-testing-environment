@@ -1,5 +1,6 @@
 package okuken.iste.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,16 +60,18 @@ public class Controller {
 	public boolean judgeIsMessageSelected() {
 		return this.messageTable.getSelectedRow() >= 0;
 	}
+	/**
+	 * @return top of selected messages
+	 */
 	public MessageDto getSelectedMessage() {
 		return this.messageTableModel.getRow(this.messageTable.getSelectedRow());
 	}
+	public List<MessageDto> getSelectedMessages() {
+		int[] selectedRows = this.messageTable.getSelectedRows();
+		return Arrays.stream(selectedRows).mapToObj(i -> messageTableModel.getRow(i)).collect(Collectors.toList());
+	}
 
-	public void refreshRequestDetailPanel() {
-		MessageDto dto = getSelectedMessage();
-		if(dto.getMessage() == null) {
-			MessageLogic.getInstance().loadMessageDetail(dto);
-		}
-
+	public void refreshRequestDetailPanel(MessageDto dto) {
 		this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
 		this.responseMessageEditor.setMessage(
 				dto.getMessage().getResponse() != null ? dto.getMessage().getResponse() : new byte[] {},

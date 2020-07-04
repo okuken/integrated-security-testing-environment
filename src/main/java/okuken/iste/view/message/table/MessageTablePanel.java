@@ -26,11 +26,12 @@ public class MessageTablePanel extends JPanel {
 			@Override
 			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
 				super.changeSelection(row, col, toggle, extend);
-				Controller.getInstance().refreshRequestDetailPanel();
+				Controller.getInstance().refreshRequestDetailPanel(tableModel.getRow(row));
 			}
 		};
 		setupColumnWidth(table, tableModel);
 		setupDraggable(table);
+		table.setComponentPopupMenu(new MessageTablePopupMenu());
 		Controller.getInstance().setMessageTable(table);	
 
 		JScrollPane scrollPane = new JScrollPane(table);
