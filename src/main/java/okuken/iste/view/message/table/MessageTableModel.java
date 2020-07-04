@@ -7,6 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import com.google.common.collect.Lists;
 
 import okuken.iste.dto.MessageDto;
+import okuken.iste.logic.MessageLogic;
 
 public class MessageTableModel extends AbstractTableModel {
 
@@ -72,7 +73,15 @@ public class MessageTableModel extends AbstractTableModel {
 
 	@Override
 	public void setValueAt(Object val, int rowIndex, int columnIndex) {
-		rows.get(rowIndex).setName((String)val);
+		switch(COLUMNS[columnIndex]) {
+			case NAME: {
+				MessageDto dto = rows.get(rowIndex); 
+				dto.setName((String)val);
+				MessageLogic.getInstance().updateMessage(dto);
+			}
+			default:
+				throw new IllegalArgumentException();
+		}
 	}
 
 	public int getDefaultColumnWidth(int columnIndex) {

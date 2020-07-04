@@ -97,6 +97,7 @@ public class MessageLogic {
 					message.setPrcDate(now);
 					messageMapper.insert(message); //TODO: generated id is not returned...
 					int messageId = SqlUtil.loadGeneratedId(session);
+					dto.setId(messageId);
 
 					for(MessageParamDto paramDto: dto.getMessageParamList()) {
 						//TODO: auto convert
@@ -120,6 +121,33 @@ public class MessageLogic {
 		//TODO: rollback controll???
 	}
 
+	/**
+	 * It only updates editable fields: name.
+	 * @param dto MessageDto. id is required.
+	 */
+	public void updateMessage(MessageDto dto) {
+		try {
+			String now = SqlUtil.now();
+			try (SqlSession session = DatabaseManager.getInstance().getSessionFactory().openSession()) {
+				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
+
+				//TODO: auto convert
+				Message message = new Message();
+				message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
+				message.setId(dto.getId());
+				message.setName(dto.getName());
+				message.setPrcDate(now);
+				messageMapper.updateByPrimaryKeySelective(message);
+
+				session.commit();
+			}
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw e;
+		}
+		//TODO: rollback controll???
+	}
+
 	public List<MessageDto> loadMessages() {
 		try {
 			List<Message> messages;
@@ -131,6 +159,7 @@ public class MessageLogic {
 
 			return messages.stream().map(message -> { //TODO:converter
 				MessageDto dto = new MessageDto();
+				dto.setId(message.getId());
 				dto.setName(message.getName());
 				dto.setUrl(message.getUrl());
 				dto.setMethod(message.getMethod());

@@ -8,6 +8,8 @@ import burp.IResponseInfo;
 
 public class MessageDto {
 
+	private Integer id;
+
 	private String name;
 
 	private String method;
@@ -25,6 +27,12 @@ public class MessageDto {
 	private IRequestInfo requestInfo;
 	private IResponseInfo responseInfo;
 
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
 	public String getName() {
 		return name;
 	}
