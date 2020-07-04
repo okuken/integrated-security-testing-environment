@@ -67,6 +67,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 	@Override
 	public void extensionUnloaded() {
 		DatabaseManager.getInstance().unloadDatabase();
+		Controller.getInstance().disposeDockoutFrame();
 	}
 
 }

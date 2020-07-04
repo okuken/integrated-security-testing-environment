@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
 import burp.IHttpRequestResponse;
@@ -19,6 +22,10 @@ public class Controller {
 	private static final Controller instance = new Controller();
 
 	private SuiteTab suiteTab;
+	private JTabbedPane mainTabbedPane;
+	private JPanel mainPanel;
+
+	private JFrame dockoutFrame;
 
 	private MessageTableModel messageTableModel;
 	private JTable messageTable;
@@ -33,6 +40,21 @@ public class Controller {
 	
 	public void setSuiteTab(SuiteTab suiteTab) {
 		this.suiteTab = suiteTab;
+	}
+	public void setMainTabbedPane(JTabbedPane mainTabbedPane) {
+		this.mainTabbedPane = mainTabbedPane;
+	}
+	public JTabbedPane getMainTabbedPane() {
+		return mainTabbedPane;
+	}
+	public void setMainPanel(JPanel mainPanel) {
+		this.mainPanel = mainPanel;
+	}
+	public JPanel getMainPanel() {
+		return this.mainPanel;
+	}
+	public void setDockoutFrame(JFrame dockoutFrame) {
+		this.dockoutFrame = dockoutFrame;
 	}
 	public void setMessageTableModel(MessageTableModel messageTableModel) {
 		this.messageTableModel = messageTableModel;
@@ -88,6 +110,12 @@ public class Controller {
 		this.responseMessageEditor.setMessage(new byte[] {}, false);
 
 		loadDatabase();
+	}
+
+	public void disposeDockoutFrame() {
+		if(dockoutFrame != null) {
+			dockoutFrame.dispose();
+		}
 	}
 
 //For test

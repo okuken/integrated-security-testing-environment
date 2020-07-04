@@ -9,6 +9,8 @@ public class Captions {
 	public static final String TAB_MAIN = "List";
 	public static final String TAB_OPTIONS = "Options";
 
+	public static final String MAIN_HEADER_BUTTON_DOCKOUT = "\u2197";
+
 	public static final String TABLE_CONTEXT_MENU_DO_PASSIVE_SCAN = "Do passive scan";
 	public static final String TABLE_CONTEXT_MENU_DO_ACTIVE_SCAN = "Do active scan";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_INTRUDER = "Send to Intruder";

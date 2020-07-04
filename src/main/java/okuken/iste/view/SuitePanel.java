@@ -6,6 +6,8 @@ import java.awt.BorderLayout;
 import javax.swing.JSplitPane;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.controller.Controller;
+import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.option.TestPanel;
@@ -18,12 +20,17 @@ public class SuitePanel extends JPanel {
 	public SuitePanel() {
 		setLayout(new BorderLayout(0, 0));
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		add(tabbedPane);
+		JTabbedPane mainTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		add(mainTabbedPane);
+		Controller.getInstance().setMainTabbedPane(mainTabbedPane);
 		
 		JPanel mainPanel = new JPanel();
-		tabbedPane.addTab(Captions.TAB_MAIN, null, mainPanel, null);
+		mainTabbedPane.addTab(Captions.TAB_MAIN, null, mainPanel, null);
 		mainPanel.setLayout(new BorderLayout(0, 0));
+		Controller.getInstance().setMainPanel(mainPanel);
+		
+		JPanel mainHeaderPanel = new MainHeaderPanel();
+		mainPanel.add(mainHeaderPanel, BorderLayout.NORTH);
 		
 		JSplitPane mainSplitPane = new JSplitPane();
 		mainPanel.add(mainSplitPane);
@@ -60,7 +67,7 @@ public class SuitePanel extends JPanel {
 		mainRightSplitPane.setRightComponent(messageAttrMemoPanel);
 		
 		JPanel optionsPanel = new JPanel();
-		tabbedPane.addTab(Captions.TAB_OPTIONS, null, optionsPanel, null);
+		mainTabbedPane.addTab(Captions.TAB_OPTIONS, null, optionsPanel, null);
 		optionsPanel.setLayout(new BorderLayout(0, 0));
 		
 		JPanel userOptionsPanel = new UserOptionsPanel();
