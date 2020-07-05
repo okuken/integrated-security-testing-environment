@@ -34,6 +34,18 @@ public class MessageTableModel extends AbstractTableModel {
 		fireTableRowsInserted(insertedRowIndex, insertedRowIndex);
 	}
 
+	public void insertRows(int rowIndex, List<MessageDto> messageDtos) {
+		for(int i = 0; i < messageDtos.size(); i++) {
+			this.rows.add(rowIndex + i, messageDtos.get(i));
+		}
+		fireTableRowsInserted(rowIndex, rowIndex + messageDtos.size() - 1);
+	}
+
+	public void removeRow(int rowIndex) {
+		this.rows.remove(rowIndex);
+		fireTableRowsDeleted(rowIndex, rowIndex);
+	}
+
 	public void clearRows() {
 		int rowCount = getRowCount();
 		if(rowCount > 0) {

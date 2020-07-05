@@ -7,6 +7,7 @@ import javax.swing.DropMode;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
 import okuken.iste.controller.Controller;
@@ -30,7 +31,7 @@ public class MessageTablePanel extends JPanel {
 			}
 		};
 		setupColumnWidth(table, tableModel);
-		setupDraggable(table);
+		setupDraggable(table, tableModel);
 		table.setComponentPopupMenu(new MessageTablePopupMenu());
 		Controller.getInstance().setMessageTable(table);	
 
@@ -48,9 +49,10 @@ public class MessageTablePanel extends JPanel {
 		}
 	}
 
-	private void setupDraggable(JTable table) {
+	private void setupDraggable(JTable table, MessageTableModel messageTableModel) {
 		table.setDragEnabled(true);
 		table.setDropMode(DropMode.INSERT_ROWS);
-//		table.setTransferHandler;//TODO: implement
+		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		table.setTransferHandler(new MessageTableTransferHandler(table, messageTableModel));
 	}
 }
