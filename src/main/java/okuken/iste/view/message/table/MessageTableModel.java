@@ -54,6 +54,10 @@ public class MessageTableModel extends AbstractTableModel {
 		}
 	}
 
+	public List<MessageDto> getRows() {
+		return rows;
+	}
+
 	public MessageDto getRow(int rowIndex) {
 		return rows.get(rowIndex);
 	}

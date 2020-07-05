@@ -77,6 +77,7 @@ public class Controller {
 				.collect(Collectors.toList());
 		MessageLogic.getInstance().saveMessages(messageDtos);
 		this.messageTableModel.addRows(messageDtos);
+		MessageLogic.getInstance().saveMessageOrder(this.messageTableModel.getRows()); // TODO: join transaction...
 	}
 
 	public boolean judgeIsMessageSelected() {
@@ -101,7 +102,12 @@ public class Controller {
 	}
 
 	public void loadDatabase() {
-		this.messageTableModel.addRows(MessageLogic.getInstance().loadMessages());
+		List<Integer> messageOrder = MessageLogic.getInstance().loadMessageOrder();
+		List<MessageDto> messageDtos = MessageLogic.getInstance().loadMessages();
+
+		this.messageTableModel.addRows(messageOrder.stream()
+				.map(messageId -> messageDtos.stream().filter(dto -> dto.getId().equals(messageId)).findFirst().get())
+				.collect(Collectors.toList()));
 	}
 
 	public void reloadDatabase() {
@@ -120,7 +126,7 @@ public class Controller {
 
 //For test
 	public void test1() {
-		this.messageTableModel.addRows(MessageLogic.getInstance().loadMessages());
+		loadDatabase();
 	}
 
 }

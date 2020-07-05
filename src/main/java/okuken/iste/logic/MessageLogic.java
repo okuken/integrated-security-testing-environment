@@ -1,10 +1,14 @@
 package okuken.iste.logic;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.dynamic.sql.SqlBuilder;
+
+import com.google.common.collect.Lists;
 
 import burp.IHttpRequestResponse;
 import burp.IHttpService;
@@ -12,6 +16,8 @@ import burp.IParameter;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dao.MessageDynamicSqlSupport;
 import okuken.iste.dao.MessageMapper;
+import okuken.iste.dao.MessageOrdDynamicSqlSupport;
+import okuken.iste.dao.MessageOrdMapper;
 import okuken.iste.dao.MessageParamMapper;
 import okuken.iste.dao.MessageRawDynamicSqlSupport;
 import okuken.iste.dao.MessageRawMapper;
@@ -20,6 +26,7 @@ import okuken.iste.dto.MessageParamDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.entity.Message;
+import okuken.iste.entity.MessageOrd;
 import okuken.iste.entity.MessageParam;
 import okuken.iste.entity.MessageRaw;
 import okuken.iste.util.BurpUtil;
@@ -195,6 +202,61 @@ public class MessageLogic {
 			BurpUtil.printStderr(e);
 			throw e;
 		}
+	}
+
+	public List<Integer> loadMessageOrder() {
+		try {
+			try (SqlSession session = DatabaseManager.getInstance().getSessionFactory().openSession()) {
+				MessageOrdMapper messageOrdMapper = session.getMapper(MessageOrdMapper.class);
+				Optional<MessageOrd> messageOrd = messageOrdMapper
+						.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+
+				if(messageOrd.isEmpty()) {
+					return Lists.newArrayList();
+				}
+				return Arrays.stream(messageOrd.get().getOrd().split(","))
+						.map(Integer::valueOf)
+						.collect(Collectors.toList());
+			}
+
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw e;
+		}
+	}
+
+	public void saveMessageOrder(List<MessageDto> dtos) {
+		try {
+			String order = dtos.stream().map(dto -> dto.getId().toString()).collect(Collectors.joining(","));
+			String now = SqlUtil.now();
+			try (SqlSession session = DatabaseManager.getInstance().getSessionFactory().openSession()) {
+				MessageOrdMapper messageOrdMapper = session.getMapper(MessageOrdMapper.class);
+
+				Optional<MessageOrd> messageOrd = messageOrdMapper
+						.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId,
+								SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+
+				//TODO: auto convert, share impl
+				if (messageOrd.isPresent()) {
+					MessageOrd entity = messageOrd.get();
+					entity.setOrd(order);
+					entity.setPrcDate(now);
+					messageOrdMapper.updateByPrimaryKeySelective(entity);
+				} else {
+					MessageOrd entity = new MessageOrd();
+					entity.setFkProjectId(ConfigLogic.getInstance().getProjectId());
+					entity.setOrd(order);
+					entity.setPrcDate(now);
+					messageOrdMapper.insert(entity);
+				}
+
+				session.commit();
+			}
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw e;
+		}
+		//TODO: rollback controll???
 	}
 
 	public void loadMessageDetail(MessageDto dto) {

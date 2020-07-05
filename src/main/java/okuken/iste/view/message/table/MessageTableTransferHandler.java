@@ -14,6 +14,7 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
 import okuken.iste.dto.MessageDto;
+import okuken.iste.logic.MessageLogic;
 
 public class MessageTableTransferHandler extends TransferHandler {
 
@@ -91,6 +92,8 @@ public class MessageTableTransferHandler extends TransferHandler {
 
 		Collections.reverse(selectedRowAfterIndexs);
 		selectedRowAfterIndexs.stream().forEach(selectedRowAfterIndex -> messageTableModel.removeRow(selectedRowAfterIndex));
+
+		MessageLogic.getInstance().saveMessageOrder(messageTableModel.getRows());
 	}
 
 	@Override
