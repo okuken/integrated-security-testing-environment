@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import okuken.iste.controller.Controller;
@@ -34,6 +35,10 @@ public class MessageTablePanel extends JPanel {
 		setupDraggable(table, tableModel);
 		table.setComponentPopupMenu(new MessageTablePopupMenu());
 		Controller.getInstance().setMessageTable(table);	
+
+		SwingUtilities.invokeLater(() -> { // run after IBurpExtenderCallbacks#customizeUiComponent().
+			table.getTableHeader().setReorderingAllowed(true);
+		});
 
 		JScrollPane scrollPane = new JScrollPane(table);
 
