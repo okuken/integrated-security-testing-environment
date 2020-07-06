@@ -113,6 +113,7 @@ public class MessageLogic {
 					message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
 					message.setFkMessageRawId(messageRawId);
 					message.setName(dto.getName());
+					message.setRemark(dto.getRemark());
 					message.setUrl(dto.getUrl());
 					message.setMethod(dto.getMethod());
 					message.setParams(dto.getParams());
@@ -162,6 +163,7 @@ public class MessageLogic {
 				message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
 				message.setId(dto.getId());
 				message.setName(dto.getName());
+				message.setRemark(dto.getRemark());
 				message.setPrcDate(now);
 				messageMapper.updateByPrimaryKeySelective(message);
 
@@ -187,6 +189,7 @@ public class MessageLogic {
 				MessageDto dto = new MessageDto();
 				dto.setId(message.getId());
 				dto.setName(message.getName());
+				dto.setRemark(message.getRemark());
 				dto.setUrl(message.getUrl());
 				dto.setMethod(message.getMethod());
 				dto.setParams(message.getParams());

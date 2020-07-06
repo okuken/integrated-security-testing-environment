@@ -12,6 +12,7 @@ public class MessageDto {
 	private Integer id;
 
 	private String name;
+	private String remark;
 
 	private String method;
 	private String url;
@@ -39,6 +40,12 @@ public class MessageDto {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 	public String getMethod() {
 		return method;

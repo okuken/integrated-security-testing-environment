@@ -16,6 +16,7 @@ public class MessageTableModel extends AbstractTableModel {
 	private static final MessageTableColumn[] COLUMNS = {
 			MessageTableColumn.NAME,
 			MessageTableColumn.URL,
+			MessageTableColumn.REMARK,
 			MessageTableColumn.METHOD,
 			MessageTableColumn.PARAMS,
 			MessageTableColumn.STATUS,
@@ -96,6 +97,12 @@ public class MessageTableModel extends AbstractTableModel {
 				MessageLogic.getInstance().updateMessage(dto);
 				break;
 			}
+			case REMARK: {
+				MessageDto dto = rows.get(rowIndex); 
+				dto.setRemark((String)val);
+				MessageLogic.getInstance().updateMessage(dto);
+				break;
+			}
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -113,6 +120,9 @@ public class MessageTableModel extends AbstractTableModel {
 		switch(COLUMNS[columnIndex]) {
 			case NAME: {
 				return row.getName();
+			}
+			case REMARK: {
+				return row.getRemark();
 			}
 			case METHOD: {
 				return row.getMethod();

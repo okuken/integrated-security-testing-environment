@@ -3,6 +3,7 @@ package okuken.iste.view.message.table;
 public enum MessageTableColumn {
 
 	NAME		("Name",		400,	true),
+	REMARK		("Remark",		200,	true),
 	HOST		("Host",		100,	false),
 	METHOD		("Method",		40,		false),
 	URL			("URL",			300,	false),
