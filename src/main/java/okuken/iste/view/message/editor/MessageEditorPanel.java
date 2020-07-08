@@ -23,36 +23,10 @@ public class MessageEditorPanel extends JPanel {
 			return;
 		}
 
-		IMessageEditor requestMessageEditor = callbacks.createMessageEditor(new IMessageEditorController() {
-			@Override
-			public IHttpService getHttpService() {
-				return Controller.getInstance().getSelectedMessage().getMessage().getHttpService();
-			}
-			@Override
-			public byte[] getRequest() {
-				return Controller.getInstance().getSelectedMessage().getMessage().getRequest();
-			}
-			@Override
-			public byte[] getResponse() {
-				return null;
-			}
-		}, false);
+		IMessageEditor requestMessageEditor = createMessageEditor(callbacks);
 		Controller.getInstance().setRequestMessageEditor(requestMessageEditor);
 
-		IMessageEditor responseMessageEditor = callbacks.createMessageEditor(new IMessageEditorController() {
-			@Override
-			public IHttpService getHttpService() {
-				return Controller.getInstance().getSelectedMessage().getMessage().getHttpService();
-			}
-			@Override
-			public byte[] getRequest() {
-				return null;
-			}
-			@Override
-			public byte[] getResponse() {
-				return Controller.getInstance().getSelectedMessage().getMessage().getResponse();
-			}
-		}, false);
+		IMessageEditor responseMessageEditor = createMessageEditor(callbacks);
 		Controller.getInstance().setResponseMessageEditor(responseMessageEditor);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -63,5 +37,22 @@ public class MessageEditorPanel extends JPanel {
 
 		add(splitPane);
 	}
-	
+
+	private IMessageEditor createMessageEditor(IBurpExtenderCallbacks callbacks) {
+		return callbacks.createMessageEditor(new IMessageEditorController() {
+			@Override
+			public IHttpService getHttpService() {
+				return Controller.getInstance().getSelectedMessage().getMessage().getHttpService();
+			}
+			@Override
+			public byte[] getRequest() {
+				return Controller.getInstance().getSelectedMessage().getMessage().getRequest();
+			}
+			@Override
+			public byte[] getResponse() {
+				return Controller.getInstance().getSelectedMessage().getMessage().getResponse();
+			}
+		}, false);
+	}
+
 }
