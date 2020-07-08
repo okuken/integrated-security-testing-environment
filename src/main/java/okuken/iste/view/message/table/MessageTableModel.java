@@ -1,6 +1,10 @@
 package okuken.iste.view.message.table;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -57,6 +61,14 @@ public class MessageTableModel extends AbstractTableModel {
 
 	public List<MessageDto> getRows() {
 		return rows;
+	}
+
+	public String getRowsAsTsv(int[] rows) {
+		return Arrays.stream(rows).mapToObj(
+				row -> IntStream.range(0, COLUMNS.length).mapToObj(
+				column -> Optional.ofNullable(getValueAt(row, column)).orElse("").toString())
+				.collect(Collectors.joining("\t")))
+				.collect(Collectors.joining(System.lineSeparator()));
 	}
 
 	public MessageDto getRow(int rowIndex) {

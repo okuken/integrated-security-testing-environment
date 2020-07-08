@@ -17,6 +17,8 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_REPEATER = "Send to Repeater";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_REQUEST = "Send to Comparer (request)";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE = "Send to Comparer (response)";
+	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
+	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";

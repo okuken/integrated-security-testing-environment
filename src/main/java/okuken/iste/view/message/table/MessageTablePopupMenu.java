@@ -7,8 +7,10 @@ import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 import java.awt.event.ActionListener;
+import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 
 public class MessageTablePopupMenu extends JPopupMenu {
@@ -92,6 +94,26 @@ public class MessageTablePopupMenu extends JPopupMenu {
 			}
 		});
 		add(sendToComparerResponseMenuItem);
+
+		add(new JPopupMenu.Separator());
+
+		JMenuItem copyUrlMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_URL);
+		copyUrlMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessages().stream()
+						.map(messageDto -> messageDto.getUrl())
+						.collect(Collectors.joining(System.lineSeparator())));
+			}
+		});
+		add(copyUrlMenuItem);
+
+		JMenuItem copyTableMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_TABLE);
+		copyTableMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessagesForCopyToClipboad());
+			}
+		});
+		add(copyTableMenuItem);
 
 	}
 

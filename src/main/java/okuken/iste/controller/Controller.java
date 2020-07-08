@@ -94,6 +94,10 @@ public class Controller {
 		return Arrays.stream(selectedRows).mapToObj(i -> messageTableModel.getRow(i)).collect(Collectors.toList());
 	}
 
+	public String getSelectedMessagesForCopyToClipboad() {
+		return this.messageTableModel.getRowsAsTsv(this.messageTable.getSelectedRows());
+	}
+
 	public void refreshRequestDetailPanel(MessageDto dto) {
 		this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
 		this.responseMessageEditor.setMessage(
