@@ -34,6 +34,14 @@ public class MainHeaderPanel extends JPanel {
 				}
 			}
 		});
+		
+		JButton initColumnWidthButton = new JButton(Captions.MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH);
+		initColumnWidthButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Controller.getInstance().initMessageTableColumnWidth();
+			}
+		});
+		add(initColumnWidthButton);
 		add(dockoutButton);
 	}
 

@@ -1,6 +1,7 @@
 package okuken.iste.controller;
 
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.table.TableColumn;
 
 import burp.IHttpRequestResponse;
 import burp.IMessageEditor;
@@ -78,6 +80,14 @@ public class Controller {
 		MessageLogic.getInstance().saveMessages(messageDtos);
 		this.messageTableModel.addRows(messageDtos);
 		MessageLogic.getInstance().saveMessageOrder(this.messageTableModel.getRows()); // TODO: join transaction...
+	}
+
+	public void initMessageTableColumnWidth() {
+		//TODO: should reset column order...
+		Enumeration<TableColumn> e = messageTable.getColumnModel().getColumns();
+		for (int i = 0; e.hasMoreElements(); i++) {
+			e.nextElement().setPreferredWidth(messageTableModel.getDefaultColumnWidth(i));
+		}
 	}
 
 	public boolean judgeIsMessageSelected() {
