@@ -4,6 +4,7 @@ public class UserOptionsDto {
 
 	private String userName;
 	private String dbFilePath;
+	private String lastSelectedProjectName;
 
 	public String getUserName() {
 		return userName;
@@ -16,6 +17,12 @@ public class UserOptionsDto {
 	}
 	public void setDbFilePath(String dbFilePath) {
 		this.dbFilePath = dbFilePath;
+	}
+	public String getLastSelectedProjectName() {
+		return lastSelectedProjectName;
+	}
+	public void setLastSelectedProjectName(String lastSelectedProjectName) {
+		this.lastSelectedProjectName = lastSelectedProjectName;
 	}
 
 }

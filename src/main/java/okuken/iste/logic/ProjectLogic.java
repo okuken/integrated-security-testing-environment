@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.mybatis.dynamic.sql.select.SelectDSLCompleter;
 
 import okuken.iste.DatabaseManager;
+import okuken.iste.dao.ProjectDynamicSqlSupport;
 import okuken.iste.dao.ProjectMapper;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.entity.Project;
@@ -32,6 +33,7 @@ public class ProjectLogic {
 			saveProject(projectDto);
 		}
 		ConfigLogic.getInstance().setProject(projectDto);
+		ConfigLogic.getInstance().saveLastSelectedProjectName(projectDto.getName());
 	}
 
 	public List<ProjectDto> loadProjects() {
@@ -39,7 +41,7 @@ public class ProjectLogic {
 			List<Project> projects;
 			try (SqlSession session = DatabaseManager.getInstance().getSessionFactory().openSession()) {
 				ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
-				projects = projectMapper.select(SelectDSLCompleter.allRows()); //TODO: order by id desc??
+				projects = projectMapper.select(SelectDSLCompleter.allRowsOrderedBy(ProjectDynamicSqlSupport.id));
 			}
 
 			return projects.stream().map(entity -> { //TODO:converter

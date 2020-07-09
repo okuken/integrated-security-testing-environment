@@ -14,6 +14,7 @@ public class ConfigLogic {
 
 	private static final String CONFIG_KEY_USER_NAME = "userName";
 	private static final String CONFIG_KEY_DB_FILE_PATH = "dbFilePath";
+	private static final String CONFIG_KEY_LAST_SELECTED_PROJECT_NAME = "lastSelectedProjectName";
 
 	private UserOptionsDto configDto;
 	private ProcessOptionsDto processOptionsDto = new ProcessOptionsDto();
@@ -35,6 +36,7 @@ public class ConfigLogic {
 		ret.setUserName(Optional.ofNullable(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_USER_NAME))
 				.orElse(System.getProperty("user.name")));
 		ret.setDbFilePath(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_DB_FILE_PATH));
+		ret.setLastSelectedProjectName(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME));
 		return ret;
 	}
 
@@ -49,6 +51,11 @@ public class ConfigLogic {
 	public void saveDbFilePath(String dbFilePath) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_DB_FILE_PATH, dbFilePath);
 		getUserOptions().setDbFilePath(dbFilePath);
+	}
+
+	public void saveLastSelectedProjectName(String projectName) {
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME, projectName);
+		getUserOptions().setLastSelectedProjectName(projectName);
 	}
 
 
