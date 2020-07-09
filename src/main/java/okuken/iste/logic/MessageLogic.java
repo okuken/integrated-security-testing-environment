@@ -1,5 +1,7 @@
 package okuken.iste.logic;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +52,7 @@ public class MessageLogic {
 
 		dto.setName(message.getComment());
 		dto.setMethod(dto.getRequestInfo().getMethod());
-		dto.setUrl(dto.getRequestInfo().getUrl().toExternalForm());
+		dto.setUrl(dto.getRequestInfo().getUrl());
 		dto.setParams(dto.getRequestInfo().getParameters().size());
 
 		dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
@@ -114,7 +116,7 @@ public class MessageLogic {
 					message.setFkMessageRawId(messageRawId);
 					message.setName(dto.getName());
 					message.setRemark(dto.getRemark());
-					message.setUrl(dto.getUrl());
+					message.setUrl(dto.getUrl().toExternalForm());
 					message.setMethod(dto.getMethod());
 					message.setParams(dto.getParams());
 					message.setStatus(dto.getStatus());
@@ -190,7 +192,11 @@ public class MessageLogic {
 				dto.setId(message.getId());
 				dto.setName(message.getName());
 				dto.setRemark(message.getRemark());
-				dto.setUrl(message.getUrl());
+				try {
+					dto.setUrl(new URL(message.getUrl()));
+				} catch (MalformedURLException e) {
+					BurpUtil.printStderr(e);
+				}
 				dto.setMethod(message.getMethod());
 				dto.setParams(message.getParams());
 				dto.setStatus(message.getStatus());

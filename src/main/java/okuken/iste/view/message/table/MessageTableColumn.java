@@ -2,11 +2,15 @@ package okuken.iste.view.message.table;
 
 public enum MessageTableColumn {
 
-	NAME		("Name",		400,	true),
-	REMARK		("Remark",		200,	true),
-	HOST		("Host",		100,	false),
+	NAME		("Name",		300,	true),
+	REMARK		("Remark",		150,	true),
+	PROTOCOL	("Protocol",	50,		false),
+	HOST		("Host",		80,		false),
+	PORT		("Port",		40,		false),
+	PATH		("Path",		100,	false),
+	QUERY		("Query",		100,	false),
+	URL			("URL without Query", 300,	false),
 	METHOD		("Method",		40,		false),
-	URL			("URL",			300,	false),
 	PARAMS		("Params",		30,		false),
 	STATUS		("Status",		30,		false),
 	LENGTH		("Length",		50,		false),

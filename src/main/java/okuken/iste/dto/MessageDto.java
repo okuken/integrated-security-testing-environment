@@ -1,5 +1,6 @@
 package okuken.iste.dto;
 
+import java.net.URL;
 import java.util.List;
 
 import burp.IHttpRequestResponse;
@@ -15,7 +16,7 @@ public class MessageDto {
 	private String remark;
 
 	private String method;
-	private String url;
+	private URL url;
 	private Integer params;
 	private Short status;
 	private Integer length;
@@ -28,6 +29,53 @@ public class MessageDto {
 	private IHttpRequestResponse message;
 	private IRequestInfo requestInfo;
 	private IResponseInfo responseInfo;
+
+	public String getProtocol() {
+		if(url == null) {return null;}
+		return url.getProtocol();
+	}
+	public String getHost() {
+		if(url == null) {return null;}
+		return url.getHost();
+	}
+	public Integer getPort() {
+		if(url == null) {return null;}
+		return url.getPort() != -1 ? url.getPort() : null;
+	}
+	public Integer getPortIfNotDefault() {
+		if(url == null) {return null;}
+		return url.getPort() != url.getDefaultPort() ? url.getPort() : null; 
+	}
+	public String getPath() {
+		if(url == null) {return null;}
+		return url.getPath();
+	}
+	public String getQuery() {
+		if(url == null) {return null;}
+		return url.getQuery();
+	}
+	/**
+	 * not include default port.
+	 */
+	public String getUrlShort() {
+		if(url == null) {return null;}
+		return String.format("%s://%s%s", url.getProtocol(), createShortAuthority(url), url.getFile());
+	}
+	/**
+	 * not include default port and GET parameters.
+	 */
+	public String getUrlShortest() {
+		if(url == null) {return null;}
+		return String.format("%s://%s%s", url.getProtocol(), createShortAuthority(url), url.getPath());
+	}
+	private String createShortAuthority(URL url) {
+		String authority = url.getAuthority();
+		if(url.getPort() == url.getDefaultPort()) {
+			authority = authority.substring(0, authority.indexOf(":"));
+		}
+		return authority;
+	}
+
 
 	public Integer getId() {
 		return id;
@@ -53,10 +101,10 @@ public class MessageDto {
 	public void setMethod(String method) {
 		this.method = method;
 	}
-	public String getUrl() {
+	public URL getUrl() {
 		return url;
 	}
-	public void setUrl(String url) {
+	public void setUrl(URL url) {
 		this.url = url;
 	}
 	public Integer getParams() {

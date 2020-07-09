@@ -18,15 +18,19 @@ public class MessageTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
 	private static final MessageTableColumn[] COLUMNS = {
-			MessageTableColumn.NAME,
-			MessageTableColumn.URL,
-			MessageTableColumn.REMARK,
+			MessageTableColumn.HOST,
+			MessageTableColumn.PORT,
+			MessageTableColumn.PATH,
+			MessageTableColumn.QUERY,
 			MessageTableColumn.METHOD,
 			MessageTableColumn.PARAMS,
+			MessageTableColumn.NAME,
+			MessageTableColumn.REMARK,
 			MessageTableColumn.STATUS,
 			MessageTableColumn.LENGTH,
 			MessageTableColumn.MIME_TYPE,
-			MessageTableColumn.COOKIES};
+			MessageTableColumn.COOKIES,
+			MessageTableColumn.URL};
 
 	private List<MessageDto> rows = Lists.newArrayList();
 
@@ -129,38 +133,70 @@ public class MessageTableModel extends AbstractTableModel {
 		return getColumnValue(rows.get(rowIndex), columnIndex);
 	}
 	private String getColumnValue(MessageDto row, int columnIndex) {
+		String value;
 		switch(COLUMNS[columnIndex]) {
 			case NAME: {
-				return row.getName();
+				value = row.getName();
+				break;
 			}
 			case REMARK: {
-				return row.getRemark();
+				value = row.getRemark();
+				break;
 			}
-			case METHOD: {
-				return row.getMethod();
+			case PROTOCOL: {
+				value = row.getProtocol();
+				break;
+			}
+			case HOST: {
+				value = row.getHost();
+				break;
+			}
+			case PORT: {
+				Integer port = row.getPortIfNotDefault();
+				value = port != null ? Integer.toString(port) : "";
+				break;
+			}
+			case PATH: {
+				value = row.getPath();
+				break;
+			}
+			case QUERY: {
+				value = row.getQuery();
+				break;
 			}
 			case URL: {
-				return row.getUrl();
+				value = row.getUrlShortest();
+				break;
+			}
+			case METHOD: {
+				value = row.getMethod();
+				break;
 			}
 			case PARAMS: {
-				return Integer.toString(row.getParams());
+				value = Integer.toString(row.getParams());
+				break;
 			}
 			case STATUS: {
-				return row.getStatus() != null ? Short.toString(row.getStatus()) : "";
+				value = row.getStatus() != null ? Short.toString(row.getStatus()) : "";
+				break;
 			}
 			case LENGTH: {
-				return row.getLength() != null ? Integer.toString(row.getLength()) : "";
+				value = row.getLength() != null ? Integer.toString(row.getLength()) : "";
+				break;
 			}
 			case MIME_TYPE: {
-				return row.getMimeType() != null ? row.getMimeType() : "";
+				value = row.getMimeType();
+				break;
 			}
 			case COOKIES: {
-				return row.getCookies() != null ? row.getCookies() : "";
+				value = row.getCookies();
+				break;
 			}
 			default: {
 				return "";
 			}
 		}
+		return Optional.ofNullable(value).orElse("");
 	}
 
 }

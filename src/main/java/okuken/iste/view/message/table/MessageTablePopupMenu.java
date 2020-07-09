@@ -101,7 +101,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		copyUrlMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessages().stream()
-						.map(messageDto -> messageDto.getUrl())
+						.map(messageDto -> messageDto.getUrlShort())
 						.collect(Collectors.joining(System.lineSeparator())));
 			}
 		});
