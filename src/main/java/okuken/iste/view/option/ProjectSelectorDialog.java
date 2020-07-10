@@ -41,7 +41,7 @@ public class ProjectSelectorDialog extends JDialog {
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setModal(true);
 		setTitle(Captions.MESSAGE_SELECT_PROJECT);
-		setBounds(100, 100, 400, 135);
+		setBounds(100, 100, 400, 136);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);

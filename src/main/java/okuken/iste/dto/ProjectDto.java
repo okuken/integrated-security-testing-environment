@@ -32,7 +32,7 @@ public class ProjectDto {
 		if(id == null) {
 			return Captions.SELECT_PROJECT_NEW;
 		}
-		return String.format("%s: %s: %d", name, explanation, id);
+		return String.format("[%d] %s", id, name);
 	}
 
 }

@@ -5,6 +5,7 @@ import javax.swing.SwingUtilities;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
 
 import java.awt.FlowLayout;
@@ -14,13 +15,26 @@ import javax.swing.JFrame;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
 
 public class MainHeaderPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	public MainHeaderPanel() {
-		FlowLayout flowLayout = (FlowLayout) getLayout();
+		setLayout(new BorderLayout(0, 0));
+		
+		JPanel leftPanel = new JPanel();
+		add(leftPanel, BorderLayout.WEST);
+		
+		JPanel centerPanel = new JPanel();
+		JLabel projectNameLabel = new JLabel(ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName());
+		centerPanel.add(projectNameLabel);
+		add(centerPanel, BorderLayout.CENTER);
+		
+		JPanel rightPanel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) rightPanel.getLayout();
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 		
 		JButton dockoutButton = new JButton(Captions.MAIN_HEADER_BUTTON_DOCKOUT);
@@ -41,8 +55,10 @@ public class MainHeaderPanel extends JPanel {
 				Controller.getInstance().initMessageTableColumnWidth();
 			}
 		});
-		add(initColumnWidthButton);
-		add(dockoutButton);
+		
+		rightPanel.add(initColumnWidthButton);
+		rightPanel.add(dockoutButton);
+		add(rightPanel, BorderLayout.EAST);
 	}
 
 	private void dockout() {
@@ -63,6 +79,7 @@ public class MainHeaderPanel extends JPanel {
 	private void dockin() {
 		Controller controller = Controller.getInstance();
 		controller.getMainTabbedPane().insertTab(Captions.TAB_MAIN, null, controller.getMainPanel(), null, 0);
+		controller.getMainTabbedPane().setSelectedIndex(0);
 		controller.disposeDockoutFrame();
 	}
 
