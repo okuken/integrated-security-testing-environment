@@ -2,6 +2,7 @@ package okuken.iste.view.option;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -20,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import java.awt.event.ActionEvent;
 
 public class ProjectSelectorDialog extends JDialog {
@@ -32,22 +33,11 @@ public class ProjectSelectorDialog extends JDialog {
 	private JTextField newProjectNameTextField;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			ProjectSelectorDialog dialog = new ProjectSelectorDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Create the dialog.
 	 */
-	public ProjectSelectorDialog() {
+	public ProjectSelectorDialog(Frame owner) {
+		super(owner);
+
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setModal(true);
 		setTitle(Captions.MESSAGE_SELECT_PROJECT);
@@ -84,9 +74,9 @@ public class ProjectSelectorDialog extends JDialog {
 			projectsComboBox.setSelectedIndex(0);
 			String lastSelectedProjectName = ConfigLogic.getInstance().getUserOptions().getLastSelectedProjectName();
 			if(lastSelectedProjectName != null) {
-				List<ProjectDto> lastSelectedProject = projects.stream().filter(projectDto -> lastSelectedProjectName.equals(projectDto.getName())).collect(Collectors.toList());
-				if(!lastSelectedProject.isEmpty()) {
-					projectsComboBox.setSelectedIndex(projects.indexOf(lastSelectedProject.get(0)) + 1);
+				Optional<ProjectDto> lastSelectedProject = projects.stream().filter(projectDto -> lastSelectedProjectName.equals(projectDto.getName())).findFirst();
+				if(lastSelectedProject.isPresent()) {
+					projectsComboBox.setSelectedIndex(projects.indexOf(lastSelectedProject.get()) + 1);
 				}
 			}
 

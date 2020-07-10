@@ -1,5 +1,6 @@
 package okuken.iste.logic;
 
+import java.awt.Frame;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +25,10 @@ public class ProjectLogic {
 	}
 
 	public void selectProject() {
-		ProjectSelectorDialog projectSelectorDialog = new ProjectSelectorDialog();
+		Frame burpFrame = BurpUtil.getBurpSuiteJFrame();
+		ProjectSelectorDialog projectSelectorDialog = new ProjectSelectorDialog(burpFrame);
 		BurpUtil.getCallbacks().customizeUiComponent(projectSelectorDialog);
+		projectSelectorDialog.setLocationRelativeTo(burpFrame);
 		projectSelectorDialog.setVisible(true);
 		ProjectDto projectDto = projectSelectorDialog.getSelectedProject();
 
