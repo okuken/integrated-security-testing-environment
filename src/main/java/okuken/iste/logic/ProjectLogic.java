@@ -4,15 +4,14 @@ import java.awt.Frame;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.ibatis.session.SqlSession;
 import org.mybatis.dynamic.sql.select.SelectDSLCompleter;
 
-import okuken.iste.DatabaseManager;
 import okuken.iste.dao.ProjectDynamicSqlSupport;
 import okuken.iste.dao.ProjectMapper;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.entity.Project;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.DbUtil;
 import okuken.iste.util.SqlUtil;
 import okuken.iste.view.option.ProjectSelectorDialog;
 
@@ -41,11 +40,11 @@ public class ProjectLogic {
 
 	public List<ProjectDto> loadProjects() {
 		try {
-			List<Project> projects;
-			try (SqlSession session = DatabaseManager.getInstance().getSessionFactory().openSession()) {
-				ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
-				projects = projectMapper.select(SelectDSLCompleter.allRowsOrderedBy(ProjectDynamicSqlSupport.id));
-			}
+			List<Project> projects =
+				DbUtil.withSession(session -> {
+					ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
+					return projectMapper.select(SelectDSLCompleter.allRowsOrderedBy(ProjectDynamicSqlSupport.id));
+				});
 
 			return projects.stream().map(entity -> { //TODO:converter
 				ProjectDto dto = new ProjectDto();
@@ -64,7 +63,7 @@ public class ProjectLogic {
 	public void saveProject(ProjectDto dto) {
 		try {
 			String now = SqlUtil.now();
-			try (SqlSession session = DatabaseManager.getInstance().getSessionFactory().openSession()) {
+			DbUtil.withTransaction(session -> {
 				Project entity = new Project();
 				entity.setName(dto.getName());
 				entity.setExplanation(dto.getExplanation());
@@ -76,14 +75,11 @@ public class ProjectLogic {
 				int id = SqlUtil.loadGeneratedId(session);
 
 				dto.setId(id);
-
-				session.commit();
-			}
+			});
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);
 			throw e;
 		}
-		//TODO: rollback controll???
 	}
 
 }
