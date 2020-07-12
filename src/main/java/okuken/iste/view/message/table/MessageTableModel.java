@@ -109,12 +109,20 @@ public class MessageTableModel extends AbstractTableModel {
 		switch(COLUMNS[columnIndex]) {
 			case NAME: {
 				MessageDto dto = rows.get(rowIndex); 
+				if(val.equals(dto.getName())) {
+					break;
+				}
+
 				dto.setName((String)val);
 				MessageLogic.getInstance().updateMessage(dto);
 				break;
 			}
 			case REMARK: {
 				MessageDto dto = rows.get(rowIndex); 
+				if(val.equals(dto.getRemark())) {
+					break;
+				}
+
 				dto.setRemark((String)val);
 				MessageLogic.getInstance().updateMessage(dto);
 				break;

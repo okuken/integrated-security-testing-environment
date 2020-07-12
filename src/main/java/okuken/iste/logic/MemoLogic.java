@@ -47,11 +47,6 @@ public class MemoLogic {
 			DbUtil.withTransaction(session -> {
 				MemoMessageMapper mapper = session.getMapper(MemoMessageMapper.class);
 
-				if (mapper.selectByPrimaryKey(messageDto.getMemoId()).get().getMemo().equals(messageDto.getMemo())) { //update only if memo is changed
-					messageDto.setMemoChanged(false);
-					return;
-				}
-
 				MemoMessage entity = new MemoMessage();
 				entity.setId(messageDto.getMemoId());
 				entity.setMemo(messageDto.getMemo());
