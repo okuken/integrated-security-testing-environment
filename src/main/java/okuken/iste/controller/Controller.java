@@ -19,6 +19,7 @@ import okuken.iste.logic.MessageLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuiteTab;
 import okuken.iste.view.memo.MessageMemoPanel;
+import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.table.MessageTableModel;
 
 public class Controller {
@@ -38,6 +39,8 @@ public class Controller {
 	private IMessageEditor responseMessageEditor;
 
 	private MessageMemoPanel messageMemoPanel;
+
+	private ProjectMemoPanel projectMemoPanel;
 
 	private Controller() {}
 	public static Controller getInstance() {
@@ -76,6 +79,9 @@ public class Controller {
 	}
 	public void setMessageMemoPanel(MessageMemoPanel messageMemoPanel) {
 		this.messageMemoPanel = messageMemoPanel;
+	}
+	public void setProjectMemoPanel(ProjectMemoPanel projectMemoPanel) {
+		this.projectMemoPanel = projectMemoPanel;
 	}
 
 
@@ -133,6 +139,13 @@ public class Controller {
 		MemoLogic.getInstance().updateMessageMemo(messageDto);
 	}
 
+	public String getProjectMemo() {
+		return MemoLogic.getInstance().loadProjectMemo();
+	}
+	public void saveProjectMemo(String memo) {
+		MemoLogic.getInstance().saveProjectMemo(memo);
+	}
+
 	public void loadDatabase() {
 		List<Integer> messageOrder = MessageLogic.getInstance().loadMessageOrder();
 		List<MessageDto> messageDtos = MessageLogic.getInstance().loadMessages();
@@ -140,6 +153,8 @@ public class Controller {
 		this.messageTableModel.addRows(messageOrder.stream()
 				.map(messageId -> messageDtos.stream().filter(dto -> dto.getId().equals(messageId)).findFirst().get())
 				.collect(Collectors.toList()));
+
+		this.projectMemoPanel.refreshPanel();
 	}
 
 	public void reloadDatabase() {
@@ -159,7 +174,7 @@ public class Controller {
 
 //For test
 	public void test1() {
-		loadDatabase();
+//		loadDatabase();
 	}
 
 }

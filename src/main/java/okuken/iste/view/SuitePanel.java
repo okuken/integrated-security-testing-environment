@@ -9,6 +9,7 @@ import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
+import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.option.TestPanel;
@@ -66,6 +67,9 @@ public class SuitePanel extends JPanel {
 		
 		JPanel messageAttrMemoPanel = new JPanel();
 		mainRightSplitPane.setRightComponent(messageAttrMemoPanel);
+		
+		JPanel projectMemoPanel = new ProjectMemoPanel();
+		mainTabbedPane.addTab(Captions.TAB_MEMO, null, projectMemoPanel, null);
 		
 		JPanel optionsPanel = new JPanel();
 		mainTabbedPane.addTab(Captions.TAB_OPTIONS, null, optionsPanel, null);
