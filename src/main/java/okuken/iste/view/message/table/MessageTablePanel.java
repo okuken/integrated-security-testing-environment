@@ -28,7 +28,7 @@ public class MessageTablePanel extends JPanel {
 			@Override
 			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
 				super.changeSelection(row, col, toggle, extend);
-				Controller.getInstance().refreshRequestDetailPanel(tableModel.getRow(row));
+				Controller.getInstance().refreshMessageDetailPanels(tableModel.getRow(row));
 			}
 		};
 		setupColumnWidth(table, tableModel);

@@ -14,9 +14,11 @@ import javax.swing.table.TableColumn;
 import burp.IHttpRequestResponse;
 import burp.IMessageEditor;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuiteTab;
+import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.message.table.MessageTableModel;
 
 public class Controller {
@@ -34,6 +36,8 @@ public class Controller {
 
 	private IMessageEditor requestMessageEditor;
 	private IMessageEditor responseMessageEditor;
+
+	private MessageMemoPanel messageMemoPanel;
 
 	private Controller() {}
 	public static Controller getInstance() {
@@ -70,6 +74,9 @@ public class Controller {
 	public void setResponseMessageEditor(IMessageEditor messageEditor) {
 		this.responseMessageEditor = messageEditor;
 	}
+	public void setMessageMemoPanel(MessageMemoPanel messageMemoPanel) {
+		this.messageMemoPanel = messageMemoPanel;
+	}
 
 
 	public void sendMessagesToSuiteTab(List<IHttpRequestResponse> messages) {
@@ -80,6 +87,7 @@ public class Controller {
 		MessageLogic.getInstance().saveMessages(messageDtos);
 		this.messageTableModel.addRows(messageDtos);
 		MessageLogic.getInstance().saveMessageOrder(this.messageTableModel.getRows()); // TODO: join transaction...
+		messageDtos.forEach(messageDto -> MemoLogic.getInstance().saveMessageMemo(messageDto));
 	}
 
 	public void initMessageTableColumnWidth() {
@@ -108,11 +116,21 @@ public class Controller {
 		return this.messageTableModel.getRowsAsTsv(this.messageTable.getSelectedRows());
 	}
 
-	public void refreshRequestDetailPanel(MessageDto dto) {
+	public void refreshMessageDetailPanels(MessageDto dto) {
 		this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
 		this.responseMessageEditor.setMessage(
 				dto.getMessage().getResponse() != null ? dto.getMessage().getResponse() : new byte[] {},
 				false);
+
+		this.messageMemoPanel.enablePanel(dto);
+	}
+
+	public void saveMessageMemo(MessageDto messageDto) {
+		if(messageDto.getMemoIdWithoutLoad() == null) {
+			MemoLogic.getInstance().saveMessageMemo(messageDto);
+			return;
+		}
+		MemoLogic.getInstance().updateMessageMemo(messageDto);
 	}
 
 	public void loadDatabase() {
@@ -128,6 +146,7 @@ public class Controller {
 		this.messageTableModel.clearRows();
 		this.requestMessageEditor.setMessage(new byte[] {}, true);
 		this.responseMessageEditor.setMessage(new byte[] {}, false);
+		this.messageMemoPanel.disablePanel();
 
 		loadDatabase();
 	}

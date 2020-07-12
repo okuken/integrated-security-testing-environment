@@ -67,6 +67,8 @@ public class MessageLogic {
 					.collect(Collectors.joining("; ")));
 		}
 
+		dto.setMemo("");
+
 		return dto;
 	}
 	private IHttpRequestResponse convertOriginalToMock(IHttpRequestResponse httpRequestResponse) {

@@ -6,6 +6,7 @@ import java.util.List;
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
+import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
 
 public class MessageDto {
@@ -14,6 +15,10 @@ public class MessageDto {
 
 	private String name;
 	private String remark;
+
+	private Integer memoId;
+	private String memo;
+	private boolean memoChanged;
 
 	private String method;
 	private URL url;
@@ -95,6 +100,39 @@ public class MessageDto {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
+
+	public Integer getMemoId() {
+		if (memoId == null) {
+			MemoLogic.getInstance().loadMessageMemo(this);
+		}
+		return memoId;
+	}
+	public Integer getMemoIdWithoutLoad() {
+		return memoId;
+	}
+	public void setMemoId(Integer memoId) {
+		this.memoId = memoId;
+	}
+	public String getMemo() {
+		if (memoId == null) {
+			MemoLogic.getInstance().loadMessageMemo(this);
+		}
+		return memo;
+	}
+	public String getMemoWithoutLoad() {
+		return memo;
+	}
+	public void setMemo(String memo) {
+		this.memo = memo;
+	}
+	public boolean isMemoChanged() {
+		return memoChanged;
+	}
+	public void setMemoChanged(boolean memoChanged) {
+		this.memoChanged = memoChanged;
+	}
+
+
 	public String getMethod() {
 		return method;
 	}

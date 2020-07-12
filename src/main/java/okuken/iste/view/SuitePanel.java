@@ -8,6 +8,7 @@ import javax.swing.JSplitPane;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.view.header.MainHeaderPanel;
+import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.option.TestPanel;
@@ -60,7 +61,7 @@ public class SuitePanel extends JPanel {
 		mainRightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		mainRightPanel.add(mainRightSplitPane);
 		
-		JPanel messageMemoPanel = new JPanel();
+		JPanel messageMemoPanel = new MessageMemoPanel();
 		mainRightSplitPane.setLeftComponent(messageMemoPanel);
 		
 		JPanel messageAttrMemoPanel = new JPanel();
