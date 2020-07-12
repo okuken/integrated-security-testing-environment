@@ -1,6 +1,7 @@
 package okuken.iste.view.message.table;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.Arrays;
 import java.util.Enumeration;
 
@@ -12,6 +13,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import okuken.iste.controller.Controller;
@@ -38,6 +41,7 @@ public class MessageTablePanel extends JPanel {
 		setupColumnWidth(table, tableModel);
 		setupDraggable(table, tableModel);
 		setupProgressColumn(table, tableModel);
+		setupTableRowColorControl(table, tableModel);
 		table.setComponentPopupMenu(new MessageTablePopupMenu());
 		Controller.getInstance().setMessageTable(table);	
 
@@ -73,4 +77,27 @@ public class MessageTablePanel extends JPanel {
 		Arrays.stream(SecurityTestingProgress.values()).forEach(progress -> progressComboBox.addItem(progress));
 		progressColumn.setCellEditor(new DefaultCellEditor(progressComboBox));
 	}
+
+	private void setupTableRowColorControl(JTable table, MessageTableModel tableModel) {
+		@SuppressWarnings("serial")
+		TableCellRenderer tableCellRenderer = new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				if(isSelected) {
+					return renderer;
+				}
+
+				setBackground(tableModel.getRow(row).getProgress().getColor());
+
+				return renderer;
+			}
+		};
+
+		Enumeration<TableColumn> e = table.getColumnModel().getColumns();
+		while (e.hasMoreElements()) {
+			e.nextElement().setCellRenderer(tableCellRenderer);
+		}
+	}
+
 }

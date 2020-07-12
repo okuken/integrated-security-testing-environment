@@ -1,5 +1,6 @@
 package okuken.iste.enums;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -7,18 +8,20 @@ import com.google.common.collect.Maps;
 
 public enum SecurityTestingProgress {
 
-	NOT_YET	(0, "New"),
-	DOING	(1, "Work"),
-	HOLD	(5, "Hold"),
-	ABORT	(8, "Abort"),
-	DONE	(9, "Done");
+	NOT_YET	(0, "New",   Color.WHITE),
+	DOING	(1, "Work",  Color.ORANGE),
+	HOLD	(5, "Hold",  Color.CYAN),
+	ABORT	(8, "Abort", Color.GRAY),
+	DONE	(9, "Done",  Color.LIGHT_GRAY);
 
-	private Integer id;
+	private final Integer id;
 	private final String caption;
+	private final Color color;
 
-	private SecurityTestingProgress(Integer id, String caption) {
+	private SecurityTestingProgress(Integer id, String caption, Color color) {
 		this.id = id;
 		this.caption = caption;
+		this.color = color;
 	}
 
 	public Integer getId() {
@@ -26,6 +29,9 @@ public enum SecurityTestingProgress {
 	}
 	public String getCaption() {
 		return caption;
+	}
+	public Color getColor() {
+		return color;
 	}
 
 	@Override
