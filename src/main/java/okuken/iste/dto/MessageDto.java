@@ -6,6 +6,7 @@ import java.util.List;
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
+import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
 
@@ -15,6 +16,7 @@ public class MessageDto {
 
 	private String name;
 	private String remark;
+	private SecurityTestingProgress progress;
 
 	private Integer memoId;
 	private String memo;
@@ -99,6 +101,12 @@ public class MessageDto {
 	}
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+	public SecurityTestingProgress getProgress() {
+		return progress;
+	}
+	public void setProgress(SecurityTestingProgress progress) {
+		this.progress = progress;
 	}
 
 	public Integer getMemoId() {

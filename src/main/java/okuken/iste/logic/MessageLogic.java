@@ -29,6 +29,7 @@ import okuken.iste.entity.Message;
 import okuken.iste.entity.MessageOrd;
 import okuken.iste.entity.MessageParam;
 import okuken.iste.entity.MessageRaw;
+import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.SqlUtil;
@@ -117,6 +118,7 @@ public class MessageLogic {
 					message.setFkMessageRawId(messageRawId);
 					message.setName(dto.getName());
 					message.setRemark(dto.getRemark());
+					message.setProgress(dto.getProgress().getId());
 					message.setUrl(dto.getUrl().toExternalForm());
 					message.setMethod(dto.getMethod());
 					message.setParams(dto.getParams());
@@ -163,6 +165,7 @@ public class MessageLogic {
 				message.setId(dto.getId());
 				message.setName(dto.getName());
 				message.setRemark(dto.getRemark());
+				message.setProgress(dto.getProgress().getId());
 				message.setPrcDate(now);
 				messageMapper.updateByPrimaryKeySelective(message);
 			});
@@ -187,6 +190,7 @@ public class MessageLogic {
 				dto.setId(message.getId());
 				dto.setName(message.getName());
 				dto.setRemark(message.getRemark());
+				dto.setProgress(SecurityTestingProgress.getById(message.getProgress()));
 				try {
 					dto.setUrl(new URL(message.getUrl()));
 				} catch (MalformedURLException e) {

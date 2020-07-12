@@ -1,9 +1,12 @@
 package okuken.iste.view.message.table;
 
 import java.awt.BorderLayout;
+import java.util.Arrays;
 import java.util.Enumeration;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.DropMode;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -12,6 +15,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import okuken.iste.controller.Controller;
+import okuken.iste.enums.SecurityTestingProgress;
 
 public class MessageTablePanel extends JPanel {
 
@@ -33,6 +37,7 @@ public class MessageTablePanel extends JPanel {
 		};
 		setupColumnWidth(table, tableModel);
 		setupDraggable(table, tableModel);
+		setupProgressColumn(table, tableModel);
 		table.setComponentPopupMenu(new MessageTablePopupMenu());
 		Controller.getInstance().setMessageTable(table);	
 
@@ -59,5 +64,13 @@ public class MessageTablePanel extends JPanel {
 		table.setDropMode(DropMode.INSERT_ROWS);
 		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		table.setTransferHandler(new MessageTableTransferHandler(table, messageTableModel));
+	}
+
+	private void setupProgressColumn(JTable table, MessageTableModel messageTableModel) {
+		TableColumn progressColumn = table.getColumnModel().getColumn(messageTableModel.getColumnIndex(MessageTableColumn.PROGRESS));
+
+		JComboBox<SecurityTestingProgress> progressComboBox = new JComboBox<SecurityTestingProgress>();
+		Arrays.stream(SecurityTestingProgress.values()).forEach(progress -> progressComboBox.addItem(progress));
+		progressColumn.setCellEditor(new DefaultCellEditor(progressComboBox));
 	}
 }

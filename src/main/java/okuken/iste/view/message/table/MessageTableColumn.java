@@ -4,6 +4,7 @@ public enum MessageTableColumn {
 
 	NAME		("Name",		300,	true),
 	REMARK		("Remark",		150,	true),
+	PROGRESS	("Progress",	40,		true),
 	PROTOCOL	("Protocol",	50,		false),
 	HOST		("Host",		80,		false),
 	PORT		("Port",		40,		false),

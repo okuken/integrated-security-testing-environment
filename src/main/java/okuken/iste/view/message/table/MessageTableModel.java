@@ -11,6 +11,7 @@ import javax.swing.table.AbstractTableModel;
 import com.google.common.collect.Lists;
 
 import okuken.iste.dto.MessageDto;
+import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MessageLogic;
 
 public class MessageTableModel extends AbstractTableModel {
@@ -25,6 +26,7 @@ public class MessageTableModel extends AbstractTableModel {
 			MessageTableColumn.METHOD,
 			MessageTableColumn.PARAMS,
 			MessageTableColumn.NAME,
+			MessageTableColumn.PROGRESS,
 			MessageTableColumn.REMARK,
 			MessageTableColumn.STATUS,
 			MessageTableColumn.LENGTH,
@@ -127,6 +129,18 @@ public class MessageTableModel extends AbstractTableModel {
 				MessageLogic.getInstance().updateMessage(dto);
 				break;
 			}
+			case PROGRESS: {
+				SecurityTestingProgress progress = (SecurityTestingProgress)val;
+
+				MessageDto dto = rows.get(rowIndex); 
+				if(progress == dto.getProgress()) {
+					break;
+				}
+
+				dto.setProgress(progress);
+				MessageLogic.getInstance().updateMessage(dto);
+				break;
+			}
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -134,6 +148,15 @@ public class MessageTableModel extends AbstractTableModel {
 
 	public int getDefaultColumnWidth(int columnIndex) {
 		return COLUMNS[columnIndex].getWidth();
+	}
+
+	public int getColumnIndex(MessageTableColumn column) {
+		for(int i = 0; i < COLUMNS.length; i++) {
+			if(column == COLUMNS[i]) {
+				return i;
+			}
+		}
+		throw new IllegalArgumentException();
 	}
 
 	@Override
@@ -149,6 +172,10 @@ public class MessageTableModel extends AbstractTableModel {
 			}
 			case REMARK: {
 				value = row.getRemark();
+				break;
+			}
+			case PROGRESS: {
+				value = row.getProgress().getCaption();
 				break;
 			}
 			case PROTOCOL: {
