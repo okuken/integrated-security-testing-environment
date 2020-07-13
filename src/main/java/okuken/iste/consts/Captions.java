@@ -8,6 +8,7 @@ public class Captions {
 	public static final String TAB_SUITE = "ISTE";
 	public static final String TAB_MAIN = "List";
 	public static final String TAB_MEMO = "Memo";
+	public static final String TAB_TOOLS = "Tools";
 	public static final String TAB_OPTIONS = "Options";
 
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
@@ -23,6 +24,8 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
 	public static final String PROJECT_MEMO_BUTTON_WRAP = "Wrap";
+
+	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo to txt";
 
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";

@@ -14,6 +14,9 @@ import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.option.TestPanel;
 import okuken.iste.view.option.UserOptionsPanel;
+import okuken.iste.view.tool.ExportToolsPanel;
+
+import java.awt.GridLayout;
 
 public class SuitePanel extends JPanel {
 
@@ -70,6 +73,13 @@ public class SuitePanel extends JPanel {
 		
 		JPanel projectMemoPanel = new ProjectMemoPanel();
 		mainTabbedPane.addTab(Captions.TAB_MEMO, null, projectMemoPanel, null);
+		
+		JPanel toolsPanel = new JPanel();
+		mainTabbedPane.addTab(Captions.TAB_TOOLS, null, toolsPanel, null);
+		toolsPanel.setLayout(new GridLayout(5, 1, 0, 0));
+		
+		JPanel exportToolPanel = new ExportToolsPanel();
+		toolsPanel.add(exportToolPanel);
 		
 		JPanel optionsPanel = new JPanel();
 		mainTabbedPane.addTab(Captions.TAB_OPTIONS, null, optionsPanel, null);

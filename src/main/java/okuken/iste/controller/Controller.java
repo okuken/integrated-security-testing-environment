@@ -1,5 +1,6 @@
 package okuken.iste.controller;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -14,6 +15,7 @@ import javax.swing.table.TableColumn;
 import burp.IHttpRequestResponse;
 import burp.IMessageEditor;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.logic.ExportLogic;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.util.BurpUtil;
@@ -146,15 +148,22 @@ public class Controller {
 		MemoLogic.getInstance().saveProjectMemo(memo);
 	}
 
+	public void exportMemoToTxtFile(File file) {
+		ExportLogic.getInstance().exportMemoToTextFile(file, loadMessages(), getProjectMemo());
+	}
+
 	public void loadDatabase() {
+		this.messageTableModel.addRows(loadMessages());
+		this.projectMemoPanel.refreshPanel();
+	}
+
+	private List<MessageDto> loadMessages() {
 		List<Integer> messageOrder = MessageLogic.getInstance().loadMessageOrder();
 		List<MessageDto> messageDtos = MessageLogic.getInstance().loadMessages();
 
-		this.messageTableModel.addRows(messageOrder.stream()
-				.map(messageId -> messageDtos.stream().filter(dto -> dto.getId().equals(messageId)).findFirst().get())
-				.collect(Collectors.toList()));
-
-		this.projectMemoPanel.refreshPanel();
+		return messageOrder.stream()
+			.map(messageId -> messageDtos.stream().filter(dto -> dto.getId().equals(messageId)).findFirst().get())
+			.collect(Collectors.toList());
 	}
 
 	public void reloadDatabase() {
