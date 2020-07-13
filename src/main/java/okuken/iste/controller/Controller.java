@@ -14,12 +14,16 @@ import javax.swing.table.TableColumn;
 
 import burp.IHttpRequestResponse;
 import burp.IMessageEditor;
+import okuken.iste.DatabaseManager;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
+import okuken.iste.logic.ProjectLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuiteTab;
+import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.table.MessageTableModel;
@@ -31,6 +35,7 @@ public class Controller {
 	private SuiteTab suiteTab;
 	private JTabbedPane mainTabbedPane;
 	private JPanel mainPanel;
+	private MainHeaderPanel mainHeaderPanel;
 
 	private JFrame dockoutFrame;
 
@@ -63,6 +68,9 @@ public class Controller {
 	}
 	public JPanel getMainPanel() {
 		return this.mainPanel;
+	}
+	public void setMainHeaderPanel(MainHeaderPanel mainHeaderPanel) {
+		this.mainHeaderPanel = mainHeaderPanel;
 	}
 	public void setDockoutFrame(JFrame dockoutFrame) {
 		this.dockoutFrame = dockoutFrame;
@@ -166,7 +174,14 @@ public class Controller {
 			.collect(Collectors.toList());
 	}
 
-	public void reloadDatabase() {
+	public void changeDatabase(String dbFilePath) {
+		ConfigLogic.getInstance().saveDbFilePath(dbFilePath);
+		DatabaseManager.getInstance().changeDatabase(dbFilePath);
+		ProjectLogic.getInstance().selectProject();
+		mainHeaderPanel.refreshProjectName();
+		reloadDatabase();
+	}
+	private void reloadDatabase() {
 		this.messageTableModel.clearRows();
 		this.requestMessageEditor.setMessage(new byte[] {}, true);
 		this.responseMessageEditor.setMessage(new byte[] {}, false);
@@ -179,11 +194,6 @@ public class Controller {
 		if(dockoutFrame != null) {
 			dockoutFrame.dispose();
 		}
-	}
-
-//For test
-	public void test1() {
-//		loadDatabase();
 	}
 
 }

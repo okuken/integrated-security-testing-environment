@@ -3,11 +3,9 @@ package okuken.iste.view.option;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import okuken.iste.DatabaseManager;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.logic.ProjectLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 
@@ -76,11 +74,7 @@ public class UserOptionsPanel extends JPanel {
 		dbFileSaveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//TODO: validation
-				String dbFilePath = dbFileTextField.getText();
-				ConfigLogic.getInstance().saveDbFilePath(dbFilePath);
-				DatabaseManager.getInstance().changeDatabase(dbFilePath);
-				ProjectLogic.getInstance().selectProject();
-				Controller.getInstance().reloadDatabase();
+				Controller.getInstance().changeDatabase(dbFileTextField.getText());
 			}
 		});
 		dbFileSaveButton.setBounds(400, 60, 120, 30);

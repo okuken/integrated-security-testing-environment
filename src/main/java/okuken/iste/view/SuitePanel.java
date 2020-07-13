@@ -12,7 +12,6 @@ import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
-import okuken.iste.view.option.TestPanel;
 import okuken.iste.view.option.UserOptionsPanel;
 import okuken.iste.view.tool.ExportToolsPanel;
 
@@ -38,6 +37,7 @@ public class SuitePanel extends JPanel {
 		mainPanel.add(mainHeaderPanel, BorderLayout.NORTH);
 		
 		JSplitPane mainSplitPane = new JSplitPane();
+		mainSplitPane.setResizeWeight(1.0);
 		mainPanel.add(mainSplitPane);
 		
 		JPanel mainLeftPanel = new JPanel();
@@ -87,9 +87,6 @@ public class SuitePanel extends JPanel {
 		
 		JPanel userOptionsPanel = new UserOptionsPanel();
 		optionsPanel.add(userOptionsPanel, BorderLayout.CENTER);
-		
-		JPanel panel_1 = new TestPanel();
-		optionsPanel.add(panel_1, BorderLayout.NORTH);
 
 	}
 }

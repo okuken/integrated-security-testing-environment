@@ -51,7 +51,7 @@ public class MessageMemoPanel extends JPanel {
 		textArea.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) { //[CAUTION] It's called after JTable#changeSelection.
-				if(currentMessageDto.isMemoChanged()) {
+				if(currentMessageDto != null && currentMessageDto.isMemoChanged()) {
 					currentMessageDto.setMemo(textArea.getText());
 					Controller.getInstance().saveMessageMemo(currentMessageDto);
 				}
@@ -73,7 +73,7 @@ public class MessageMemoPanel extends JPanel {
 		currentMessageDto = null;
 		textArea.setText("");
 		undoManager.discardAllEdits();
-		textArea.setEnabled(false);
+		textArea.setEditable(false);
 	}
 
 	public void enablePanel(MessageDto messageDto) {
@@ -86,7 +86,7 @@ public class MessageMemoPanel extends JPanel {
 		textArea.setText(messageDto.getMemo());
 		currentMessageDto.setMemoChanged(false); // clear flag, because setText for initialize textArea set flag on...
 		undoManager.discardAllEdits();
-		textArea.setEnabled(true);
+		textArea.setEditable(true);
 	}
 
 }

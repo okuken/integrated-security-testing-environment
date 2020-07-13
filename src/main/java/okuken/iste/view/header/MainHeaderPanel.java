@@ -22,6 +22,8 @@ public class MainHeaderPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private JLabel projectNameLabel;
+
 	public MainHeaderPanel() {
 		setLayout(new BorderLayout(0, 0));
 		
@@ -29,7 +31,8 @@ public class MainHeaderPanel extends JPanel {
 		add(leftPanel, BorderLayout.WEST);
 		
 		JPanel centerPanel = new JPanel();
-		JLabel projectNameLabel = new JLabel(ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName());
+		projectNameLabel = new JLabel();
+		refreshProjectName();
 		centerPanel.add(projectNameLabel);
 		add(centerPanel, BorderLayout.CENTER);
 		
@@ -59,6 +62,8 @@ public class MainHeaderPanel extends JPanel {
 		rightPanel.add(initColumnWidthButton);
 		rightPanel.add(dockoutButton);
 		add(rightPanel, BorderLayout.EAST);
+
+		Controller.getInstance().setMainHeaderPanel(this);
 	}
 
 	private void dockout() {
@@ -81,6 +86,10 @@ public class MainHeaderPanel extends JPanel {
 		controller.getMainTabbedPane().insertTab(Captions.TAB_MAIN, null, controller.getMainPanel(), null, 0);
 		controller.getMainTabbedPane().setSelectedIndex(0);
 		controller.disposeDockoutFrame();
+	}
+
+	public void refreshProjectName() {
+		projectNameLabel.setText(ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName());
 	}
 
 }
