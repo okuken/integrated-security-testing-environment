@@ -51,6 +51,7 @@ public class MessageLogic {
 		dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(message));
 
 		dto.setName(message.getComment());
+		dto.setProgress(SecurityTestingProgress.NOT_YET);
 		dto.setMethod(dto.getRequestInfo().getMethod());
 		dto.setUrl(dto.getRequestInfo().getUrl());
 		dto.setParams(dto.getRequestInfo().getParameters().size());
