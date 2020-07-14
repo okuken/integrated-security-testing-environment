@@ -11,6 +11,9 @@ public class Captions {
 	public static final String TAB_TOOLS = "Tools";
 	public static final String TAB_OPTIONS = "Options";
 
+	public static final String TAB_MAIN_MESSAGE_EDITOR_ORIGINAL = "Org";
+	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT = "Repeater";
+
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
 	public static final String MAIN_HEADER_BUTTON_DOCKOUT = "\u2197";
 

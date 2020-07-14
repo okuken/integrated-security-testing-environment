@@ -1,33 +1,34 @@
 package okuken.iste.view.message.editor;
 
 import java.awt.BorderLayout;
+import java.util.Optional;
+
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import burp.IBurpExtenderCallbacks;
 import burp.IHttpService;
 import burp.IMessageEditor;
 import burp.IMessageEditorController;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.MessageDto;
 import okuken.iste.util.BurpUtil;
 
 public class MessageEditorPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private IMessageEditor requestMessageEditor;
+	private IMessageEditor responseMessageEditor;
+
 	public MessageEditorPanel() {
+		this(createDefaultMessageEditorController(), false, false);
+	}
+
+	public MessageEditorPanel(IMessageEditorController messageEditorController, boolean requestEditable, boolean responseEditable) {
 		setLayout(new BorderLayout(0, 0));
 
-		IBurpExtenderCallbacks callbacks = BurpUtil.getCallbacks();
-		if(callbacks == null) { // case: Visual Editor...
-			return;
-		}
-
-		IMessageEditor requestMessageEditor = createMessageEditor(callbacks);
-		Controller.getInstance().setRequestMessageEditor(requestMessageEditor);
-
-		IMessageEditor responseMessageEditor = createMessageEditor(callbacks);
-		Controller.getInstance().setResponseMessageEditor(responseMessageEditor);
+		requestMessageEditor = BurpUtil.getCallbacks().createMessageEditor(messageEditorController, requestEditable);
+		responseMessageEditor = BurpUtil.getCallbacks().createMessageEditor(messageEditorController, responseEditable);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				requestMessageEditor.getComponent(),
@@ -38,8 +39,8 @@ public class MessageEditorPanel extends JPanel {
 		add(splitPane);
 	}
 
-	private IMessageEditor createMessageEditor(IBurpExtenderCallbacks callbacks) {
-		return callbacks.createMessageEditor(new IMessageEditorController() {
+	private static IMessageEditorController createDefaultMessageEditorController() {
+		return new IMessageEditorController() {
 			@Override
 			public IHttpService getHttpService() {
 				return Controller.getInstance().getSelectedMessage().getMessage().getHttpService();
@@ -52,7 +53,21 @@ public class MessageEditorPanel extends JPanel {
 			public byte[] getResponse() {
 				return Controller.getInstance().getSelectedMessage().getMessage().getResponse();
 			}
-		}, false);
+		};
+	}
+
+	public void setMessage(MessageDto dto) {
+		requestMessageEditor.setMessage(
+				dto.getMessage().getRequest(),
+				true);
+		responseMessageEditor.setMessage(
+				Optional.ofNullable(dto.getMessage().getResponse()).orElse(new byte[] {}),
+				false);
+	}
+
+	public void clearMessage() {
+		requestMessageEditor.setMessage(new byte[] {}, true);
+		responseMessageEditor.setMessage(new byte[] {}, false);
 	}
 
 }

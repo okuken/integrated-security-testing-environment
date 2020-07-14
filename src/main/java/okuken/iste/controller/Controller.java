@@ -13,7 +13,6 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import burp.IHttpRequestResponse;
-import burp.IMessageEditor;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.logic.ConfigLogic;
@@ -26,8 +25,10 @@ import okuken.iste.view.SuiteTab;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
+import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
+import okuken.iste.view.repeater.RepeaterPanel;
 
 public class Controller {
 
@@ -44,8 +45,8 @@ public class Controller {
 	private MessageTableModel messageTableModel;
 	private JTable messageTable;
 
-	private IMessageEditor requestMessageEditor;
-	private IMessageEditor responseMessageEditor;
+	private MessageEditorPanel orgMessageEditorPanel;
+	private RepeaterPanel repeaterPanel;
 
 	private MessageMemoPanel messageMemoPanel;
 
@@ -86,11 +87,11 @@ public class Controller {
 	public void setMessageTable(JTable messageTable) {
 		this.messageTable = messageTable;
 	}
-	public void setRequestMessageEditor(IMessageEditor messageEditor) {
-		this.requestMessageEditor = messageEditor;
+	public void setOrgMessageEditorPanel(MessageEditorPanel orgMessageEditorPanel) {
+		this.orgMessageEditorPanel = orgMessageEditorPanel;
 	}
-	public void setResponseMessageEditor(IMessageEditor messageEditor) {
-		this.responseMessageEditor = messageEditor;
+	public void setRepeaterPanel(RepeaterPanel repeaterPanel) {
+		this.repeaterPanel = repeaterPanel;
 	}
 	public void setMessageMemoPanel(MessageMemoPanel messageMemoPanel) {
 		this.messageMemoPanel = messageMemoPanel;
@@ -138,11 +139,8 @@ public class Controller {
 	}
 
 	public void refreshMessageDetailPanels(MessageDto dto) {
-		this.requestMessageEditor.setMessage(dto.getMessage().getRequest(), true);
-		this.responseMessageEditor.setMessage(
-				dto.getMessage().getResponse() != null ? dto.getMessage().getResponse() : new byte[] {},
-				false);
-
+		this.orgMessageEditorPanel.setMessage(dto);
+		this.repeaterPanel.setMessage(dto);
 		this.messageMemoPanel.enablePanel(dto);
 	}
 
@@ -189,8 +187,8 @@ public class Controller {
 	private void reloadDatabase() {
 		this.messageTableModel.clearRows();
 		this.messageTablePanel.setupTable(); // for fix bug: progress column control can't be active after to load empty messageTable.
-		this.requestMessageEditor.setMessage(new byte[] {}, true);
-		this.responseMessageEditor.setMessage(new byte[] {}, false);
+		this.orgMessageEditorPanel.clearMessage();
+		this.repeaterPanel.clearMessage();
 		this.messageMemoPanel.disablePanel();
 
 		loadDatabase();

@@ -13,6 +13,7 @@ import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.option.UserOptionsPanel;
+import okuken.iste.view.repeater.RepeaterPanel;
 import okuken.iste.view.tool.ExportToolsPanel;
 
 import java.awt.GridLayout;
@@ -51,8 +52,16 @@ public class SuitePanel extends JPanel {
 		JPanel messageTablePanel = new MessageTablePanel();
 		mainLeftSplitPane.setLeftComponent(messageTablePanel);
 		
-		JPanel messageEditorPanel = new MessageEditorPanel();
-		mainLeftSplitPane.setRightComponent(messageEditorPanel);
+		JTabbedPane messageDetailTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		mainLeftSplitPane.setRightComponent(messageDetailTabbedPane);
+		
+		MessageEditorPanel orgMessageEditorPanel = new MessageEditorPanel();
+		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_ORIGINAL, null, orgMessageEditorPanel, null);
+		Controller.getInstance().setOrgMessageEditorPanel(orgMessageEditorPanel);
+		
+		RepeaterPanel repeaterPanel = new RepeaterPanel();
+		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_REPEAT, null, repeaterPanel, null);
+		Controller.getInstance().setRepeaterPanel(repeaterPanel);
 		
 		JPanel panel = new JPanel();
 		mainLeftPanel.add(panel, BorderLayout.NORTH);
