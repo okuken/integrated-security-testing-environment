@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 
 import burp.IHttpService;
 import burp.IMessageEditorController;
@@ -48,7 +49,9 @@ public class RepeaterPanel extends JPanel {
 				Executors.newSingleThreadExecutor().submit(() -> {
 					messageEditorPanel.clearResponse();
 					MessageDto messageDto = Controller.getInstance().sendRequest(messageEditorPanel.getRequest(), Controller.getInstance().getSelectedMessage());
-					messageEditorPanel.setResponse(messageDto.getMessage().getResponse());
+					SwingUtilities.invokeLater(() -> {
+						messageEditorPanel.setResponse(messageDto.getMessage().getResponse());
+					});
 				});
 			}
 		});

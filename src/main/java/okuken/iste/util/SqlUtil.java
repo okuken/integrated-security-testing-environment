@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.ibatis.session.SqlSession;
 
@@ -14,6 +15,9 @@ public class SqlUtil {
 	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 	public static final String now() {
 		return timestampFormat.format(Calendar.getInstance().getTime());
+	}
+	public static final String dateToString(Date date) {
+		return timestampFormat.format(date);
 	}
 
 	public static final int loadGeneratedId(SqlSession session) {

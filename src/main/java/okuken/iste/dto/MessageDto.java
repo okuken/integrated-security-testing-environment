@@ -1,6 +1,7 @@
 package okuken.iste.dto;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
 import burp.IHttpRequestResponse;
@@ -36,6 +37,12 @@ public class MessageDto {
 	private IHttpRequestResponse message;
 	private IRequestInfo requestInfo;
 	private IResponseInfo responseInfo;
+
+	// Repeater only
+	private String difference; //TODO: structure
+	private Date sendDate;
+	private Integer time;
+
 
 	public String getProtocol() {
 		if(url == null) {return null;}
@@ -215,6 +222,25 @@ public class MessageDto {
 	}
 	public void setResponseInfo(IResponseInfo responseInfo) {
 		this.responseInfo = responseInfo;
+	}
+
+	public String getDifference() {
+		return difference;
+	}
+	public void setDifference(String difference) {
+		this.difference = difference;
+	}
+	public Date getSendDate() {
+		return sendDate;
+	}
+	public void setSendDate(Date sendDate) {
+		this.sendDate = sendDate;
+	}
+	public Integer getTime() {
+		return time;
+	}
+	public void setTime(Integer time) {
+		this.time = time;
 	}
 
 }
