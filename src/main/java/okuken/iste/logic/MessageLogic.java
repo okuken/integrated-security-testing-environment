@@ -267,24 +267,34 @@ public class MessageLogic {
 
 	public void loadMessageDetail(MessageDto dto) {
 		try {
-			MessageRaw messageRaw =
-				DbUtil.withSession(session -> {
-					MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
-					return messageRawMapper
-							.selectOne(c -> c.where(MessageRawDynamicSqlSupport.id, SqlBuilder.isEqualTo(dto.getMessageRawId())))
-							.get();
-				});
-
-			IHttpRequestResponse httpRequestResponse = new HttpRequestResponseMock(
-					messageRaw.getRequest(),
-					messageRaw.getResponse(),
-					new HttpServiceMock(messageRaw.getHost(), messageRaw.getPort(), messageRaw.getProtocol()));
+			IHttpRequestResponse httpRequestResponse = loadMessageDetail(dto.getMessageRawId());
 
 			dto.setMessage(httpRequestResponse);
 			dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(httpRequestResponse)); //TODO: share implementation...
 			if(httpRequestResponse.getResponse() != null) {
 				dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(httpRequestResponse.getResponse()));
 			}
+
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw e;
+		}
+	}
+
+	public IHttpRequestResponse loadMessageDetail(Integer messageRawId) {
+		try {
+			MessageRaw messageRaw =
+				DbUtil.withSession(session -> {
+					MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
+					return messageRawMapper
+							.selectOne(c -> c.where(MessageRawDynamicSqlSupport.id, SqlBuilder.isEqualTo(messageRawId)))
+							.get();
+				});
+
+			return new HttpRequestResponseMock(
+					messageRaw.getRequest(),
+					messageRaw.getResponse(),
+					new HttpServiceMock(messageRaw.getHost(), messageRaw.getPort(), messageRaw.getProtocol()));
 
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);

@@ -15,6 +15,7 @@ import javax.swing.table.TableColumn;
 import burp.IHttpRequestResponse;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
 import okuken.iste.logic.MemoLogic;
@@ -141,11 +142,19 @@ public class Controller {
 
 	public void refreshMessageDetailPanels(MessageDto dto) {
 		this.orgMessageEditorPanel.setMessage(dto);
-		this.repeaterPanel.setMessage(dto);
+		this.repeaterPanel.setup(dto);
 		this.messageMemoPanel.enablePanel(dto);
 	}
 
-	public MessageDto sendRequest(byte[] request, MessageDto orgMessageDto) {
+	public void refreshMessageRepeaterPanel(int rowIndex) {
+		repeaterPanel.setMessage(rowIndex);
+	}
+
+	public List<MessageRepeatDto> getRepeaterHistory(Integer orgMessageId) {
+		return RepeaterLogic.getInstance().loadHistory(orgMessageId);
+	}
+
+	public MessageRepeatDto sendRequest(byte[] request, MessageDto orgMessageDto) {
 		return RepeaterLogic.getInstance().sendRequest(request, orgMessageDto);
 	}
 
@@ -193,7 +202,7 @@ public class Controller {
 		this.messageTableModel.clearRows();
 		this.messageTablePanel.setupTable(); // for fix bug: progress column control can't be active after to load empty messageTable.
 		this.orgMessageEditorPanel.clearMessage();
-		this.repeaterPanel.clearMessage();
+		this.repeaterPanel.clear();
 		this.messageMemoPanel.disablePanel();
 
 		loadDatabase();

@@ -78,6 +78,10 @@ public class MessageEditorPanel extends JPanel {
 		responseMessageEditor.setMessage(new byte[] {}, false);
 	}
 
+	public void setRequest(byte[] request) {
+		requestMessageEditor.setMessage(request, true);
+	}
+
 	public void setResponse(byte[] response) {
 		responseMessageEditor.setMessage(response, false);
 	}

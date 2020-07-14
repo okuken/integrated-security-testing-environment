@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +19,13 @@ public class SqlUtil {
 	}
 	public static final String dateToString(Date date) {
 		return timestampFormat.format(date);
+	}
+	public static final Date stringToDate(String dateStr) {
+		try {
+			return timestampFormat.parse(dateStr);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static final int loadGeneratedId(SqlSession session) {

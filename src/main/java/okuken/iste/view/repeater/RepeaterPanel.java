@@ -11,6 +11,7 @@ import burp.IMessageEditorController;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import javax.swing.JButton;
 import java.awt.FlowLayout;
@@ -22,7 +23,10 @@ public class RepeaterPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private RepeatTablePanel repeatTablePanel;
 	private MessageEditorPanel messageEditorPanel;
+
+	private MessageDto orgMessageDto;
 
 	public RepeaterPanel() {
 		setLayout(new BorderLayout(0, 0));
@@ -35,7 +39,7 @@ public class RepeaterPanel extends JPanel {
 		splitPane.setLeftComponent(headerPanel);
 		headerPanel.setLayout(new BorderLayout(0, 0));
 		
-		JPanel repeatTablePanel = new RepeatTablePanel();
+		repeatTablePanel = new RepeatTablePanel();
 		headerPanel.add(repeatTablePanel, BorderLayout.CENTER);
 		
 		JPanel controlPanel = new JPanel();
@@ -48,9 +52,11 @@ public class RepeaterPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				Executors.newSingleThreadExecutor().submit(() -> {
 					messageEditorPanel.clearResponse();
-					MessageDto messageDto = Controller.getInstance().sendRequest(messageEditorPanel.getRequest(), Controller.getInstance().getSelectedMessage());
+					MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRequest(messageEditorPanel.getRequest(), Controller.getInstance().getSelectedMessage());
 					SwingUtilities.invokeLater(() -> {
-						messageEditorPanel.setResponse(messageDto.getMessage().getResponse());
+						messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
+						repeatTablePanel.setup(orgMessageDto.getId());
+						repeatTablePanel.selectLastRow();
 					});
 				});
 			}
@@ -75,11 +81,26 @@ public class RepeaterPanel extends JPanel {
 		
 	}
 
-	public void setMessage(MessageDto dto) {
-		messageEditorPanel.setMessage(dto);
+	public void setup(MessageDto orgMessageDto) {
+		this.orgMessageDto = orgMessageDto;
+		repeatTablePanel.setup(orgMessageDto.getId()); //TODO: should cache repeat data or not??
+
+		Integer lastRowIndex = repeatTablePanel.selectLastRow();
+		if(lastRowIndex == null) {
+			messageEditorPanel.setMessage(orgMessageDto);
+			return;
+		}
+		setMessage(lastRowIndex);
 	}
 
-	public void clearMessage() {
+	public void setMessage(int rowIndex) {
+		MessageRepeatDto messageRepeatDto = repeatTablePanel.getRow(rowIndex);
+		messageEditorPanel.setRequest(messageRepeatDto.getMessage().getRequest());
+		messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
+	}
+
+	public void clear() {
+		repeatTablePanel.clear();
 		messageEditorPanel.clearMessage();
 	}
 
