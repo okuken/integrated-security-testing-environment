@@ -56,6 +56,14 @@ public class MessageEditorPanel extends JPanel {
 		};
 	}
 
+	public byte[] getRequest() {
+		return requestMessageEditor.getMessage();
+	}
+
+	public byte[] getResponse() {
+		return responseMessageEditor.getMessage();
+	}
+
 	public void setMessage(MessageDto dto) {
 		requestMessageEditor.setMessage(
 				dto.getMessage().getRequest(),
@@ -67,6 +75,14 @@ public class MessageEditorPanel extends JPanel {
 
 	public void clearMessage() {
 		requestMessageEditor.setMessage(new byte[] {}, true);
+		responseMessageEditor.setMessage(new byte[] {}, false);
+	}
+
+	public void setResponse(byte[] response) {
+		responseMessageEditor.setMessage(response, false);
+	}
+
+	public void clearResponse() {
 		responseMessageEditor.setMessage(new byte[] {}, false);
 	}
 

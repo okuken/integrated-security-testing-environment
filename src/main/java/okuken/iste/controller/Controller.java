@@ -20,6 +20,7 @@ import okuken.iste.logic.ExportLogic;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.ProjectLogic;
+import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuiteTab;
 import okuken.iste.view.header.MainHeaderPanel;
@@ -142,6 +143,10 @@ public class Controller {
 		this.orgMessageEditorPanel.setMessage(dto);
 		this.repeaterPanel.setMessage(dto);
 		this.messageMemoPanel.enablePanel(dto);
+	}
+
+	public MessageDto sendRequest(byte[] request, MessageDto orgMessageDto) {
+		return RepeaterLogic.getInstance().sendRequest(request, orgMessageDto);
 	}
 
 	public void saveMessageMemo(MessageDto messageDto) {

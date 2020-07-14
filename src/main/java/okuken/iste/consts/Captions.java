@@ -26,6 +26,8 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
+	public static final String REPEATER_BUTTON_SEND = "Send";
+
 	public static final String PROJECT_MEMO_BUTTON_WRAP = "Wrap";
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo to txt";
