@@ -84,7 +84,7 @@ public class MessageTablePanel extends JPanel {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 				Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-				if(isSelected) {
+				if(isSelected && !MessageTableColumn.PROGRESS.getCaption().equals(table.getColumnName(column))) {
 					return renderer;
 				}
 
