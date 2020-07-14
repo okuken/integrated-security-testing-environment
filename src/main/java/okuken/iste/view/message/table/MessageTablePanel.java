@@ -24,13 +24,16 @@ public class MessageTablePanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private MessageTableModel tableModel;
+	private JTable table;
+
 	public MessageTablePanel() {
 		setLayout(new BorderLayout(0, 0));
 		
-		MessageTableModel tableModel = new MessageTableModel();
+		tableModel = new MessageTableModel();
 		Controller.getInstance().setMessageTableModel(tableModel);
 
-		JTable table = new JTable(tableModel) {
+		table = new JTable(tableModel) {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
@@ -38,11 +41,7 @@ public class MessageTablePanel extends JPanel {
 				Controller.getInstance().refreshMessageDetailPanels(tableModel.getRow(row));
 			}
 		};
-		setupColumnWidth(table, tableModel);
-		setupDraggable(table, tableModel);
-		setupProgressColumn(table, tableModel);
-		setupTableRowColorControl(table, tableModel);
-		table.setComponentPopupMenu(new MessageTablePopupMenu());
+		setupTable();
 		Controller.getInstance().setMessageTable(table);	
 
 		SwingUtilities.invokeLater(() -> { // run after IBurpExtenderCallbacks#customizeUiComponent().
@@ -52,6 +51,16 @@ public class MessageTablePanel extends JPanel {
 		JScrollPane scrollPane = new JScrollPane(table);
 
 		add(scrollPane);
+
+		Controller.getInstance().setMessageTablePanel(this);
+	}
+
+	public void setupTable() {
+		setupColumnWidth(table, tableModel);
+		setupDraggable(table, tableModel);
+		setupProgressColumn(table, tableModel);
+		setupTableRowColorControl(table, tableModel);
+		table.setComponentPopupMenu(new MessageTablePopupMenu());
 	}
 
 	private void setupColumnWidth(JTable table, MessageTableModel messageTableModel) {

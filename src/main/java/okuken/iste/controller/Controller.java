@@ -27,6 +27,7 @@ import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.table.MessageTableModel;
+import okuken.iste.view.message.table.MessageTablePanel;
 
 public class Controller {
 
@@ -39,6 +40,7 @@ public class Controller {
 
 	private JFrame dockoutFrame;
 
+	private MessageTablePanel messageTablePanel;
 	private MessageTableModel messageTableModel;
 	private JTable messageTable;
 
@@ -74,6 +76,9 @@ public class Controller {
 	}
 	public void setDockoutFrame(JFrame dockoutFrame) {
 		this.dockoutFrame = dockoutFrame;
+	}
+	public void setMessageTablePanel(MessageTablePanel messageTablePanel) {
+		this.messageTablePanel = messageTablePanel;
 	}
 	public void setMessageTableModel(MessageTableModel messageTableModel) {
 		this.messageTableModel = messageTableModel;
@@ -183,6 +188,7 @@ public class Controller {
 	}
 	private void reloadDatabase() {
 		this.messageTableModel.clearRows();
+		this.messageTablePanel.setupTable(); // for fix bug: progress column control can't be active after to load empty messageTable.
 		this.requestMessageEditor.setMessage(new byte[] {}, true);
 		this.responseMessageEditor.setMessage(new byte[] {}, false);
 		this.messageMemoPanel.disablePanel();
