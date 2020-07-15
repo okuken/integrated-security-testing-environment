@@ -51,8 +51,8 @@ public class RepeaterPanel extends JPanel {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		headerPanel.add(controlPanel, BorderLayout.SOUTH);
 		
-		JButton btnNewButton = new JButton(Captions.REPEATER_BUTTON_SEND);
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton sendButton = new JButton(Captions.REPEATER_BUTTON_SEND);
+		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Executors.newSingleThreadExecutor().submit(() -> {
 					messageEditorPanel.clearResponse();
@@ -65,7 +65,15 @@ public class RepeaterPanel extends JPanel {
 				});
 			}
 		});
-		controlPanel.add(btnNewButton);
+		controlPanel.add(sendButton);
+		
+		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
+		copyOrgButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				messageEditorPanel.setMessage(orgMessageDto);
+			}
+		});
+		controlPanel.add(copyOrgButton);
 		
 		messageEditorPanel = new MessageEditorPanel(new IMessageEditorController() {
 			@Override
