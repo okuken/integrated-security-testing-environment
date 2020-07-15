@@ -19,6 +19,7 @@ import javax.swing.table.TableColumn;
 
 import okuken.iste.controller.Controller;
 import okuken.iste.enums.SecurityTestingProgress;
+import okuken.iste.util.UiUtil;
 
 public class MessageTablePanel extends JPanel {
 
@@ -61,6 +62,7 @@ public class MessageTablePanel extends JPanel {
 		setupProgressColumn(table, tableModel);
 		setupTableRowColorControl(table, tableModel);
 		table.setComponentPopupMenu(new MessageTablePopupMenu());
+		UiUtil.setupCtrlCAsCopyCell(table);
 	}
 
 	private void setupColumnWidth(JTable table, MessageTableModel messageTableModel) {

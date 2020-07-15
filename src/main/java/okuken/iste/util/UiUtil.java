@@ -2,9 +2,13 @@ package okuken.iste.util;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.JTextComponent;
@@ -15,6 +19,19 @@ public class UiUtil {
 	public static final void copyToClipboard(String content) {
 		StringSelection stringSelection = new StringSelection(content);
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, stringSelection);
+	}
+
+	@SuppressWarnings("serial")
+	public static final void setupCtrlCAsCopyCell(JTable table) {
+		String actionMapKeyCopyCell = "Copy Cell";
+		KeyStroke keyStrokeCtrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK, false);
+		table.getInputMap().put(keyStrokeCtrlC, actionMapKeyCopyCell);
+		table.getActionMap().put(actionMapKeyCopyCell, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				copyToClipboard(table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString());
+			}
+		});
 	}
 
 	public static final UndoManager addUndoRedoFeature(JTextComponent textComponent) {

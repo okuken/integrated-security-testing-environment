@@ -12,6 +12,7 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.logic.AuthLogic;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 import java.awt.BorderLayout;
 import javax.swing.JButton;
@@ -102,6 +103,7 @@ public class AuthAccountTablePanel extends JPanel {
 		table.getColumnModel().getColumn(COLNUM_REMARK).setPreferredWidth(300);
 		scrollPane.setViewportView(table);
 		
+		UiUtil.setupCtrlCAsCopyCell(table);
 		SwingUtilities.invokeLater(() -> { // run after IBurpExtenderCallbacks#customizeUiComponent().
 			table.setBorder(new LineBorder(Colors.TABLE_BORDER));
 		});
