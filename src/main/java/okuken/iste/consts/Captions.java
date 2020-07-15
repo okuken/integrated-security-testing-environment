@@ -28,7 +28,7 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
 	public static final String REPEATER_BUTTON_SEND = "Send";
-	public static final String REPEATER_BUTTON_COPY_ORG = "Copy Org";
+	public static final String REPEATER_BUTTON_COPY_ORG = "Org";
 
 	public static final String PROJECT_MEMO_BUTTON_WRAP = "Wrap";
 
@@ -38,6 +38,13 @@ public class Captions {
 	public static final String AUTH_TABLE_FIELD_USER_ID = "ID";
 	public static final String AUTH_TABLE_FIELD_PASSWORD = "Password";
 	public static final String AUTH_TABLE_FIELD_REMARK = "Remark";
+
+	public static final String AUTH_CONFIG_LOGIN_URL = "URL:";
+	public static final String AUTH_CONFIG_LOGIN_ID = "ID:";
+	public static final String AUTH_CONFIG_LOGIN_PW = "Password:";
+	public static final String AUTH_CONFIG_SESSIONID = "Session ID:";
+
+	public static final String AUTH_CONFIG_BUTTON_LOGIN_TEST = "Test";
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo to txt";
 

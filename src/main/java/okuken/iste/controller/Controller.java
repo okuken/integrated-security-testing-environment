@@ -17,6 +17,7 @@ import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.dto.PayloadDto;
 import okuken.iste.logic.AuthLogic;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
@@ -120,6 +121,12 @@ public class Controller {
 		this.messageTableModel.addRows(messageDtos);
 		MessageLogic.getInstance().saveMessageOrder(this.messageTableModel.getRows()); // TODO: join transaction...
 		messageDtos.forEach(messageDto -> MemoLogic.getInstance().saveMessageMemo(messageDto));
+
+		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
+	}
+
+	private void refreshComponentsDependentOnMessages(List<MessageDto> messageDtos) {
+		authPanel.refreshConfigPanel(messageDtos);
 	}
 
 	public void initMessageTableColumnWidth() {
@@ -162,8 +169,12 @@ public class Controller {
 		return RepeaterLogic.getInstance().loadHistory(orgMessageId);
 	}
 
-	public MessageRepeatDto sendRequest(byte[] request, MessageDto orgMessageDto) {
-		return RepeaterLogic.getInstance().sendRequest(request, orgMessageDto);
+	public MessageRepeatDto sendRepeaterRequest(byte[] request, MessageDto orgMessageDto) {
+		return RepeaterLogic.getInstance().sendRequest(request, orgMessageDto, true);
+	}
+
+	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto) {
+		return RepeaterLogic.getInstance().sendRequest(payloadDtos, orgMessageDto, false);
 	}
 
 	public void saveMessageMemo(MessageDto messageDto) {
@@ -196,9 +207,10 @@ public class Controller {
 	}
 
 	public void loadDatabase() {
-		this.messageTableModel.addRows(loadMessages());
+		List<MessageDto> messageDtos = loadMessages();
+		this.messageTableModel.addRows(messageDtos);
 		this.projectMemoPanel.refreshPanel();
-		this.authPanel.refreshPanel();
+		this.authPanel.refreshPanel(messageDtos);
 	}
 
 	private List<MessageDto> loadMessages() {

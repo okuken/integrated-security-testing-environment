@@ -11,6 +11,7 @@ import org.mybatis.dynamic.sql.SqlBuilder;
 
 import com.google.common.collect.Lists;
 
+import burp.ICookie;
 import burp.IHttpRequestResponse;
 import burp.IHttpService;
 import burp.IParameter;
@@ -21,6 +22,7 @@ import okuken.iste.dao.MessageOrdMapper;
 import okuken.iste.dao.MessageParamMapper;
 import okuken.iste.dao.MessageRawDynamicSqlSupport;
 import okuken.iste.dao.MessageRawMapper;
+import okuken.iste.dto.MessageCookieDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageParamDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
@@ -67,6 +69,9 @@ public class MessageLogic {
 			dto.setCookies(dto.getResponseInfo().getCookies().stream()
 					.map(cookie -> String.format("%s=%s;", cookie.getName(), cookie.getValue()))
 					.collect(Collectors.joining("; ")));
+
+			dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
+					.map(cookie -> convertCookieToDto(cookie)).collect(Collectors.toList()));
 		}
 
 		dto.setMemo("");
@@ -92,6 +97,16 @@ public class MessageLogic {
 		dto.setName(parameter.getName());
 		dto.setValue(parameter.getValue());
 		return dto;
+	}
+
+	public MessageCookieDto convertCookieToDto(ICookie cookie) { // TODO: externalize to converter
+		MessageCookieDto cookieDto = new MessageCookieDto();
+		cookieDto.setDomain(cookie.getDomain());
+		cookieDto.setPath(cookie.getPath());
+		cookieDto.setExpiration(cookie.getExpiration());
+		cookieDto.setName(cookie.getName());
+		cookieDto.setValue(cookie.getValue());
+		return cookieDto;
 	}
 
 	public void saveMessages(List<MessageDto> dtos) {
@@ -271,8 +286,13 @@ public class MessageLogic {
 
 			dto.setMessage(httpRequestResponse);
 			dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(httpRequestResponse)); //TODO: share implementation...
+			dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
+					.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
+
 			if(httpRequestResponse.getResponse() != null) {
 				dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(httpRequestResponse.getResponse()));
+				dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
+						.map(cookie -> convertCookieToDto(cookie)).collect(Collectors.toList()));
 			}
 
 		} catch (Exception e) {

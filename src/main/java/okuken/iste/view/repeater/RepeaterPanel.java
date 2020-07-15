@@ -56,7 +56,7 @@ public class RepeaterPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				Executors.newSingleThreadExecutor().submit(() -> {
 					messageEditorPanel.clearResponse();
-					MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRequest(messageEditorPanel.getRequest(), Controller.getInstance().getSelectedMessage());
+					MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), Controller.getInstance().getSelectedMessage());
 					SwingUtilities.invokeLater(() -> {
 						messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
 						repeatTablePanel.setup(orgMessageDto.getId());

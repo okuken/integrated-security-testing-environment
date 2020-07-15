@@ -32,6 +32,8 @@ public class MessageDto {
 
 	private List<MessageParamDto> messageParamList;
 
+	private List<MessageCookieDto> messageCookieList;
+
 	private Integer messageRawId;
 	private IHttpRequestResponse message;
 	private IRequestInfo requestInfo;
@@ -185,10 +187,22 @@ public class MessageDto {
 		this.cookies = cookies;
 	}
 	public List<MessageParamDto> getMessageParamList() {
+		if(messageParamList == null) {
+			MessageLogic.getInstance().loadMessageDetail(this);
+		}
 		return messageParamList;
 	}
 	public void setMessageParamList(List<MessageParamDto> messageParamList) {
 		this.messageParamList = messageParamList;
+	}
+	public List<MessageCookieDto> getMessageCookieList() {
+		if(messageCookieList == null) {
+			MessageLogic.getInstance().loadMessageDetail(this);
+		}
+		return messageCookieList;
+	}
+	public void setMessageCookieList(List<MessageCookieDto> messageCookieList) {
+		this.messageCookieList = messageCookieList;
 	}
 	public Integer getMessageRawId() {
 		return messageRawId;
@@ -216,6 +230,11 @@ public class MessageDto {
 	}
 	public void setResponseInfo(IResponseInfo responseInfo) {
 		this.responseInfo = responseInfo;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s [%s]", name, getUrlShort());
 	}
 
 }

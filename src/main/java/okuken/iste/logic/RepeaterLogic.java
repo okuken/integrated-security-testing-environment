@@ -13,6 +13,7 @@ import okuken.iste.dao.MessageRepeatDynamicSqlSupport;
 import okuken.iste.dao.MessageRepeatMapper;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.dto.PayloadDto;
 import okuken.iste.entity.MessageRaw;
 import okuken.iste.entity.MessageRepeat;
 import okuken.iste.util.BurpUtil;
@@ -27,7 +28,30 @@ public class RepeaterLogic {
 		return instance;
 	}
 
-	public MessageRepeatDto sendRequest(byte[] request, MessageDto orgMessageDto) {
+	public MessageRepeatDto sendRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto, boolean needSaveHistory) {
+		try {
+			return sendRequest(
+					applyPayloads(orgMessageDto.getMessage().getRequest(), payloadDtos),
+					orgMessageDto,
+					needSaveHistory);
+
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw e;
+		}
+	}
+	private byte[] applyPayloads(byte[] request, List<PayloadDto> payloadDtos) {
+		byte[] ret = request;
+		for(PayloadDto payloadDto: payloadDtos) {
+			ret = BurpUtil.getHelpers().updateParameter(ret, BurpUtil.getHelpers().buildParameter(
+					payloadDto.getTargetParamName(),
+					payloadDto.getPayload(),
+					payloadDto.getTargetParamType()));
+		}
+		return ret;
+	}
+
+	public MessageRepeatDto sendRequest(byte[] request, MessageDto orgMessageDto, boolean needSaveHistory) {
 		try {
 			Date sendDate = Calendar.getInstance().getTime();
 			long timerStart = System.currentTimeMillis();
@@ -47,7 +71,9 @@ public class RepeaterLogic {
 			ret.setTime(time);
 			ret.setDifference("");//TODO: impl
 
-			save(ret, orgMessageDto.getId());
+			if(needSaveHistory) {
+				save(ret, orgMessageDto.getId());
+			}
 
 			return ret;
 
