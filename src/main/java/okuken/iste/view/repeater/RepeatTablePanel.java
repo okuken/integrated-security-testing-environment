@@ -85,7 +85,6 @@ public class RepeatTablePanel extends JPanel {
 		for(int i = rowCount - 1; i >= 0; i--) {
 			tableModel.removeRow(i);
 		}
-		tableModel.fireTableRowsDeleted(0, rowCount - 1);
 
 		repeaterHistory = null;
 	}

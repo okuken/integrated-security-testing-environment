@@ -14,8 +14,10 @@ import javax.swing.table.TableColumn;
 
 import burp.IHttpRequestResponse;
 import okuken.iste.DatabaseManager;
+import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.logic.AuthLogic;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
 import okuken.iste.logic.MemoLogic;
@@ -24,6 +26,7 @@ import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuiteTab;
+import okuken.iste.view.auth.AuthPanel;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
@@ -53,6 +56,8 @@ public class Controller {
 	private MessageMemoPanel messageMemoPanel;
 
 	private ProjectMemoPanel projectMemoPanel;
+
+	private AuthPanel authPanel;
 
 	private Controller() {}
 	public static Controller getInstance() {
@@ -100,6 +105,9 @@ public class Controller {
 	}
 	public void setProjectMemoPanel(ProjectMemoPanel projectMemoPanel) {
 		this.projectMemoPanel = projectMemoPanel;
+	}
+	public void setAuthPanel(AuthPanel authPanel) {
+		this.authPanel = authPanel;
 	}
 
 
@@ -177,9 +185,20 @@ public class Controller {
 		ExportLogic.getInstance().exportMemoToTextFile(file, loadMessages(), getProjectMemo());
 	}
 
+	public List<AuthAccountDto> getAuthAccounts() {
+		return AuthLogic.getInstance().loadAuthAccounts();
+	}
+	public void saveAuthAccount(AuthAccountDto authAccountDto) {
+		AuthLogic.getInstance().saveAuthAccount(authAccountDto);
+	}
+	public void deleteAuthAccounts(List<AuthAccountDto> authAccountDtos) {
+		AuthLogic.getInstance().deleteAuthAccounts(authAccountDtos);
+	}
+
 	public void loadDatabase() {
 		this.messageTableModel.addRows(loadMessages());
 		this.projectMemoPanel.refreshPanel();
+		this.authPanel.refreshPanel();
 	}
 
 	private List<MessageDto> loadMessages() {

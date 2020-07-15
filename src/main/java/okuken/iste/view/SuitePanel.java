@@ -10,6 +10,7 @@ import javax.swing.JSplitPane;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
+import okuken.iste.view.auth.AuthPanel;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
@@ -72,9 +73,6 @@ public class SuitePanel extends JPanel {
 		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_REPEAT, null, repeaterPanel, null);
 		Controller.getInstance().setRepeaterPanel(repeaterPanel);
 		
-		JPanel panel = new JPanel();
-		mainLeftPanel.add(panel, BorderLayout.NORTH);
-		
 		JPanel mainRightPanel = new JPanel();
 		mainSplitPane.setRightComponent(mainRightPanel);
 		mainRightPanel.setLayout(new BorderLayout(0, 0));
@@ -94,6 +92,10 @@ public class SuitePanel extends JPanel {
 		
 		JPanel projectMemoPanel = new ProjectMemoPanel();
 		mainTabbedPane.addTab(Captions.TAB_MEMO, null, projectMemoPanel, null);
+		
+		AuthPanel authPanel = new AuthPanel();
+		mainTabbedPane.addTab(Captions.TAB_AUTH, null, authPanel, null);
+		Controller.getInstance().setAuthPanel(authPanel);
 		
 		JPanel toolsPanel = new JPanel();
 		mainTabbedPane.addTab(Captions.TAB_TOOLS, null, toolsPanel, null);
