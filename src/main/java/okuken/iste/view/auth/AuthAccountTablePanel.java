@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
+import java.awt.Dimension;
 
 public class AuthAccountTablePanel extends JPanel {
 
@@ -39,6 +40,10 @@ public class AuthAccountTablePanel extends JPanel {
 	private static final int COLNUM_PASSWORD = 1;
 	private static final int COLNUM_REMARK = 2;
 
+	private static final int WIDTH_USER_ID = 100;
+	private static final int WIDTH_PASSWORD = 100;
+	private static final int WIDTH_REMARK = 300;
+
 	private DefaultTableModel tableModel;
 
 	private List<AuthAccountDto> authAccountDtos;
@@ -48,6 +53,7 @@ public class AuthAccountTablePanel extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setPreferredSize(new Dimension(WIDTH_USER_ID + WIDTH_PASSWORD + WIDTH_REMARK + 25, 210));
 		add(scrollPane);
 		
 		table = new JTable();
@@ -98,9 +104,9 @@ public class AuthAccountTablePanel extends JPanel {
 				super.setValueAt(val, rowIndex, columnIndex);
 			}
 		});
-		table.getColumnModel().getColumn(COLNUM_USER_ID).setPreferredWidth(100);
-		table.getColumnModel().getColumn(COLNUM_PASSWORD).setPreferredWidth(100);
-		table.getColumnModel().getColumn(COLNUM_REMARK).setPreferredWidth(300);
+		table.getColumnModel().getColumn(COLNUM_USER_ID).setPreferredWidth(WIDTH_USER_ID);
+		table.getColumnModel().getColumn(COLNUM_PASSWORD).setPreferredWidth(WIDTH_PASSWORD);
+		table.getColumnModel().getColumn(COLNUM_REMARK).setPreferredWidth(WIDTH_REMARK);
 		scrollPane.setViewportView(table);
 		
 		UiUtil.setupCtrlCAsCopyCell(table);
@@ -112,22 +118,8 @@ public class AuthAccountTablePanel extends JPanel {
 		
 		JPanel authTableHeaderPanel = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) authTableHeaderPanel.getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
+		flowLayout.setAlignment(FlowLayout.RIGHT);
 		add(authTableHeaderPanel, BorderLayout.NORTH);
-		
-		JButton addRowButton = new JButton(Captions.AUTH_CONTROL_BUTTON_ADD);
-		addRowButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				AuthAccountDto authDto = showInputDialog();
-				if(authDto == null) {
-					return;
-				}
-
-				Controller.getInstance().saveAuthAccount(authDto);
-				tableModel.addRow(convertAuthAccountDtoToObjectArray(authDto));
-			}
-		});
-		authTableHeaderPanel.add(addRowButton);
 		
 		JButton deleteRowButton = new JButton(Captions.AUTH_CONTROL_BUTTON_DELETE);
 		deleteRowButton.addActionListener(new ActionListener() {
@@ -145,6 +137,20 @@ public class AuthAccountTablePanel extends JPanel {
 			}
 		});
 		authTableHeaderPanel.add(deleteRowButton);
+		
+		JButton addRowButton = new JButton(Captions.AUTH_CONTROL_BUTTON_ADD);
+		addRowButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AuthAccountDto authDto = showInputDialog();
+				if(authDto == null) {
+					return;
+				}
+
+				Controller.getInstance().saveAuthAccount(authDto);
+				tableModel.addRow(convertAuthAccountDtoToObjectArray(authDto));
+			}
+		});
+		authTableHeaderPanel.add(addRowButton);
 		
 	}
 

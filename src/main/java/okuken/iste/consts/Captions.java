@@ -32,8 +32,8 @@ public class Captions {
 
 	public static final String PROJECT_MEMO_BUTTON_WRAP = "Wrap";
 
-	public static final String AUTH_CONTROL_BUTTON_ADD = "Add";
-	public static final String AUTH_CONTROL_BUTTON_DELETE = "Del";
+	public static final String AUTH_CONTROL_BUTTON_ADD = "+";
+	public static final String AUTH_CONTROL_BUTTON_DELETE = "-";
 
 	public static final String AUTH_TABLE_FIELD_USER_ID = "ID";
 	public static final String AUTH_TABLE_FIELD_PASSWORD = "Password";
