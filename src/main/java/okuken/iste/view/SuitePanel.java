@@ -2,10 +2,13 @@ package okuken.iste.view;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+
 import java.awt.BorderLayout;
 import javax.swing.JSplitPane;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
@@ -40,6 +43,9 @@ public class SuitePanel extends JPanel {
 		JSplitPane mainSplitPane = new JSplitPane();
 		mainSplitPane.setResizeWeight(1.0);
 		mainPanel.add(mainSplitPane);
+		SwingUtilities.invokeLater(() -> {
+			mainSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN);
+		});
 		
 		JPanel mainLeftPanel = new JPanel();
 		mainSplitPane.setLeftComponent(mainLeftPanel);
@@ -48,6 +54,9 @@ public class SuitePanel extends JPanel {
 		JSplitPane mainLeftSplitPane = new JSplitPane();
 		mainLeftSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		mainLeftPanel.add(mainLeftSplitPane);
+		SwingUtilities.invokeLater(() -> {
+			mainLeftSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN_LEFT);
+		});
 		
 		JPanel messageTablePanel = new MessageTablePanel();
 		mainLeftSplitPane.setLeftComponent(messageTablePanel);
@@ -73,6 +82,9 @@ public class SuitePanel extends JPanel {
 		JSplitPane mainRightSplitPane = new JSplitPane();
 		mainRightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		mainRightPanel.add(mainRightSplitPane);
+		SwingUtilities.invokeLater(() -> {
+			mainRightSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN_RIGHT);
+		});
 		
 		JPanel messageMemoPanel = new MessageMemoPanel();
 		mainRightSplitPane.setLeftComponent(messageMemoPanel);

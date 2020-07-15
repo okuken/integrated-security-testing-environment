@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import burp.IHttpService;
 import burp.IMessageEditorController;
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
@@ -34,6 +35,9 @@ public class RepeaterPanel extends JPanel {
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		add(splitPane);
+		SwingUtilities.invokeLater(() -> {
+			splitPane.setDividerLocation(Positions.DIVIDER_LOCATION_REPEATER);
+		});
 		
 		JPanel headerPanel = new JPanel();
 		splitPane.setLeftComponent(headerPanel);
