@@ -32,6 +32,7 @@ import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
+import okuken.iste.view.message.table.MessageTableColumn;
 import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.repeater.RepeaterPanel;
@@ -130,10 +131,9 @@ public class Controller {
 	}
 
 	public void initMessageTableColumnWidth() {
-		//TODO: should reset column order...
 		Enumeration<TableColumn> e = messageTable.getColumnModel().getColumns();
 		for (int i = 0; e.hasMoreElements(); i++) {
-			e.nextElement().setPreferredWidth(messageTableModel.getDefaultColumnWidth(i));
+			e.nextElement().setPreferredWidth(MessageTableColumn.getByCaption(messageTable.getColumnName(i)).getWidth());
 		}
 	}
 

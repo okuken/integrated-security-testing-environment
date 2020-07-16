@@ -1,5 +1,10 @@
 package okuken.iste.view.message.table;
 
+import java.util.Arrays;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 public enum MessageTableColumn {
 
 	NAME		("Name",		300,	true),
@@ -43,4 +48,14 @@ public enum MessageTableColumn {
 	public boolean isEditable() {
 		return editable;
 	}
+
+	private static final Map<String, MessageTableColumn> captionToEnumMap;
+	static {
+		captionToEnumMap = Maps.newHashMap();
+		Arrays.stream(values()).forEach(column -> captionToEnumMap.put(column.caption, column));
+	}
+	public static MessageTableColumn getByCaption(String caption) {
+		return captionToEnumMap.get(caption);
+	}
+
 }

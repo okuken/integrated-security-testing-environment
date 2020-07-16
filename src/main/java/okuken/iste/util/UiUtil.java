@@ -5,6 +5,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.JTable;
@@ -21,15 +22,19 @@ public class UiUtil {
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, stringSelection);
 	}
 
+	public static final void setupCtrlCAsCopyCell(JTable table) { 
+		setupCtrlCAsCopyCell(table, c -> c);
+	}
+
 	@SuppressWarnings("serial")
-	public static final void setupCtrlCAsCopyCell(JTable table) {
+	public static final void setupCtrlCAsCopyCell(JTable table, Function<Integer, Integer> columnIndexTranslator) {
 		String actionMapKeyCopyCell = "Copy Cell";
 		KeyStroke keyStrokeCtrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK, false);
 		table.getInputMap().put(keyStrokeCtrlC, actionMapKeyCopyCell);
 		table.getActionMap().put(actionMapKeyCopyCell, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				copyToClipboard(table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString());
+				copyToClipboard(table.getModel().getValueAt(table.getSelectedRow(), columnIndexTranslator.apply(table.getSelectedColumn())).toString());
 			}
 		});
 	}

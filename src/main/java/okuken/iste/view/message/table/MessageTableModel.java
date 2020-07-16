@@ -147,10 +147,6 @@ public class MessageTableModel extends AbstractTableModel {
 		}
 	}
 
-	public int getDefaultColumnWidth(int columnIndex) {
-		return COLUMNS[columnIndex].getWidth();
-	}
-
 	public int getColumnIndex(MessageTableColumn column) {
 		for(int i = 0; i < COLUMNS.length; i++) {
 			if(column == COLUMNS[i]) {

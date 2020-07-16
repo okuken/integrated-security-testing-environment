@@ -62,7 +62,7 @@ public class MessageTablePanel extends JPanel {
 		setupProgressColumn(table, tableModel);
 		setupTableRowColorControl(table, tableModel);
 		table.setComponentPopupMenu(new MessageTablePopupMenu());
-		UiUtil.setupCtrlCAsCopyCell(table);
+		UiUtil.setupCtrlCAsCopyCell(table, colIndex -> tableModel.getColumnIndex(MessageTableColumn.getByCaption(table.getColumnName(colIndex))));
 	}
 
 	private void setupColumnWidth(JTable table, MessageTableModel messageTableModel) {
@@ -70,7 +70,7 @@ public class MessageTablePanel extends JPanel {
 
 		Enumeration<TableColumn> e = table.getColumnModel().getColumns();
 		for (int i = 0; e.hasMoreElements(); i++) {
-			e.nextElement().setPreferredWidth(messageTableModel.getDefaultColumnWidth(i));
+			e.nextElement().setPreferredWidth(MessageTableColumn.getByCaption(table.getColumnName(i)).getWidth());
 		}
 	}
 
