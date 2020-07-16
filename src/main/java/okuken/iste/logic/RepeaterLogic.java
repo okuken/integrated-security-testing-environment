@@ -109,6 +109,20 @@ public class RepeaterLogic {
 			messageRepeat.setLength(messageRepeatDto.getLength());
 			messageRepeat.setPrcDate(now);
 			messageRepeatMapper.insert(messageRepeat);
+			messageRepeatDto.setId(messageRepeat.getId());
+		});
+	}
+
+	public void updateMemo(MessageRepeatDto messageRepeatDto) {
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			MessageRepeatMapper messageRepeatMapper = session.getMapper(MessageRepeatMapper.class);
+
+			MessageRepeat messageRepeat = new MessageRepeat();
+			messageRepeat.setId(messageRepeatDto.getId());
+			messageRepeat.setMemo(messageRepeatDto.getMemo());
+			messageRepeat.setPrcDate(now);
+			messageRepeatMapper.updateByPrimaryKeySelective(messageRepeat);
 		});
 	}
 
@@ -124,6 +138,7 @@ public class RepeaterLogic {
 
 			return messageRepeats.stream().map(messageRepeat -> { //TODO:converter
 				MessageRepeatDto dto = new MessageRepeatDto();
+				dto.setId(messageRepeat.getId());
 				dto.setOrgMessageId(messageRepeat.getFkMessageId());
 				dto.setMessageRawId(messageRepeat.getFkMessageRawId());
 				dto.setSendDate(SqlUtil.stringToDate(messageRepeat.getSendDate()));
@@ -131,6 +146,7 @@ public class RepeaterLogic {
 				dto.setTime(messageRepeat.getTime());
 				dto.setStatus(messageRepeat.getStatus());
 				dto.setLength(messageRepeat.getLength());
+				dto.setMemo(messageRepeat.getMemo());
 				return dto;
 			}).collect(Collectors.toList());
 

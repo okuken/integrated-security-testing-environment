@@ -7,6 +7,8 @@ import okuken.iste.logic.MessageLogic;
 
 public class MessageRepeatDto {
 
+	private Integer id;
+
 	private Date sendDate;
 	private String difference; //TODO: structure
 
@@ -14,11 +16,19 @@ public class MessageRepeatDto {
 	private Integer length;
 	private Integer time;
 
+	private String memo;
+
 	private Integer messageRawId;
 	private IHttpRequestResponse message;
 
 	private Integer orgMessageId;
 
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
 	public Date getSendDate() {
 		return sendDate;
 	}
@@ -48,6 +58,12 @@ public class MessageRepeatDto {
 	}
 	public void setTime(Integer time) {
 		this.time = time;
+	}
+	public String getMemo() {
+		return memo;
+	}
+	public void setMemo(String memo) {
+		this.memo = memo;
 	}
 	public Integer getMessageRawId() {
 		return messageRawId;

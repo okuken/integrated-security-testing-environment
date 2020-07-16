@@ -1,6 +1,7 @@
 package okuken.iste.view.repeater;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -9,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.util.SqlUtil;
 import java.awt.BorderLayout;
 import javax.swing.JScrollPane;
@@ -43,23 +45,36 @@ public class RepeatTablePanel extends JPanel {
 		scrollPane.setViewportView(table);
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
+				{null, null, null, null, null, null},
 			},
 			new String[] {
-				"Send date", "Status", "Length", "Time", "Diff"
+				"Send date", "Status", "Length", "Time", "Diff", "Memo"
 			}
 		) {
 			boolean[] columnEditables = new boolean[] {
-				false, false, false, false, false
+				false, false, false, false, false, true
 			};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
+			}
+			@Override
+			public void setValueAt(Object val, int rowIndex, int columnIndex) {
+				MessageRepeatDto dto = repeaterHistory.get(rowIndex);
+				if(val.equals(dto.getMemo())) {
+					return;
+				}
+
+				dto.setMemo((String)val);
+				RepeaterLogic.getInstance().updateMemo(dto);
+				super.setValueAt(val, rowIndex, columnIndex);
 			}
 		});
 		table.getColumnModel().getColumn(0).setPreferredWidth(150);
 		table.getColumnModel().getColumn(1).setPreferredWidth(50);
 		table.getColumnModel().getColumn(2).setPreferredWidth(50);
 		table.getColumnModel().getColumn(3).setPreferredWidth(50);
-		table.getColumnModel().getColumn(4).setPreferredWidth(600);
+		table.getColumnModel().getColumn(4).setPreferredWidth(400);
+		table.getColumnModel().getColumn(5).setPreferredWidth(200);
 
 		tableModel = (DefaultTableModel)table.getModel();
 	}
@@ -73,7 +88,8 @@ public class RepeatTablePanel extends JPanel {
 					messageRepeatDto.getStatus(),
 					messageRepeatDto.getLength(),
 					messageRepeatDto.getTime(),
-					messageRepeatDto.getDifference()});
+					messageRepeatDto.getDifference(),
+					Optional.ofNullable(messageRepeatDto.getMemo()).orElse("")});
 		});
 	}
 	private void clearRows() {
