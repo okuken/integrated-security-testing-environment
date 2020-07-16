@@ -19,11 +19,12 @@ public class MessageTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
 	private static final MessageTableColumn[] COLUMNS = {
+			MessageTableColumn.PROTOCOL,
 			MessageTableColumn.HOST,
 			MessageTableColumn.PORT,
+			MessageTableColumn.METHOD,
 			MessageTableColumn.PATH,
 			MessageTableColumn.QUERY,
-			MessageTableColumn.METHOD,
 			MessageTableColumn.PARAMS,
 			MessageTableColumn.NAME,
 			MessageTableColumn.PROGRESS,
