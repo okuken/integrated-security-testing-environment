@@ -26,6 +26,12 @@ public class SuitePanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private JSplitPane mainSplitPane;
+	private JSplitPane mainLeftSplitPane;
+	private JSplitPane mainRightSplitPane;
+
+	private RepeaterPanel repeaterPanel;
+
 	public SuitePanel() {
 		setLayout(new BorderLayout(0, 0));
 		
@@ -41,23 +47,17 @@ public class SuitePanel extends JPanel {
 		JPanel mainHeaderPanel = new MainHeaderPanel();
 		mainPanel.add(mainHeaderPanel, BorderLayout.NORTH);
 		
-		JSplitPane mainSplitPane = new JSplitPane();
+		mainSplitPane = new JSplitPane();
 		mainSplitPane.setResizeWeight(1.0);
 		mainPanel.add(mainSplitPane);
-		SwingUtilities.invokeLater(() -> {
-			mainSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN);
-		});
 		
 		JPanel mainLeftPanel = new JPanel();
 		mainSplitPane.setLeftComponent(mainLeftPanel);
 		mainLeftPanel.setLayout(new BorderLayout(0, 0));
 		
-		JSplitPane mainLeftSplitPane = new JSplitPane();
+		mainLeftSplitPane = new JSplitPane();
 		mainLeftSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		mainLeftPanel.add(mainLeftSplitPane);
-		SwingUtilities.invokeLater(() -> {
-			mainLeftSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN_LEFT);
-		});
 		
 		JPanel messageTablePanel = new MessageTablePanel();
 		mainLeftSplitPane.setLeftComponent(messageTablePanel);
@@ -69,7 +69,7 @@ public class SuitePanel extends JPanel {
 		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_ORIGINAL, null, orgMessageEditorPanel, null);
 		Controller.getInstance().setOrgMessageEditorPanel(orgMessageEditorPanel);
 		
-		RepeaterPanel repeaterPanel = new RepeaterPanel();
+		repeaterPanel = new RepeaterPanel();
 		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_REPEAT, null, repeaterPanel, null);
 		Controller.getInstance().setRepeaterPanel(repeaterPanel);
 		
@@ -77,12 +77,9 @@ public class SuitePanel extends JPanel {
 		mainSplitPane.setRightComponent(mainRightPanel);
 		mainRightPanel.setLayout(new BorderLayout(0, 0));
 		
-		JSplitPane mainRightSplitPane = new JSplitPane();
+		mainRightSplitPane = new JSplitPane();
 		mainRightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		mainRightPanel.add(mainRightSplitPane);
-		SwingUtilities.invokeLater(() -> {
-			mainRightSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN_RIGHT);
-		});
 		
 		JPanel messageMemoPanel = new MessageMemoPanel();
 		mainRightSplitPane.setLeftComponent(messageMemoPanel);
@@ -110,6 +107,19 @@ public class SuitePanel extends JPanel {
 		
 		JPanel userOptionsPanel = new UserOptionsPanel();
 		optionsPanel.add(userOptionsPanel, BorderLayout.CENTER);
-
+		
+		
+		SwingUtilities.invokeLater(() -> {
+			initDividerLocation();
+		});
 	}
+
+	public void initDividerLocation() {
+		mainSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN);
+		mainLeftSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN_LEFT);
+		mainRightSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN_RIGHT);
+
+		repeaterPanel.initDividerLocation();
+	}
+
 }

@@ -26,6 +26,7 @@ import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.view.SuitePanel;
 import okuken.iste.view.SuiteTab;
 import okuken.iste.view.auth.AuthPanel;
 import okuken.iste.view.header.MainHeaderPanel;
@@ -130,7 +131,11 @@ public class Controller {
 		authPanel.refreshConfigPanel(messageDtos);
 	}
 
-	public void initMessageTableColumnWidth() {
+	public void initSizeRatioOfParts() {
+		initMessageTableColumnWidth();
+		((SuitePanel)suiteTab.getUiComponent()).initDividerLocation();
+	}
+	private void initMessageTableColumnWidth() {
 		Enumeration<TableColumn> e = messageTable.getColumnModel().getColumns();
 		for (int i = 0; e.hasMoreElements(); i++) {
 			e.nextElement().setPreferredWidth(MessageTableColumn.getByCaption(messageTable.getColumnName(i)).getWidth());

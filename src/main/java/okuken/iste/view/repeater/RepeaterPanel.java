@@ -24,6 +24,7 @@ public class RepeaterPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private JSplitPane splitPane;
 	private RepeatTablePanel repeatTablePanel;
 	private MessageEditorPanel messageEditorPanel;
 
@@ -32,12 +33,9 @@ public class RepeaterPanel extends JPanel {
 	public RepeaterPanel() {
 		setLayout(new BorderLayout(0, 0));
 		
-		JSplitPane splitPane = new JSplitPane();
+		splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		add(splitPane);
-		SwingUtilities.invokeLater(() -> {
-			splitPane.setDividerLocation(Positions.DIVIDER_LOCATION_REPEATER);
-		});
 		
 		JPanel headerPanel = new JPanel();
 		splitPane.setLeftComponent(headerPanel);
@@ -91,6 +89,10 @@ public class RepeaterPanel extends JPanel {
 		}, true, false);
 		splitPane.setRightComponent(messageEditorPanel);
 		
+		
+		SwingUtilities.invokeLater(() -> {
+			initDividerLocation();
+		});
 	}
 
 	public void setup(MessageDto orgMessageDto) {
@@ -114,6 +116,10 @@ public class RepeaterPanel extends JPanel {
 	public void clear() {
 		repeatTablePanel.clear();
 		messageEditorPanel.clearMessage();
+	}
+
+	public void initDividerLocation() {
+		splitPane.setDividerLocation(Positions.DIVIDER_LOCATION_REPEATER);
 	}
 
 }
