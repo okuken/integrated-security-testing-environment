@@ -2,7 +2,6 @@ package okuken.iste.view.auth;
 
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -11,12 +10,10 @@ import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.logic.AuthLogic;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
 import java.awt.BorderLayout;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
@@ -126,14 +123,7 @@ public class AuthAccountTablePanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				List<Integer> selectedRows = Arrays.stream(table.getSelectedRows()).mapToObj(Integer::valueOf).collect(Collectors.toList());
 				Collections.reverse(selectedRows);
-
-				Controller.getInstance().deleteAuthAccounts(selectedRows.stream()
-						.map(selectedRow -> authAccountDtos.get(selectedRow))
-						.collect(Collectors.toList()));
-
-				selectedRows.forEach(selectedRow -> {
-					tableModel.removeRow(selectedRow);
-				});
+				removeRows(selectedRows);
 			}
 		});
 		authTableHeaderPanel.add(deleteRowButton);
@@ -141,13 +131,7 @@ public class AuthAccountTablePanel extends JPanel {
 		JButton addRowButton = new JButton(Captions.AUTH_CONTROL_BUTTON_ADD);
 		addRowButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AuthAccountDto authDto = showInputDialog();
-				if(authDto == null) {
-					return;
-				}
-
-				Controller.getInstance().saveAuthAccount(authDto);
-				tableModel.addRow(convertAuthAccountDtoToObjectArray(authDto));
+				addRow();
 			}
 		});
 		authTableHeaderPanel.add(addRowButton);
@@ -158,34 +142,28 @@ public class AuthAccountTablePanel extends JPanel {
 		return new String[] {dto.getUserId(), dto.getPassword(), dto.getRemark()};
 	}
 
-	private AuthAccountDto showInputDialog() {
-		JTextField userIdTextField = new JTextField();
-		JTextField passwordTextField = new JTextField();
-		JTextField remarkTextField = new JTextField();
-
-		//TODO: validation
-		int option = JOptionPane.showConfirmDialog(BurpUtil.getBurpSuiteJFrame(), new Object[] {
-				Captions.AUTH_TABLE_FIELD_USER_ID, userIdTextField,
-				Captions.AUTH_TABLE_FIELD_PASSWORD, passwordTextField,
-				Captions.AUTH_TABLE_FIELD_REMARK, remarkTextField,
-		}, "", JOptionPane.OK_CANCEL_OPTION);
-
-		switch (option) {
-		case JOptionPane.OK_OPTION:
-			AuthAccountDto authDto = new AuthAccountDto();
-			authDto.setUserId(userIdTextField.getText());
-			authDto.setPassword(passwordTextField.getText());
-			authDto.setRemark(remarkTextField.getText());
-			return authDto;
-		default:
-			return null;
-		}
-	}
-
 	private void loadRows() {
 		authAccountDtos = Controller.getInstance().getAuthAccounts();
 		authAccountDtos.forEach(authDto -> {
 			tableModel.addRow(convertAuthAccountDtoToObjectArray(authDto));
+		});
+	}
+
+	private void addRow() {
+		AuthAccountDto authDto = new AuthAccountDto();
+		Controller.getInstance().saveAuthAccount(authDto);
+		authAccountDtos.add(authDto);
+		tableModel.addRow(convertAuthAccountDtoToObjectArray(authDto));
+	}
+
+	private void removeRows(List<Integer> selectedRowsReversed) {
+		Controller.getInstance().deleteAuthAccounts(selectedRowsReversed.stream()
+				.map(selectedRow -> authAccountDtos.get(selectedRow))
+				.collect(Collectors.toList()));
+
+		selectedRowsReversed.forEach(selectedRow -> {
+			authAccountDtos.remove(selectedRow.intValue());
+			tableModel.removeRow(selectedRow);
 		});
 	}
 
@@ -198,7 +176,6 @@ public class AuthAccountTablePanel extends JPanel {
 		for(int i = rowCount - 1; i >= 0; i--) {
 			tableModel.removeRow(i);
 		}
-
 		authAccountDtos = null;
 	}
 
