@@ -3,8 +3,12 @@ package okuken.iste.view.header;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.google.common.collect.Lists;
+
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.MessageFilterDto;
+import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
 
@@ -14,21 +18,40 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
+import javax.swing.JCheckBox;
 
 public class MainHeaderPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private JLabel projectNameLabel;
+	private List<JCheckBox> progressCheckboxs;
 
 	public MainHeaderPanel() {
 		setLayout(new BorderLayout(0, 0));
 		
 		JPanel leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);
+		
+		progressCheckboxs = Lists.newArrayList();
+		Arrays.stream(SecurityTestingProgress.values()).forEach(progress -> {
+			var progressCheckbox = new JCheckBox(progress.getCaption());
+			progressCheckbox.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					applyMessageProgressFilter();
+				}
+			});
+			progressCheckbox.setSelected(true);
+			leftPanel.add(progressCheckbox);
+			progressCheckboxs.add(progressCheckbox);
+		});
+		
 		
 		JPanel centerPanel = new JPanel();
 		projectNameLabel = new JLabel();
@@ -86,6 +109,16 @@ public class MainHeaderPanel extends JPanel {
 		controller.getMainTabbedPane().insertTab(Captions.TAB_MAIN, null, controller.getMainPanel(), null, 0);
 		controller.getMainTabbedPane().setSelectedIndex(0);
 		controller.disposeDockoutFrame();
+	}
+
+	public void applyMessageProgressFilter() {
+		var dto = new MessageFilterDto();
+		dto.setProgresses(progressCheckboxs.stream()
+			.filter(progressCheckbox -> progressCheckbox.isSelected())
+			.map(progressCheckbox -> SecurityTestingProgress.getByCaption(progressCheckbox.getText()))
+			.collect(Collectors.toList()));
+
+		Controller.getInstance().applyMessageFilter(dto);
 	}
 
 	public void refreshProjectName() {

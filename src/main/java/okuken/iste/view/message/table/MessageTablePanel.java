@@ -2,8 +2,12 @@ package okuken.iste.view.message.table;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.DropMode;
@@ -12,12 +16,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.util.UiUtil;
 
@@ -39,7 +47,7 @@ public class MessageTablePanel extends JPanel {
 			@Override
 			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
 				super.changeSelection(row, col, toggle, extend);
-				Controller.getInstance().refreshMessageDetailPanels(tableModel.getRow(row));
+				Controller.getInstance().refreshMessageDetailPanels(tableModel.getRow(table.convertRowIndexToModel(row)));
 			}
 		};
 		setupTable();
@@ -63,6 +71,7 @@ public class MessageTablePanel extends JPanel {
 		setupTableRowColorControl(table, tableModel);
 		table.setComponentPopupMenu(new MessageTablePopupMenu());
 		UiUtil.setupCtrlCAsCopyCell(table, colIndex -> tableModel.getColumnIndex(MessageTableColumn.getByCaption(table.getColumnName(colIndex))));
+		table.setRowSorter(null);
 	}
 
 	private void setupColumnWidth(JTable table, MessageTableModel messageTableModel) {
@@ -86,6 +95,12 @@ public class MessageTablePanel extends JPanel {
 
 		JComboBox<SecurityTestingProgress> progressComboBox = new JComboBox<SecurityTestingProgress>();
 		Arrays.stream(SecurityTestingProgress.values()).forEach(progress -> progressComboBox.addItem(progress));
+		progressComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Controller.getInstance().applyMessageFilter();
+			}
+		});
 		progressColumn.setCellEditor(new DefaultCellEditor(progressComboBox));
 	}
 
@@ -99,7 +114,7 @@ public class MessageTablePanel extends JPanel {
 					return renderer;
 				}
 
-				setBackground(tableModel.getRow(row).getProgress().getColor());
+				setBackground(tableModel.getRow(table.convertRowIndexToModel(row)).getProgress().getColor());
 
 				return renderer;
 			}
@@ -109,6 +124,36 @@ public class MessageTablePanel extends JPanel {
 		while (e.hasMoreElements()) {
 			e.nextElement().setCellRenderer(tableCellRenderer);
 		}
+	}
+
+	public void applyFilter(MessageFilterDto messageFilterDto) {
+		if(messageFilterDto.getProgresses() == null) {
+			return;
+		}
+
+		var tableRowSorter = new TableRowSorter<MessageTableModel>(tableModel);
+		tableRowSorter.setRowFilter(new RowFilter<MessageTableModel, Integer>() {
+			@SuppressWarnings("rawtypes")
+			@Override
+			public boolean include(Entry entry) {
+				return messageFilterDto.getProgresses().contains(
+						tableModel.getRow((Integer)entry.getIdentifier()).getProgress());
+			}
+		});
+
+		table.setRowSorter(tableRowSorter);
+	}
+
+	public MessageDto getSelectedMessage() {
+		return tableModel.getRow(table.convertRowIndexToModel(table.getSelectedRow()));
+	}
+
+	public List<MessageDto> getSelectedMessages() {
+		return Arrays.stream(table.getSelectedRows()).mapToObj(i -> tableModel.getRow(table.convertRowIndexToModel(i))).collect(Collectors.toList());
+	}
+
+	public String getSelectedMessagesForCopyToClipboad() {
+		return tableModel.getRowsAsTsv(Arrays.stream(table.getSelectedRows()).map(i -> table.convertRowIndexToModel(i)).toArray());
 	}
 
 }

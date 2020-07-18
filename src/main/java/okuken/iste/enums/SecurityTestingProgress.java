@@ -48,4 +48,13 @@ public enum SecurityTestingProgress {
 		return idToEnumMap.get(id);
 	}
 
+	private static final Map<String, SecurityTestingProgress> captionToEnumMap;
+	static {
+		captionToEnumMap = Maps.newHashMap();
+		Arrays.stream(values()).forEach(progress -> captionToEnumMap.put(progress.caption, progress));
+	}
+	public static SecurityTestingProgress getByCaption(String caption) {
+		return captionToEnumMap.get(caption);
+	}
+
 }

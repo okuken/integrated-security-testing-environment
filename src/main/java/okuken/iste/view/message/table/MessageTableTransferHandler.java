@@ -25,7 +25,7 @@ public class MessageTableTransferHandler extends TransferHandler {
 	private JTable table;
 	private MessageTableModel messageTableModel;
 
-	private int[] selectedRowIndexs;
+	private List<Integer> selectedRowIndexs;
 	private Integer targetIndex;
 
 	public MessageTableTransferHandler(JTable table, MessageTableModel tableModel) {
@@ -36,8 +36,13 @@ public class MessageTableTransferHandler extends TransferHandler {
 
 	@Override
 	protected Transferable createTransferable(JComponent c) {
-		this.selectedRowIndexs = table.getSelectedRows();
-		List<MessageDto> selectedRows = Arrays.stream(this.selectedRowIndexs).mapToObj(messageTableModel::getRow).collect(Collectors.toList());
+		this.selectedRowIndexs = Arrays.stream(table.getSelectedRows())
+				.mapToObj(selectedRowIndex -> table.convertRowIndexToModel(selectedRowIndex))
+				.collect(Collectors.toList());
+
+		List<MessageDto> selectedRows = this.selectedRowIndexs.stream()
+				.map(messageTableModel::getRow)
+				.collect(Collectors.toList());
 
 		return new Transferable() {
 			@Override
@@ -67,7 +72,7 @@ public class MessageTableTransferHandler extends TransferHandler {
 			return false;
 		}
 
-		this.targetIndex = ((JTable.DropLocation) dropLocation).getRow();
+		this.targetIndex = table.convertRowIndexToModel(((JTable.DropLocation) dropLocation).getRow());
 
 		try {
 			@SuppressWarnings("unchecked")
@@ -86,8 +91,8 @@ public class MessageTableTransferHandler extends TransferHandler {
 			return;
 		}
 
-		List<Integer> selectedRowAfterIndexs = Arrays.stream(selectedRowIndexs)
-				.mapToObj(selectedRowIndex -> selectedRowIndex < targetIndex ? selectedRowIndex : selectedRowIndex + selectedRowIndexs.length)
+		List<Integer> selectedRowAfterIndexs = selectedRowIndexs.stream()
+				.map(selectedRowIndex -> selectedRowIndex < targetIndex ? selectedRowIndex : selectedRowIndex + selectedRowIndexs.size())
 				.collect(Collectors.toList());
 
 		Collections.reverse(selectedRowAfterIndexs);

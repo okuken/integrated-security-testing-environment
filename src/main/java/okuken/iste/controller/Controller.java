@@ -1,7 +1,6 @@
 package okuken.iste.controller;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +15,7 @@ import burp.IHttpRequestResponse;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.PayloadDto;
 import okuken.iste.logic.AuthLogic;
@@ -142,22 +142,18 @@ public class Controller {
 		}
 	}
 
-	public boolean judgeIsMessageSelected() {
-		return this.messageTable.getSelectedRow() >= 0;
-	}
 	/**
 	 * @return top of selected messages
 	 */
 	public MessageDto getSelectedMessage() {
-		return this.messageTableModel.getRow(this.messageTable.getSelectedRow());
+		return this.messageTablePanel.getSelectedMessage();
 	}
 	public List<MessageDto> getSelectedMessages() {
-		int[] selectedRows = this.messageTable.getSelectedRows();
-		return Arrays.stream(selectedRows).mapToObj(i -> messageTableModel.getRow(i)).collect(Collectors.toList());
+		return this.messageTablePanel.getSelectedMessages();
 	}
 
 	public String getSelectedMessagesForCopyToClipboad() {
-		return this.messageTableModel.getRowsAsTsv(this.messageTable.getSelectedRows());
+		return this.messageTablePanel.getSelectedMessagesForCopyToClipboad();
 	}
 
 	public void refreshMessageDetailPanels(MessageDto dto) {
@@ -214,6 +210,7 @@ public class Controller {
 	public void loadDatabase() {
 		List<MessageDto> messageDtos = loadMessages();
 		this.messageTableModel.addRows(messageDtos);
+		applyMessageFilter();
 		this.projectMemoPanel.refreshPanel();
 		this.authPanel.refreshPanel(messageDtos);
 	}
@@ -225,6 +222,13 @@ public class Controller {
 		return messageOrder.stream()
 			.map(messageId -> messageDtos.stream().filter(dto -> dto.getId().equals(messageId)).findFirst().get())
 			.collect(Collectors.toList());
+	}
+
+	public void applyMessageFilter() {
+		mainHeaderPanel.applyMessageProgressFilter();
+	}
+	public void applyMessageFilter(MessageFilterDto messageFilterDto) {
+		messageTablePanel.applyFilter(messageFilterDto);
 	}
 
 	public void changeDatabase(String dbFilePath) {
