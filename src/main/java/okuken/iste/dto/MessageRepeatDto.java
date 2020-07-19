@@ -11,6 +11,7 @@ public class MessageRepeatDto {
 
 	private Date sendDate;
 	private String difference; //TODO: structure
+	private String userId;
 
 	private Short status;
 	private Integer length;
@@ -40,6 +41,12 @@ public class MessageRepeatDto {
 	}
 	public void setDifference(String difference) {
 		this.difference = difference;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	public Short getStatus() {
 		return status;

@@ -82,7 +82,7 @@ public class RepeaterLogic {
 			ret.setDifference("");//TODO: impl
 
 			if(needSaveHistory) {
-				save(ret, orgMessageDto.getId());
+				save(ret, authConfigDto, orgMessageDto.getId());
 			}
 
 			return ret;
@@ -93,7 +93,7 @@ public class RepeaterLogic {
 		}
 	}
 
-	private void save(MessageRepeatDto messageRepeatDto, Integer orgMessageId) {
+	private void save(MessageRepeatDto messageRepeatDto, AuthConfigDto authConfigDto, Integer orgMessageId) {
 		String now = SqlUtil.now();
 		DbUtil.withTransaction(session -> {
 			MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
@@ -114,6 +114,9 @@ public class RepeaterLogic {
 			messageRepeat.setFkMessageRawId(messageRaw.getId());
 			messageRepeat.setSendDate(SqlUtil.dateToString(messageRepeatDto.getSendDate()));
 			messageRepeat.setDifference(messageRepeatDto.getDifference());
+			if(authConfigDto != null) {
+				messageRepeat.setUserId(authConfigDto.getSelectedAuthAccountDto().getUserId());
+			}
 			messageRepeat.setTime(messageRepeatDto.getTime());
 			messageRepeat.setStatus(messageRepeatDto.getStatus());
 			messageRepeat.setLength(messageRepeatDto.getLength());
@@ -153,6 +156,7 @@ public class RepeaterLogic {
 				dto.setMessageRawId(messageRepeat.getFkMessageRawId());
 				dto.setSendDate(SqlUtil.stringToDate(messageRepeat.getSendDate()));
 				dto.setDifference(messageRepeat.getDifference());
+				dto.setUserId(messageRepeat.getUserId());
 				dto.setTime(messageRepeat.getTime());
 				dto.setStatus(messageRepeat.getStatus());
 				dto.setLength(messageRepeat.getLength());

@@ -45,14 +45,14 @@ public class RepeatTablePanel extends JPanel {
 		scrollPane.setViewportView(table);
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
-				{null, null, null, null, null, null},
+				{null, null, null, null, null, null, null},
 			},
 			new String[] {
-				"Send date", "Status", "Length", "Time", "Diff", "Memo"
+				"Send date", "Status", "Length", "Time", "Auth", "Diff", "Memo"
 			}
 		) {
 			boolean[] columnEditables = new boolean[] {
-				false, false, false, false, false, true
+				false, false, false, false, false, false, true
 			};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
@@ -73,8 +73,9 @@ public class RepeatTablePanel extends JPanel {
 		table.getColumnModel().getColumn(1).setPreferredWidth(50);
 		table.getColumnModel().getColumn(2).setPreferredWidth(50);
 		table.getColumnModel().getColumn(3).setPreferredWidth(50);
-		table.getColumnModel().getColumn(4).setPreferredWidth(400);
-		table.getColumnModel().getColumn(5).setPreferredWidth(200);
+		table.getColumnModel().getColumn(4).setPreferredWidth(100);
+		table.getColumnModel().getColumn(5).setPreferredWidth(300);
+		table.getColumnModel().getColumn(6).setPreferredWidth(200);
 
 		tableModel = (DefaultTableModel)table.getModel();
 	}
@@ -88,6 +89,7 @@ public class RepeatTablePanel extends JPanel {
 					messageRepeatDto.getStatus(),
 					messageRepeatDto.getLength(),
 					messageRepeatDto.getTime(),
+					Optional.ofNullable(messageRepeatDto.getUserId()).orElse(""),
 					messageRepeatDto.getDifference(),
 					Optional.ofNullable(messageRepeatDto.getMemo()).orElse("")});
 		});
