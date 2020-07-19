@@ -37,10 +37,11 @@ public class AuthLogic {
 				entity.setUserId(dto.getUserId());
 				entity.setPassword(dto.getPassword());
 				entity.setRemark(dto.getRemark());
+				entity.setSessionId(dto.getSessionId());
 				entity.setPrcDate(now);
 
 				if(entity.getId() != null) {
-					mapper.updateByPrimaryKeySelective(entity);
+					mapper.updateByPrimaryKey(entity);
 					return;
 				}
 
@@ -70,6 +71,7 @@ public class AuthLogic {
 				dto.setUserId(entity.getUserId());
 				dto.setPassword(entity.getPassword());
 				dto.setRemark(entity.getRemark());
+				dto.setSessionId(entity.getSessionId());
 				return dto;
 			}).collect(Collectors.toList());
 

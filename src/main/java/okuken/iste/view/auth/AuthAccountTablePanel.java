@@ -75,18 +75,23 @@ public class AuthAccountTablePanel extends JPanel {
 			@Override
 			public void setValueAt(Object val, int rowIndex, int columnIndex) {
 				AuthAccountDto dto = authAccountDtos.get(rowIndex);
+				boolean needRefreshComponentsDependOnAuthAccounts = false;
 				switch (columnIndex) {
 					case COLNUM_USER_ID:
 						if(val.equals(dto.getUserId())) {
 							return;
 						}
 						dto.setUserId((String)val);
+						dto.setSessionId(null);
+						needRefreshComponentsDependOnAuthAccounts = true;
 						break;
 					case COLNUM_PASSWORD:
 						if(val.equals(dto.getPassword())) {
 							return;
 						}
 						dto.setPassword((String)val);
+						dto.setSessionId(null);
+						needRefreshComponentsDependOnAuthAccounts = true;
 						break;
 					case COLNUM_REMARK:
 						if(val.equals(dto.getRemark())) {
@@ -99,6 +104,10 @@ public class AuthAccountTablePanel extends JPanel {
 				}
 				AuthLogic.getInstance().saveAuthAccount(dto);
 				super.setValueAt(val, rowIndex, columnIndex);
+				
+				if(needRefreshComponentsDependOnAuthAccounts) {
+					Controller.getInstance().refreshComponentsDependOnAuthAccounts();
+				}
 			}
 		});
 		table.getColumnModel().getColumn(COLNUM_USER_ID).setPreferredWidth(WIDTH_USER_ID);

@@ -168,12 +168,16 @@ public class Controller {
 		repeaterPanel.setMessage(rowIndex);
 	}
 
+	public void refreshComponentsDependOnAuthAccounts() {
+		repeaterPanel.refreshAuthAccountsComboBox();
+	}
+
 	public List<MessageRepeatDto> getRepeaterHistory(Integer orgMessageId) {
 		return RepeaterLogic.getInstance().loadHistory(orgMessageId);
 	}
 
 	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto) {
-		if(authAccountDto.getSessionId() == null) {
+		if(authAccountDto.getId() != null && authAccountDto.getSessionId() == null) {
 			fetchNewAuthSession(authAccountDto);
 		}
 
@@ -228,7 +232,7 @@ public class Controller {
 		applyMessageFilter();
 		this.projectMemoPanel.refreshPanel();
 		this.authPanel.refreshPanel(messageDtos);
-		this.repeaterPanel.refreshAuthAccountsComboBox();
+		refreshComponentsDependOnAuthAccounts();
 	}
 
 	private List<MessageDto> loadMessages() {

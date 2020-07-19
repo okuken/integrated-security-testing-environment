@@ -24,6 +24,7 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageParamDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.PayloadDto;
+import okuken.iste.logic.AuthLogic;
 import okuken.iste.util.BurpUtil;
 
 import java.awt.event.ActionListener;
@@ -125,6 +126,7 @@ public class AuthConfigPanel extends JPanel {
 				.findFirst();
 		if(cookieOptional.isPresent()) {
 			authAccountDto.setSessionId(cookieOptional.get().getValue());
+			AuthLogic.getInstance().saveAuthAccount(authAccountDto);
 		}
 	}
 	private MessageRepeatDto sendLoginRequest() {
