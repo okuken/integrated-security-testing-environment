@@ -11,6 +11,7 @@ import burp.IHttpRequestResponse;
 import okuken.iste.dao.MessageRawMapper;
 import okuken.iste.dao.MessageRepeatDynamicSqlSupport;
 import okuken.iste.dao.MessageRepeatMapper;
+import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.PayloadDto;
@@ -32,6 +33,7 @@ public class RepeaterLogic {
 		try {
 			return sendRequest(
 					applyPayloads(orgMessageDto.getMessage().getRequest(), payloadDtos),
+					null,
 					orgMessageDto,
 					needSaveHistory);
 
@@ -51,8 +53,16 @@ public class RepeaterLogic {
 		return ret;
 	}
 
-	public MessageRepeatDto sendRequest(byte[] request, MessageDto orgMessageDto, boolean needSaveHistory) {
+	public MessageRepeatDto sendRequest(byte[] aRequest, AuthConfigDto authConfigDto, MessageDto orgMessageDto, boolean needSaveHistory) {
 		try {
+			byte[] request = aRequest;
+			if(authConfigDto != null && authConfigDto.getSelectedAuthAccountDto().getSessionId() != null) {
+				request = BurpUtil.getHelpers().updateParameter(request, BurpUtil.getHelpers().buildParameter(
+						authConfigDto.getSessionIdParamName(),
+						authConfigDto.getSelectedAuthAccountDto().getSessionId(),
+						authConfigDto.getSessionIdParamType()));
+			}
+
 			Date sendDate = Calendar.getInstance().getTime();
 			long timerStart = System.currentTimeMillis();
 

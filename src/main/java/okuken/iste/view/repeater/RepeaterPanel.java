@@ -11,6 +11,7 @@ import burp.IMessageEditorController;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.view.message.editor.MessageEditorPanel;
@@ -19,6 +20,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.util.concurrent.Executors;
 import java.awt.event.ActionEvent;
+import javax.swing.JComboBox;
 
 public class RepeaterPanel extends JPanel {
 
@@ -27,6 +29,8 @@ public class RepeaterPanel extends JPanel {
 	private JSplitPane splitPane;
 	private RepeatTablePanel repeatTablePanel;
 	private MessageEditorPanel messageEditorPanel;
+
+	private JComboBox<AuthAccountDto> authAccountComboBox;
 
 	private MessageDto orgMessageDto;
 
@@ -52,9 +56,10 @@ public class RepeaterPanel extends JPanel {
 		JButton sendButton = new JButton(Captions.REPEATER_BUTTON_SEND);
 		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				AuthAccountDto authAccountDto = authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex());
 				Executors.newSingleThreadExecutor().submit(() -> {
 					messageEditorPanel.clearResponse();
-					MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), Controller.getInstance().getSelectedMessage());
+					MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, Controller.getInstance().getSelectedMessage());
 					SwingUtilities.invokeLater(() -> {
 						messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
 						repeatTablePanel.setup(orgMessageDto.getId());
@@ -64,6 +69,19 @@ public class RepeaterPanel extends JPanel {
 			}
 		});
 		controlPanel.add(sendButton);
+		
+		authAccountComboBox = new JComboBox<AuthAccountDto>();
+		controlPanel.add(authAccountComboBox);
+		
+		JButton authSessionRefreshButton = new JButton(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH);
+		authSessionRefreshButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Executors.newSingleThreadExecutor().submit(() -> {
+					Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()));
+				});
+			}
+		});
+		controlPanel.add(authSessionRefreshButton);
 		
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
 		copyOrgButton.addActionListener(new ActionListener() {
@@ -111,6 +129,14 @@ public class RepeaterPanel extends JPanel {
 		MessageRepeatDto messageRepeatDto = repeatTablePanel.getRow(rowIndex);
 		messageEditorPanel.setRequest(messageRepeatDto.getMessage().getRequest());
 		messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
+	}
+
+	public void refreshAuthAccountsComboBox() {
+		authAccountComboBox.removeAllItems();
+		authAccountComboBox.addItem(new AuthAccountDto());
+		Controller.getInstance().getAuthAccounts().forEach(authAccount -> {
+			authAccountComboBox.addItem(authAccount);
+		});
 	}
 
 	public void clear() {

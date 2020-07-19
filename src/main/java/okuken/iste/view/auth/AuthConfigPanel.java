@@ -96,15 +96,11 @@ public class AuthConfigPanel extends JPanel {
 		testLoginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Executors.newSingleThreadExecutor().submit(() -> {
-					MessageRepeatDto messageRepeatDto = sendLoginRequest();
+					AuthAccountDto authAccountDto = Controller.getInstance().getAuthAccounts().get(0); //first row
+					sendLoginRequestAndSetSessionId(authAccountDto);
 					SwingUtilities.invokeLater(() -> {
-						MessageCookieDto sessionIdCookieDto = sessionIdParamComboBox.getItemAt(sessionIdParamComboBox.getSelectedIndex());
-						Optional<ICookie> cookieOptional = BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()).getCookies().stream()
-								.filter(cookie -> cookie.getName().equals(sessionIdCookieDto.getName()))
-								.findFirst();
-
-						if(cookieOptional.isPresent()) {
-							testResultTextField.setText(cookieOptional.get().getValue());
+						if(authAccountDto.getSessionId() != null) {
+							testResultTextField.setText(authAccountDto.getSessionId());
 						} else {
 							testResultTextField.setText("ERROR: Response doesn't have selected cookie.");
 						}
@@ -121,6 +117,16 @@ public class AuthConfigPanel extends JPanel {
 		
 	}
 
+	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto) {
+		MessageRepeatDto messageRepeatDto = sendLoginRequest();
+		MessageCookieDto sessionIdCookieDto = sessionIdParamComboBox.getItemAt(sessionIdParamComboBox.getSelectedIndex());
+		Optional<ICookie> cookieOptional = BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()).getCookies().stream()
+				.filter(cookie -> cookie.getName().equals(sessionIdCookieDto.getName()))
+				.findFirst();
+		if(cookieOptional.isPresent()) {
+			authAccountDto.setSessionId(cookieOptional.get().getValue());
+		}
+	}
 	private MessageRepeatDto sendLoginRequest() {
 		//TODO: validation
 		return Controller.getInstance().sendAutoRequest(

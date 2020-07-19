@@ -12,8 +12,10 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import burp.IHttpRequestResponse;
+import burp.IParameter;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
@@ -170,8 +172,17 @@ public class Controller {
 		return RepeaterLogic.getInstance().loadHistory(orgMessageId);
 	}
 
-	public MessageRepeatDto sendRepeaterRequest(byte[] request, MessageDto orgMessageDto) {
-		return RepeaterLogic.getInstance().sendRequest(request, orgMessageDto, true);
+	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto) {
+		if(authAccountDto.getSessionId() == null) {
+			fetchNewAuthSession(authAccountDto);
+		}
+
+		//TODO:ÅöÅöimpl(load from db)ÅöÅö
+		AuthConfigDto authConfigDto = new AuthConfigDto();
+		authConfigDto.setSessionIdParamType(IParameter.PARAM_COOKIE);
+		authConfigDto.setSessionIdParamName("SESSIONID");
+		authConfigDto.setSelectedAuthAccountDto(authAccountDto);
+		return RepeaterLogic.getInstance().sendRequest(request, authConfigDto, orgMessageDto, true);
 	}
 
 	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto) {
@@ -207,12 +218,17 @@ public class Controller {
 		AuthLogic.getInstance().deleteAuthAccounts(authAccountDtos);
 	}
 
+	public void fetchNewAuthSession(AuthAccountDto authAccountDto) {
+		authPanel.sendLoginRequestAndSetSessionId(authAccountDto);
+	}
+
 	public void loadDatabase() {
 		List<MessageDto> messageDtos = loadMessages();
 		this.messageTableModel.addRows(messageDtos);
 		applyMessageFilter();
 		this.projectMemoPanel.refreshPanel();
 		this.authPanel.refreshPanel(messageDtos);
+		this.repeaterPanel.refreshAuthAccountsComboBox();
 	}
 
 	private List<MessageDto> loadMessages() {

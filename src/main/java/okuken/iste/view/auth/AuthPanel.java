@@ -2,6 +2,7 @@ package okuken.iste.view.auth;
 
 import javax.swing.JPanel;
 
+import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 
 import java.awt.FlowLayout;
@@ -36,6 +37,10 @@ public class AuthPanel extends JPanel {
 
 	public void refreshConfigPanel(List<MessageDto> messageDtos) {
 		authConfigPanel.refreshPanel(messageDtos);
+	}
+
+	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto) {
+		authConfigPanel.sendLoginRequestAndSetSessionId(authAccountDto);
 	}
 
 }

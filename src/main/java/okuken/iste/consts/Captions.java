@@ -28,6 +28,7 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
 	public static final String REPEATER_BUTTON_SEND = "Send";
+	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH = "\uD83D\uDD04";
 	public static final String REPEATER_BUTTON_COPY_ORG = "Org";
 
 	public static final String PROJECT_MEMO_BUTTON_WRAP = "Wrap";

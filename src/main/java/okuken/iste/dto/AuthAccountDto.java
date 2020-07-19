@@ -1,5 +1,7 @@
 package okuken.iste.dto;
 
+import java.util.Optional;
+
 public class AuthAccountDto {
 
 	private Integer id;
@@ -7,6 +9,8 @@ public class AuthAccountDto {
 	private String userId;
 	private String password;
 	private String remark;
+
+	private String sessionId;
 
 	public Integer getId() {
 		return id;
@@ -32,5 +36,15 @@ public class AuthAccountDto {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
+	public String getSessionId() {
+		return sessionId;
+	}
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
 
+	@Override
+	public String toString() {
+		return Optional.ofNullable(userId).orElse("-");
+	}
 }

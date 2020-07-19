@@ -59,8 +59,9 @@ public class AuthLogic {
 			List<AuthAccount> entitys =
 				DbUtil.withSession(session -> {
 					AuthAccountMapper mapper = session.getMapper(AuthAccountMapper.class);
-					return mapper.select(c -> c.where(AuthAccountDynamicSqlSupport.fkProjectId,
-							SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+					return mapper.select(c -> c
+							.where(AuthAccountDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId()))
+							.orderBy(AuthAccountDynamicSqlSupport.id));
 				});
 
 			return entitys.stream().map(entity -> {//TODO: auto convert
