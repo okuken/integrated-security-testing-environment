@@ -2,29 +2,33 @@ package okuken.iste.dto;
 
 public class AuthConfigDto {
 
-	private String sessionIdParamName;
-	private byte sessionIdParamType; //@see IParameter
+	private Integer id;
 
-	private AuthAccountDto selectedAuthAccountDto;
+	private Integer authMessageChainId;
+	private MessageChainDto authMessageChainDto;
 
-
-	public String getSessionIdParamName() {
-		return sessionIdParamName;
+	public Integer getId() {
+		return id;
 	}
-	public void setSessionIdParamName(String sessionIdParamName) {
-		this.sessionIdParamName = sessionIdParamName;
+	public void setId(Integer id) {
+		this.id = id;
 	}
-	public byte getSessionIdParamType() {
-		return sessionIdParamType;
+	public Integer getAuthMessageChainId() {
+		return authMessageChainId;
 	}
-	public void setSessionIdParamType(byte sessionIdParamType) {
-		this.sessionIdParamType = sessionIdParamType;
+	public void setAuthMessageChainId(Integer authMessageChainId) {
+		this.authMessageChainId = authMessageChainId;
 	}
-	public AuthAccountDto getSelectedAuthAccountDto() {
-		return selectedAuthAccountDto;
+	public MessageChainDto getAuthMessageChainDto() {
+		return authMessageChainDto;
 	}
-	public void setSelectedAuthAccountDto(AuthAccountDto selectedAuthAccountDto) {
-		this.selectedAuthAccountDto = selectedAuthAccountDto;
+	public void setAuthMessageChainDto(MessageChainDto authMessageChainDto) {
+		this.authMessageChainDto = authMessageChainDto;
+		if(authMessageChainDto == null) {
+			setAuthMessageChainId(null);
+		} else {
+			setAuthMessageChainId(authMessageChainDto.getId());
+		}
 	}
 
 }

@@ -3,8 +3,10 @@ package okuken.iste.logic;
 import java.io.File;
 import java.util.Optional;
 
+import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.ProcessOptionsDto;
 import okuken.iste.dto.ProjectDto;
+import okuken.iste.dto.ProjectOptionsDto;
 import okuken.iste.dto.UserOptionsDto;
 import okuken.iste.util.BurpUtil;
 
@@ -16,7 +18,9 @@ public class ConfigLogic {
 	private static final String CONFIG_KEY_DB_FILE_PATH = "dbFilePath";
 	private static final String CONFIG_KEY_LAST_SELECTED_PROJECT_NAME = "lastSelectedProjectName";
 
+	//cache
 	private UserOptionsDto configDto;
+	private ProjectOptionsDto projectOptionsDto;
 	private ProcessOptionsDto processOptionsDto = new ProcessOptionsDto();
 
 	private ConfigLogic() {}
@@ -58,6 +62,27 @@ public class ConfigLogic {
 		getUserOptions().setLastSelectedProjectName(projectName);
 	}
 
+
+	public ProjectOptionsDto getProjectOptionsDto() {
+		if(projectOptionsDto == null) {
+			//TODO: synchronize
+			projectOptionsDto = loadProjectOptions();
+		}
+		return projectOptionsDto;
+	}
+	private ProjectOptionsDto loadProjectOptions() {
+		var ret = new ProjectOptionsDto();
+		ret.setAuthConfigDto(AuthLogic.getInstance().loadAuthConfig());
+		return ret;
+	}
+
+	public AuthConfigDto getAuthConfig() {
+		return getProjectOptionsDto().getAuthConfigDto();
+	}
+
+	public void setAuthConfig(AuthConfigDto authConfigDto) {
+		getProjectOptionsDto().setAuthConfigDto(authConfigDto);
+	}
 
 
 	public ProcessOptionsDto getProcessOptions() {

@@ -192,6 +192,18 @@ public class MessageLogic {
 		//TODO: rollback controll???
 	}
 
+	public MessageDto loadMessage(Integer id) {
+		try {
+			return DbUtil.withSession(session -> {
+					MessageMapper messageMapper = session.getMapper(MessageMapper.class);
+					return convertMessageEntityToDto(messageMapper.selectByPrimaryKey(id).get());
+				});
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw e;
+		}
+	}
+
 	public List<MessageDto> loadMessages() {
 		try {
 			List<Message> messages = 
@@ -201,31 +213,34 @@ public class MessageLogic {
 							SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
 				});
 
-			return messages.stream().map(message -> { //TODO:converter
-				MessageDto dto = new MessageDto();
-				dto.setId(message.getId());
-				dto.setName(message.getName());
-				dto.setRemark(message.getRemark());
-				dto.setProgress(SecurityTestingProgress.getById(message.getProgress()));
-				try {
-					dto.setUrl(new URL(message.getUrl()));
-				} catch (MalformedURLException e) {
-					BurpUtil.printStderr(e);
-				}
-				dto.setMethod(message.getMethod());
-				dto.setParams(message.getParams());
-				dto.setStatus(message.getStatus());
-				dto.setLength(message.getLength());
-				dto.setMimeType(message.getMimeType());
-				dto.setCookies(message.getCookies());
-				dto.setMessageRawId(message.getFkMessageRawId());
-				return dto;
-			}).collect(Collectors.toList());
+			return messages.stream().map(message -> convertMessageEntityToDto(message)).collect(Collectors.toList());
 
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);
 			throw e;
 		}
+	}
+
+	//TODO: converter
+	private MessageDto convertMessageEntityToDto(Message message) {
+		MessageDto dto = new MessageDto();
+		dto.setId(message.getId());
+		dto.setName(message.getName());
+		dto.setRemark(message.getRemark());
+		dto.setProgress(SecurityTestingProgress.getById(message.getProgress()));
+		try {
+			dto.setUrl(new URL(message.getUrl()));
+		} catch (MalformedURLException e) {
+			BurpUtil.printStderr(e);
+		}
+		dto.setMethod(message.getMethod());
+		dto.setParams(message.getParams());
+		dto.setStatus(message.getStatus());
+		dto.setLength(message.getLength());
+		dto.setMimeType(message.getMimeType());
+		dto.setCookies(message.getCookies());
+		dto.setMessageRawId(message.getFkMessageRawId());
+		return dto;
 	}
 
 	public List<Integer> loadMessageOrder() {

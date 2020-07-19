@@ -46,6 +46,7 @@ public class Captions {
 	public static final String AUTH_CONFIG_SESSIONID = "Session ID:";
 
 	public static final String AUTH_CONFIG_BUTTON_LOGIN_TEST = "Test";
+	public static final String AUTH_CONFIG_BUTTON_SAVE = "Save";
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo to txt";
 

@@ -11,6 +11,7 @@ import burp.IHttpRequestResponse;
 import okuken.iste.dao.MessageRawMapper;
 import okuken.iste.dao.MessageRepeatDynamicSqlSupport;
 import okuken.iste.dao.MessageRepeatMapper;
+import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
@@ -53,14 +54,19 @@ public class RepeaterLogic {
 		return ret;
 	}
 
-	public MessageRepeatDto sendRequest(byte[] aRequest, AuthConfigDto authConfigDto, MessageDto orgMessageDto, boolean needSaveHistory) {
+	public MessageRepeatDto sendRequest(byte[] aRequest, AuthAccountDto authAccountDto, MessageDto orgMessageDto, boolean needSaveHistory) {
 		try {
 			byte[] request = aRequest;
-			if(authConfigDto != null && authConfigDto.getSelectedAuthAccountDto().getSessionId() != null) {
+			if(authAccountDto != null && authAccountDto.getSessionId() != null) {
+				AuthConfigDto authConfig = ConfigLogic.getInstance().getAuthConfig();
+				if(authConfig == null) {
+					throw new IllegalStateException("Sessionid was set but AuthConfig has not saved.");
+				}
+				var sessionidNodeOutDto = authConfig.getAuthMessageChainDto().getNodes().get(0).getOuts().get(0);
 				request = BurpUtil.getHelpers().updateParameter(request, BurpUtil.getHelpers().buildParameter(
-						authConfigDto.getSessionIdParamName(),
-						authConfigDto.getSelectedAuthAccountDto().getSessionId(),
-						authConfigDto.getSessionIdParamType()));
+						sessionidNodeOutDto.getParamName(),
+						authAccountDto.getSessionId(),
+						sessionidNodeOutDto.getParamType()));
 			}
 
 			Date sendDate = Calendar.getInstance().getTime();
@@ -82,7 +88,7 @@ public class RepeaterLogic {
 			ret.setDifference("");//TODO: impl
 
 			if(needSaveHistory) {
-				save(ret, authConfigDto, orgMessageDto.getId());
+				save(ret, authAccountDto, orgMessageDto.getId());
 			}
 
 			return ret;
@@ -93,7 +99,7 @@ public class RepeaterLogic {
 		}
 	}
 
-	private void save(MessageRepeatDto messageRepeatDto, AuthConfigDto authConfigDto, Integer orgMessageId) {
+	private void save(MessageRepeatDto messageRepeatDto, AuthAccountDto authAccountDto, Integer orgMessageId) {
 		String now = SqlUtil.now();
 		DbUtil.withTransaction(session -> {
 			MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
@@ -114,8 +120,8 @@ public class RepeaterLogic {
 			messageRepeat.setFkMessageRawId(messageRaw.getId());
 			messageRepeat.setSendDate(SqlUtil.dateToString(messageRepeatDto.getSendDate()));
 			messageRepeat.setDifference(messageRepeatDto.getDifference());
-			if(authConfigDto != null) {
-				messageRepeat.setUserId(authConfigDto.getSelectedAuthAccountDto().getUserId());
+			if(authAccountDto != null && authAccountDto.getSessionId() != null) {
+				messageRepeat.setUserId(authAccountDto.getUserId());
 			}
 			messageRepeat.setTime(messageRepeatDto.getTime());
 			messageRepeat.setStatus(messageRepeatDto.getStatus());

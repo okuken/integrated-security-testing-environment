@@ -12,10 +12,10 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import burp.IHttpRequestResponse;
-import burp.IParameter;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthConfigDto;
+import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
@@ -24,6 +24,7 @@ import okuken.iste.logic.AuthLogic;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
 import okuken.iste.logic.MemoLogic;
+import okuken.iste.logic.MessageChainLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
@@ -168,7 +169,7 @@ public class Controller {
 		repeaterPanel.setMessage(rowIndex);
 	}
 
-	public void refreshComponentsDependOnAuthAccounts() {
+	public void refreshComponentsDependOnAuthConfig() {
 		repeaterPanel.refreshAuthAccountsComboBox();
 	}
 
@@ -180,13 +181,7 @@ public class Controller {
 		if(authAccountDto.getId() != null && authAccountDto.getSessionId() == null) {
 			fetchNewAuthSession(authAccountDto);
 		}
-
-		//TODO:ÅöÅöimpl(load from db)ÅöÅö
-		AuthConfigDto authConfigDto = new AuthConfigDto();
-		authConfigDto.setSessionIdParamType(IParameter.PARAM_COOKIE);
-		authConfigDto.setSessionIdParamName("SESSIONID");
-		authConfigDto.setSelectedAuthAccountDto(authAccountDto);
-		return RepeaterLogic.getInstance().sendRequest(request, authConfigDto, orgMessageDto, true);
+		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, true);
 	}
 
 	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto) {
@@ -222,8 +217,33 @@ public class Controller {
 		AuthLogic.getInstance().deleteAuthAccounts(authAccountDtos);
 	}
 
+	public void fetchNewAuthSession(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, boolean isTest) {
+		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, authMessageChainDto, isTest);
+	}
 	public void fetchNewAuthSession(AuthAccountDto authAccountDto) {
-		authPanel.sendLoginRequestAndSetSessionId(authAccountDto);
+		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto);
+	}
+
+	public AuthConfigDto getAuthConfig() {
+		var ret = AuthLogic.getInstance().loadAuthConfig();
+		var messageChainDto = MessageChainLogic.getInstance().loadMessageChain(ret.getAuthMessageChainId());
+		ret.setAuthMessageChainDto(messageChainDto);
+		return ret;
+	}
+
+	public AuthConfigDto saveAuthConfig(MessageChainDto messageChainDto) {
+		MessageChainLogic.getInstance().saveMessageChain(messageChainDto);
+
+		var authConfigDto = ConfigLogic.getInstance().getAuthConfig();
+		if(authConfigDto == null) {
+			authConfigDto = new AuthConfigDto();
+		}
+		authConfigDto.setAuthMessageChainDto(messageChainDto);
+		AuthLogic.getInstance().saveAuthConfig(authConfigDto);
+
+		refreshComponentsDependOnAuthConfig();
+
+		return authConfigDto;
 	}
 
 	public void loadDatabase() {
@@ -232,7 +252,7 @@ public class Controller {
 		applyMessageFilter();
 		this.projectMemoPanel.refreshPanel();
 		this.authPanel.refreshPanel(messageDtos);
-		refreshComponentsDependOnAuthAccounts();
+		refreshComponentsDependOnAuthConfig();
 	}
 
 	private List<MessageDto> loadMessages() {

@@ -14,6 +14,7 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import javax.swing.JButton;
 import java.awt.FlowLayout;
@@ -31,6 +32,7 @@ public class RepeaterPanel extends JPanel {
 	private MessageEditorPanel messageEditorPanel;
 
 	private JComboBox<AuthAccountDto> authAccountComboBox;
+	private JButton authSessionRefreshButton;
 
 	private MessageDto orgMessageDto;
 
@@ -71,13 +73,22 @@ public class RepeaterPanel extends JPanel {
 		controlPanel.add(sendButton);
 		
 		authAccountComboBox = new JComboBox<AuthAccountDto>();
+		authAccountComboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				authSessionRefreshButton.setEnabled(authAccountComboBox.getSelectedIndex() > 0);
+			}
+		});
 		controlPanel.add(authAccountComboBox);
 		
-		JButton authSessionRefreshButton = new JButton(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH);
+		authSessionRefreshButton = new JButton(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH);
 		authSessionRefreshButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int selectedIndex = authAccountComboBox.getSelectedIndex();
+				if(selectedIndex < 1) {
+					return;
+				}
 				Executors.newSingleThreadExecutor().submit(() -> {
-					Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()));
+					Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex));
 				});
 			}
 		});
@@ -134,6 +145,12 @@ public class RepeaterPanel extends JPanel {
 	public void refreshAuthAccountsComboBox() {
 		authAccountComboBox.removeAllItems();
 		authAccountComboBox.addItem(new AuthAccountDto());
+		authSessionRefreshButton.setEnabled(false);
+
+		if(ConfigLogic.getInstance().getAuthConfig() == null) {
+			return;
+		}
+
 		Controller.getInstance().getAuthAccounts().forEach(authAccount -> {
 			authAccountComboBox.addItem(authAccount);
 		});

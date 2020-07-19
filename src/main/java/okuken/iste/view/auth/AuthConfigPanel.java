@@ -2,12 +2,14 @@ package okuken.iste.view.auth;
 
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.FlowLayout;
 import javax.swing.JComboBox;
 import java.awt.GridLayout;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
@@ -15,16 +17,19 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.collect.Lists;
 
-import burp.ICookie;
+import burp.IParameter;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.AuthConfigDto;
+import okuken.iste.dto.MessageChainDto;
+import okuken.iste.dto.MessageChainNodeDto;
+import okuken.iste.dto.MessageChainNodeInDto;
+import okuken.iste.dto.MessageChainNodeOutDto;
 import okuken.iste.dto.MessageCookieDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageParamDto;
-import okuken.iste.dto.MessageRepeatDto;
-import okuken.iste.dto.PayloadDto;
-import okuken.iste.logic.AuthLogic;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
 
 import java.awt.event.ActionListener;
@@ -41,6 +46,8 @@ public class AuthConfigPanel extends JPanel {
 
 	private JComboBox<String> sessionIdParamTypeComboBox;
 	private JComboBox<MessageCookieDto> sessionIdParamComboBox;
+
+	private AuthConfigDto authConfigDto;
 
 	public AuthConfigPanel() {
 		setLayout(new GridLayout(0, 1, 0, 0));
@@ -96,9 +103,19 @@ public class AuthConfigPanel extends JPanel {
 		JButton testLoginButton = new JButton(Captions.AUTH_CONFIG_BUTTON_LOGIN_TEST);
 		testLoginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(!validateAndShowPopup()) {
+					return;
+				}
+
+				List<AuthAccountDto> authAccountDtos = Controller.getInstance().getAuthAccounts();
+				if(authAccountDtos.isEmpty()) {
+					JOptionPane.showMessageDialog(BurpUtil.getBurpSuiteJFrame(), "Please register one or more account information.");
+					return;
+				}
+				AuthAccountDto authAccountDto = authAccountDtos.get(0);//TODO: selected row
+
 				Executors.newSingleThreadExecutor().submit(() -> {
-					AuthAccountDto authAccountDto = Controller.getInstance().getAuthAccounts().get(0); //first row
-					sendLoginRequestAndSetSessionId(authAccountDto);
+					Controller.getInstance().fetchNewAuthSession(authAccountDto, createChainDto(), true);
 					SwingUtilities.invokeLater(() -> {
 						if(authAccountDto.getSessionId() != null) {
 							testResultTextField.setText(authAccountDto.getSessionId());
@@ -114,36 +131,63 @@ public class AuthConfigPanel extends JPanel {
 		testResultTextField = new JTextField();
 		testResultTextField.setEditable(false);
 		loginTestPanel.add(testResultTextField);
-		testResultTextField.setColumns(10);
+		testResultTextField.setColumns(20);
+		
+		JButton saveButton = new JButton(Captions.AUTH_CONFIG_BUTTON_SAVE);
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(validateAndShowPopup()) {
+					saveConfig();
+				}
+			}
+		});
+		loginTestPanel.add(saveButton);
 		
 	}
 
-	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto) {
-		MessageRepeatDto messageRepeatDto = sendLoginRequest();
-		MessageCookieDto sessionIdCookieDto = sessionIdParamComboBox.getItemAt(sessionIdParamComboBox.getSelectedIndex());
-		Optional<ICookie> cookieOptional = BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()).getCookies().stream()
-				.filter(cookie -> cookie.getName().equals(sessionIdCookieDto.getName()))
-				.findFirst();
-		if(cookieOptional.isPresent()) {
-			authAccountDto.setSessionId(cookieOptional.get().getValue());
-			AuthLogic.getInstance().saveAuthAccount(authAccountDto);
+	private boolean validateAndShowPopup() {
+		boolean ret = validateInputs();
+		if(!ret) {
+			JOptionPane.showMessageDialog(BurpUtil.getBurpSuiteJFrame(), "Please fill in all fields.");
 		}
+		return ret;
 	}
-	private MessageRepeatDto sendLoginRequest() {
-		//TODO: validation
-		return Controller.getInstance().sendAutoRequest(
-				createLoginPayload(Controller.getInstance().getAuthAccounts().get(0)),
-				loginUrlComboBox.getItemAt(loginUrlComboBox.getSelectedIndex()));
+	private boolean validateInputs() {
+		return idParamComboBox.getSelectedIndex() > -1 &&
+				passwordParamComboBox.getSelectedIndex() > -1 &&
+				sessionIdParamComboBox.getSelectedIndex() > -1;
 	}
-	private List<PayloadDto> createLoginPayload(AuthAccountDto authAccountDto) {
-		List<PayloadDto> ret = Lists.newArrayList();
 
-		MessageParamDto idParamDto = idParamComboBox.getItemAt(idParamComboBox.getSelectedIndex());
-		ret.add(new PayloadDto(idParamDto.getName(), idParamDto.getType(), authAccountDto.getUserId()));
+	private void saveConfig() {
+		authConfigDto = Controller.getInstance().saveAuthConfig(createChainDto());
+	}
+	private MessageChainDto createChainDto() {
+		var ret = new MessageChainDto();
 
-		MessageParamDto passwordParamDto = passwordParamComboBox.getItemAt(passwordParamComboBox.getSelectedIndex());
-		ret.add(new PayloadDto(passwordParamDto.getName(), passwordParamDto.getType(), authAccountDto.getPassword()));
+		var nodeDto = new MessageChainNodeDto();
+		nodeDto.setMessageDto(loginUrlComboBox.getItemAt(loginUrlComboBox.getSelectedIndex()));
+		ret.setNodes(Lists.newArrayList(nodeDto));
 
+		nodeDto.setIns(Lists.newArrayList(
+				convertToChainNodeInDto(idParamComboBox.getItemAt(idParamComboBox.getSelectedIndex())),
+				convertToChainNodeInDto(passwordParamComboBox.getItemAt(passwordParamComboBox.getSelectedIndex()))));
+
+		nodeDto.setOuts(Lists.newArrayList(
+				convertToChainNodeOutDto(sessionIdParamComboBox.getItemAt(sessionIdParamComboBox.getSelectedIndex()))));
+
+		return ret;
+	}
+	private MessageChainNodeInDto convertToChainNodeInDto(MessageParamDto paramDto) {
+		var ret = new MessageChainNodeInDto();
+		ret.setParamType(paramDto.getType());
+		ret.setParamName(paramDto.getName());
+		return ret;
+	}
+	private MessageChainNodeOutDto convertToChainNodeOutDto(MessageCookieDto cookieDto) {
+		var ret = new MessageChainNodeOutDto();
+		ret.setParamType(IParameter.PARAM_COOKIE);
+		ret.setParamName(cookieDto.getName());
+		ret.setVarName(cookieDto.getName());
 		return ret;
 	}
 
@@ -154,7 +198,40 @@ public class AuthConfigPanel extends JPanel {
 			loginUrlComboBox.addItem(messageDto);
 		});
 
+		authConfigDto = ConfigLogic.getInstance().getAuthConfig();
+		if(authConfigDto == null) {
+			refreshParamComboBox();
+			return;
+		}
+
+		var chainNodeDto = authConfigDto.getAuthMessageChainDto().getNodes().get(0); //now, support only one node
+		loginUrlComboBox.setSelectedItem(messageDtos.stream().filter(messageDto -> messageDto.getId().equals(chainNodeDto.getMessageDto().getId())).findFirst().get());
+
 		refreshParamComboBox();
+
+		var idInDto = chainNodeDto.getIns().get(0);//...
+		idParamComboBox.setSelectedIndex(
+			IntStream.range(0, idParamComboBox.getItemCount()).filter(i -> {
+				var idParamDto = idParamComboBox.getItemAt(i);
+				return idParamDto.getType() == idInDto.getParamType() &&
+						idParamDto.getName().equals(idInDto.getParamName());
+				}).findFirst().getAsInt());
+
+		var pwInDto = chainNodeDto.getIns().get(1);//...
+		passwordParamComboBox.setSelectedIndex(
+			IntStream.range(0, passwordParamComboBox.getItemCount()).filter(i -> {
+				var pwParamDto = passwordParamComboBox.getItemAt(i);
+				return pwParamDto.getType() == pwInDto.getParamType() &&
+						pwParamDto.getName().equals(pwInDto.getParamName());
+				}).findFirst().getAsInt());
+
+		var sessIdOutDto = chainNodeDto.getOuts().get(0);//...
+		sessionIdParamComboBox.setSelectedIndex(
+			IntStream.range(0, sessionIdParamComboBox.getItemCount()).filter(i -> {
+				var sessIdCookieDto = sessionIdParamComboBox.getItemAt(i);
+				return sessIdCookieDto.getName().equals(sessIdOutDto.getParamName());
+				}).findFirst().getAsInt());
+
 	}
 
 	private void refreshParamComboBox() {

@@ -106,7 +106,7 @@ public class AuthAccountTablePanel extends JPanel {
 				super.setValueAt(val, rowIndex, columnIndex);
 				
 				if(needRefreshComponentsDependOnAuthAccounts) {
-					Controller.getInstance().refreshComponentsDependOnAuthAccounts();
+					Controller.getInstance().refreshComponentsDependOnAuthConfig();
 				}
 			}
 		});
