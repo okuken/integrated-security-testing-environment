@@ -5,6 +5,9 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.function.Function;
 
 import javax.swing.AbstractAction;
@@ -78,6 +81,11 @@ public class UiUtil {
 		});
 
 		return undoManager;
+	}
+
+	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	public static final String now() {
+		return timestampFormat.format(Calendar.getInstance().getTime());
 	}
 
 }

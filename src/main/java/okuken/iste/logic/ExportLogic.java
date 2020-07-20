@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.ProjectMemoDto;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 public class ExportLogic {
 
@@ -19,21 +21,30 @@ public class ExportLogic {
 		return instance;
 	}
 
-	public void exportMemoToTextFile(File file, List<MessageDto> messageDtos, String projectMemo) {
+	public void exportMemoToTextFile(File file, List<MessageDto> messageDtos, List<ProjectMemoDto> projectMemos) {
 		try (FileOutputStream fos = new FileOutputStream(file);
 			OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
 			BufferedWriter bw = new BufferedWriter(osw)) {
 
-			bw.write(ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName());
+			bw.write(String.format("# %s [%s]", ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName(), UiUtil.now()));
 			bw.newLine();
 			bw.newLine();
 
-			bw.write(projectMemo);
+			for(int i = 0; i < projectMemos.size(); i++) {
+				bw.write(String.format("## Project memo %d", i + 1));
+				bw.newLine();
+				bw.newLine();
+				bw.write(Optional.ofNullable(projectMemos.get(i).getMemo()).orElse(""));
+				bw.newLine();
+				bw.newLine();
+			}
+
+			bw.write("## Requests memo");
 			bw.newLine();
 			bw.newLine();
 
 			for(MessageDto messageDto: messageDtos) {
-				bw.write(String.format("■ %s\t%s", messageDto.getName(), messageDto.getUrlShort()));
+				bw.write(String.format("### %s\t%s", messageDto.getName(), messageDto.getUrlShort()));
 				bw.newLine();
 
 				bw.write(Optional.ofNullable(messageDto.getRemark()).orElse(""));

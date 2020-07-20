@@ -1,6 +1,8 @@
 package okuken.iste.logic;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.mybatis.dynamic.sql.SqlBuilder;
 
@@ -9,6 +11,7 @@ import okuken.iste.dao.MemoMessageMapper;
 import okuken.iste.dao.MemoProjectDynamicSqlSupport;
 import okuken.iste.dao.MemoProjectMapper;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.ProjectMemoDto;
 import okuken.iste.entity.MemoMessage;
 import okuken.iste.entity.MemoProject;
 import okuken.iste.util.BurpUtil;
@@ -89,32 +92,27 @@ public class MemoLogic {
 	/**
 	 * insert or update.
 	 */
-	public void saveProjectMemo(String memo) {
+	public void saveProjectMemo(ProjectMemoDto memoDto) {
 		try {
 			String now = SqlUtil.now();
 			Integer projectId = ConfigLogic.getInstance().getProjectId();
 			DbUtil.withTransaction(session -> {
 				MemoProjectMapper mapper = session.getMapper(MemoProjectMapper.class);
 
-				Optional<MemoProject> entityOptional = mapper.selectOne(c -> c.where(MemoProjectDynamicSqlSupport.fkProjectId,
-						SqlBuilder.isEqualTo(projectId)));
-
-				if (entityOptional.isEmpty()) {
-					MemoProject entity = new MemoProject();
-					entity.setFkProjectId(projectId);
-					entity.setMemo(memo);
-					entity.setPrcDate(now);
-					mapper.insert(entity);
-					return;
-				}
-
-				MemoProject entity = entityOptional.get();
-				if (memo.equals(entity.getMemo())) {
-					return;
-				}
-				entity.setMemo(memo);
+				MemoProject entity = new MemoProject();
+				entity.setId(memoDto.getId());
+				entity.setFkProjectId(projectId);
+				entity.setMemo(memoDto.getMemo());
 				entity.setPrcDate(now);
-				mapper.updateByPrimaryKeySelective(entity);
+
+				if(entity.getId() != null) {
+					mapper.updateByPrimaryKey(entity);
+					return;
+				}
+
+				mapper.insert(entity);
+				memoDto.setId(entity.getId());
+
 			});
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);
@@ -122,20 +120,22 @@ public class MemoLogic {
 		}
 	}
 
-	public String loadProjectMemo() {
+	public List<ProjectMemoDto> loadProjectMemos() {
 		try {
-			Optional<MemoProject> entity =
+			List<MemoProject> entitys =
 				DbUtil.withSession(session -> {
 					MemoProjectMapper mapper = session.getMapper(MemoProjectMapper.class);
-					return mapper.selectOne(c -> c.where(MemoProjectDynamicSqlSupport.fkProjectId,
-							SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+					return mapper.select(c -> c
+							.where(MemoProjectDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId()))
+							.orderBy(MemoProjectDynamicSqlSupport.id));
 				});
 
-			if(entity.isPresent()) {
-				return entity.get().getMemo();
-			} else {
-				return "";
-			}
+			return entitys.stream().map(entity -> {
+				var dto = new ProjectMemoDto();
+				dto.setId(entity.getId());
+				dto.setMemo(entity.getMemo());
+				return dto;
+			}).collect(Collectors.toList());
 
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);

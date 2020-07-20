@@ -20,6 +20,7 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.PayloadDto;
+import okuken.iste.dto.ProjectMemoDto;
 import okuken.iste.logic.AuthLogic;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
@@ -196,15 +197,15 @@ public class Controller {
 		MemoLogic.getInstance().updateMessageMemo(messageDto);
 	}
 
-	public String getProjectMemo() {
-		return MemoLogic.getInstance().loadProjectMemo();
+	public List<ProjectMemoDto> getProjectMemos() {
+		return MemoLogic.getInstance().loadProjectMemos();
 	}
-	public void saveProjectMemo(String memo) {
-		MemoLogic.getInstance().saveProjectMemo(memo);
+	public void saveProjectMemo(ProjectMemoDto dto) {
+		MemoLogic.getInstance().saveProjectMemo(dto);
 	}
 
 	public void exportMemoToTxtFile(File file) {
-		ExportLogic.getInstance().exportMemoToTextFile(file, loadMessages(), getProjectMemo());
+		ExportLogic.getInstance().exportMemoToTextFile(file, loadMessages(), getProjectMemos());
 	}
 
 	public List<AuthAccountDto> getAuthAccounts() {
