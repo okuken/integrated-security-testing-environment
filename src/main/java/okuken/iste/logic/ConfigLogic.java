@@ -76,6 +76,10 @@ public class ConfigLogic {
 		return ret;
 	}
 
+	public void resetProjectOptionsDto() {
+		projectOptionsDto = null;
+	}
+
 	public AuthConfigDto getAuthConfig() {
 		return getProjectOptionsDto().getAuthConfigDto();
 	}

@@ -276,6 +276,7 @@ public class Controller {
 		DatabaseManager.getInstance().changeDatabase(dbFilePath);
 		ProjectLogic.getInstance().selectProject();
 		mainHeaderPanel.refreshProjectName();
+		ConfigLogic.getInstance().resetProjectOptionsDto();
 		reloadDatabase();
 	}
 	private void reloadDatabase() {
