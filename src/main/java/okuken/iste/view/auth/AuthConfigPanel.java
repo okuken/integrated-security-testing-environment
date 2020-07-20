@@ -68,17 +68,22 @@ public class AuthConfigPanel extends JPanel {
 		});
 		loginRequestConfigPanel.add(loginUrlComboBox);
 		
+		JPanel loginRequestParamConfigPanel = new JPanel();
+		FlowLayout flowLayout_3 = (FlowLayout) loginRequestParamConfigPanel.getLayout();
+		flowLayout_3.setAlignment(FlowLayout.LEFT);
+		add(loginRequestParamConfigPanel);
+		
 		JLabel idParamLabel = new JLabel(Captions.AUTH_CONFIG_LOGIN_ID);
-		loginRequestConfigPanel.add(idParamLabel);
+		loginRequestParamConfigPanel.add(idParamLabel);
 		
 		idParamComboBox = new JComboBox<MessageParamDto>();
-		loginRequestConfigPanel.add(idParamComboBox);
+		loginRequestParamConfigPanel.add(idParamComboBox);
 		
 		JLabel passwordParamLabel = new JLabel(Captions.AUTH_CONFIG_LOGIN_PW);
-		loginRequestConfigPanel.add(passwordParamLabel);
+		loginRequestParamConfigPanel.add(passwordParamLabel);
 		
 		passwordParamComboBox = new JComboBox<MessageParamDto>();
-		loginRequestConfigPanel.add(passwordParamComboBox);
+		loginRequestParamConfigPanel.add(passwordParamComboBox);
 		
 		JPanel loginResponseConfigPanel = new JPanel();
 		FlowLayout flowLayout_1 = (FlowLayout) loginResponseConfigPanel.getLayout();

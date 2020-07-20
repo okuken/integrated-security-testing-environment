@@ -55,7 +55,7 @@ public class MessageChainLogic {
 					chainDto.setId(chain.getId());
 				}
 
-				//TODO: ššNodeŒS‚Ìì‚è’¼‚µ(DELETE-INSERT)šš
+				//TODO: ****(DELETE-INSERT)****
 
 				chainDto.getNodes().forEach(nodeDto -> {
 					var node = new MessageChainNode();
