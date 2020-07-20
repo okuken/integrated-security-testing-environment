@@ -128,6 +128,7 @@ public class AuthLogic {
 
 				if(entity.getId() != null) {
 					mapper.updateByPrimaryKey(entity);
+					return;
 				}
 
 				mapper.insert(entity);
