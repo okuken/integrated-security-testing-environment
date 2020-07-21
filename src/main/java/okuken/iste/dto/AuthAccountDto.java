@@ -45,6 +45,8 @@ public class AuthAccountDto {
 
 	@Override
 	public String toString() {
-		return Optional.ofNullable(userId).orElse("-");
+		return String.format("%s - %s", 
+				Optional.ofNullable(userId).orElse(""),
+				Optional.ofNullable(remark).orElse(""));
 	}
 }

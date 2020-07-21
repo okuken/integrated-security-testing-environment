@@ -98,6 +98,7 @@ public class AuthAccountTablePanel extends JPanel {
 							return;
 						}
 						dto.setRemark((String)val);
+						needRefreshComponentsDependOnAuthAccounts = true;
 						break;
 					default:
 						return;

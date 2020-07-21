@@ -37,7 +37,7 @@ public class UiUtil {
 		table.getActionMap().put(actionMapKeyCopyCell, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				copyToClipboard(table.getModel().getValueAt(table.getSelectedRow(), columnIndexTranslator.apply(table.getSelectedColumn())).toString());
+				copyToClipboard(table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), columnIndexTranslator.apply(table.getSelectedColumn())).toString());
 			}
 		});
 	}
