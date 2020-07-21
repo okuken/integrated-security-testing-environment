@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.mybatis.dynamic.sql.SqlBuilder;
 
 import burp.IHttpRequestResponse;
+import burp.IParameter;
 import okuken.iste.dao.MessageRawMapper;
 import okuken.iste.dao.MessageRepeatDynamicSqlSupport;
 import okuken.iste.dao.MessageRepeatMapper;
@@ -20,6 +21,7 @@ import okuken.iste.entity.MessageRaw;
 import okuken.iste.entity.MessageRepeat;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
+import okuken.iste.util.HttpUtil;
 import okuken.iste.util.SqlUtil;
 
 public class RepeaterLogic {
@@ -63,10 +65,15 @@ public class RepeaterLogic {
 					throw new IllegalStateException("Sessionid was set but AuthConfig has not saved.");
 				}
 				var sessionidNodeOutDto = authConfig.getAuthMessageChainDto().getNodes().get(0).getOuts().get(0);
-				request = BurpUtil.getHelpers().updateParameter(request, BurpUtil.getHelpers().buildParameter(
+
+				IParameter sessionIdParam = BurpUtil.getHelpers().buildParameter(
 						sessionidNodeOutDto.getParamName(),
 						authAccountDto.getSessionId(),
-						sessionidNodeOutDto.getParamType()));
+						sessionidNodeOutDto.getParamType());
+
+				request = BurpUtil.getHelpers().removeParameter(request, sessionIdParam);
+				request = HttpUtil.removeDustAtEndOfCookieHeader(request); // bug recovery
+				request = BurpUtil.getHelpers().addParameter(request, sessionIdParam);
 			}
 
 			Date sendDate = Calendar.getInstance().getTime();
