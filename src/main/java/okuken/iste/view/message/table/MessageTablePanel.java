@@ -124,6 +124,9 @@ public class MessageTablePanel extends JPanel {
 					setBorder(defaultRowBorder);
 				}
 
+				if(isSelected && column == table.getSelectedColumn()) {
+					return renderer;
+				}
 				setBackground(tableModel.getRow(table.convertRowIndexToModel(row)).getProgress().getColor());
 
 				return renderer;
