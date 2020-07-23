@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -148,6 +149,10 @@ public class MessageTablePanel extends JPanel {
 				return messageFilterDto.getProgresses().contains(
 						tableModel.getRow((Integer)entry.getIdentifier()).getProgress());
 			}
+		});
+
+		IntStream.range(0, table.getColumnCount()).forEach(i -> {
+			tableRowSorter.setSortable(i, false);
 		});
 
 		table.setRowSorter(tableRowSorter);
