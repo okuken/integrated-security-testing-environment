@@ -31,6 +31,8 @@ public class Captions {
 	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH = "\uD83D\uDD04";
 	public static final String REPEATER_BUTTON_COPY_ORG = "Org";
 
+	public static final String MESSAGE_MEMO_TOGGLE_PIN = "\uD83D\uDCCC";
+
 	public static final String PROJECT_MEMO_BUTTON_WRAP = "Wrap";
 
 	public static final String AUTH_CONTROL_BUTTON_ADD = "+";
