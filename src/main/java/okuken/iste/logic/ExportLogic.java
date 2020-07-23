@@ -47,7 +47,11 @@ public class ExportLogic {
 				bw.write(String.format("### %s\t%s", messageDto.getName(), messageDto.getUrlShort()));
 				bw.newLine();
 
-				bw.write(Optional.ofNullable(messageDto.getRemark()).orElse(""));
+				if(messageDto.getRemark() != null && !messageDto.getRemark().isBlank()) {
+					bw.write(messageDto.getRemark());
+					bw.newLine();
+				}
+				bw.write(String.format("Progress: %s %s", messageDto.getProgress().getCaption(), Optional.ofNullable(messageDto.getProgressMemo()).orElse("")));
 				bw.newLine();
 				bw.newLine();
 

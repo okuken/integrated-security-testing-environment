@@ -135,6 +135,7 @@ public class MessageLogic {
 					message.setName(dto.getName());
 					message.setRemark(dto.getRemark());
 					message.setProgress(dto.getProgress().getId());
+					message.setProgressMemo(dto.getProgressMemo());
 					message.setUrl(dto.getUrl().toExternalForm());
 					message.setMethod(dto.getMethod());
 					message.setParams(dto.getParams());
@@ -182,6 +183,7 @@ public class MessageLogic {
 				message.setName(dto.getName());
 				message.setRemark(dto.getRemark());
 				message.setProgress(dto.getProgress().getId());
+				message.setProgressMemo(dto.getProgressMemo());
 				message.setPrcDate(now);
 				messageMapper.updateByPrimaryKeySelective(message);
 			});
@@ -228,6 +230,7 @@ public class MessageLogic {
 		dto.setName(message.getName());
 		dto.setRemark(message.getRemark());
 		dto.setProgress(SecurityTestingProgress.getById(message.getProgress()));
+		dto.setProgressMemo(message.getProgressMemo());
 		try {
 			dto.setUrl(new URL(message.getUrl()));
 		} catch (MalformedURLException e) {

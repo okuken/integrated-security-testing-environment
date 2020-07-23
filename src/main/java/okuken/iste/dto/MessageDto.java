@@ -17,6 +17,7 @@ public class MessageDto {
 	private String name;
 	private String remark;
 	private SecurityTestingProgress progress;
+	private String progressMemo;
 
 	private Integer memoId;
 	private String memo;
@@ -110,6 +111,12 @@ public class MessageDto {
 	}
 	public void setProgress(SecurityTestingProgress progress) {
 		this.progress = progress;
+	}
+	public String getProgressMemo() {
+		return progressMemo;
+	}
+	public void setProgressMemo(String progressMemo) {
+		this.progressMemo = progressMemo;
 	}
 
 	public Integer getMemoId() {

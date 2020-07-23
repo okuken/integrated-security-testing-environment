@@ -8,8 +8,9 @@ import com.google.common.collect.Maps;
 public enum MessageTableColumn {
 
 	NAME		("Name",		350,	true),
-	REMARK		("Remark",		150,	true),
+	REMARK		("Remark",		130,	true),
 	PROGRESS	("Progress",	40,		true),
+	PROGRESS_MEMO("Progress memo", 60,	true),
 	PROTOCOL	("Protocol",	30,		false),
 	HOST		("Host",		80,		false),
 	PORT		("Port",		35,		false),

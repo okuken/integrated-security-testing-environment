@@ -26,8 +26,9 @@ public class MessageTableModel extends AbstractTableModel {
 			MessageTableColumn.PATH,
 			MessageTableColumn.QUERY,
 			MessageTableColumn.NAME,
-			MessageTableColumn.PROGRESS,
 			MessageTableColumn.REMARK,
+			MessageTableColumn.PROGRESS,
+			MessageTableColumn.PROGRESS_MEMO,
 			MessageTableColumn.PARAMS,
 			MessageTableColumn.STATUS,
 			MessageTableColumn.LENGTH,
@@ -142,6 +143,16 @@ public class MessageTableModel extends AbstractTableModel {
 				MessageLogic.getInstance().updateMessage(dto);
 				break;
 			}
+			case PROGRESS_MEMO: {
+				MessageDto dto = rows.get(rowIndex); 
+				if(val.equals(dto.getProgressMemo())) {
+					break;
+				}
+
+				dto.setProgressMemo((String)val);
+				MessageLogic.getInstance().updateMessage(dto);
+				break;
+			}
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -173,6 +184,10 @@ public class MessageTableModel extends AbstractTableModel {
 			}
 			case PROGRESS: {
 				value = row.getProgress().getCaption();
+				break;
+			}
+			case PROGRESS_MEMO: {
+				value = row.getProgressMemo();
 				break;
 			}
 			case PROTOCOL: {
