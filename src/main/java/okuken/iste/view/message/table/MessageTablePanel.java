@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DropMode;
 import javax.swing.JComboBox;
@@ -18,11 +19,13 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageFilterDto;
@@ -105,13 +108,19 @@ public class MessageTablePanel extends JPanel {
 	}
 
 	private void setupTableRowColorControl(JTable table, MessageTableModel tableModel) {
+		Border defaultRowBorder = BorderFactory.createEmptyBorder(2, 0, 2, 0);
+		Border selectedRowBorder = BorderFactory.createMatteBorder(2, 0, 2, 0, Colors.TABLE_ROW_SELECTED_BORDER);
+
 		@SuppressWarnings("serial")
 		TableCellRenderer tableCellRenderer = new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 				Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-				if(isSelected && MessageTableColumn.getByCaption(table.getColumnName(column)) != MessageTableColumn.PROGRESS) {
-					return renderer;
+
+				if(isSelected) {
+					setBorder(selectedRowBorder);
+				} else {
+					setBorder(defaultRowBorder);
 				}
 
 				setBackground(tableModel.getRow(table.convertRowIndexToModel(row)).getProgress().getColor());

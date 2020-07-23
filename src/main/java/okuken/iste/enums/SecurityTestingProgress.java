@@ -9,8 +9,8 @@ import com.google.common.collect.Maps;
 public enum SecurityTestingProgress {
 
 	NOT_YET	(0, "New",   Color.WHITE),
-	DOING	(1, "Work",  Color.ORANGE),
-	HOLD	(5, "Hold",  Color.CYAN),
+	DOING	(1, "Work",  new Color(0xDF907C)),
+	HOLD	(5, "Hold",  new Color(0x83BAD6)),
 	ABORT	(8, "Abort", Color.GRAY),
 	DONE	(9, "Done",  Color.LIGHT_GRAY);
 
