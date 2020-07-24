@@ -32,6 +32,7 @@ public class MainHeaderPanel extends JPanel {
 
 	private JLabel projectNameLabel;
 	private List<JCheckBox> progressCheckboxs;
+	private JLabel rowCountLabel;
 
 	public MainHeaderPanel() {
 		setLayout(new BorderLayout(0, 0));
@@ -52,6 +53,8 @@ public class MainHeaderPanel extends JPanel {
 			progressCheckboxs.add(progressCheckbox);
 		});
 		
+		rowCountLabel = new JLabel("");
+		leftPanel.add(rowCountLabel);
 		
 		JPanel centerPanel = new JPanel();
 		projectNameLabel = new JLabel();
@@ -118,7 +121,12 @@ public class MainHeaderPanel extends JPanel {
 			.map(progressCheckbox -> SecurityTestingProgress.getByCaption(progressCheckbox.getText()))
 			.collect(Collectors.toList()));
 
-		Controller.getInstance().applyMessageFilter(dto);
+		int rowCount = Controller.getInstance().applyMessageFilter(dto);
+		setRowCount(rowCount);
+	}
+
+	private void setRowCount(int rowCount) {
+		rowCountLabel.setText(String.format(" [%d] ", rowCount));
 	}
 
 	public void refreshProjectName() {

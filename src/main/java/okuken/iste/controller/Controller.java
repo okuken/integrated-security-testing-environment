@@ -128,6 +128,7 @@ public class Controller {
 		MessageLogic.getInstance().saveMessageOrder(this.messageTableModel.getRows()); // TODO: join transaction...
 		messageDtos.forEach(messageDto -> MemoLogic.getInstance().saveMessageMemo(messageDto));
 
+		applyMessageFilter();
 		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
 	}
 
@@ -268,8 +269,11 @@ public class Controller {
 	public void applyMessageFilter() {
 		mainHeaderPanel.applyMessageProgressFilter();
 	}
-	public void applyMessageFilter(MessageFilterDto messageFilterDto) {
-		messageTablePanel.applyFilter(messageFilterDto);
+	/**
+	 * @return number of rows after filtering
+	 */
+	public int applyMessageFilter(MessageFilterDto messageFilterDto) {
+		return messageTablePanel.applyFilter(messageFilterDto);
 	}
 
 	public void changeDatabase(String dbFilePath) {

@@ -139,9 +139,9 @@ public class MessageTablePanel extends JPanel {
 		}
 	}
 
-	public void applyFilter(MessageFilterDto messageFilterDto) {
+	public int applyFilter(MessageFilterDto messageFilterDto) {
 		if(messageFilterDto.getProgresses() == null) {
-			return;
+			return table.getRowCount();
 		}
 
 		var tableRowSorter = new TableRowSorter<MessageTableModel>(tableModel);
@@ -159,6 +159,8 @@ public class MessageTablePanel extends JPanel {
 		});
 
 		table.setRowSorter(tableRowSorter);
+
+		return table.getRowCount();
 	}
 
 	public MessageDto getSelectedMessage() {
