@@ -40,6 +40,7 @@ import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTableColumn;
 import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
+import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeaterPanel;
 
 public class Controller {
@@ -58,6 +59,7 @@ public class Controller {
 	private JTable messageTable;
 
 	private MessageEditorPanel orgMessageEditorPanel;
+	private RepeatMasterPanel repeatMasterPanel;
 	private RepeaterPanel repeaterPanel;
 
 	private MessageMemoPanel messageMemoPanel;
@@ -103,6 +105,9 @@ public class Controller {
 	}
 	public void setOrgMessageEditorPanel(MessageEditorPanel orgMessageEditorPanel) {
 		this.orgMessageEditorPanel = orgMessageEditorPanel;
+	}
+	public void setRepeatMasterPanel(RepeatMasterPanel repeatMasterPanel) {
+		this.repeatMasterPanel = repeatMasterPanel;
 	}
 	public void setRepeaterPanel(RepeaterPanel repeaterPanel) {
 		this.repeaterPanel = repeaterPanel;
@@ -163,6 +168,7 @@ public class Controller {
 
 	public void refreshMessageDetailPanels(MessageDto dto) {
 		this.orgMessageEditorPanel.setMessage(dto);
+		this.repeatMasterPanel.setup(dto);
 		this.repeaterPanel.setup(dto);
 		this.messageMemoPanel.enablePanel(dto);
 	}
@@ -188,6 +194,11 @@ public class Controller {
 
 	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto) {
 		return RepeaterLogic.getInstance().sendRequest(payloadDtos, orgMessageDto, false);
+	}
+
+	public void saveRepeatMaster(MessageDto messageDto) {
+		MessageLogic.getInstance().saveRepeatMaster(messageDto);
+		repeatMasterPanel.refreshPanel();
 	}
 
 	public void saveMessageMemo(MessageDto messageDto) {
@@ -288,6 +299,7 @@ public class Controller {
 		this.messageTableModel.clearRows();
 		this.messageTablePanel.setupTable(); // for fix bug: progress column control can't be active after to load empty messageTable.
 		this.orgMessageEditorPanel.clearMessage();
+		this.repeatMasterPanel.clear();
 		this.repeaterPanel.clear();
 		this.messageMemoPanel.disablePanel();
 

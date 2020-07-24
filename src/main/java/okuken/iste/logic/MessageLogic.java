@@ -22,6 +22,8 @@ import okuken.iste.dao.MessageOrdMapper;
 import okuken.iste.dao.MessageParamMapper;
 import okuken.iste.dao.MessageRawDynamicSqlSupport;
 import okuken.iste.dao.MessageRawMapper;
+import okuken.iste.dao.MessageRepeatMasterDynamicSqlSupport;
+import okuken.iste.dao.MessageRepeatMasterMapper;
 import okuken.iste.dto.MessageCookieDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageParamDto;
@@ -31,6 +33,7 @@ import okuken.iste.entity.Message;
 import okuken.iste.entity.MessageOrd;
 import okuken.iste.entity.MessageParam;
 import okuken.iste.entity.MessageRaw;
+import okuken.iste.entity.MessageRepeatMaster;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
@@ -89,6 +92,13 @@ public class MessageLogic {
 		ret.setHighlight(httpRequestResponse.getHighlight());
 
 		return ret;
+	}
+
+	private IHttpRequestResponse convertEntityToMock(MessageRaw messageRaw) {
+		return new HttpRequestResponseMock(
+				messageRaw.getRequest(),
+				messageRaw.getResponse(),
+				new HttpServiceMock(messageRaw.getHost(), messageRaw.getPort(), messageRaw.getProtocol()));
 	}
 
 	public MessageParamDto convertParameterToDto(IParameter parameter) { //TODO: externalize to converter
@@ -329,11 +339,77 @@ public class MessageLogic {
 							.get();
 				});
 
-			return new HttpRequestResponseMock(
-					messageRaw.getRequest(),
-					messageRaw.getResponse(),
-					new HttpServiceMock(messageRaw.getHost(), messageRaw.getPort(), messageRaw.getProtocol()));
+			return convertEntityToMock(messageRaw);
 
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw e;
+		}
+	}
+
+	public void loadRepeatMaster(MessageDto messageDto) {
+		try {
+			MessageRaw messageRaw =
+				DbUtil.withSession(session -> {
+					MessageRepeatMasterMapper messageRepeatMasterMapper = session.getMapper(MessageRepeatMasterMapper.class);
+					MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
+
+					var messageRepeatMaster = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(messageDto.getId())));
+					if(messageRepeatMaster.isEmpty()) {
+						return null;
+					}
+
+					return messageRawMapper
+							.selectByPrimaryKey(messageRepeatMaster.get().getFkMessageRawId())
+							.get();
+				});
+
+			if(messageRaw != null) {
+				messageDto.setRepeatMasterMessage(convertEntityToMock(messageRaw));
+			}
+
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			throw e;
+		}
+	}
+
+	/**
+	 * insert or update
+	 */
+	public void saveRepeatMaster(MessageDto messageDto) {
+		try {
+			String now = SqlUtil.now();
+			DbUtil.withTransaction(session -> {
+				MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
+				MessageRepeatMasterMapper messageRepeatMasterMapper = session.getMapper(MessageRepeatMasterMapper.class);
+
+				var messageRepeatMasterOptional = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(messageDto.getId())));
+				if(messageRepeatMasterOptional.isPresent()) {
+					var messageRaw = messageRawMapper.selectByPrimaryKey(messageRepeatMasterOptional.get().getFkMessageRawId()).get();
+					messageRaw.setRequest(messageDto.getRepeatMasterMessage().getRequest());
+					messageRaw.setResponse(messageDto.getRepeatMasterMessage().getResponse());
+					messageRaw.setPrcDate(now);
+					messageRawMapper.updateByPrimaryKey(messageRaw);
+					return;
+				}
+
+				var messageRaw = new MessageRaw();
+				messageRaw.setHost(messageDto.getMessage().getHttpService().getHost());
+				messageRaw.setPort(messageDto.getMessage().getHttpService().getPort());
+				messageRaw.setProtocol(messageDto.getMessage().getHttpService().getProtocol());
+				messageRaw.setRequest(messageDto.getRepeatMasterMessage().getRequest());
+				messageRaw.setResponse(messageDto.getRepeatMasterMessage().getResponse());
+				messageRaw.setPrcDate(now);
+				messageRawMapper.insert(messageRaw);
+
+				var messageRepeatMaster = new MessageRepeatMaster();
+				messageRepeatMaster.setFkMessageId(messageDto.getId());
+				messageRepeatMaster.setFkMessageRawId(messageRaw.getId());
+				messageRepeatMaster.setPrcDate(now);
+				messageRepeatMasterMapper.insert(messageRepeatMaster);
+
+			});
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);
 			throw e;

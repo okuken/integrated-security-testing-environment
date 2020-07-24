@@ -14,10 +14,10 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import javax.swing.JButton;
-import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.util.concurrent.Executors;
 import java.awt.event.ActionEvent;
@@ -51,9 +51,11 @@ public class RepeaterPanel extends JPanel {
 		headerPanel.add(repeatTablePanel, BorderLayout.CENTER);
 		
 		JPanel controlPanel = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) controlPanel.getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
 		headerPanel.add(controlPanel, BorderLayout.SOUTH);
+		controlPanel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel controlLeftPanel = new JPanel();
+		controlPanel.add(controlLeftPanel, BorderLayout.WEST);
 		
 		JButton sendButton = new JButton(Captions.REPEATER_BUTTON_SEND);
 		sendButton.addActionListener(new ActionListener() {
@@ -70,7 +72,7 @@ public class RepeaterPanel extends JPanel {
 				});
 			}
 		});
-		controlPanel.add(sendButton);
+		controlLeftPanel.add(sendButton);
 		
 		authAccountComboBox = new JComboBox<AuthAccountDto>();
 		authAccountComboBox.addActionListener(new ActionListener() {
@@ -78,7 +80,7 @@ public class RepeaterPanel extends JPanel {
 				authSessionRefreshButton.setEnabled(authAccountComboBox.getSelectedIndex() > 0);
 			}
 		});
-		controlPanel.add(authAccountComboBox);
+		controlLeftPanel.add(authAccountComboBox);
 		
 		authSessionRefreshButton = new JButton(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH);
 		authSessionRefreshButton.addActionListener(new ActionListener() {
@@ -92,7 +94,7 @@ public class RepeaterPanel extends JPanel {
 				});
 			}
 		});
-		controlPanel.add(authSessionRefreshButton);
+		controlLeftPanel.add(authSessionRefreshButton);
 		
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
 		copyOrgButton.addActionListener(new ActionListener() {
@@ -100,7 +102,34 @@ public class RepeaterPanel extends JPanel {
 				messageEditorPanel.setMessage(orgMessageDto);
 			}
 		});
-		controlPanel.add(copyOrgButton);
+		controlLeftPanel.add(copyOrgButton);
+		
+		JButton copyMasterButton = new JButton(Captions.REPEATER_BUTTON_COPY_MASTER);
+		copyMasterButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(orgMessageDto.getRepeatMasterMessage() != null) {
+					messageEditorPanel.setMessage(orgMessageDto.getRepeatMasterMessage());
+				} else {
+					messageEditorPanel.setMessage(orgMessageDto);
+				}
+			}
+		});
+		controlLeftPanel.add(copyMasterButton);
+		
+		JPanel controlRightPanel = new JPanel();
+		controlPanel.add(controlRightPanel, BorderLayout.EAST);
+		
+		JButton saveAsMasterButton = new JButton(Captions.REPEATER_BUTTON_SAVE_AS_MASTER);
+		saveAsMasterButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				orgMessageDto.setRepeatMasterMessage(new HttpRequestResponseMock(
+						messageEditorPanel.getRequest(),
+						messageEditorPanel.getResponse(),
+						orgMessageDto.getMessage().getHttpService()));
+				Controller.getInstance().saveRepeatMaster(orgMessageDto);
+			}
+		});
+		controlRightPanel.add(saveAsMasterButton);
 		
 		messageEditorPanel = new MessageEditorPanel(new IMessageEditorController() {
 			@Override
@@ -115,7 +144,7 @@ public class RepeaterPanel extends JPanel {
 			public IHttpService getHttpService() {
 				return Controller.getInstance().getSelectedMessage().getMessage().getHttpService();
 			}
-		}, true, false);
+		}, true, true);
 		splitPane.setRightComponent(messageEditorPanel);
 		
 		

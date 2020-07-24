@@ -17,6 +17,7 @@ import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.option.UserOptionsPanel;
+import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeaterPanel;
 import okuken.iste.view.tool.ExportToolsPanel;
 
@@ -68,6 +69,10 @@ public class SuitePanel extends JPanel {
 		MessageEditorPanel orgMessageEditorPanel = new MessageEditorPanel();
 		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_ORIGINAL, null, orgMessageEditorPanel, null);
 		Controller.getInstance().setOrgMessageEditorPanel(orgMessageEditorPanel);
+		
+		RepeatMasterPanel repeatMasterPanel = new RepeatMasterPanel();
+		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_REPEAT_MASTER, null, repeatMasterPanel, null);
+		Controller.getInstance().setRepeatMasterPanel(repeatMasterPanel);
 		
 		repeaterPanel = new RepeaterPanel();
 		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_REPEAT, null, repeaterPanel, null);

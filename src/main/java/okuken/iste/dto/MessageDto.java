@@ -40,6 +40,7 @@ public class MessageDto {
 	private IRequestInfo requestInfo;
 	private IResponseInfo responseInfo;
 
+	private IHttpRequestResponse repeatMasterMessage;
 
 	public String getProtocol() {
 		if(url == null) {return null;}
@@ -237,6 +238,15 @@ public class MessageDto {
 	}
 	public void setResponseInfo(IResponseInfo responseInfo) {
 		this.responseInfo = responseInfo;
+	}
+	public IHttpRequestResponse getRepeatMasterMessage() {
+		if(repeatMasterMessage == null) {
+			MessageLogic.getInstance().loadRepeatMaster(this);
+		}
+		return repeatMasterMessage;
+	}
+	public void setRepeatMasterMessage(IHttpRequestResponse repeatMasterMessage) {
+		this.repeatMasterMessage = repeatMasterMessage;
 	}
 
 	@Override

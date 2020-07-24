@@ -13,6 +13,7 @@ public class Captions {
 	public static final String TAB_OPTIONS = "Options";
 
 	public static final String TAB_MAIN_MESSAGE_EDITOR_ORIGINAL = "Org";
+	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT_MASTER = "Master";
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT = "Repeater";
 
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
@@ -30,6 +31,8 @@ public class Captions {
 	public static final String REPEATER_BUTTON_SEND = "Send";
 	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH = "\uD83D\uDD04";
 	public static final String REPEATER_BUTTON_COPY_ORG = "Org";
+	public static final String REPEATER_BUTTON_COPY_MASTER = "Master";
+	public static final String REPEATER_BUTTON_SAVE_AS_MASTER = "Save as master";
 
 	public static final String MESSAGE_MEMO_TOGGLE_PIN = "\uD83D\uDCCC";
 

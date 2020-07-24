@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import burp.IHttpRequestResponse;
 import burp.IHttpService;
 import burp.IMessageEditor;
 import burp.IMessageEditorController;
@@ -71,6 +72,11 @@ public class MessageEditorPanel extends JPanel {
 		responseMessageEditor.setMessage(
 				Optional.ofNullable(dto.getMessage().getResponse()).orElse(new byte[] {}),
 				false);
+	}
+
+	public void setMessage(IHttpRequestResponse message) {
+		setRequest(message.getRequest());
+		setResponse(Optional.ofNullable(message.getResponse()).orElse(new byte[] {}));
 	}
 
 	public void clearMessage() {
