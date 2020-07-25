@@ -1,11 +1,14 @@
 package okuken.iste.view;
 
+import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import com.google.common.collect.Lists;
 
 import java.awt.BorderLayout;
 import javax.swing.JSplitPane;
@@ -26,6 +29,7 @@ import okuken.iste.view.repeater.RepeaterPanel;
 import okuken.iste.view.tool.ExportToolsPanel;
 
 import java.awt.GridLayout;
+import java.util.List;
 
 public class SuitePanel extends JPanel {
 
@@ -34,12 +38,15 @@ public class SuitePanel extends JPanel {
 	private JTabbedPane mainTabbedPane;
 	private JFrame dockoutFrame;
 
+	private MainHeaderPanel mainHeaderPanel;
+
 	private JSplitPane mainSplitPane;
 	private JSplitPane mainLeftSplitPane;
 	private JSplitPane mainRightSplitPane;
 
 	private RepeaterPanel repeaterPanel;
 
+	@SuppressWarnings("serial")
 	public SuitePanel() {
 		setLayout(new BorderLayout(0, 0));
 		
@@ -47,12 +54,25 @@ public class SuitePanel extends JPanel {
 		add(mainTabbedPane);
 		Controller.getInstance().setMainTabbedPane(mainTabbedPane);
 		
-		JPanel mainPanel = new JPanel();
+		List<AbstractDockoutableTabPanel> dockoutableTabPanels = Lists.newArrayList();
+		
+		var mainPanel = new AbstractDockoutableTabPanel() {
+			protected AbstractButton getDockoutButton() {
+				return mainHeaderPanel.getDockoutButton();
+			}
+			protected String getTabName() {
+				return Captions.TAB_MAIN;
+			}
+			protected int getTabIndex() {
+				return 0;
+			}
+		};
+		dockoutableTabPanels.add(mainPanel);
 		mainTabbedPane.addTab(Captions.TAB_MAIN, null, mainPanel, null);
 		mainPanel.setLayout(new BorderLayout(0, 0));
 		Controller.getInstance().setMainPanel(mainPanel);
 		
-		JPanel mainHeaderPanel = new MainHeaderPanel();
+		mainHeaderPanel = new MainHeaderPanel();
 		mainPanel.add(mainHeaderPanel, BorderLayout.NORTH);
 		
 		mainSplitPane = new JSplitPane();
@@ -131,6 +151,9 @@ public class SuitePanel extends JPanel {
 		});
 		
 		
+		dockoutableTabPanels.forEach(panel -> {
+			panel.setupDockout();
+		});
 		SwingUtilities.invokeLater(() -> {
 			initDividerLocation();
 		});

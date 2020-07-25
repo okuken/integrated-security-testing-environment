@@ -9,7 +9,6 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.UiUtil;
 
 import java.awt.FlowLayout;
 
@@ -23,7 +22,6 @@ import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
 
 public class MainHeaderPanel extends JPanel {
 
@@ -34,7 +32,6 @@ public class MainHeaderPanel extends JPanel {
 	private JLabel rowCountLabel;
 
 	private JButton dockoutButton;
-	private JFrame dockoutFrame;
 
 	public MainHeaderPanel() {
 		setLayout(new BorderLayout(0, 0));
@@ -68,36 +65,20 @@ public class MainHeaderPanel extends JPanel {
 		FlowLayout flowLayout = (FlowLayout) rightPanel.getLayout();
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 		
-		dockoutButton = new JButton(Captions.DOCKOUT);
-		dockoutButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dockoutOrDockin();
-			}
-		});
-		
 		JButton initColumnWidthButton = new JButton(Captions.MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH);
 		initColumnWidthButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().initSizeRatioOfParts();
 			}
 		});
-		
 		rightPanel.add(initColumnWidthButton);
+		
+		dockoutButton = new JButton();
 		rightPanel.add(dockoutButton);
+		
 		add(rightPanel, BorderLayout.EAST);
 
 		Controller.getInstance().setMainHeaderPanel(this);
-	}
-
-	private void dockoutOrDockin() {
-		if(dockoutFrame == null) {
-			dockoutFrame = UiUtil.dockout(UiUtil.createDockoutTitleByTabName(Captions.TAB_MAIN), Controller.getInstance().getMainPanel());
-			dockoutButton.setText(Captions.DOCKIN);
-		} else {
-			UiUtil.dockin(Captions.TAB_MAIN, Controller.getInstance().getMainPanel(), 0, Controller.getInstance().getMainTabbedPane(), dockoutFrame);
-			dockoutFrame = null;
-			dockoutButton.setText(Captions.DOCKOUT);
-		}
 	}
 
 	public void applyMessageProgressFilter() {
@@ -117,6 +98,10 @@ public class MainHeaderPanel extends JPanel {
 
 	public void refreshProjectName() {
 		projectNameLabel.setText(ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName());
+	}
+
+	public JButton getDockoutButton() {
+		return dockoutButton;
 	}
 
 }

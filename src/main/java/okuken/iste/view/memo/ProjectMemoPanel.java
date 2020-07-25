@@ -5,6 +5,8 @@ import javax.swing.JScrollBar;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -13,6 +15,7 @@ import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.ProjectMemoDto;
 import okuken.iste.logic.MemoLogic;
+import okuken.iste.view.AbstractDockoutableTabPanel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -20,12 +23,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.awt.GridLayout;
 
-public class ProjectMemoPanel extends JPanel {
+public class ProjectMemoPanel extends AbstractDockoutableTabPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final int PROJECT_MEMO_COUNT = 4;
 
+	private JButton dockoutButton;
 	private JPanel memoPanel;
 
 	private List<MemoTextArea> memoTextAreas;
@@ -42,15 +46,19 @@ public class ProjectMemoPanel extends JPanel {
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 		add(headerPanel, BorderLayout.NORTH);
 		
-		JButton btnNewButton = new JButton(Captions.PROJECT_MEMO_BUTTON_WRAP);
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton wrapButton = new JButton(Captions.PROJECT_MEMO_BUTTON_WRAP);
+		wrapButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				memoTextAreas.forEach(memoTextArea -> {
 					memoTextArea.setLineWrap(!memoTextArea.getLineWrap());
 				});
 			}
 		});
-		headerPanel.add(btnNewButton);
+		headerPanel.add(wrapButton);
+		
+		dockoutButton = new JButton();
+		headerPanel.add(dockoutButton);
+		setupDockout();
 
 		Controller.getInstance().setProjectMemoPanel(this);
 	}
@@ -86,6 +94,19 @@ public class ProjectMemoPanel extends JPanel {
 	public void refreshPanel() {
 		memoPanel.removeAll();
 		load();
+	}
+
+	@Override
+	protected AbstractButton getDockoutButton() {
+		return dockoutButton;
+	}
+	@Override
+	protected String getTabName() {
+		return Captions.TAB_MEMO;
+	}
+	@Override
+	protected int getTabIndex() {
+		return 1; //TODO: consider other dockout
 	}
 
 }
