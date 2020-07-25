@@ -1,5 +1,6 @@
 package okuken.iste.util;
 
+import java.awt.Container;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -8,15 +9,22 @@ import java.awt.event.KeyListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.function.Function;
 
 import javax.swing.AbstractAction;
+import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.undo.UndoManager;
+
+import com.google.common.collect.Lists;
+
+import okuken.iste.consts.Captions;
 
 public class UiUtil {
 
@@ -82,6 +90,50 @@ public class UiUtil {
 
 		return undoManager;
 	}
+
+
+	private static final List<JFrame> dockoutFrames = Lists.newArrayList(); 
+	public static void disposeDockoutFrames() {
+		dockoutFrames.forEach(dockoutFrame -> {
+			dockoutFrame.dispose();
+		});
+	}
+
+	public static JFrame dockout(String title, Container contentPane) {
+		JFrame burpSuiteFrame = BurpUtil.getBurpSuiteJFrame();
+
+		JFrame dockoutFrame = new JFrame();
+		dockoutFrame.setTitle(title);
+		dockoutFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		dockoutFrame.setBounds(burpSuiteFrame.getBounds());
+		dockoutFrame.setContentPane(contentPane);
+		dockoutFrame.setLocationRelativeTo(burpSuiteFrame);
+		dockoutFrame.setVisible(true);
+
+		dockoutFrames.add(dockoutFrame);
+
+		return dockoutFrame;
+	}
+
+	public static void dockin(Container contentPane, Container parentContainer, JFrame dockoutFrame) {
+		parentContainer.add(contentPane);
+		dockinAfterProcess(dockoutFrame);
+	}
+	public static void dockin(String tabName, Container contentPane, int tabIndex, JTabbedPane parentTabbedPane, JFrame dockoutFrame) {
+		parentTabbedPane.insertTab(tabName, null, contentPane, null, tabIndex);
+		parentTabbedPane.setSelectedIndex(tabIndex);
+		dockinAfterProcess(dockoutFrame);
+	}
+	private static void dockinAfterProcess(JFrame dockoutFrame) {
+		dockoutFrame.dispose();
+		dockoutFrames.remove(dockoutFrame);
+	}
+
+	public static String createDockoutTitleByTabName(String tabName) {
+		return String.format("%s - %s", tabName, Captions.EXTENSION_NAME_FULL);
+	}
+
+
 
 	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	public static final String now() {

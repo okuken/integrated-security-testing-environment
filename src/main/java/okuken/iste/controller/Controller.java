@@ -5,7 +5,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -52,8 +51,6 @@ public class Controller {
 	private JPanel mainPanel;
 	private MainHeaderPanel mainHeaderPanel;
 
-	private JFrame dockoutFrame;
-
 	private MessageTablePanel messageTablePanel;
 	private MessageTableModel messageTableModel;
 	private JTable messageTable;
@@ -90,9 +87,6 @@ public class Controller {
 	}
 	public void setMainHeaderPanel(MainHeaderPanel mainHeaderPanel) {
 		this.mainHeaderPanel = mainHeaderPanel;
-	}
-	public void setDockoutFrame(JFrame dockoutFrame) {
-		this.dockoutFrame = dockoutFrame;
 	}
 	public void setMessageTablePanel(MessageTablePanel messageTablePanel) {
 		this.messageTablePanel = messageTablePanel;
@@ -304,12 +298,6 @@ public class Controller {
 		this.messageMemoPanel.disablePanel();
 
 		loadDatabase();
-	}
-
-	public void disposeDockoutFrame() {
-		if(dockoutFrame != null) {
-			dockoutFrame.dispose();
-		}
 	}
 
 }

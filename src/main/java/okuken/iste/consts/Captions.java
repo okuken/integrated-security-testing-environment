@@ -3,6 +3,10 @@ package okuken.iste.consts;
 public class Captions {
 
 	public static final String EXTENSION_NAME = "Integrated Security Testing Environment";
+	public static final String EXTENSION_NAME_FULL = "ISTE: Integrated Security Testing Environment";
+
+	public static final String DOCKOUT = "\u2197";
+	public static final String DOCKIN = "\u2199";
 
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";	
 	public static final String TAB_SUITE = "ISTE";
@@ -17,7 +21,6 @@ public class Captions {
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT = "Repeater";
 
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
-	public static final String MAIN_HEADER_BUTTON_DOCKOUT = "\u2197";
 
 	public static final String TABLE_CONTEXT_MENU_DO_PASSIVE_SCAN = "Do passive scan";
 	public static final String TABLE_CONTEXT_MENU_DO_ACTIVE_SCAN = "Do active scan";

@@ -1,7 +1,6 @@
 package okuken.iste.view.header;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import com.google.common.collect.Lists;
 
@@ -10,12 +9,11 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -25,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 
 public class MainHeaderPanel extends JPanel {
 
@@ -33,6 +32,9 @@ public class MainHeaderPanel extends JPanel {
 	private JLabel projectNameLabel;
 	private List<JCheckBox> progressCheckboxs;
 	private JLabel rowCountLabel;
+
+	private JButton dockoutButton;
+	private JFrame dockoutFrame;
 
 	public MainHeaderPanel() {
 		setLayout(new BorderLayout(0, 0));
@@ -66,15 +68,10 @@ public class MainHeaderPanel extends JPanel {
 		FlowLayout flowLayout = (FlowLayout) rightPanel.getLayout();
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 		
-		JButton dockoutButton = new JButton(Captions.MAIN_HEADER_BUTTON_DOCKOUT);
-		MainHeaderPanel that = this;
+		dockoutButton = new JButton(Captions.DOCKOUT);
 		dockoutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(SwingUtilities.getWindowAncestor(that) == BurpUtil.getBurpSuiteJFrame()) {
-					dockout();
-				} else {
-					dockin();
-				}
+				dockoutOrDockin();
 			}
 		});
 		
@@ -92,26 +89,15 @@ public class MainHeaderPanel extends JPanel {
 		Controller.getInstance().setMainHeaderPanel(this);
 	}
 
-	private void dockout() {
-		JFrame burpSuiteFrame = BurpUtil.getBurpSuiteJFrame();
-		SwingUtilities.invokeLater(() -> {
-			JFrame dockoutFrame = new JFrame();
-			Controller.getInstance().setDockoutFrame(dockoutFrame);
-
-			dockoutFrame.setTitle(Captions.TAB_SUITE);
-			dockoutFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			dockoutFrame.setBounds(burpSuiteFrame.getBounds());
-			dockoutFrame.setContentPane(Controller.getInstance().getMainPanel());
-			dockoutFrame.setLocationRelativeTo(burpSuiteFrame);
-			dockoutFrame.setVisible(true);
-		});
-	}
-
-	private void dockin() {
-		Controller controller = Controller.getInstance();
-		controller.getMainTabbedPane().insertTab(Captions.TAB_MAIN, null, controller.getMainPanel(), null, 0);
-		controller.getMainTabbedPane().setSelectedIndex(0);
-		controller.disposeDockoutFrame();
+	private void dockoutOrDockin() {
+		if(dockoutFrame == null) {
+			dockoutFrame = UiUtil.dockout(UiUtil.createDockoutTitleByTabName(Captions.TAB_MAIN), Controller.getInstance().getMainPanel());
+			dockoutButton.setText(Captions.DOCKIN);
+		} else {
+			UiUtil.dockin(Captions.TAB_MAIN, Controller.getInstance().getMainPanel(), 0, Controller.getInstance().getMainTabbedPane(), dockoutFrame);
+			dockoutFrame = null;
+			dockoutButton.setText(Captions.DOCKOUT);
+		}
 	}
 
 	public void applyMessageProgressFilter() {

@@ -1,8 +1,11 @@
 package okuken.iste.view;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import java.awt.BorderLayout;
 import javax.swing.JSplitPane;
@@ -10,6 +13,7 @@ import javax.swing.JSplitPane;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.auth.AuthPanel;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
@@ -27,6 +31,9 @@ public class SuitePanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private JTabbedPane mainTabbedPane;
+	private JFrame dockoutFrame;
+
 	private JSplitPane mainSplitPane;
 	private JSplitPane mainLeftSplitPane;
 	private JSplitPane mainRightSplitPane;
@@ -36,7 +43,7 @@ public class SuitePanel extends JPanel {
 	public SuitePanel() {
 		setLayout(new BorderLayout(0, 0));
 		
-		JTabbedPane mainTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		mainTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		add(mainTabbedPane);
 		Controller.getInstance().setMainTabbedPane(mainTabbedPane);
 		
@@ -113,6 +120,16 @@ public class SuitePanel extends JPanel {
 		JPanel userOptionsPanel = new UserOptionsPanel();
 		optionsPanel.add(userOptionsPanel, BorderLayout.CENTER);
 		
+		mainTabbedPane.addTab(Captions.DOCKOUT, null);
+		mainTabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if(mainTabbedPane.getSelectedIndex() == getDockoutTabIndex()) {
+					dockoutOrDockin();
+				}
+			}
+		});
+		
 		
 		SwingUtilities.invokeLater(() -> {
 			initDividerLocation();
@@ -125,6 +142,26 @@ public class SuitePanel extends JPanel {
 		mainRightSplitPane.setDividerLocation(Positions.DIVIDER_LOCATION_MAIN_RIGHT);
 
 		repeaterPanel.initDividerLocation();
+	}
+
+	private int getDockoutTabIndex() {
+		return mainTabbedPane.getTabCount() - 1;
+	}
+	private void setDockoutTabTitle(String title) {
+		mainTabbedPane.setTitleAt(getDockoutTabIndex(), title);
+	}
+	private void dockoutOrDockin() {
+		if (dockoutFrame == null) {
+			dockoutFrame = UiUtil.dockout(Captions.EXTENSION_NAME_FULL, mainTabbedPane);
+			setDockoutTabTitle(Captions.DOCKIN);
+			this.repaint();
+		} else {
+			UiUtil.dockin(mainTabbedPane, this, dockoutFrame);
+			dockoutFrame = null;
+			setDockoutTabTitle(Captions.DOCKOUT);
+		}
+
+		mainTabbedPane.setSelectedIndex(0);
 	}
 
 }
