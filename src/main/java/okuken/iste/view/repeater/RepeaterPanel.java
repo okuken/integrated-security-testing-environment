@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import burp.IHttpService;
@@ -16,14 +17,17 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.view.AbstractDockoutableTabPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
+
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.util.concurrent.Executors;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 
-public class RepeaterPanel extends JPanel {
+public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,6 +37,8 @@ public class RepeaterPanel extends JPanel {
 
 	private JComboBox<AuthAccountDto> authAccountComboBox;
 	private JButton authSessionRefreshButton;
+
+	private JButton dockoutButton;
 
 	private MessageDto orgMessageDto;
 
@@ -60,16 +66,7 @@ public class RepeaterPanel extends JPanel {
 		JButton sendButton = new JButton(Captions.REPEATER_BUTTON_SEND);
 		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AuthAccountDto authAccountDto = authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex());
-				Executors.newSingleThreadExecutor().submit(() -> {
-					messageEditorPanel.clearResponse();
-					MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, Controller.getInstance().getSelectedMessage());
-					SwingUtilities.invokeLater(() -> {
-						messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
-						repeatTablePanel.setup(orgMessageDto.getId());
-						repeatTablePanel.selectLastRow();
-					});
-				});
+				sendRequest();
 			}
 		});
 		controlLeftPanel.add(sendButton);
@@ -131,6 +128,10 @@ public class RepeaterPanel extends JPanel {
 		});
 		controlRightPanel.add(saveAsMasterButton);
 		
+		dockoutButton = new JButton();
+		controlRightPanel.add(dockoutButton);
+		setupDockout();
+		
 		messageEditorPanel = new MessageEditorPanel(new IMessageEditorController() {
 			@Override
 			public byte[] getResponse() {
@@ -171,6 +172,19 @@ public class RepeaterPanel extends JPanel {
 		messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
 	}
 
+	public void sendRequest() {
+		AuthAccountDto authAccountDto = authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex());
+		Executors.newSingleThreadExecutor().submit(() -> {
+			messageEditorPanel.clearResponse();
+			MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, Controller.getInstance().getSelectedMessage());
+			SwingUtilities.invokeLater(() -> {
+				messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
+				repeatTablePanel.setup(orgMessageDto.getId());
+				repeatTablePanel.selectLastRow();
+			});
+		});
+	}
+
 	public void refreshAuthAccountsComboBox() {
 		authAccountComboBox.removeAllItems();
 		authAccountComboBox.addItem(new AuthAccountDto());
@@ -192,6 +206,23 @@ public class RepeaterPanel extends JPanel {
 
 	public void initDividerLocation() {
 		splitPane.setDividerLocation(Positions.DIVIDER_LOCATION_REPEATER);
+	}
+
+	@Override
+	protected AbstractButton getDockoutButton() {
+		return dockoutButton;
+	}
+	@Override
+	protected String getTabName() {
+		return Captions.TAB_MAIN_MESSAGE_EDITOR_REPEAT;
+	}
+	@Override
+	protected int getTabIndex() {
+		return 2;
+	}
+	@Override
+	protected JTabbedPane getParentTabbedPane() {
+		return Controller.getInstance().getMessageDetailTabbedPane();
 	}
 
 }

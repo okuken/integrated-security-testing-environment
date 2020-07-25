@@ -92,6 +92,7 @@ public class SuitePanel extends JPanel {
 		
 		JTabbedPane messageDetailTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		mainLeftSplitPane.setRightComponent(messageDetailTabbedPane);
+		Controller.getInstance().setMessageDetailTabbedPane(messageDetailTabbedPane);
 		
 		MessageEditorPanel orgMessageEditorPanel = new MessageEditorPanel();
 		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_ORIGINAL, null, orgMessageEditorPanel, null);

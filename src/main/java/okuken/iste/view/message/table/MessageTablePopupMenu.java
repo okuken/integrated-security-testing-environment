@@ -19,6 +19,16 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 	public MessageTablePopupMenu() {
 
+		JMenuItem sendRepeaterRequest = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER);
+		sendRepeaterRequest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Controller.getInstance().sendRepeaterRequest();
+			}
+		});
+		add(sendRepeaterRequest);
+
+		add(new JPopupMenu.Separator());
+
 		JMenuItem doPassiveScanMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_DO_PASSIVE_SCAN);
 		doPassiveScanMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

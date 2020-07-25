@@ -22,6 +22,7 @@ public class Captions {
 
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
 
+	public static final String TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER = "Send request (Repeater)";
 	public static final String TABLE_CONTEXT_MENU_DO_PASSIVE_SCAN = "Do passive scan";
 	public static final String TABLE_CONTEXT_MENU_DO_ACTIVE_SCAN = "Do active scan";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_INTRUDER = "Send to Intruder";

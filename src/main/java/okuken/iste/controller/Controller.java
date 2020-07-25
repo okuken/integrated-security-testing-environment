@@ -55,6 +55,7 @@ public class Controller {
 	private MessageTableModel messageTableModel;
 	private JTable messageTable;
 
+	private JTabbedPane messageDetailTabbedPane;
 	private MessageEditorPanel orgMessageEditorPanel;
 	private RepeatMasterPanel repeatMasterPanel;
 	private RepeaterPanel repeaterPanel;
@@ -96,6 +97,12 @@ public class Controller {
 	}
 	public void setMessageTable(JTable messageTable) {
 		this.messageTable = messageTable;
+	}
+	public void setMessageDetailTabbedPane(JTabbedPane messageDetailTabbedPane) {
+		this.messageDetailTabbedPane = messageDetailTabbedPane;
+	}
+	public JTabbedPane getMessageDetailTabbedPane() {
+		return messageDetailTabbedPane;
 	}
 	public void setOrgMessageEditorPanel(MessageEditorPanel orgMessageEditorPanel) {
 		this.orgMessageEditorPanel = orgMessageEditorPanel;
@@ -184,6 +191,10 @@ public class Controller {
 			fetchNewAuthSession(authAccountDto);
 		}
 		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, true);
+	}
+
+	public void sendRepeaterRequest() {
+		repeaterPanel.sendRequest();
 	}
 
 	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto) {
