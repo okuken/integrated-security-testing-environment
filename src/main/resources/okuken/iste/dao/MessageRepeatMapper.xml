@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="okuken.iste.dao.MessageRepeatMapper">
+  <resultMap id="MessageRepeatJoinResultMap" type="okuken.iste.entity.MessageRepeat">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="FK_MESSAGE_ID" jdbcType="INTEGER" property="fkMessageId" />
+    <result column="FK_MESSAGE_RAW_ID" jdbcType="INTEGER" property="fkMessageRawId" />
+    <result column="SEND_DATE" jdbcType="VARCHAR" property="sendDate" />
+    <result column="DIFFERENCE" jdbcType="VARCHAR" property="difference" />
+    <result column="TIME" jdbcType="INTEGER" property="time" />
+    <result column="STATUS" jdbcType="INTEGER" property="status" />
+    <result column="LENGTH" jdbcType="INTEGER" property="length" />
+    <result column="PRC_DATE" jdbcType="VARCHAR" property="prcDate" />
+    <result column="MEMO" jdbcType="VARCHAR" property="memo" />
+    <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+    <collection property="messageRepeatRedirs" ofType="okuken.iste.entity.auto.MessageRepeatRedir" columnPrefix="mrr_">
+        <id column="FK_MESSAGE_REPEAT_ID" jdbcType="INTEGER" property="fkMessageRepeatId" />
+        <id column="ID" jdbcType="INTEGER" property="id" />
+        <result column="FK_MESSAGE_RAW_ID" jdbcType="INTEGER" property="fkMessageRawId" />
+        <result column="SEND_DATE" jdbcType="VARCHAR" property="sendDate" />
+        <result column="TIME" jdbcType="INTEGER" property="time" />
+        <result column="STATUS" jdbcType="INTEGER" property="status" />
+        <result column="LENGTH" jdbcType="INTEGER" property="length" />
+        <result column="PRC_DATE" jdbcType="VARCHAR" property="prcDate" />
+    </collection>
+  </resultMap>
+</mapper>

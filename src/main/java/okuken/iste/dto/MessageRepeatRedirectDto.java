@@ -1,31 +1,21 @@
 package okuken.iste.dto;
 
 import java.util.Date;
-import java.util.List;
 
 import burp.IHttpRequestResponse;
 import okuken.iste.logic.MessageLogic;
 
-public class MessageRepeatDto {
+public class MessageRepeatRedirectDto {
 
 	private Integer id;
 
 	private Date sendDate;
-	private String difference; //TODO: structure
-	private String userId;
-
 	private Short status;
 	private Integer length;
 	private Integer time;
 
-	private String memo;
-
 	private Integer messageRawId;
 	private IHttpRequestResponse message;
-
-	private Integer orgMessageId;
-
-	private List<MessageRepeatRedirectDto> messageRepeatRedirectDtos;
 
 	public Integer getId() {
 		return id;
@@ -38,18 +28,6 @@ public class MessageRepeatDto {
 	}
 	public void setSendDate(Date sendDate) {
 		this.sendDate = sendDate;
-	}
-	public String getDifference() {
-		return difference;
-	}
-	public void setDifference(String difference) {
-		this.difference = difference;
-	}
-	public String getUserId() {
-		return userId;
-	}
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 	public Short getStatus() {
 		return status;
@@ -69,12 +47,6 @@ public class MessageRepeatDto {
 	public void setTime(Integer time) {
 		this.time = time;
 	}
-	public String getMemo() {
-		return memo;
-	}
-	public void setMemo(String memo) {
-		this.memo = memo;
-	}
 	public Integer getMessageRawId() {
 		return messageRawId;
 	}
@@ -89,19 +61,6 @@ public class MessageRepeatDto {
 	}
 	public void setMessage(IHttpRequestResponse message) {
 		this.message = message;
-	}
-	public Integer getOrgMessageId() {
-		return orgMessageId;
-	}
-	public void setOrgMessageId(Integer orgMessageId) {
-		this.orgMessageId = orgMessageId;
-	}
-
-	public List<MessageRepeatRedirectDto> getMessageRepeatRedirectDtos() {
-		return messageRepeatRedirectDtos;
-	}
-	public void setMessageRepeatRedirectDtos(List<MessageRepeatRedirectDto> messageRepeatRedirectDtos) {
-		this.messageRepeatRedirectDtos = messageRepeatRedirectDtos;
 	}
 
 }

@@ -1,23 +1,32 @@
 package okuken.iste.logic;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.mybatis.dynamic.sql.BasicColumn;
 import org.mybatis.dynamic.sql.SqlBuilder;
+import org.mybatis.dynamic.sql.SqlColumn;
+import org.mybatis.dynamic.sql.render.RenderingStrategies;
+import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 
 import burp.IHttpRequestResponse;
 import burp.IParameter;
-import okuken.iste.dao.MessageRawMapper;
-import okuken.iste.dao.MessageRepeatDynamicSqlSupport;
+import okuken.iste.dao.auto.MessageRawMapper;
+import okuken.iste.dao.auto.MessageRepeatDynamicSqlSupport;
 import okuken.iste.dao.MessageRepeatMapper;
+import okuken.iste.dao.auto.MessageRepeatRedirDynamicSqlSupport;
+import okuken.iste.dao.auto.MessageRepeatRedirMapper;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.PayloadDto;
-import okuken.iste.entity.MessageRaw;
+import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.entity.MessageRepeat;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
@@ -156,10 +165,19 @@ public class RepeaterLogic {
 		try {
 			List<MessageRepeat> messageRepeats = 
 				DbUtil.withSession(session -> {
-					MessageRepeatMapper messageRepeatMapper = session.getMapper(MessageRepeatMapper.class);
-					return messageRepeatMapper.select(c -> c
-							.where(MessageRepeatDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(orgMessageId))
-							.orderBy(MessageRepeatDynamicSqlSupport.id));
+					var messageRepeatMapper = session.getMapper(MessageRepeatMapper.class);
+					SelectStatementProvider selectStatement = SqlBuilder
+									.select(ArrayUtils.addAll(
+										Arrays.stream(MessageRepeatMapper.selectList).map(c->c.as(((SqlColumn<?>)c).name())).collect(Collectors.toList()).toArray(new BasicColumn[0]),
+										Arrays.stream(MessageRepeatRedirMapper.selectList).map(c->c.as("mrr_" + ((SqlColumn<?>)c).name())).collect(Collectors.toList()).toArray(new BasicColumn[0])))
+									.from(MessageRepeatDynamicSqlSupport.messageRepeat)
+									.leftJoin(MessageRepeatRedirDynamicSqlSupport.messageRepeatRedir).on(MessageRepeatDynamicSqlSupport.messageRepeat.id, SqlBuilder.equalTo(MessageRepeatRedirDynamicSqlSupport.messageRepeatRedir.fkMessageRepeatId))
+									.where(MessageRepeatDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(orgMessageId))
+									.orderBy(MessageRepeatDynamicSqlSupport.id)
+									.build()
+									.render(RenderingStrategies.MYBATIS3);
+
+					return messageRepeatMapper.selectManyWithRedir(selectStatement);
 				});
 
 			return messageRepeats.stream().map(messageRepeat -> { //TODO:converter
@@ -174,6 +192,19 @@ public class RepeaterLogic {
 				dto.setStatus(messageRepeat.getStatus());
 				dto.setLength(messageRepeat.getLength());
 				dto.setMemo(messageRepeat.getMemo());
+
+				dto.setMessageRepeatRedirectDtos(
+					messageRepeat.getMessageRepeatRedirs().stream().map(redirect -> {
+						var redirectDto = new MessageRepeatRedirectDto();
+						redirectDto.setId(redirect.getId());
+						redirectDto.setSendDate(SqlUtil.stringToDate(redirect.getSendDate()));
+						redirectDto.setStatus(redirect.getStatus());
+						redirectDto.setLength(redirect.getLength());
+						redirectDto.setTime(redirect.getTime());
+						redirectDto.setMessageRawId(redirect.getFkMessageRawId());
+						return redirectDto;
+					}).collect(Collectors.toList()));
+
 				return dto;
 			}).collect(Collectors.toList());
 
