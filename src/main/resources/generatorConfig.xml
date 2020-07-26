@@ -3,8 +3,8 @@
 <generatorConfiguration>
   <context id="context1">
     <jdbcConnection connectionURL="jdbc:sqlite:C:/work/iste.db" driverClass="org.sqlite.JDBC" />
-    <javaModelGenerator targetPackage="okuken.iste.entity" targetProject="integrated-security-testing-environment/src/main/java/" />
-    <javaClientGenerator targetPackage="okuken.iste.dao" targetProject="integrated-security-testing-environment/src/main/java/" type="XMLMAPPER" />
+    <javaModelGenerator targetPackage="okuken.iste.entity.auto" targetProject="integrated-security-testing-environment/src/main/java/" />
+    <javaClientGenerator targetPackage="okuken.iste.dao.auto" targetProject="integrated-security-testing-environment/src/main/java/" type="XMLMAPPER" />
     <table tableName="ISTE_%">
         <generatedKey column="ID" sqlStatement="SELECT LAST_INSERT_ROWID()" identity="true" />
         <domainObjectRenamingRule searchString="^Iste" />

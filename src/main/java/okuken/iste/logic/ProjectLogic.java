@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 
 import org.mybatis.dynamic.sql.select.SelectDSLCompleter;
 
-import okuken.iste.dao.ProjectDynamicSqlSupport;
-import okuken.iste.dao.ProjectMapper;
+import okuken.iste.dao.auto.ProjectDynamicSqlSupport;
+import okuken.iste.dao.auto.ProjectMapper;
 import okuken.iste.dto.ProjectDto;
-import okuken.iste.entity.Project;
+import okuken.iste.entity.auto.Project;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.SqlUtil;

@@ -3,6 +3,7 @@ package okuken.iste;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -54,10 +55,12 @@ public class DatabaseManager {
 	private void addAllMappers(Configuration configuration) {
 		try {
 			ClassLoader loader = this.getClass().getClassLoader();
-			ClassPath.from(loader).getTopLevelClasses("okuken.iste.dao").stream()
+			for(String packageName: Arrays.asList("okuken.iste.dao.auto", "okuken.iste.dao")) {
+				ClassPath.from(loader).getTopLevelClasses(packageName).stream()
 					.filter(classInfo -> classInfo.getName().endsWith("Mapper"))
 					.map(classInfo -> classInfo.load())
 					.forEach(clazz -> configuration.addMapper(clazz));
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

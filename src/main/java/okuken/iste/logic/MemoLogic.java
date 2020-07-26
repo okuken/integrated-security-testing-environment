@@ -6,14 +6,14 @@ import java.util.stream.Collectors;
 
 import org.mybatis.dynamic.sql.SqlBuilder;
 
-import okuken.iste.dao.MemoMessageDynamicSqlSupport;
-import okuken.iste.dao.MemoMessageMapper;
-import okuken.iste.dao.MemoProjectDynamicSqlSupport;
-import okuken.iste.dao.MemoProjectMapper;
+import okuken.iste.dao.auto.MemoMessageDynamicSqlSupport;
+import okuken.iste.dao.auto.MemoMessageMapper;
+import okuken.iste.dao.auto.MemoProjectDynamicSqlSupport;
+import okuken.iste.dao.auto.MemoProjectMapper;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.ProjectMemoDto;
-import okuken.iste.entity.MemoMessage;
-import okuken.iste.entity.MemoProject;
+import okuken.iste.entity.auto.MemoMessage;
+import okuken.iste.entity.auto.MemoProject;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.SqlUtil;
