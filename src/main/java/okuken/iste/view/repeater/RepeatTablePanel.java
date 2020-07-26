@@ -48,7 +48,7 @@ public class RepeatTablePanel extends JPanel {
 				{null, null, null, null, null, null, null},
 			},
 			new String[] {
-				"Send date", "Status", "Length", "Time", "Auth", "Diff", "Memo"
+				"Send date", "Auth", "Status", "Length", "Time", "Diff", "Memo"
 			}
 		) {
 			boolean[] columnEditables = new boolean[] {
@@ -70,29 +70,31 @@ public class RepeatTablePanel extends JPanel {
 			}
 		});
 		table.getColumnModel().getColumn(0).setPreferredWidth(150);
-		table.getColumnModel().getColumn(1).setPreferredWidth(50);
+		table.getColumnModel().getColumn(1).setPreferredWidth(100);
 		table.getColumnModel().getColumn(2).setPreferredWidth(50);
 		table.getColumnModel().getColumn(3).setPreferredWidth(50);
-		table.getColumnModel().getColumn(4).setPreferredWidth(100);
+		table.getColumnModel().getColumn(4).setPreferredWidth(50);
 		table.getColumnModel().getColumn(5).setPreferredWidth(300);
 		table.getColumnModel().getColumn(6).setPreferredWidth(200);
 
 		tableModel = (DefaultTableModel)table.getModel();
 	}
 
+	private Object[] convertDtoToRow(MessageRepeatDto messageRepeatDto) {
+		return new Object[] {
+				SqlUtil.dateToString(messageRepeatDto.getSendDate()),
+				Optional.ofNullable(messageRepeatDto.getUserId()).orElse(""),
+				messageRepeatDto.getStatus(),
+				messageRepeatDto.getLength(),
+				messageRepeatDto.getTime(),
+				messageRepeatDto.getDifference(),
+				Optional.ofNullable(messageRepeatDto.getMemo()).orElse("")};
+	}
+
 	public void setup(Integer orgMessageId) {
 		clearRows();
 		repeaterHistory = Controller.getInstance().getRepeaterHistory(orgMessageId);
-		repeaterHistory.forEach(messageRepeatDto -> {
-			tableModel.addRow(new Object[] {
-					SqlUtil.dateToString(messageRepeatDto.getSendDate()),
-					messageRepeatDto.getStatus(),
-					messageRepeatDto.getLength(),
-					messageRepeatDto.getTime(),
-					Optional.ofNullable(messageRepeatDto.getUserId()).orElse(""),
-					messageRepeatDto.getDifference(),
-					Optional.ofNullable(messageRepeatDto.getMemo()).orElse("")});
-		});
+		repeaterHistory.stream().map(this::convertDtoToRow).forEach(tableModel::addRow);
 	}
 	private void clearRows() {
 		int rowCount = tableModel.getRowCount();
