@@ -91,9 +91,9 @@ public class RepeatTablePanel extends JPanel {
 				Optional.ofNullable(messageRepeatDto.getMemo()).orElse("")};
 	}
 
-	public void setup(Integer orgMessageId) {
+	public void setup(List<MessageRepeatDto> repeaterHistory) {
 		clearRows();
-		repeaterHistory = Controller.getInstance().getRepeaterHistory(orgMessageId);
+		this.repeaterHistory = repeaterHistory;
 		repeaterHistory.stream().map(this::convertDtoToRow).forEach(tableModel::addRow);
 	}
 	private void clearRows() {

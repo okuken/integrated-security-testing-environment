@@ -3,12 +3,15 @@ package okuken.iste.dto;
 import java.net.URL;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
+import okuken.iste.logic.RepeaterLogic;
 
 public class MessageDto {
 
@@ -41,6 +44,8 @@ public class MessageDto {
 	private IResponseInfo responseInfo;
 
 	private IHttpRequestResponse repeatMasterMessage;
+
+	private List<MessageRepeatDto> repeatList;
 
 	public String getProtocol() {
 		if(url == null) {return null;}
@@ -247,6 +252,22 @@ public class MessageDto {
 	}
 	public void setRepeatMasterMessage(IHttpRequestResponse repeatMasterMessage) {
 		this.repeatMasterMessage = repeatMasterMessage;
+	}
+
+	public List<MessageRepeatDto> getRepeatList() {
+		if(repeatList == null) {
+			repeatList = RepeaterLogic.getInstance().loadHistory(getId());
+		}
+		return repeatList;
+	}
+	public void setRepeatList(List<MessageRepeatDto> repeatList) {
+		this.repeatList = repeatList;
+	}
+	public void addRepeat(MessageRepeatDto repeatDto) {
+		if(repeatList == null) {
+			repeatList = Lists.newArrayList();
+		}
+		repeatList.add(repeatDto);
 	}
 
 	@Override

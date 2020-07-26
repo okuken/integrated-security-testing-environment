@@ -182,10 +182,6 @@ public class Controller {
 		repeaterPanel.refreshAuthAccountsComboBox();
 	}
 
-	public List<MessageRepeatDto> getRepeaterHistory(Integer orgMessageId) {
-		return RepeaterLogic.getInstance().loadHistory(orgMessageId);
-	}
-
 	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto) {
 		if(authAccountDto.getId() != null && authAccountDto.getSessionId() == null) {
 			fetchNewAuthSession(authAccountDto);
