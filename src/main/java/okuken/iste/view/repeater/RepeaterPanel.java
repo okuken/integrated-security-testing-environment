@@ -7,6 +7,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
+import burp.IHttpRequestResponse;
 import burp.IHttpService;
 import burp.IMessageEditorController;
 import okuken.iste.consts.Captions;
@@ -15,8 +16,10 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.util.BurpUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 
@@ -37,6 +40,8 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	private JComboBox<AuthAccountDto> authAccountComboBox;
 	private JButton authSessionRefreshButton;
+
+	private JButton followRedirectButton;
 
 	private JButton dockoutButton;
 
@@ -96,7 +101,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
 		copyOrgButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				messageEditorPanel.setMessage(orgMessageDto);
+				setMessage(orgMessageDto);
 			}
 		});
 		controlLeftPanel.add(copyOrgButton);
@@ -105,13 +110,24 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		copyMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(orgMessageDto.getRepeatMasterMessage() != null) {
-					messageEditorPanel.setMessage(orgMessageDto.getRepeatMasterMessage());
+					setMessage(orgMessageDto.getRepeatMasterMessage());
 				} else {
-					messageEditorPanel.setMessage(orgMessageDto);
+					setMessage(orgMessageDto);
 				}
 			}
 		});
 		controlLeftPanel.add(copyMasterButton);
+		
+		JPanel controlCenterPanel = new JPanel();
+		controlPanel.add(controlCenterPanel, BorderLayout.CENTER);
+		
+		followRedirectButton = new JButton(Captions.REPEATER_BUTTON_FOLLOW_REDIRECT);
+		followRedirectButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				followRedirect();
+			}
+		});
+		controlCenterPanel.add(followRedirectButton);
 		
 		JPanel controlRightPanel = new JPanel();
 		controlPanel.add(controlRightPanel, BorderLayout.EAST);
@@ -156,11 +172,11 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	public void setup(MessageDto orgMessageDto) {
 		this.orgMessageDto = orgMessageDto;
-		repeatTablePanel.setup(orgMessageDto.getId()); //TODO: should cache repeat data or not??
+		repeatTablePanel.setup(orgMessageDto.getRepeatList());
 
 		Integer lastRowIndex = repeatTablePanel.selectLastRow();
 		if(lastRowIndex == null) {
-			messageEditorPanel.setMessage(orgMessageDto);
+			setMessage(orgMessageDto);
 			return;
 		}
 		setMessage(lastRowIndex);
@@ -168,21 +184,52 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	public void setMessage(int rowIndex) {
 		MessageRepeatDto messageRepeatDto = repeatTablePanel.getRow(rowIndex);
-		messageEditorPanel.setRequest(messageRepeatDto.getMessage().getRequest());
-		messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
+		setMessage(messageRepeatDto);
+	}
+	private void setMessage(MessageRepeatDto messageRepeatDto) {
+		messageEditorPanel.setMessage(messageRepeatDto.getMessage());
+		refreshFollowRedirectButton(messageRepeatDto.getStatus());
+	}
+	private void setMessage(MessageRepeatRedirectDto messageRepeatRedirectDto) {
+		messageEditorPanel.setMessage(messageRepeatRedirectDto.getMessage());
+		refreshFollowRedirectButton(messageRepeatRedirectDto.getStatus());
+	}
+	private void setMessage(MessageDto messageDto) {
+		messageEditorPanel.setMessage(messageDto);
+		refreshFollowRedirectButton(messageDto.getStatus());
+	}
+	private void setMessage(IHttpRequestResponse message) {
+		messageEditorPanel.setMessage(message);
+		refreshFollowRedirectButton(BurpUtil.getHelpers().analyzeResponse(message.getResponse()).getStatusCode());
 	}
 
 	public void sendRequest() {
 		AuthAccountDto authAccountDto = authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex());
 		Executors.newSingleThreadExecutor().submit(() -> {
 			messageEditorPanel.clearResponse();
-			MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, Controller.getInstance().getSelectedMessage());
+			MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, orgMessageDto);
 			SwingUtilities.invokeLater(() -> {
-				messageEditorPanel.setResponse(messageRepeatDto.getMessage().getResponse());
-				repeatTablePanel.setup(orgMessageDto.getId());
+				setMessage(messageRepeatDto);
+				repeatTablePanel.setup(orgMessageDto.getRepeatList());
 				repeatTablePanel.selectLastRow();
 			});
 		});
+	}
+
+	private void followRedirect() {
+		var request = messageEditorPanel.getRequest();
+		var response = messageEditorPanel.getResponse();
+		Executors.newSingleThreadExecutor().submit(() -> {
+			messageEditorPanel.clearResponse();
+			var messageRepeatRedirectDto = Controller.getInstance().sendFollowRedirectRequest(request, response, orgMessageDto);
+			SwingUtilities.invokeLater(() -> {
+				setMessage(messageRepeatRedirectDto);
+			});
+		});
+	}
+
+	private void refreshFollowRedirectButton(short statusCode) {
+		followRedirectButton.setEnabled(statusCode / 100 == 3);
 	}
 
 	public void refreshAuthAccountsComboBox() {
@@ -202,6 +249,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 	public void clear() {
 		repeatTablePanel.clear();
 		messageEditorPanel.clearMessage();
+		followRedirectButton.setEnabled(false);
 	}
 
 	public void initDividerLocation() {

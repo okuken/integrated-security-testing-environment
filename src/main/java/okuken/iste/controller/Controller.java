@@ -18,6 +18,7 @@ import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
+import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.PayloadDto;
 import okuken.iste.dto.ProjectMemoDto;
 import okuken.iste.logic.AuthLogic;
@@ -195,6 +196,10 @@ public class Controller {
 
 	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto) {
 		return RepeaterLogic.getInstance().sendRequest(payloadDtos, orgMessageDto, false);
+	}
+
+	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] request, byte[] response, MessageDto orgMessageDto) {
+		return RepeaterLogic.getInstance().sendFollowRedirectRequest(request, response, orgMessageDto);
 	}
 
 	public void saveRepeatMaster(MessageDto messageDto) {
