@@ -26,6 +26,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import org.apache.commons.lang3.StringUtils;
+
 import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
@@ -149,8 +151,10 @@ public class MessageTablePanel extends JPanel {
 			@SuppressWarnings("rawtypes")
 			@Override
 			public boolean include(Entry entry) {
-				return messageFilterDto.getProgresses().contains(
-						tableModel.getRow((Integer)entry.getIdentifier()).getProgress());
+				var messageDto = tableModel.getRow((Integer)entry.getIdentifier());
+				return messageFilterDto.getProgresses().contains(messageDto.getProgress())
+						&& (StringUtils.containsIgnoreCase(messageDto.getName(), messageFilterDto.getSearchWord())
+							|| StringUtils.containsIgnoreCase(messageDto.getRemark(), messageFilterDto.getSearchWord()));
 			}
 		});
 

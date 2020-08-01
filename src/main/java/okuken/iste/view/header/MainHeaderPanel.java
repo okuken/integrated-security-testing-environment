@@ -22,6 +22,9 @@ import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class MainHeaderPanel extends JPanel {
 
@@ -32,6 +35,7 @@ public class MainHeaderPanel extends JPanel {
 	private JLabel rowCountLabel;
 
 	private JButton dockoutButton;
+	private JTextField searchTextField;
 
 	public MainHeaderPanel() {
 		setLayout(new BorderLayout(0, 0));
@@ -44,12 +48,24 @@ public class MainHeaderPanel extends JPanel {
 			var progressCheckbox = new JCheckBox(progress.getCaption());
 			progressCheckbox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					applyMessageProgressFilter();
+					applyMessageFilter();
 				}
 			});
 			progressCheckbox.setSelected(true);
 			leftPanel.add(progressCheckbox);
 			progressCheckboxs.add(progressCheckbox);
+		});
+		
+		searchTextField = new JTextField();
+		leftPanel.add(searchTextField);
+		searchTextField.setColumns(20);
+		searchTextField.getDocument().addDocumentListener(new DocumentListener() {
+			public void removeUpdate(DocumentEvent e) {apply();}
+			public void insertUpdate(DocumentEvent e) {apply();}
+			public void changedUpdate(DocumentEvent e) {apply();}
+			private void apply() {
+				applyMessageFilter();
+			}
 		});
 		
 		rowCountLabel = new JLabel("");
@@ -81,12 +97,14 @@ public class MainHeaderPanel extends JPanel {
 		Controller.getInstance().setMainHeaderPanel(this);
 	}
 
-	public void applyMessageProgressFilter() {
+	public void applyMessageFilter() {
 		var dto = new MessageFilterDto();
 		dto.setProgresses(progressCheckboxs.stream()
 			.filter(progressCheckbox -> progressCheckbox.isSelected())
 			.map(progressCheckbox -> SecurityTestingProgress.getByCaption(progressCheckbox.getText()))
 			.collect(Collectors.toList()));
+
+		dto.setSearchWord(searchTextField.getText());
 
 		int rowCount = Controller.getInstance().applyMessageFilter(dto);
 		setRowCount(rowCount);

@@ -284,7 +284,7 @@ public class Controller {
 	}
 
 	public void applyMessageFilter() {
-		mainHeaderPanel.applyMessageProgressFilter();
+		mainHeaderPanel.applyMessageFilter();
 	}
 	/**
 	 * @return number of rows after filtering
