@@ -228,7 +228,11 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		});
 	}
 
-	private void refreshFollowRedirectButton(short statusCode) {
+	private void refreshFollowRedirectButton(Short statusCode) {
+		if(statusCode == null) {
+			followRedirectButton.setEnabled(false);
+			return;
+		}
 		followRedirectButton.setEnabled(statusCode / 100 == 3);
 	}
 

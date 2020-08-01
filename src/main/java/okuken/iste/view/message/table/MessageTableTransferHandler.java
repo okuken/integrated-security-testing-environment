@@ -72,7 +72,12 @@ public class MessageTableTransferHandler extends TransferHandler {
 			return false;
 		}
 
-		this.targetIndex = table.convertRowIndexToModel(((JTable.DropLocation) dropLocation).getRow());
+		int index = ((JTable.DropLocation) dropLocation).getRow();
+		if(index >= table.getRowCount()) { // case: drug&drop a row to last of rows
+			this.targetIndex = messageTableModel.getRowCount();
+		} else {
+			this.targetIndex = table.convertRowIndexToModel(index);
+		}
 
 		try {
 			@SuppressWarnings("unchecked")
