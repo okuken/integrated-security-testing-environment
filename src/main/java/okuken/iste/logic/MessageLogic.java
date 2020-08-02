@@ -120,60 +120,55 @@ public class MessageLogic {
 	}
 
 	public void saveMessages(List<MessageDto> dtos) {
-		try {
-			String now = SqlUtil.now();
-			DbUtil.withTransaction(session -> {
-				MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
-				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
-				MessageParamMapper messageParamMapper = session.getMapper(MessageParamMapper.class);
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
+			MessageMapper messageMapper = session.getMapper(MessageMapper.class);
+			MessageParamMapper messageParamMapper = session.getMapper(MessageParamMapper.class);
 
-				for(MessageDto dto: dtos) {
-					MessageRaw messageRaw = new MessageRaw();
-					messageRaw.setHost(dto.getMessage().getHttpService().getHost());
-					messageRaw.setPort(dto.getMessage().getHttpService().getPort());
-					messageRaw.setProtocol(dto.getMessage().getHttpService().getProtocol());
-					messageRaw.setRequest(dto.getMessage().getRequest());
-					messageRaw.setResponse(dto.getMessage().getResponse());
-					messageRaw.setPrcDate(now);
-					messageRawMapper.insert(messageRaw); //TODO: generated id is not returned...
-					int messageRawId = SqlUtil.loadGeneratedId(session);
+			for(MessageDto dto: dtos) {
+				MessageRaw messageRaw = new MessageRaw();
+				messageRaw.setHost(dto.getMessage().getHttpService().getHost());
+				messageRaw.setPort(dto.getMessage().getHttpService().getPort());
+				messageRaw.setProtocol(dto.getMessage().getHttpService().getProtocol());
+				messageRaw.setRequest(dto.getMessage().getRequest());
+				messageRaw.setResponse(dto.getMessage().getResponse());
+				messageRaw.setPrcDate(now);
+				messageRawMapper.insert(messageRaw); //TODO: generated id is not returned...
+				int messageRawId = SqlUtil.loadGeneratedId(session);
 
+				//TODO: auto convert
+				Message message = new Message();
+				message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
+				message.setFkMessageRawId(messageRawId);
+				message.setName(dto.getName());
+				message.setRemark(dto.getRemark());
+				message.setProgress(dto.getProgress().getId());
+				message.setProgressMemo(dto.getProgressMemo());
+				message.setUrl(dto.getUrl().toExternalForm());
+				message.setMethod(dto.getMethod());
+				message.setParams(dto.getParams());
+				message.setStatus(dto.getStatus());
+				message.setLength(dto.getLength());
+				message.setMimeType(dto.getMimeType());
+				message.setCookies(dto.getCookies());
+				message.setPrcDate(now);
+				messageMapper.insert(message); //TODO: generated id is not returned...
+				int messageId = SqlUtil.loadGeneratedId(session);
+				dto.setId(messageId);
+
+				for(MessageParamDto paramDto: dto.getMessageParamList()) {
 					//TODO: auto convert
-					Message message = new Message();
-					message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
-					message.setFkMessageRawId(messageRawId);
-					message.setName(dto.getName());
-					message.setRemark(dto.getRemark());
-					message.setProgress(dto.getProgress().getId());
-					message.setProgressMemo(dto.getProgressMemo());
-					message.setUrl(dto.getUrl().toExternalForm());
-					message.setMethod(dto.getMethod());
-					message.setParams(dto.getParams());
-					message.setStatus(dto.getStatus());
-					message.setLength(dto.getLength());
-					message.setMimeType(dto.getMimeType());
-					message.setCookies(dto.getCookies());
-					message.setPrcDate(now);
-					messageMapper.insert(message); //TODO: generated id is not returned...
-					int messageId = SqlUtil.loadGeneratedId(session);
-					dto.setId(messageId);
-
-					for(MessageParamDto paramDto: dto.getMessageParamList()) {
-						//TODO: auto convert
-						MessageParam messageParam = new MessageParam();
-						messageParam.setFkMessageId(messageId);
-						messageParam.setType(Byte.toUnsignedInt(paramDto.getType()));
-						messageParam.setName(paramDto.getName());
-						messageParam.setValue(paramDto.getValue());
-						messageParam.setPrcDate(now);
-						messageParamMapper.insert(messageParam);
-					}
+					MessageParam messageParam = new MessageParam();
+					messageParam.setFkMessageId(messageId);
+					messageParam.setType(Byte.toUnsignedInt(paramDto.getType()));
+					messageParam.setName(paramDto.getName());
+					messageParam.setValue(paramDto.getValue());
+					messageParam.setPrcDate(now);
+					messageParamMapper.insert(messageParam);
 				}
-			});
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+			}
+		});
 	}
 
 	/**
@@ -181,56 +176,39 @@ public class MessageLogic {
 	 * @param dto MessageDto. id is required.
 	 */
 	public void updateMessage(MessageDto dto) {
-		try {
-			String now = SqlUtil.now();
-			DbUtil.withTransaction(session -> {
-				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			MessageMapper messageMapper = session.getMapper(MessageMapper.class);
 
-				//TODO: auto convert
-				Message message = new Message();
-				message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
-				message.setId(dto.getId());
-				message.setName(dto.getName());
-				message.setRemark(dto.getRemark());
-				message.setProgress(dto.getProgress().getId());
-				message.setProgressMemo(dto.getProgressMemo());
-				message.setPrcDate(now);
-				messageMapper.updateByPrimaryKeySelective(message);
-			});
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
-		//TODO: rollback controll???
+			//TODO: auto convert
+			Message message = new Message();
+			message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
+			message.setId(dto.getId());
+			message.setName(dto.getName());
+			message.setRemark(dto.getRemark());
+			message.setProgress(dto.getProgress().getId());
+			message.setProgressMemo(dto.getProgressMemo());
+			message.setPrcDate(now);
+			messageMapper.updateByPrimaryKeySelective(message);
+		});
 	}
 
 	public MessageDto loadMessage(Integer id) {
-		try {
-			return DbUtil.withSession(session -> {
-					MessageMapper messageMapper = session.getMapper(MessageMapper.class);
-					return convertMessageEntityToDto(messageMapper.selectByPrimaryKey(id).get());
-				});
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+		return DbUtil.withSession(session -> {
+				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
+				return convertMessageEntityToDto(messageMapper.selectByPrimaryKey(id).get());
+			});
 	}
 
 	public List<MessageDto> loadMessages() {
-		try {
-			List<Message> messages = 
-				DbUtil.withSession(session -> {
-					MessageMapper messageMapper = session.getMapper(MessageMapper.class);
-					return messageMapper.select(c -> c.where(MessageDynamicSqlSupport.fkProjectId,
-							SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
-				});
+		List<Message> messages = 
+			DbUtil.withSession(session -> {
+				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
+				return messageMapper.select(c -> c.where(MessageDynamicSqlSupport.fkProjectId,
+						SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+			});
 
-			return messages.stream().map(message -> convertMessageEntityToDto(message)).collect(Collectors.toList());
-
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+		return messages.stream().map(message -> convertMessageEntityToDto(message)).collect(Collectors.toList());
 	}
 
 	//TODO: converter
@@ -244,7 +222,7 @@ public class MessageLogic {
 		try {
 			dto.setUrl(new URL(message.getUrl()));
 		} catch (MalformedURLException e) {
-			BurpUtil.printStderr(e);
+			throw new RuntimeException(e);
 		}
 		dto.setMethod(message.getMethod());
 		dto.setParams(message.getParams());
@@ -257,120 +235,91 @@ public class MessageLogic {
 	}
 
 	public List<Integer> loadMessageOrder() {
-		try {
-			return DbUtil.withSession(session -> {
-				MessageOrdMapper messageOrdMapper = session.getMapper(MessageOrdMapper.class);
-				Optional<MessageOrd> messageOrd = messageOrdMapper
-						.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+		return DbUtil.withSession(session -> {
+			MessageOrdMapper messageOrdMapper = session.getMapper(MessageOrdMapper.class);
+			Optional<MessageOrd> messageOrd = messageOrdMapper
+					.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
 
-				if(messageOrd.isEmpty()) {
-					return Lists.newArrayList();
-				}
-				return Arrays.stream(messageOrd.get().getOrd().split(","))
-						.map(Integer::valueOf)
-						.collect(Collectors.toList());
-			});
-
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+			if(messageOrd.isEmpty()) {
+				return Lists.newArrayList();
+			}
+			return Arrays.stream(messageOrd.get().getOrd().split(","))
+					.map(Integer::valueOf)
+					.collect(Collectors.toList());
+		});
 	}
 
 	public void saveMessageOrder(List<MessageDto> dtos) {
-		try {
-			String order = dtos.stream().map(dto -> dto.getId().toString()).collect(Collectors.joining(","));
-			String now = SqlUtil.now();
-			DbUtil.withTransaction(session -> {
-				MessageOrdMapper messageOrdMapper = session.getMapper(MessageOrdMapper.class);
+		String order = dtos.stream().map(dto -> dto.getId().toString()).collect(Collectors.joining(","));
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			MessageOrdMapper messageOrdMapper = session.getMapper(MessageOrdMapper.class);
 
-				Optional<MessageOrd> messageOrd = messageOrdMapper
-						.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId,
-								SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+			Optional<MessageOrd> messageOrd = messageOrdMapper
+					.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId,
+							SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
 
-				//TODO: auto convert, share impl
-				if (messageOrd.isPresent()) {
-					MessageOrd entity = messageOrd.get();
-					entity.setOrd(order);
-					entity.setPrcDate(now);
-					messageOrdMapper.updateByPrimaryKeySelective(entity);
-				} else {
-					MessageOrd entity = new MessageOrd();
-					entity.setFkProjectId(ConfigLogic.getInstance().getProjectId());
-					entity.setOrd(order);
-					entity.setPrcDate(now);
-					messageOrdMapper.insert(entity);
-				}
-			});
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+			//TODO: auto convert, share impl
+			if (messageOrd.isPresent()) {
+				MessageOrd entity = messageOrd.get();
+				entity.setOrd(order);
+				entity.setPrcDate(now);
+				messageOrdMapper.updateByPrimaryKeySelective(entity);
+			} else {
+				MessageOrd entity = new MessageOrd();
+				entity.setFkProjectId(ConfigLogic.getInstance().getProjectId());
+				entity.setOrd(order);
+				entity.setPrcDate(now);
+				messageOrdMapper.insert(entity);
+			}
+		});
 	}
 
 	public void loadMessageDetail(MessageDto dto) {
-		try {
-			IHttpRequestResponse httpRequestResponse = loadMessageDetail(dto.getMessageRawId());
+		IHttpRequestResponse httpRequestResponse = loadMessageDetail(dto.getMessageRawId());
 
-			dto.setMessage(httpRequestResponse);
-			dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(httpRequestResponse)); //TODO: share implementation...
-			dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
-					.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
+		dto.setMessage(httpRequestResponse);
+		dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(httpRequestResponse)); //TODO: share implementation...
+		dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
+				.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
 
-			if(httpRequestResponse.getResponse() != null) {
-				dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(httpRequestResponse.getResponse()));
-				dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
-						.map(cookie -> convertCookieToDto(cookie)).collect(Collectors.toList()));
-			}
-
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
+		if(httpRequestResponse.getResponse() != null) {
+			dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(httpRequestResponse.getResponse()));
+			dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
+					.map(cookie -> convertCookieToDto(cookie)).collect(Collectors.toList()));
 		}
 	}
 
 	public IHttpRequestResponse loadMessageDetail(Integer messageRawId) {
-		try {
-			MessageRaw messageRaw =
-				DbUtil.withSession(session -> {
-					MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
-					return messageRawMapper
-							.selectOne(c -> c.where(MessageRawDynamicSqlSupport.id, SqlBuilder.isEqualTo(messageRawId)))
-							.get();
-				});
+		MessageRaw messageRaw =
+			DbUtil.withSession(session -> {
+				MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
+				return messageRawMapper
+						.selectOne(c -> c.where(MessageRawDynamicSqlSupport.id, SqlBuilder.isEqualTo(messageRawId)))
+						.get();
+			});
 
-			return convertEntityToMock(messageRaw);
-
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+		return convertEntityToMock(messageRaw);
 	}
 
 	public void loadRepeatMaster(MessageDto messageDto) {
-		try {
-			MessageRaw messageRaw =
-				DbUtil.withSession(session -> {
-					MessageRepeatMasterMapper messageRepeatMasterMapper = session.getMapper(MessageRepeatMasterMapper.class);
-					MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
+		MessageRaw messageRaw =
+			DbUtil.withSession(session -> {
+				MessageRepeatMasterMapper messageRepeatMasterMapper = session.getMapper(MessageRepeatMasterMapper.class);
+				MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
 
-					var messageRepeatMaster = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(messageDto.getId())));
-					if(messageRepeatMaster.isEmpty()) {
-						return null;
-					}
+				var messageRepeatMaster = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(messageDto.getId())));
+				if(messageRepeatMaster.isEmpty()) {
+					return null;
+				}
 
-					return messageRawMapper
-							.selectByPrimaryKey(messageRepeatMaster.get().getFkMessageRawId())
-							.get();
-				});
+				return messageRawMapper
+						.selectByPrimaryKey(messageRepeatMaster.get().getFkMessageRawId())
+						.get();
+			});
 
-			if(messageRaw != null) {
-				messageDto.setRepeatMasterMessage(convertEntityToMock(messageRaw));
-			}
-
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
+		if(messageRaw != null) {
+			messageDto.setRepeatMasterMessage(convertEntityToMock(messageRaw));
 		}
 	}
 
@@ -378,42 +327,37 @@ public class MessageLogic {
 	 * insert or update
 	 */
 	public void saveRepeatMaster(MessageDto messageDto) {
-		try {
-			String now = SqlUtil.now();
-			DbUtil.withTransaction(session -> {
-				MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
-				MessageRepeatMasterMapper messageRepeatMasterMapper = session.getMapper(MessageRepeatMasterMapper.class);
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
+			MessageRepeatMasterMapper messageRepeatMasterMapper = session.getMapper(MessageRepeatMasterMapper.class);
 
-				var messageRepeatMasterOptional = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(messageDto.getId())));
-				if(messageRepeatMasterOptional.isPresent()) {
-					var messageRaw = messageRawMapper.selectByPrimaryKey(messageRepeatMasterOptional.get().getFkMessageRawId()).get();
-					messageRaw.setRequest(messageDto.getRepeatMasterMessage().getRequest());
-					messageRaw.setResponse(messageDto.getRepeatMasterMessage().getResponse());
-					messageRaw.setPrcDate(now);
-					messageRawMapper.updateByPrimaryKey(messageRaw);
-					return;
-				}
-
-				var messageRaw = new MessageRaw();
-				messageRaw.setHost(messageDto.getMessage().getHttpService().getHost());
-				messageRaw.setPort(messageDto.getMessage().getHttpService().getPort());
-				messageRaw.setProtocol(messageDto.getMessage().getHttpService().getProtocol());
+			var messageRepeatMasterOptional = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(messageDto.getId())));
+			if(messageRepeatMasterOptional.isPresent()) {
+				var messageRaw = messageRawMapper.selectByPrimaryKey(messageRepeatMasterOptional.get().getFkMessageRawId()).get();
 				messageRaw.setRequest(messageDto.getRepeatMasterMessage().getRequest());
 				messageRaw.setResponse(messageDto.getRepeatMasterMessage().getResponse());
 				messageRaw.setPrcDate(now);
-				messageRawMapper.insert(messageRaw);
+				messageRawMapper.updateByPrimaryKey(messageRaw);
+				return;
+			}
 
-				var messageRepeatMaster = new MessageRepeatMaster();
-				messageRepeatMaster.setFkMessageId(messageDto.getId());
-				messageRepeatMaster.setFkMessageRawId(messageRaw.getId());
-				messageRepeatMaster.setPrcDate(now);
-				messageRepeatMasterMapper.insert(messageRepeatMaster);
+			var messageRaw = new MessageRaw();
+			messageRaw.setHost(messageDto.getMessage().getHttpService().getHost());
+			messageRaw.setPort(messageDto.getMessage().getHttpService().getPort());
+			messageRaw.setProtocol(messageDto.getMessage().getHttpService().getProtocol());
+			messageRaw.setRequest(messageDto.getRepeatMasterMessage().getRequest());
+			messageRaw.setResponse(messageDto.getRepeatMasterMessage().getResponse());
+			messageRaw.setPrcDate(now);
+			messageRawMapper.insert(messageRaw);
 
-			});
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+			var messageRepeatMaster = new MessageRepeatMaster();
+			messageRepeatMaster.setFkMessageId(messageDto.getId());
+			messageRepeatMaster.setFkMessageRawId(messageRaw.getId());
+			messageRepeatMaster.setPrcDate(now);
+			messageRepeatMasterMapper.insert(messageRepeatMaster);
+
+		});
 	}
 
 }

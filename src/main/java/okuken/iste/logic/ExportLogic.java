@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.ProjectMemoDto;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
 public class ExportLogic {
@@ -61,7 +60,6 @@ public class ExportLogic {
 			}
 
 		} catch (Exception e) {
-			BurpUtil.printStderr(e);
 			throw new RuntimeException(e);
 		}
 	}

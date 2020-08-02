@@ -39,47 +39,36 @@ public class ProjectLogic {
 	}
 
 	public List<ProjectDto> loadProjects() {
-		try {
-			List<Project> projects =
-				DbUtil.withSession(session -> {
-					ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
-					return projectMapper.select(SelectDSLCompleter.allRowsOrderedBy(ProjectDynamicSqlSupport.id));
-				});
+		List<Project> projects =
+			DbUtil.withSession(session -> {
+				ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
+				return projectMapper.select(SelectDSLCompleter.allRowsOrderedBy(ProjectDynamicSqlSupport.id));
+			});
 
-			return projects.stream().map(entity -> { //TODO:converter
-				ProjectDto dto = new ProjectDto();
-				dto.setId(entity.getId());
-				dto.setName(entity.getName());
-				dto.setExplanation(entity.getExplanation());
-				return dto;
-			}).collect(Collectors.toList());
-
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+		return projects.stream().map(entity -> { //TODO:converter
+			ProjectDto dto = new ProjectDto();
+			dto.setId(entity.getId());
+			dto.setName(entity.getName());
+			dto.setExplanation(entity.getExplanation());
+			return dto;
+		}).collect(Collectors.toList());
 	}
 
 	public void saveProject(ProjectDto dto) {
-		try {
-			String now = SqlUtil.now();
-			DbUtil.withTransaction(session -> {
-				Project entity = new Project();
-				entity.setName(dto.getName());
-				entity.setExplanation(dto.getExplanation());
-				entity.setFkUserId(1);//TODO
-				entity.setPrcDate(now);
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			Project entity = new Project();
+			entity.setName(dto.getName());
+			entity.setExplanation(dto.getExplanation());
+			entity.setFkUserId(1);//TODO
+			entity.setPrcDate(now);
 
-				ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
-				projectMapper.insert(entity);
-				int id = SqlUtil.loadGeneratedId(session);
+			ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
+			projectMapper.insert(entity);
+			int id = SqlUtil.loadGeneratedId(session);
 
-				dto.setId(id);
-			});
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw e;
-		}
+			dto.setId(id);
+		});
 	}
 
 }

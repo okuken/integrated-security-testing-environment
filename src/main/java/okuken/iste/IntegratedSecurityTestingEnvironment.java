@@ -22,30 +22,25 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 	@Override
 	public void registerExtenderCallbacks(IBurpExtenderCallbacks burpExtenderCallbacks) {
 		BurpUtil.init(burpExtenderCallbacks);
-		try {
-			burpExtenderCallbacks.setExtensionName(Captions.EXTENSION_NAME);
 
-			burpExtenderCallbacks.registerContextMenuFactory(ContextMenuFactory.create());
+		burpExtenderCallbacks.setExtensionName(Captions.EXTENSION_NAME);
 
-			burpExtenderCallbacks.registerExtensionStateListener(this);
+		burpExtenderCallbacks.registerContextMenuFactory(ContextMenuFactory.create());
 
-			setupDatabase();
-			ProjectLogic.getInstance().selectProject();
+		burpExtenderCallbacks.registerExtensionStateListener(this);
 
-			SwingUtilities.invokeLater(() -> {
-				SuiteTab suiteTab = new SuiteTab();
+		setupDatabase();
+		ProjectLogic.getInstance().selectProject();
 
-				Controller controller = Controller.getInstance();
-				controller.setSuiteTab(suiteTab);
-				controller.loadDatabase();
+		SwingUtilities.invokeLater(() -> {
+			SuiteTab suiteTab = new SuiteTab();
 
-				burpExtenderCallbacks.addSuiteTab(suiteTab);
-			});
+			Controller controller = Controller.getInstance();
+			controller.setSuiteTab(suiteTab);
+			controller.loadDatabase();
 
-		} catch (Exception e) {
-			BurpUtil.printStderr(e);
-			throw new RuntimeException(e);
-		}
+			burpExtenderCallbacks.addSuiteTab(suiteTab);
+		});
 	}
 
 	private void setupDatabase() {
