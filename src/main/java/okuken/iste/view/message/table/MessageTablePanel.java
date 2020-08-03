@@ -153,8 +153,10 @@ public class MessageTablePanel extends JPanel {
 			public boolean include(Entry entry) {
 				var messageDto = tableModel.getRow((Integer)entry.getIdentifier());
 				return messageFilterDto.getProgresses().contains(messageDto.getProgress())
-						&& (StringUtils.containsIgnoreCase(messageDto.getName(), messageFilterDto.getSearchWord())
-							|| StringUtils.containsIgnoreCase(messageDto.getRemark(), messageFilterDto.getSearchWord()));
+						&& (messageFilterDto.getSearchWord().isEmpty()
+							|| StringUtils.containsIgnoreCase(messageDto.getName(), messageFilterDto.getSearchWord())
+							|| StringUtils.containsIgnoreCase(messageDto.getRemark(), messageFilterDto.getSearchWord())
+							|| StringUtils.containsIgnoreCase(messageDto.getProgressMemo(), messageFilterDto.getSearchWord()));
 			}
 		});
 
@@ -167,16 +169,16 @@ public class MessageTablePanel extends JPanel {
 		return table.getRowCount();
 	}
 
-	public MessageDto getSelectedMessage() {
-		return tableModel.getRow(table.convertRowIndexToModel(table.getSelectedRow()));
-	}
-
 	public List<MessageDto> getSelectedMessages() {
-		return Arrays.stream(table.getSelectedRows()).mapToObj(i -> tableModel.getRow(table.convertRowIndexToModel(i))).collect(Collectors.toList());
+		return Arrays.stream(table.getSelectedRows())
+				.map(table::convertRowIndexToModel)
+				.mapToObj(tableModel::getRow)
+				.collect(Collectors.toList());
 	}
 
 	public String getSelectedMessagesForCopyToClipboad() {
-		return tableModel.getRowsAsTsv(Arrays.stream(table.getSelectedRows()).map(i -> table.convertRowIndexToModel(i)).toArray());
+		return tableModel.getRowsAsTsv(
+				Arrays.stream(table.getSelectedRows()).map(table::convertRowIndexToModel).toArray());
 	}
 
 }

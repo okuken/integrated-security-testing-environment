@@ -3,8 +3,6 @@ package okuken.iste.view.repeater;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-import burp.IHttpService;
-import burp.IMessageEditorController;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 
@@ -19,20 +17,7 @@ public class RepeatMasterPanel extends JPanel {
 	public RepeatMasterPanel() {
 		setLayout(new BorderLayout(0, 0));
 		
-		messageEditorPanel = new MessageEditorPanel(new IMessageEditorController() {
-			@Override
-			public byte[] getResponse() {
-				return messageEditorPanel.getResponse();
-			}
-			@Override
-			public byte[] getRequest() {
-				return messageEditorPanel.getRequest();
-			}
-			@Override
-			public IHttpService getHttpService() {
-				return messageDto.getMessage().getHttpService();
-			}
-		}, false, false);
+		messageEditorPanel = new MessageEditorPanel(false, false);
 		add(messageEditorPanel, BorderLayout.CENTER);
 		
 	}
@@ -44,7 +29,7 @@ public class RepeatMasterPanel extends JPanel {
 
 	public void refreshPanel() {
 		if(messageDto.getRepeatMasterMessage() == null) {
-			messageEditorPanel.setMessage(messageDto);
+			messageEditorPanel.setMessage(messageDto); //set org message
 			return;
 		}
 

@@ -8,8 +8,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import burp.IHttpRequestResponse;
-import burp.IHttpService;
-import burp.IMessageEditorController;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
@@ -148,22 +146,8 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlRightPanel.add(dockoutButton);
 		setupDockout();
 		
-		messageEditorPanel = new MessageEditorPanel(new IMessageEditorController() {
-			@Override
-			public byte[] getResponse() {
-				return messageEditorPanel.getResponse();
-			}
-			@Override
-			public byte[] getRequest() {
-				return messageEditorPanel.getRequest();
-			}
-			@Override
-			public IHttpService getHttpService() {
-				return Controller.getInstance().getSelectedMessage().getMessage().getHttpService();
-			}
-		}, true, true);
+		messageEditorPanel = new MessageEditorPanel(true, true);
 		splitPane.setRightComponent(messageEditorPanel);
-		
 		
 		SwingUtilities.invokeLater(() -> {
 			initDividerLocation();

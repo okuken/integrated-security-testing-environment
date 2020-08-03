@@ -154,12 +154,6 @@ public class Controller {
 		}
 	}
 
-	/**
-	 * @return top of selected messages
-	 */
-	public MessageDto getSelectedMessage() {
-		return this.messageTablePanel.getSelectedMessage();
-	}
 	public List<MessageDto> getSelectedMessages() {
 		return this.messageTablePanel.getSelectedMessages();
 	}
