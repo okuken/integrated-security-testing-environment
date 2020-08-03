@@ -154,15 +154,22 @@ public class AuthLogic {
 				createLoginPayload(authAccountDto, authChainNodeDto.getIns().get(0)/**/, authChainNodeDto.getIns().get(1)/**/),
 				authChainNodeDto.getMessageDto());
 
+		if(messageRepeatDto.getMessage().getResponse() == null) {
+			throw new IllegalStateException("Authentication request's response is empty.");
+		}
+
 		String sessionIdCookieName = authChainNodeDto.getOuts().get(0)/**/.getParamName();
 		Optional<ICookie> cookieOptional = BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()).getCookies().stream()
 				.filter(cookie -> cookie.getName().equals(sessionIdCookieName))
 				.findFirst();
-		if(cookieOptional.isPresent()) {
-			authAccountDto.setSessionId(cookieOptional.get().getValue());
-			if(!isTest) {
-				saveAuthAccount(authAccountDto);
-			}
+
+		if(cookieOptional.isEmpty()) {
+			throw new IllegalStateException(String.format("Authentication request's response doesn't have %s.", sessionIdCookieName));
+		}
+
+		authAccountDto.setSessionId(cookieOptional.get().getValue());
+		if(!isTest) {
+			saveAuthAccount(authAccountDto);
 		}
 	}
 	private List<PayloadDto> createLoginPayload(AuthAccountDto authAccountDto, MessageChainNodeInDto userIdInDto, MessageChainNodeInDto passwordInDto) {

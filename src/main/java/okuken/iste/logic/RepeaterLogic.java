@@ -93,8 +93,8 @@ public class RepeaterLogic {
 
 		MessageRepeatDto ret = new MessageRepeatDto();
 		ret.setMessage(response);
-		ret.setStatus(BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode());
-		ret.setLength(response.getResponse().length);
+		ret.setStatus(response.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode() : -1);
+		ret.setLength(response.getResponse() != null ? response.getResponse().length : 0);
 		ret.setSendDate(sendDate);
 		ret.setTime(time);
 		ret.setDifference("");//TODO: impl
@@ -236,8 +236,8 @@ public class RepeaterLogic {
 
 		var ret = new MessageRepeatRedirectDto();
 		ret.setMessage(response);
-		ret.setStatus(BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode());
-		ret.setLength(response.getResponse().length);
+		ret.setStatus(response.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode() : -1);
+		ret.setLength(response.getResponse() != null ? response.getResponse().length : 0);
 		ret.setSendDate(sendDate);
 		ret.setTime(time);
 
