@@ -42,9 +42,12 @@ public class MessageTableModel extends AbstractTableModel {
 	}
 
 	public void addRows(List<MessageDto> messageDtos) {
+		if(messageDtos.isEmpty()) {
+			return;
+		}
+		int beginIndex = rows.size();
 		this.rows.addAll(messageDtos);
-		int insertedRowIndex = getRowCount() - 1;
-		fireTableRowsInserted(insertedRowIndex, insertedRowIndex);
+		fireTableRowsInserted(beginIndex, getRowCount() - 1);
 	}
 
 	public void insertRows(int rowIndex, List<MessageDto> messageDtos) {
