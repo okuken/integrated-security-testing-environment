@@ -1,5 +1,6 @@
 package okuken.iste.view.message.table;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,6 @@ import javax.swing.table.AbstractTableModel;
 import com.google.common.collect.Lists;
 
 import okuken.iste.dto.MessageDto;
-import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MessageLogic;
 
 public class MessageTableModel extends AbstractTableModel {
@@ -27,7 +27,15 @@ public class MessageTableModel extends AbstractTableModel {
 			MessageTableColumn.QUERY,
 			MessageTableColumn.NAME,
 			MessageTableColumn.REMARK,
+			MessageTableColumn.AUTH,
+			MessageTableColumn.PRIORITY,
 			MessageTableColumn.PROGRESS_MEMO,
+			MessageTableColumn.PROGRESS_TECHNICAL,
+			MessageTableColumn.PROGRESS_LOGICAL,
+			MessageTableColumn.PROGRESS_AUTHENTICATION,
+			MessageTableColumn.PROGRESS_AUTH_FEATURE,
+			MessageTableColumn.PROGRESS_AUTH_RESOURCE,
+			MessageTableColumn.PROGRESS_CSRF,
 			MessageTableColumn.PROGRESS,
 			MessageTableColumn.PARAMS,
 			MessageTableColumn.STATUS,
@@ -113,51 +121,22 @@ public class MessageTableModel extends AbstractTableModel {
 
 	@Override
 	public void setValueAt(Object val, int rowIndex, int columnIndex) {
-		switch(COLUMNS[columnIndex]) {
-			case NAME: {
-				MessageDto dto = rows.get(rowIndex); 
-				if(val.equals(dto.getName())) {
-					break;
-				}
+		var column = COLUMNS[columnIndex];
+		if(!column.isEditable()) {
+			throw new IllegalArgumentException();
+		}
 
-				dto.setName((String)val);
-				MessageLogic.getInstance().updateMessage(dto);
-				break;
+		try {
+			MessageDto dto = rows.get(rowIndex);
+			if(val.equals(column.getGetter().invoke(dto))) { //case: no change
+				return;
 			}
-			case REMARK: {
-				MessageDto dto = rows.get(rowIndex); 
-				if(val.equals(dto.getRemark())) {
-					break;
-				}
 
-				dto.setRemark((String)val);
-				MessageLogic.getInstance().updateMessage(dto);
-				break;
-			}
-			case PROGRESS: {
-				SecurityTestingProgress progress = (SecurityTestingProgress)val;
+			column.getSetter().invoke(dto, val);
+			MessageLogic.getInstance().updateMessage(dto);
 
-				MessageDto dto = rows.get(rowIndex); 
-				if(progress == dto.getProgress()) {
-					break;
-				}
-
-				dto.setProgress(progress);
-				MessageLogic.getInstance().updateMessage(dto);
-				break;
-			}
-			case PROGRESS_MEMO: {
-				MessageDto dto = rows.get(rowIndex); 
-				if(val.equals(dto.getProgressMemo())) {
-					break;
-				}
-
-				dto.setProgressMemo((String)val);
-				MessageLogic.getInstance().updateMessage(dto);
-				break;
-			}
-			default:
-				throw new IllegalArgumentException();
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -175,78 +154,12 @@ public class MessageTableModel extends AbstractTableModel {
 		return getColumnValue(rows.get(rowIndex), columnIndex);
 	}
 	private String getColumnValue(MessageDto row, int columnIndex) {
-		String value;
-		switch(COLUMNS[columnIndex]) {
-			case NAME: {
-				value = row.getName();
-				break;
-			}
-			case REMARK: {
-				value = row.getRemark();
-				break;
-			}
-			case PROGRESS: {
-				value = row.getProgress().getCaption();
-				break;
-			}
-			case PROGRESS_MEMO: {
-				value = row.getProgressMemo();
-				break;
-			}
-			case PROTOCOL: {
-				value = row.getProtocol();
-				break;
-			}
-			case HOST: {
-				value = row.getHost();
-				break;
-			}
-			case PORT: {
-				Integer port = row.getPortIfNotDefault();
-				value = port != null ? Integer.toString(port) : "";
-				break;
-			}
-			case PATH: {
-				value = row.getPath();
-				break;
-			}
-			case QUERY: {
-				value = row.getQuery();
-				break;
-			}
-			case URL: {
-				value = row.getUrlShortest();
-				break;
-			}
-			case METHOD: {
-				value = row.getMethod();
-				break;
-			}
-			case PARAMS: {
-				value = Integer.toString(row.getParams());
-				break;
-			}
-			case STATUS: {
-				value = row.getStatus() != null ? Short.toString(row.getStatus()) : "";
-				break;
-			}
-			case LENGTH: {
-				value = row.getLength() != null ? Integer.toString(row.getLength()) : "";
-				break;
-			}
-			case MIME_TYPE: {
-				value = row.getMimeType();
-				break;
-			}
-			case COOKIES: {
-				value = row.getCookies();
-				break;
-			}
-			default: {
-				return "";
-			}
+		try {
+			var value = COLUMNS[columnIndex].getGetter().invoke(row);
+			return value != null ? value.toString() : "";
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return Optional.ofNullable(value).orElse("");
 	}
 
 }

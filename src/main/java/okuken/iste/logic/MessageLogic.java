@@ -119,6 +119,22 @@ public class MessageLogic {
 		return cookieDto;
 	}
 
+	private void copyEditableFieldValuesToEntity(MessageDto dto, Message message) {
+		message.setName(dto.getName());
+		message.setRemark(dto.getRemark());
+		message.setProgress(dto.getProgress().getId());
+		message.setProgressMemo(dto.getProgressMemo());
+
+		message.setAuthMatrix(dto.getAuthMatrix());
+		message.setPriority(dto.getPriority());
+		message.setProgressExt01(dto.getProgressTechnical());
+		message.setProgressExt02(dto.getProgressLogical());
+		message.setProgressExt03(dto.getProgressAuthentication());
+		message.setProgressExt04(dto.getProgressAuthorizationFeature());
+		message.setProgressExt05(dto.getProgressAuthorizationResource());
+		message.setProgressExt06(dto.getProgressCsrf());
+	}
+
 	public void saveMessages(List<MessageDto> dtos) {
 		String now = SqlUtil.now();
 		DbUtil.withTransaction(session -> {
@@ -141,10 +157,7 @@ public class MessageLogic {
 				Message message = new Message();
 				message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
 				message.setFkMessageRawId(messageRawId);
-				message.setName(dto.getName());
-				message.setRemark(dto.getRemark());
-				message.setProgress(dto.getProgress().getId());
-				message.setProgressMemo(dto.getProgressMemo());
+				copyEditableFieldValuesToEntity(dto, message);
 				message.setUrl(dto.getUrl().toExternalForm());
 				message.setMethod(dto.getMethod());
 				message.setParams(dto.getParams());
@@ -180,14 +193,10 @@ public class MessageLogic {
 		DbUtil.withTransaction(session -> {
 			MessageMapper messageMapper = session.getMapper(MessageMapper.class);
 
-			//TODO: auto convert
 			Message message = new Message();
 			message.setFkProjectId(ConfigLogic.getInstance().getProjectId());
 			message.setId(dto.getId());
-			message.setName(dto.getName());
-			message.setRemark(dto.getRemark());
-			message.setProgress(dto.getProgress().getId());
-			message.setProgressMemo(dto.getProgressMemo());
+			copyEditableFieldValuesToEntity(dto, message);
 			message.setPrcDate(now);
 			messageMapper.updateByPrimaryKeySelective(message);
 		});
@@ -219,6 +228,16 @@ public class MessageLogic {
 		dto.setRemark(message.getRemark());
 		dto.setProgress(SecurityTestingProgress.getById(message.getProgress()));
 		dto.setProgressMemo(message.getProgressMemo());
+
+		dto.setAuthMatrix(message.getAuthMatrix());
+		dto.setPriority(message.getPriority());
+		dto.setProgressTechnical(message.getProgressExt01());
+		dto.setProgressLogical(message.getProgressExt02());
+		dto.setProgressAuthentication(message.getProgressExt03());
+		dto.setProgressAuthorizationFeature(message.getProgressExt04());
+		dto.setProgressAuthorizationResource(message.getProgressExt05());
+		dto.setProgressCsrf(message.getProgressExt06());
+
 		try {
 			dto.setUrl(new URL(message.getUrl()));
 		} catch (MalformedURLException e) {

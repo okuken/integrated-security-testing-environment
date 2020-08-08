@@ -22,6 +22,16 @@ public class MessageDto {
 	private SecurityTestingProgress progress;
 	private String progressMemo;
 
+	// personal items...??
+	private String authMatrix;
+	private String priority;
+	private String progressTechnical;
+	private String progressLogical;
+	private String progressAuthentication;
+	private String progressAuthorizationFeature;
+	private String progressAuthorizationResource;
+	private String progressCsrf;
+
 	private Integer memoId;
 	private String memo;
 	private boolean memoChanged;
@@ -62,6 +72,10 @@ public class MessageDto {
 	public Integer getPortIfNotDefault() {
 		if(url == null) {return null;}
 		return url.getPort() != url.getDefaultPort() ? url.getPort() : null; 
+	}
+	public String getPortIfNotDefaultStr() {
+		Integer port = getPortIfNotDefault();
+		return port != null ? Integer.toString(port) : "";
 	}
 	public String getPath() {
 		if(url == null) {return null;}
@@ -125,6 +139,55 @@ public class MessageDto {
 		this.progressMemo = progressMemo;
 	}
 
+	public String getAuthMatrix() {
+		return authMatrix;
+	}
+	public void setAuthMatrix(String authMatrix) {
+		this.authMatrix = authMatrix;
+	}
+	public String getPriority() {
+		return priority;
+	}
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+	public String getProgressTechnical() {
+		return progressTechnical;
+	}
+	public void setProgressTechnical(String progressTechnical) {
+		this.progressTechnical = progressTechnical;
+	}
+	public String getProgressLogical() {
+		return progressLogical;
+	}
+	public void setProgressLogical(String progressLogic) {
+		this.progressLogical = progressLogic;
+	}
+	public String getProgressAuthentication() {
+		return progressAuthentication;
+	}
+	public void setProgressAuthentication(String progressAuthentication) {
+		this.progressAuthentication = progressAuthentication;
+	}
+	public String getProgressAuthorizationFeature() {
+		return progressAuthorizationFeature;
+	}
+	public void setProgressAuthorizationFeature(String progressAuthorizationFeature) {
+		this.progressAuthorizationFeature = progressAuthorizationFeature;
+	}
+	public String getProgressAuthorizationResource() {
+		return progressAuthorizationResource;
+	}
+	public void setProgressAuthorizationResource(String progressAuthorizationResource) {
+		this.progressAuthorizationResource = progressAuthorizationResource;
+	}
+	public String getProgressCsrf() {
+		return progressCsrf;
+	}
+	public void setProgressCsrf(String progressCsrf) {
+		this.progressCsrf = progressCsrf;
+	}
+
 	public Integer getMemoId() {
 		if (memoId == null) {
 			MemoLogic.getInstance().loadMessageMemo(this);
@@ -172,17 +235,26 @@ public class MessageDto {
 	public Integer getParams() {
 		return params;
 	}
+	public String getParamsStr() {
+		return Integer.toString(getParams());
+	}
 	public void setParams(Integer params) {
 		this.params = params;
 	}
 	public Short getStatus() {
 		return status;
 	}
+	public String getStatusStr() {
+		return getStatus() != null ? Short.toString(getStatus()) : "";
+	}
 	public void setStatus(Short status) {
 		this.status = status;
 	}
 	public Integer getLength() {
 		return length;
+	}
+	public String getLengthStr() {
+		return getLength() != null ? Integer.toString(getLength()) : "";
 	}
 	public void setLength(Integer length) {
 		this.length = length;
