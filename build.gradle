@@ -27,6 +27,7 @@ dependencies {
 
     implementation "org.aspectj:aspectjrt:1.9.5"
 
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.guava:guava:28.1-jre'
     implementation 'org.apache.commons:commons-lang3:3.11'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'

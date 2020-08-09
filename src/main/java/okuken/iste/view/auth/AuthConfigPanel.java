@@ -26,13 +26,15 @@ import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.dto.MessageChainNodeInDto;
 import okuken.iste.dto.MessageChainNodeOutDto;
-import okuken.iste.dto.MessageCookieDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageParamDto;
+import okuken.iste.enums.ParameterType;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.ActionEvent;
 
 public class AuthConfigPanel extends JPanel {
@@ -44,10 +46,13 @@ public class AuthConfigPanel extends JPanel {
 	private JComboBox<MessageParamDto> idParamComboBox;
 	private JComboBox<MessageParamDto> passwordParamComboBox;
 
-	private JComboBox<String> sessionIdParamTypeComboBox;
-	private JComboBox<MessageCookieDto> sessionIdParamComboBox;
+	private JComboBox<ParameterType> sessionIdParamTypeComboBox;
+	private JComboBox<MessageParamDto> sessionIdParamComboBox;
 
 	private AuthConfigDto authConfigDto;
+
+
+	private boolean refreshingFlag = false;
 
 	public AuthConfigPanel() {
 		setLayout(new GridLayout(0, 1, 0, 0));
@@ -61,9 +66,11 @@ public class AuthConfigPanel extends JPanel {
 		loginRequestConfigPanel.add(LoginUrlLabel);
 		
 		loginUrlComboBox = new JComboBox<MessageDto>();
-		loginUrlComboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				refreshParamComboBox();
+		loginUrlComboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if(!refreshingFlag && e.getStateChange() == ItemEvent.SELECTED) {
+					refreshParamComboBox();
+				}
 			}
 		});
 		loginRequestConfigPanel.add(loginUrlComboBox);
@@ -93,11 +100,17 @@ public class AuthConfigPanel extends JPanel {
 		JLabel sessionIdParamLabel = new JLabel(Captions.AUTH_CONFIG_SESSIONID);
 		loginResponseConfigPanel.add(sessionIdParamLabel);
 		
-		sessionIdParamTypeComboBox = new JComboBox<String>();
-		sessionIdParamTypeComboBox.addItem("Cookie"); //TODO: support response body (JSON, ...)
+		sessionIdParamTypeComboBox = new JComboBox<ParameterType>();
+		sessionIdParamTypeComboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if(!refreshingFlag && e.getStateChange() == ItemEvent.SELECTED) {
+					refreshSessionIdParamComboBox();
+				}
+			}
+		});
 		loginResponseConfigPanel.add(sessionIdParamTypeComboBox);
 		
-		sessionIdParamComboBox = new JComboBox<MessageCookieDto>();
+		sessionIdParamComboBox = new JComboBox<MessageParamDto>();
 		loginResponseConfigPanel.add(sessionIdParamComboBox);
 		
 		JPanel loginTestPanel = new JPanel();
@@ -188,7 +201,7 @@ public class AuthConfigPanel extends JPanel {
 		ret.setParamName(paramDto.getName());
 		return ret;
 	}
-	private MessageChainNodeOutDto convertToChainNodeOutDto(MessageCookieDto cookieDto) {
+	private MessageChainNodeOutDto convertToChainNodeOutDto(MessageParamDto cookieDto) {
 		var ret = new MessageChainNodeOutDto();
 		ret.setParamType(IParameter.PARAM_COOKIE);
 		ret.setParamName(cookieDto.getName());
@@ -197,71 +210,122 @@ public class AuthConfigPanel extends JPanel {
 	}
 
 	public void refreshPanel(List<MessageDto> messageDtos) {
-		loginUrlComboBox.removeAllItems();
-		loginUrlComboBox.setMaximumRowCount(1000);
-		messageDtos.forEach(messageDto -> {
-			loginUrlComboBox.addItem(messageDto);
-		});
+		var refreshingFlagBk = refreshingFlag;
+		refreshingFlag = true;
+		try {
+			loginUrlComboBox.removeAllItems();
+			loginUrlComboBox.setMaximumRowCount(1000);
+			messageDtos.forEach(messageDto -> {
+				loginUrlComboBox.addItem(messageDto);
+			});
 
-		authConfigDto = ConfigLogic.getInstance().getAuthConfig();
-		if(authConfigDto == null) {
+			authConfigDto = ConfigLogic.getInstance().getAuthConfig();
+			if(authConfigDto == null) {
+				refreshParamComboBox();
+				return;
+			}
+
+			var chainNodeDto = authConfigDto.getAuthMessageChainDto().getNodes().get(0); //now, support only one node
+			loginUrlComboBox.setSelectedItem(messageDtos.stream().filter(messageDto -> messageDto.getId().equals(chainNodeDto.getMessageDto().getId())).findFirst().get());
+
 			refreshParamComboBox();
-			return;
+
+			var idInDto = chainNodeDto.getIns().get(0);//...
+			idParamComboBox.setSelectedIndex(
+				IntStream.range(0, idParamComboBox.getItemCount()).filter(i -> {
+					var idParamDto = idParamComboBox.getItemAt(i);
+					return idParamDto.getType() == idInDto.getParamType() &&
+							idParamDto.getName().equals(idInDto.getParamName());
+					}).findFirst().getAsInt());
+
+			var pwInDto = chainNodeDto.getIns().get(1);//...
+			passwordParamComboBox.setSelectedIndex(
+				IntStream.range(0, passwordParamComboBox.getItemCount()).filter(i -> {
+					var pwParamDto = passwordParamComboBox.getItemAt(i);
+					return pwParamDto.getType() == pwInDto.getParamType() &&
+							pwParamDto.getName().equals(pwInDto.getParamName());
+					}).findFirst().getAsInt());
+
+
+			var sessIdOutDto = chainNodeDto.getOuts().get(0);//...
+
+			sessionIdParamTypeComboBox.setSelectedIndex(
+				IntStream.range(0, sessionIdParamTypeComboBox.getItemCount()).filter(i -> {
+					return sessionIdParamTypeComboBox.getItemAt(i).getId() == sessIdOutDto.getParamType();
+					}).findFirst().getAsInt());
+
+			sessionIdParamComboBox.setSelectedIndex(
+				IntStream.range(0, sessionIdParamComboBox.getItemCount()).filter(i -> {
+					return sessionIdParamComboBox.getItemAt(i).getName().equals(sessIdOutDto.getParamName());
+					}).findFirst().getAsInt());
+
+		} finally {
+			refreshingFlag = refreshingFlagBk;
 		}
-
-		var chainNodeDto = authConfigDto.getAuthMessageChainDto().getNodes().get(0); //now, support only one node
-		loginUrlComboBox.setSelectedItem(messageDtos.stream().filter(messageDto -> messageDto.getId().equals(chainNodeDto.getMessageDto().getId())).findFirst().get());
-
-		refreshParamComboBox();
-
-		var idInDto = chainNodeDto.getIns().get(0);//...
-		idParamComboBox.setSelectedIndex(
-			IntStream.range(0, idParamComboBox.getItemCount()).filter(i -> {
-				var idParamDto = idParamComboBox.getItemAt(i);
-				return idParamDto.getType() == idInDto.getParamType() &&
-						idParamDto.getName().equals(idInDto.getParamName());
-				}).findFirst().getAsInt());
-
-		var pwInDto = chainNodeDto.getIns().get(1);//...
-		passwordParamComboBox.setSelectedIndex(
-			IntStream.range(0, passwordParamComboBox.getItemCount()).filter(i -> {
-				var pwParamDto = passwordParamComboBox.getItemAt(i);
-				return pwParamDto.getType() == pwInDto.getParamType() &&
-						pwParamDto.getName().equals(pwInDto.getParamName());
-				}).findFirst().getAsInt());
-
-		var sessIdOutDto = chainNodeDto.getOuts().get(0);//...
-		sessionIdParamComboBox.setSelectedIndex(
-			IntStream.range(0, sessionIdParamComboBox.getItemCount()).filter(i -> {
-				var sessIdCookieDto = sessionIdParamComboBox.getItemAt(i);
-				return sessIdCookieDto.getName().equals(sessIdOutDto.getParamName());
-				}).findFirst().getAsInt());
-
 	}
 
 	private void refreshParamComboBox() {
-		idParamComboBox.removeAllItems();
-		passwordParamComboBox.removeAllItems();
-		sessionIdParamComboBox.removeAllItems();
+		var refreshingFlagBk = refreshingFlag;
+		refreshingFlag = true;
+		try {
+			idParamComboBox.removeAllItems();
+			passwordParamComboBox.removeAllItems();
+			sessionIdParamTypeComboBox.removeAllItems();
 
-		if(loginUrlComboBox.getItemCount() < 1) {
-			return;
+			if(loginUrlComboBox.getItemCount() < 1) {
+				return;
+			}
+			var loginMessageDto = loginUrlComboBox.getItemAt(loginUrlComboBox.getSelectedIndex());
+
+			idParamComboBox.setMaximumRowCount(1000);
+			loginMessageDto.getMessageParamList().forEach(messagePramDto -> {
+				idParamComboBox.addItem(messagePramDto);
+			});
+
+			passwordParamComboBox.setMaximumRowCount(1000);
+			loginMessageDto.getMessageParamList().forEach(messagePramDto -> {
+				passwordParamComboBox.addItem(messagePramDto);
+			});
+
+			sessionIdParamTypeComboBox.setMaximumRowCount(1000);
+			sessionIdParamTypeComboBox.addItem(ParameterType.COOKIE);
+			sessionIdParamTypeComboBox.addItem(ParameterType.JSON);
+
+			refreshSessionIdParamComboBox();
+
+		} finally {
+			refreshingFlag = refreshingFlagBk;
 		}
+	}
 
-		idParamComboBox.setMaximumRowCount(1000);
-		loginUrlComboBox.getItemAt(loginUrlComboBox.getSelectedIndex()).getMessageParamList().forEach(messagePramDto -> {
-			idParamComboBox.addItem(messagePramDto);
-		});
+	private void refreshSessionIdParamComboBox() {
+		var refreshingFlagBk = refreshingFlag;
+		refreshingFlag = true;
+		try {
+			sessionIdParamComboBox.removeAllItems();
+			sessionIdParamComboBox.setMaximumRowCount(1000);
 
-		passwordParamComboBox.setMaximumRowCount(1000);
-		loginUrlComboBox.getItemAt(loginUrlComboBox.getSelectedIndex()).getMessageParamList().forEach(messagePramDto -> {
-			passwordParamComboBox.addItem(messagePramDto);
-		});
+			var loginMessageDto = loginUrlComboBox.getItemAt(loginUrlComboBox.getSelectedIndex());
+			var parameterType = sessionIdParamTypeComboBox.getItemAt(sessionIdParamTypeComboBox.getSelectedIndex());
 
-		sessionIdParamComboBox.setMaximumRowCount(1000);
-		loginUrlComboBox.getItemAt(loginUrlComboBox.getSelectedIndex()).getMessageCookieList().forEach(messageCookieDto -> {
-			sessionIdParamComboBox.addItem(messageCookieDto);
-		});
+			switch (parameterType) {
+				case COOKIE:
+					loginMessageDto.getMessageCookieList().forEach(messageCookieDto -> {
+						sessionIdParamComboBox.addItem(messageCookieDto);
+					});
+					break;
+				case JSON:
+					loginMessageDto.getResponseJson().forEach(jsonEntry -> {
+						sessionIdParamComboBox.addItem(jsonEntry);
+					});
+					break;
+				default:
+					throw new IllegalStateException(parameterType.toString());
+			}
+
+		} finally {
+			refreshingFlag = refreshingFlagBk;
+		}
 	}
 
 }

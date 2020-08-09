@@ -2,13 +2,13 @@ package okuken.iste.dto;
 
 import java.util.Date;
 
-public class MessageCookieDto {
+import burp.IParameter;
+
+public class MessageCookieDto extends MessageParamDto {
 
 	private String domain;
 	private String path;
 	private Date expiration;
-	private String name;
-	private String value;
 
 	public String getDomain() {
 		return domain;
@@ -28,21 +28,14 @@ public class MessageCookieDto {
 	public void setExpiration(Date expiration) {
 		this.expiration = expiration;
 	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
-	}
 
+	@Override
+	public byte getType() {
+		return IParameter.PARAM_COOKIE;
+	}
+	@Override
 	public String toString() {
-		return name;
+		return super.getName();
 	}
 
 }

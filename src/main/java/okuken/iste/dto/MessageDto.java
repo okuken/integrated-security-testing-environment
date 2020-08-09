@@ -47,6 +47,7 @@ public class MessageDto {
 	private List<MessageParamDto> messageParamList;
 
 	private List<MessageCookieDto> messageCookieList;
+	private List<MessageParamDto> responseJson;
 
 	private Integer messageRawId;
 	private IHttpRequestResponse message;
@@ -288,6 +289,15 @@ public class MessageDto {
 	}
 	public void setMessageCookieList(List<MessageCookieDto> messageCookieList) {
 		this.messageCookieList = messageCookieList;
+	}
+	public List<MessageParamDto> getResponseJson() {
+		if(responseJson == null && getMessage().getResponse() != null) {
+			responseJson = MessageLogic.getInstance().convertJsonResponseToDto(getMessage().getResponse(), getResponseInfo());
+		}
+		return responseJson;
+	}
+	public void setResponseJson(List<MessageParamDto> responseJson) {
+		this.responseJson = responseJson;
 	}
 	public Integer getMessageRawId() {
 		return messageRawId;

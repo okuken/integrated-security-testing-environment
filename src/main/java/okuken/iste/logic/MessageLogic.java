@@ -2,19 +2,23 @@ package okuken.iste.logic;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mybatis.dynamic.sql.SqlBuilder;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 
 import burp.ICookie;
 import burp.IHttpRequestResponse;
 import burp.IHttpService;
 import burp.IParameter;
+import burp.IResponseInfo;
 import okuken.iste.dao.auto.MessageDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageMapper;
 import okuken.iste.dao.auto.MessageOrdDynamicSqlSupport;
@@ -34,6 +38,7 @@ import okuken.iste.entity.auto.MessageOrd;
 import okuken.iste.entity.auto.MessageParam;
 import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.entity.auto.MessageRepeatMaster;
+import okuken.iste.enums.ParameterType;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
@@ -117,6 +122,21 @@ public class MessageLogic {
 		cookieDto.setName(cookie.getName());
 		cookieDto.setValue(cookie.getValue());
 		return cookieDto;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<MessageParamDto> convertJsonResponseToDto(byte[] response, IResponseInfo responseInfo) {
+		var responseBody = Arrays.copyOfRange(response, responseInfo.getBodyOffset(), response.length - 1);
+		var responseBodyStr = new String(responseBody, StandardCharsets.UTF_8);
+		Map<String, String> json = new Gson().fromJson(responseBodyStr, Map.class);
+
+		return json.entrySet().stream().map(entry -> {
+			var dto = new MessageParamDto();
+			dto.setName(entry.getKey());
+			dto.setValue(entry.getValue());
+			dto.setType(ParameterType.JSON.getId());
+			return dto;
+		}).collect(Collectors.toList());
 	}
 
 	private void copyEditableFieldValuesToEntity(MessageDto dto, Message message) {
