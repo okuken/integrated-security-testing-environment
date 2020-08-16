@@ -1,5 +1,10 @@
 package okuken.iste.enums;
 
+import java.util.Arrays;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 import burp.IParameter;
 
 public enum ParameterType {
@@ -29,6 +34,15 @@ public enum ParameterType {
 	@Override
 	public String toString() {
 		return caption;
+	}
+
+	private static final Map<Byte, ParameterType> idToEnumMap;
+	static {
+		idToEnumMap = Maps.newHashMap();
+		Arrays.stream(values()).forEach(parameterType -> idToEnumMap.put(parameterType.id, parameterType));
+	}
+	public static ParameterType getById(byte id) {
+		return idToEnumMap.get(id);
 	}
 
 }

@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.collect.Lists;
 
-import burp.IParameter;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
@@ -201,11 +200,11 @@ public class AuthConfigPanel extends JPanel {
 		ret.setParamName(paramDto.getName());
 		return ret;
 	}
-	private MessageChainNodeOutDto convertToChainNodeOutDto(MessageParamDto cookieDto) {
+	private MessageChainNodeOutDto convertToChainNodeOutDto(MessageParamDto paramDto) {
 		var ret = new MessageChainNodeOutDto();
-		ret.setParamType(IParameter.PARAM_COOKIE);
-		ret.setParamName(cookieDto.getName());
-		ret.setVarName(cookieDto.getName());
+		ret.setParamType(paramDto.getType());
+		ret.setParamName(paramDto.getName());
+		ret.setVarName(paramDto.getName());
 		return ret;
 	}
 
@@ -253,6 +252,8 @@ public class AuthConfigPanel extends JPanel {
 				IntStream.range(0, sessionIdParamTypeComboBox.getItemCount()).filter(i -> {
 					return sessionIdParamTypeComboBox.getItemAt(i).getId() == sessIdOutDto.getParamType();
 					}).findFirst().getAsInt());
+
+			refreshSessionIdParamComboBox();
 
 			sessionIdParamComboBox.setSelectedIndex(
 				IntStream.range(0, sessionIdParamComboBox.getItemCount()).filter(i -> {

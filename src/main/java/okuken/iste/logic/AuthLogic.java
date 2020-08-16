@@ -1,14 +1,12 @@
 package okuken.iste.logic;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mybatis.dynamic.sql.SqlBuilder;
 
 import com.google.common.collect.Lists;
 
-import burp.ICookie;
 import okuken.iste.controller.Controller;
 import okuken.iste.dao.auto.AuthAccountDynamicSqlSupport;
 import okuken.iste.dao.auto.AuthAccountMapper;
@@ -18,10 +16,12 @@ import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeInDto;
+import okuken.iste.dto.MessageParamDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.PayloadDto;
 import okuken.iste.entity.auto.AuthAccount;
 import okuken.iste.entity.auto.AuthConfig;
+import okuken.iste.enums.ParameterType;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.SqlUtil;
@@ -150,7 +150,7 @@ public class AuthLogic {
 	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, boolean isTest) {
 		var authChainNodeDto = authMessageChainDto.getNodes().get(0);
 
-		MessageRepeatDto messageRepeatDto = Controller.getInstance().sendAutoRequest(
+		var messageRepeatDto = Controller.getInstance().sendAutoRequest(
 				createLoginPayload(authAccountDto, authChainNodeDto.getIns().get(0)/**/, authChainNodeDto.getIns().get(1)/**/),
 				authChainNodeDto.getMessageDto());
 
@@ -158,16 +158,18 @@ public class AuthLogic {
 			throw new IllegalStateException("Authentication request's response is empty.");
 		}
 
-		String sessionIdCookieName = authChainNodeDto.getOuts().get(0)/**/.getParamName();
-		Optional<ICookie> cookieOptional = BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()).getCookies().stream()
-				.filter(cookie -> cookie.getName().equals(sessionIdCookieName))
+		var sessionIdName = authChainNodeDto.getOuts().get(0)/**/.getParamName();
+		var sessionIdType = ParameterType.getById(authChainNodeDto.getOuts().get(0)/**/.getParamType());
+
+		var sessionIdParamOptional = extractSessionIdCandidateParams(messageRepeatDto, sessionIdType).stream()
+				.filter(sessionIdParam -> sessionIdParam.getName().equals(sessionIdName))
 				.findFirst();
 
-		if(cookieOptional.isEmpty()) {
-			throw new IllegalStateException(String.format("Authentication request's response doesn't have %s.", sessionIdCookieName));
+		if(sessionIdParamOptional.isEmpty()) {
+			throw new IllegalStateException(String.format("Authentication request's response doesn't have %s.", sessionIdName));
 		}
 
-		authAccountDto.setSessionId(cookieOptional.get().getValue());
+		authAccountDto.setSessionId(sessionIdParamOptional.get().getValue());
 		if(!isTest) {
 			saveAuthAccount(authAccountDto);
 		}
@@ -177,6 +179,20 @@ public class AuthLogic {
 		ret.add(new PayloadDto(userIdInDto.getParamName(), userIdInDto.getParamType(), authAccountDto.getUserId()));
 		ret.add(new PayloadDto(passwordInDto.getParamName(), passwordInDto.getParamType(), authAccountDto.getPassword()));
 		return ret;
+	}
+	private List<MessageParamDto> extractSessionIdCandidateParams(MessageRepeatDto messageRepeatDto, ParameterType sessionIdType) {
+		switch (sessionIdType) {
+			case COOKIE:
+				return BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()).getCookies().stream()
+					.map(cookie -> MessageLogic.getInstance().convertCookieToDto(cookie))
+					.collect(Collectors.toList());
+			case JSON:
+				return MessageLogic.getInstance().convertJsonResponseToDto(
+						messageRepeatDto.getMessage().getResponse(),
+						BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()));
+			default:
+				throw new IllegalArgumentException(String.format("Unsupported sessionIdType: %s", sessionIdType));
+		}
 	}
 
 }

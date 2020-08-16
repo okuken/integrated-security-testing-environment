@@ -42,6 +42,7 @@ import okuken.iste.enums.ParameterType;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
+import okuken.iste.util.HttpUtil;
 import okuken.iste.util.SqlUtil;
 
 public class MessageLogic {
@@ -126,7 +127,7 @@ public class MessageLogic {
 
 	@SuppressWarnings("unchecked")
 	public List<MessageParamDto> convertJsonResponseToDto(byte[] response, IResponseInfo responseInfo) {
-		var responseBody = Arrays.copyOfRange(response, responseInfo.getBodyOffset(), response.length - 1);
+		var responseBody = HttpUtil.extractMessageBody(response, responseInfo.getBodyOffset());
 		var responseBodyStr = new String(responseBody, StandardCharsets.UTF_8);
 		Map<String, String> json = new Gson().fromJson(responseBodyStr, Map.class);
 

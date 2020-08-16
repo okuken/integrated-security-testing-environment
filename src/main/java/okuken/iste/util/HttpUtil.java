@@ -1,5 +1,7 @@
 package okuken.iste.util;
 
+import java.util.Arrays;
+
 public class HttpUtil {
 
 	public static byte[] removeDustAtEndOfCookieHeader(byte[] request) {
@@ -21,6 +23,11 @@ public class HttpUtil {
 	private static final byte[] HEADER_END = "\r\n\r\n".getBytes();
 	private static int endIndexOfCookie(byte[] request) {
 		return ByteUtil.endIndexOf(request, HEADER_END, COOKIE_START, COOKIE_END);
+	}
+
+
+	public static byte[] extractMessageBody(byte[] message, int bodyOffset) {
+		return Arrays.copyOfRange(message, bodyOffset, message.length);
 	}
 
 }

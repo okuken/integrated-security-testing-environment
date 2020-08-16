@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.mybatis.dynamic.sql.BasicColumn;
@@ -32,6 +33,7 @@ import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.PayloadDto;
 import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.entity.auto.MessageRaw;
+import okuken.iste.enums.ParameterType;
 import okuken.iste.entity.MessageRepeat;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
@@ -78,7 +80,7 @@ public class RepeaterLogic {
 					authAccountDto.getSessionId(),
 					sessionidNodeOutDto.getParamType());
 
-			request = applyCookieParameter(request, sessionIdParam);
+			request = applyParameter(request, sessionIdParam);
 		}
 
 		Date sendDate = Calendar.getInstance().getTime();
@@ -108,11 +110,34 @@ public class RepeaterLogic {
 
 		return ret;
 	}
-	private byte[] applyCookieParameter(byte[] request, IParameter cookieParam) {
-		var ret = BurpUtil.getHelpers().removeParameter(request, cookieParam);
-		ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
-		ret = BurpUtil.getHelpers().addParameter(ret, cookieParam);
-		return ret;
+	private byte[] applyParameter(byte[] request, IParameter parameter) {
+		var parameterType = ParameterType.getById(parameter.getType());
+		switch (parameterType) {
+			case COOKIE:
+				var ret = BurpUtil.getHelpers().removeParameter(request, parameter);
+				ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
+				ret = BurpUtil.getHelpers().addParameter(ret, parameter);
+				return ret;
+			case JSON:
+				//TODO: generalize...
+				var authorizationHeaderPrefix = "Authorization: Bearer ";
+				var authorizationHeader = authorizationHeaderPrefix + parameter.getValue();
+
+				var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
+				var headers = requestInfo.getHeaders();
+				var authorizationHeaderIndex = IntStream.range(0, headers.size()).filter(i -> headers.get(i).startsWith(authorizationHeaderPrefix)).findFirst();
+				if(authorizationHeaderIndex.isPresent()) {
+					headers.remove(authorizationHeaderIndex.getAsInt());
+					headers.add(authorizationHeaderIndex.getAsInt(), authorizationHeader);
+				} else {
+					headers.add(authorizationHeader);
+				}
+
+				var body = HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset());
+				return BurpUtil.getHelpers().buildHttpMessage(headers, body);
+			default:
+				throw new IllegalArgumentException(String.format("Unsupported parameter type: %s", parameterType));
+		}
 	}
 
 	private void save(MessageRepeatDto messageRepeatDto, MessageDto orgMessageDto) {
@@ -282,7 +307,7 @@ public class RepeaterLogic {
 				.collect(Collectors.toList());
 
 		for(var targetCookieParam: beforeResponseCookieParams) {
-			ret = applyCookieParameter(ret, targetCookieParam);
+			ret = applyParameter(ret, targetCookieParam);
 		}
 
 		return ret;
