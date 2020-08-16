@@ -129,7 +129,13 @@ public class MessageTablePanel extends JPanel {
 				if(isSelected && column == table.getSelectedColumn()) {
 					return renderer;
 				}
-				setBackground(tableModel.getRow(table.convertRowIndexToModel(row)).getProgress().getColor());
+
+				if(tableModel.getColumnType(table.convertColumnIndexToModel(column)).isProgressDetail() &&
+					(StringUtils.startsWith((CharSequence) value, "/") || StringUtils.startsWith((CharSequence) value, "-"))) { //personal spec...
+					setBackground(SecurityTestingProgress.DONE.getColor());
+				} else {
+					setBackground(tableModel.getRow(table.convertRowIndexToModel(row)).getProgress().getColor());
+				}
 
 				return renderer;
 			}

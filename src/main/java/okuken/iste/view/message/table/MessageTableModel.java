@@ -149,6 +149,10 @@ public class MessageTableModel extends AbstractTableModel {
 		throw new IllegalArgumentException();
 	}
 
+	public MessageTableColumn getColumnType(int index) {
+		return COLUMNS[index];
+	}
+
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		return getColumnValue(rows.get(rowIndex), columnIndex);
