@@ -175,10 +175,15 @@ public class MessageTablePanel extends JPanel {
 		return table.getRowCount();
 	}
 
-	public List<MessageDto> getSelectedMessages() {
+	public List<Integer> getSelectedRowIndexs() {
 		return Arrays.stream(table.getSelectedRows())
-				.map(table::convertRowIndexToModel)
-				.mapToObj(tableModel::getRow)
+				.mapToObj(table::convertRowIndexToModel)
+				.collect(Collectors.toList());
+	}
+
+	public List<MessageDto> getSelectedMessages() {
+		return getSelectedRowIndexs().stream()
+				.map(tableModel::getRow)
 				.collect(Collectors.toList());
 	}
 

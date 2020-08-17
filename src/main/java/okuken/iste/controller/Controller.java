@@ -1,6 +1,7 @@
 package okuken.iste.controller;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -139,6 +140,20 @@ public class Controller {
 		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
 	}
 
+	public void deleteMessages() {
+		var selectedRowIndexs = getSelectedRowIndexs();
+		Collections.reverse(selectedRowIndexs);
+
+		for(var rowIndex: selectedRowIndexs) {
+			var dto = messageTableModel.removeRow(rowIndex);
+			MessageLogic.getInstance().deleteMessage(dto);
+		}
+		MessageLogic.getInstance().saveMessageOrder(this.messageTableModel.getRows()); // TODO: join transaction...
+
+		applyMessageFilter();
+		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
+	}
+
 	private void refreshComponentsDependentOnMessages(List<MessageDto> messageDtos) {
 		authPanel.refreshConfigPanel(messageDtos);
 	}
@@ -152,6 +167,10 @@ public class Controller {
 		for (int i = 0; e.hasMoreElements(); i++) {
 			e.nextElement().setPreferredWidth(MessageTableColumn.getByCaption(messageTable.getColumnName(i)).getWidth());
 		}
+	}
+
+	public List<Integer> getSelectedRowIndexs() {
+		return this.messageTablePanel.getSelectedRowIndexs();
 	}
 
 	public List<MessageDto> getSelectedMessages() {

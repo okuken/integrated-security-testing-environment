@@ -1,6 +1,7 @@
 package okuken.iste.view.message.table;
 
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import okuken.iste.consts.Captions;
@@ -106,6 +107,17 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		add(sendToComparerResponseMenuItem);
 
 		add(new JPopupMenu.Separator());
+
+		JMenuItem deleteItemMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_DELETE_ITEM);
+		deleteItemMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(JOptionPane.showConfirmDialog(BurpUtil.getBurpSuiteJFrame(), 
+						Captions.MESSAGE_DELETE_ITEM, "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+					Controller.getInstance().deleteMessages();
+				}
+			}
+		});
+		add(deleteItemMenuItem);
 
 		JMenuItem copyUrlMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_URL);
 		copyUrlMenuItem.addActionListener(new ActionListener() {

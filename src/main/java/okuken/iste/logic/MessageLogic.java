@@ -223,6 +223,22 @@ public class MessageLogic {
 		});
 	}
 
+	/**
+	 * Logical delete.
+	 */
+	public void deleteMessage(MessageDto dto) {
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			MessageMapper messageMapper = session.getMapper(MessageMapper.class);
+
+			Message message = new Message();
+			message.setId(dto.getId());
+			message.setDeleteFlg(true);
+			message.setPrcDate(now);
+			messageMapper.updateByPrimaryKeySelective(message);
+		});
+	}
+
 	public MessageDto loadMessage(Integer id) {
 		return DbUtil.withSession(session -> {
 				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
@@ -234,8 +250,9 @@ public class MessageLogic {
 		List<Message> messages = 
 			DbUtil.withSession(session -> {
 				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
-				return messageMapper.select(c -> c.where(MessageDynamicSqlSupport.fkProjectId,
-						SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+				return messageMapper.select(c ->
+						c.where(MessageDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId()),
+							SqlBuilder.and(MessageDynamicSqlSupport.deleteFlg, SqlBuilder.isFalse())));
 			});
 
 		return messages.stream().map(message -> convertMessageEntityToDto(message)).collect(Collectors.toList());

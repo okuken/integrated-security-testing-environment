@@ -65,9 +65,10 @@ public class MessageTableModel extends AbstractTableModel {
 		fireTableRowsInserted(rowIndex, rowIndex + messageDtos.size() - 1);
 	}
 
-	public void removeRow(int rowIndex) {
-		this.rows.remove(rowIndex);
+	public MessageDto removeRow(int rowIndex) {
+		var ret = this.rows.remove(rowIndex);
 		fireTableRowsDeleted(rowIndex, rowIndex);
+		return ret;
 	}
 
 	public void clearRows() {

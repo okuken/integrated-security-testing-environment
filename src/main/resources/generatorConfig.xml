@@ -10,9 +10,10 @@
         <domainObjectRenamingRule searchString="^Iste" />
         <!-- columnOverride column="ID" javaType="Long" / -->
         <!-- columnOverride column="PRC_DATE" javaType="java.sql.Date" / -->
-        <columnOverride column="STATUS"   javaType="Short" />
-        <columnOverride column="REQUEST"  javaType="byte[]" jdbcType="BINARY" />
-        <columnOverride column="RESPONSE" javaType="byte[]" jdbcType="BINARY" />
+        <columnOverride column="STATUS"     javaType="Short" />
+        <columnOverride column="DELETE_FLG" javaType="boolean" />
+        <columnOverride column="REQUEST"    javaType="byte[]" jdbcType="BINARY" />
+        <columnOverride column="RESPONSE"   javaType="byte[]" jdbcType="BINARY" />
     </table>
   </context>
 </generatorConfiguration>
