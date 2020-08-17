@@ -160,6 +160,8 @@ public class MessageTablePanel extends JPanel {
 				var messageDto = tableModel.getRow((Integer)entry.getIdentifier());
 				return messageFilterDto.getProgresses().contains(messageDto.getProgress())
 						&& (messageFilterDto.getSearchWord().isEmpty()
+							|| StringUtils.containsIgnoreCase(messageDto.getUrlShort(), messageFilterDto.getSearchWord())
+							|| StringUtils.containsIgnoreCase(messageDto.getMethod(), messageFilterDto.getSearchWord())
 							|| StringUtils.containsIgnoreCase(messageDto.getName(), messageFilterDto.getSearchWord())
 							|| StringUtils.containsIgnoreCase(messageDto.getRemark(), messageFilterDto.getSearchWord())
 							|| StringUtils.containsIgnoreCase(messageDto.getProgressMemo(), messageFilterDto.getSearchWord()));
