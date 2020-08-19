@@ -99,6 +99,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
 		copyOrgButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				messageEditorPanel.clearMessage();
 				setMessage(orgMessageDto);
 			}
 		});
@@ -107,6 +108,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		JButton copyMasterButton = new JButton(Captions.REPEATER_BUTTON_COPY_MASTER);
 		copyMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				messageEditorPanel.clearMessage();
 				if(orgMessageDto.getRepeatMasterMessage() != null) {
 					setMessage(orgMessageDto.getRepeatMasterMessage());
 				} else {
