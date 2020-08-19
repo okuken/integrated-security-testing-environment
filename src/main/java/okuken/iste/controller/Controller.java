@@ -273,6 +273,8 @@ public class Controller {
 		authConfigDto.setAuthMessageChainDto(messageChainDto);
 		AuthLogic.getInstance().saveAuthConfig(authConfigDto);
 
+		AuthLogic.getInstance().clearAuthAccountsSession();
+
 		refreshComponentsDependOnAuthConfig();
 
 		return authConfigDto;

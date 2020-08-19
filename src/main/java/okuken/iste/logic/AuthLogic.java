@@ -62,6 +62,18 @@ public class AuthLogic {
 		});
 	}
 
+	public void clearAuthAccountsSession() {
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			AuthAccountMapper mapper = session.getMapper(AuthAccountMapper.class);
+
+			mapper.update(c -> c
+					.set(AuthAccountDynamicSqlSupport.sessionId).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.prcDate).equalTo(now)
+					.where(AuthAccountDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+		});
+	}
+
 	public List<AuthAccountDto> loadAuthAccounts() {
 		List<AuthAccount> entitys =
 			DbUtil.withSession(session -> {

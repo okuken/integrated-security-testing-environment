@@ -260,6 +260,8 @@ public class AuthConfigPanel extends JPanel {
 					return sessionIdParamComboBox.getItemAt(i).getName().equals(sessIdOutDto.getParamName());
 					}).findFirst().getAsInt());
 
+			testResultTextField.setText("");
+
 		} finally {
 			refreshingFlag = refreshingFlagBk;
 		}
