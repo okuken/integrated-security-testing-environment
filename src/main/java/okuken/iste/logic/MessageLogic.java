@@ -129,12 +129,12 @@ public class MessageLogic {
 	public List<MessageParamDto> convertJsonResponseToDto(byte[] response, IResponseInfo responseInfo) {
 		var responseBody = HttpUtil.extractMessageBody(response, responseInfo.getBodyOffset());
 		var responseBodyStr = new String(responseBody, StandardCharsets.UTF_8);
-		Map<String, String> json = new Gson().fromJson(responseBodyStr, Map.class);
+		Map<String, Object> json = new Gson().fromJson(responseBodyStr, Map.class);
 
 		return json.entrySet().stream().map(entry -> {
 			var dto = new MessageParamDto();
 			dto.setName(entry.getKey());
-			dto.setValue(entry.getValue());
+			dto.setValue(entry.getValue().toString());
 			dto.setType(ParameterType.JSON.getId());
 			return dto;
 		}).collect(Collectors.toList());

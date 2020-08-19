@@ -120,12 +120,11 @@ public class RepeaterLogic {
 				return ret;
 			case JSON:
 				//TODO: generalize...
-				var authorizationHeaderPrefix = "Authorization: Bearer ";
-				var authorizationHeader = authorizationHeaderPrefix + parameter.getValue();
+				var authorizationHeader = HttpUtil.createAuthorizationBearerHeader(parameter.getValue());
 
 				var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
 				var headers = requestInfo.getHeaders();
-				var authorizationHeaderIndex = IntStream.range(0, headers.size()).filter(i -> headers.get(i).startsWith(authorizationHeaderPrefix)).findFirst();
+				var authorizationHeaderIndex = IntStream.range(0, headers.size()).filter(i -> HttpUtil.judgeIsAuthorizationBearerHeader(headers.get(i))).findFirst();
 				if(authorizationHeaderIndex.isPresent()) {
 					headers.remove(authorizationHeaderIndex.getAsInt());
 					headers.add(authorizationHeaderIndex.getAsInt(), authorizationHeader);

@@ -30,4 +30,12 @@ public class HttpUtil {
 		return Arrays.copyOfRange(message, bodyOffset, message.length);
 	}
 
+	private static final String AUTHORIZATION_BEARER_HEADER_PREFIX = "Authorization: Bearer ";
+	public static String createAuthorizationBearerHeader(String token) {
+		return AUTHORIZATION_BEARER_HEADER_PREFIX + token;
+	}
+	public static boolean judgeIsAuthorizationBearerHeader(String header) {
+		return header.startsWith(AUTHORIZATION_BEARER_HEADER_PREFIX);
+	}
+
 }
