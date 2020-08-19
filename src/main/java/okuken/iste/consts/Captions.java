@@ -60,6 +60,7 @@ public class Captions {
 	public static final String AUTH_CONFIG_BUTTON_SAVE = "Save";
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo to txt";
+	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";
 
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";

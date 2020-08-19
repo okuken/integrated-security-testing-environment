@@ -33,6 +33,7 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.enums.SecurityTestingProgress;
+import okuken.iste.logic.MessageFilterLogic;
 import okuken.iste.util.UiUtil;
 
 public class MessageTablePanel extends JPanel {
@@ -155,16 +156,9 @@ public class MessageTablePanel extends JPanel {
 		var tableRowSorter = new TableRowSorter<MessageTableModel>(tableModel);
 		tableRowSorter.setRowFilter(new RowFilter<MessageTableModel, Integer>() {
 			@SuppressWarnings("rawtypes")
-			@Override
 			public boolean include(Entry entry) {
 				var messageDto = tableModel.getRow((Integer)entry.getIdentifier());
-				return messageFilterDto.getProgresses().contains(messageDto.getProgress())
-						&& (messageFilterDto.getSearchWord().isEmpty()
-							|| StringUtils.containsIgnoreCase(messageDto.getUrlShort(), messageFilterDto.getSearchWord())
-							|| StringUtils.containsIgnoreCase(messageDto.getMethod(), messageFilterDto.getSearchWord())
-							|| StringUtils.containsIgnoreCase(messageDto.getName(), messageFilterDto.getSearchWord())
-							|| StringUtils.containsIgnoreCase(messageDto.getRemark(), messageFilterDto.getSearchWord())
-							|| StringUtils.containsIgnoreCase(messageDto.getProgressMemo(), messageFilterDto.getSearchWord()));
+				return MessageFilterLogic.getInstance().include(messageDto, messageFilterDto);
 			}
 		});
 

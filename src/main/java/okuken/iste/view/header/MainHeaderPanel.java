@@ -98,16 +98,24 @@ public class MainHeaderPanel extends JPanel {
 	}
 
 	public void applyMessageFilter() {
-		var dto = new MessageFilterDto();
-		dto.setProgresses(progressCheckboxs.stream()
+		int rowCount = Controller.getInstance().applyMessageFilter(createMessageFilterDto());
+		setRowCount(rowCount);
+	}
+
+	private MessageFilterDto createMessageFilterDto() {
+		var ret = new MessageFilterDto();
+		ret.setProgresses(progressCheckboxs.stream()
 			.filter(progressCheckbox -> progressCheckbox.isSelected())
 			.map(progressCheckbox -> SecurityTestingProgress.getByCaption(progressCheckbox.getText()))
 			.collect(Collectors.toList()));
 
-		dto.setSearchWord(searchTextField.getText());
+		ret.setSearchWord(searchTextField.getText());
 
-		int rowCount = Controller.getInstance().applyMessageFilter(dto);
-		setRowCount(rowCount);
+		return ret;
+	}
+
+	public MessageFilterDto getMessageFilterDto() {
+		return createMessageFilterDto();
 	}
 
 	private void setRowCount(int rowCount) {

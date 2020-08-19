@@ -27,6 +27,7 @@ import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageChainLogic;
+import okuken.iste.logic.MessageFilterLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
@@ -235,8 +236,13 @@ public class Controller {
 		MemoLogic.getInstance().saveProjectMemo(dto);
 	}
 
-	public void exportMemoToTxtFile(File file) {
-		ExportLogic.getInstance().exportMemoToTextFile(file, loadMessages(), getProjectMemos());
+	public void exportMemoToTxtFile(File file, boolean useFilter) {
+		var messages = loadMessages();
+		if(useFilter) {
+			messages = MessageFilterLogic.getInstance().filter(messages, mainHeaderPanel.getMessageFilterDto());
+		}
+
+		ExportLogic.getInstance().exportMemoToTextFile(file, messages, getProjectMemos());
 	}
 
 	public List<AuthAccountDto> getAuthAccounts() {

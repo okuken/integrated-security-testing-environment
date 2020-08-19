@@ -13,10 +13,13 @@ import javax.swing.JFileChooser;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
 
 public class ExportToolsPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+
+	private JCheckBox filterCheckBox;
 
 	public ExportToolsPanel() {
 		FlowLayout flowLayout = (FlowLayout) getLayout();
@@ -28,7 +31,7 @@ public class ExportToolsPanel extends JPanel {
 				JFileChooser fileChooser = FileUtil.createSingleFileChooser("");
 				switch (fileChooser.showSaveDialog(BurpUtil.getBurpSuiteJFrame())) {
 					case JFileChooser.APPROVE_OPTION:
-						Controller.getInstance().exportMemoToTxtFile(fileChooser.getSelectedFile());
+						Controller.getInstance().exportMemoToTxtFile(fileChooser.getSelectedFile(), filterCheckBox.isSelected());
 						break;
 					default:
 						break;
@@ -36,6 +39,9 @@ public class ExportToolsPanel extends JPanel {
 			}
 		});
 		add(exportMemoToTxtFileButton);
+		
+		filterCheckBox = new JCheckBox(Captions.TOOLS_EXPORT_CHECKBOX_FILTER);
+		add(filterCheckBox);
 
 	}
 
