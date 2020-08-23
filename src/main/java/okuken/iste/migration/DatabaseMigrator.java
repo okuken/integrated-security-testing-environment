@@ -29,8 +29,10 @@ public class DatabaseMigrator {
 		var logStream = BurpUtil.getStdoutPrintStream();
 
 		var status = new StatusOperation().operate(connectionProvider, migrationsLoader, databaseOperationOption, new PrintStream(System.out));
-		if(status.getAppliedCount() <= 0) {
+		if(status.getAppliedCount() <= 0) { // case: before initialization
 			new BootstrapOperation().operate(connectionProvider, migrationsLoader, databaseOperationOption, logStream);
+			new UpOperation().operate(connectionProvider, migrationsLoader, databaseOperationOption, logStream);
+			return;
 		}
 
 		if(status.getPendingCount() > 0 && UiUtil.getConfirmAnswer(Captions.MESSAGE_MIGRATION)) {
