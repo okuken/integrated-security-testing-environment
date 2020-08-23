@@ -24,11 +24,11 @@ public class ByteUtil {
 			if(judgeMatch(target, i, searchStart)) {
 				int currentIndex = i + searchStart.length;
 				for(int j = 0; currentIndex + j < target.length; j++) {
-					if(judgeMatch(target, currentIndex + j, targetBreak)) {
-						return -1;
-					}
 					if(judgeMatch(target, currentIndex + j, searchEnd)) {
 						return currentIndex + j - 1;
+					}
+					if(judgeMatch(target, currentIndex + j, targetBreak)) {
+						return -1;
 					}
 				}
 			}
