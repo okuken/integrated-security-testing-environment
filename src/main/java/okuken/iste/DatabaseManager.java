@@ -1,24 +1,29 @@
 package okuken.iste;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.migration.ConnectionProvider;
+import org.apache.ibatis.migration.JdbcConnectionProvider;
 import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
 import com.google.common.reflect.ClassPath;
 
+import okuken.iste.migration.DatabaseMigrator;
+
 public class DatabaseManager {
 
 	private static final DatabaseManager instance = new DatabaseManager();
 
+	private static final String DRIVER = "org.sqlite.JDBC";
+	private static final String URL_PREFIX = "jdbc:sqlite:";
+
+	private String sqliteDbFilePath;
 	private PooledDataSource dataSource;
 	private SqlSessionFactory sqlSessionFactory;
 
@@ -28,22 +33,25 @@ public class DatabaseManager {
 	}
 
 	public void setupDatabase(String sqliteDbFilePath) {
-		try {
-			this.dataSource = createDataSource(sqliteDbFilePath.replaceAll("\\\\", "/"));
-			this.sqlSessionFactory = createSqlSessionFactory();
-			if (judgeIsNeedInitDatabase()) {
-				initDatabase();
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
+		this.sqliteDbFilePath = sqliteDbFilePath.replaceAll("\\\\", "/");
+		this.dataSource = createDataSource();
+		this.sqlSessionFactory = createSqlSessionFactory();
+		DatabaseMigrator.getInstance().migrate(createConnectionProvider());
 	}
 
-	private PooledDataSource createDataSource(String sqliteDbFilePath) {
+	private PooledDataSource createDataSource() {
 		PooledDataSource ret = new PooledDataSource();
-		ret.setDriver("org.sqlite.JDBC");
-		ret.setUrl("jdbc:sqlite:" + sqliteDbFilePath);
+		ret.setDriver(DRIVER);
+		ret.setUrl(URL_PREFIX + sqliteDbFilePath);
 		return ret;
+	}
+
+	private ConnectionProvider createConnectionProvider() {
+		try {
+			return new JdbcConnectionProvider(DRIVER, URL_PREFIX + sqliteDbFilePath, null, null);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private SqlSessionFactory createSqlSessionFactory() {
@@ -63,19 +71,6 @@ public class DatabaseManager {
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-	private boolean judgeIsNeedInitDatabase() {
-		return false; //TODO:impl
-	}
-	private void initDatabase() throws SQLException {
-		//TODO: impl
-		try (SqlSession session = sqlSessionFactory.openSession()) {
-			try (Statement stmt = session.getConnection().createStatement()) {
-				stmt.execute(
-						"CREATE TABLE IF NOT EXISTS STM_MSG (ID INTEGER, NAME TEXT, URL TEXT)");
-			}
 		}
 	}
 

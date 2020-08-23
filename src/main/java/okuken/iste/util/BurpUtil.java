@@ -1,6 +1,7 @@
 package okuken.iste.util;
 
 import java.awt.Frame;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Timer;
@@ -37,6 +38,10 @@ public class BurpUtil {
 
 	public static void printStderr(Exception e) {
 		e.printStackTrace(new PrintWriter(burpExtenderCallbacks.getStderr(), true));
+	}
+
+	public static PrintStream getStdoutPrintStream() {
+		return new PrintStream(burpExtenderCallbacks.getStdout());
 	}
 
 	public static void highlightTab(ITab suiteTab) {
