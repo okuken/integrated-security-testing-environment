@@ -9,7 +9,9 @@ import org.apache.ibatis.migration.operations.StatusOperation;
 import org.apache.ibatis.migration.operations.UpOperation;
 import org.apache.ibatis.migration.options.DatabaseOperationOption;
 
+import okuken.iste.consts.Captions;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 public class DatabaseMigrator {
 
@@ -31,7 +33,9 @@ public class DatabaseMigrator {
 			new BootstrapOperation().operate(connectionProvider, migrationsLoader, databaseOperationOption, logStream);
 		}
 
-		new UpOperation().operate(connectionProvider, migrationsLoader, databaseOperationOption, logStream);
+		if(status.getPendingCount() > 0 && UiUtil.getConfirmAnswer(Captions.MESSAGE_MIGRATION)) {
+			new UpOperation().operate(connectionProvider, migrationsLoader, databaseOperationOption, logStream);
+		}
 	}
 
 	private MigrationLoader createMigrationsLoader() {

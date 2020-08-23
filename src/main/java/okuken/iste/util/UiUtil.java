@@ -14,6 +14,7 @@ import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -134,6 +135,10 @@ public class UiUtil {
 	}
 
 
+	public static boolean getConfirmAnswer(String message) {
+		return JOptionPane.showConfirmDialog(BurpUtil.getBurpSuiteJFrame(), 
+				message, String.format("Confirm [%s]", Captions.EXTENSION_NAME_FULL), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
+	}
 
 	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	public static final String now() {

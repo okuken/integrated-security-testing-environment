@@ -68,6 +68,7 @@ public class Captions {
 	public static final String SELECT_PROJECT_NEW = "** Create new project **";
 
 	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose a SQLite database file for IntegratedSecurityTestEnvironment(ISTE).";
+	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";
 	public static final String MESSAGE_SELECT_PROJECT = "Select a project for IntegratedSecurityTestEnvironment(ISTE).";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
 
