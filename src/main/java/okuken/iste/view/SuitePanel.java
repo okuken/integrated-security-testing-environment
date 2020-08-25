@@ -24,6 +24,7 @@ import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.option.UserOptionsPanel;
+import okuken.iste.view.plugin.PluginsPanel;
 import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeaterPanel;
 import okuken.iste.view.tool.ExportToolsPanel;
@@ -140,6 +141,10 @@ public class SuitePanel extends JPanel {
 		
 		JPanel userOptionsPanel = new UserOptionsPanel();
 		optionsPanel.add(userOptionsPanel, BorderLayout.CENTER);
+		
+		PluginsPanel pluginsPanel = new PluginsPanel();
+		mainTabbedPane.addTab(Captions.TAB_PLUGINS, null, pluginsPanel, null);
+		Controller.getInstance().setPluginsPanel(pluginsPanel);
 		
 		mainTabbedPane.addTab(Captions.DOCKOUT, null);
 		mainTabbedPane.addChangeListener(new ChangeListener() {

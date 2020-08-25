@@ -11,7 +11,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
+import burp.IContextMenuFactory;
 import burp.IHttpRequestResponse;
+import burp.ITab;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthConfigDto;
@@ -31,6 +33,7 @@ import okuken.iste.logic.MessageFilterLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
+import okuken.iste.plugin.PluginManager;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuitePanel;
 import okuken.iste.view.SuiteTab;
@@ -42,6 +45,8 @@ import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTableColumn;
 import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
+import okuken.iste.view.message.table.MessageTablePopupMenu;
+import okuken.iste.view.plugin.PluginsPanel;
 import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeaterPanel;
 
@@ -68,6 +73,8 @@ public class Controller {
 	private ProjectMemoPanel projectMemoPanel;
 
 	private AuthPanel authPanel;
+
+	private PluginsPanel pluginsPanel;
 
 	private Controller() {}
 	public static Controller getInstance() {
@@ -124,6 +131,9 @@ public class Controller {
 	}
 	public void setAuthPanel(AuthPanel authPanel) {
 		this.authPanel = authPanel;
+	}
+	public void setPluginsPanel(PluginsPanel pluginsPanel) {
+		this.pluginsPanel = pluginsPanel;
 	}
 
 
@@ -284,6 +294,18 @@ public class Controller {
 		refreshComponentsDependOnAuthConfig();
 
 		return authConfigDto;
+	}
+
+	public void loadPlugin(String pluginJarFilePath) {
+		PluginManager.getInstance().load(pluginJarFilePath);
+	}
+
+	public void addPluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
+		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).addPluginContextMenuFactories(pluginContextMenuFactories);
+	}
+
+	public void addPluginTabs(List<ITab> pluginTabs) {
+		pluginsPanel.addPluginTabs(pluginTabs);
 	}
 
 	public void loadDatabase() {

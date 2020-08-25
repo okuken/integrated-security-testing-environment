@@ -57,6 +57,7 @@ public class MessageTablePanel extends JPanel {
 				Controller.getInstance().refreshMessageDetailPanels(tableModel.getRow(table.convertRowIndexToModel(row)));
 			}
 		};
+		table.setComponentPopupMenu(new MessageTablePopupMenu());
 		setupTable();
 		Controller.getInstance().setMessageTable(table);	
 
@@ -76,7 +77,6 @@ public class MessageTablePanel extends JPanel {
 		setupDraggable(table, tableModel);
 		setupProgressColumn(table, tableModel);
 		setupTableRowColorControl(table, tableModel);
-		table.setComponentPopupMenu(new MessageTablePopupMenu());
 		UiUtil.setupCtrlCAsCopyCell(table, colIndex -> tableModel.getColumnIndex(MessageTableColumn.getByCaption(table.getColumnName(colIndex))));
 		table.setRowSorter(null);
 	}

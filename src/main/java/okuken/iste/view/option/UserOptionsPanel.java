@@ -58,7 +58,7 @@ public class UserOptionsPanel extends JPanel {
 		add(dbFileTextField);
 		dbFileTextField.setText(ConfigLogic.getInstance().getUserOptions().getDbFilePath());
 		
-		JButton dbFileChooseButton = new JButton("...");
+		JButton dbFileChooseButton = new JButton(Captions.FILECHOOSER);
 		dbFileChooseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_DB_FILE);

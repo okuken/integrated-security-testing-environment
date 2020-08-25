@@ -8,6 +8,8 @@ public class Captions {
 	public static final String DOCKOUT = "\u2197";
 	public static final String DOCKIN = "\u2199";
 
+	public static final String FILECHOOSER = "...";
+
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";	
 	public static final String TAB_SUITE = "ISTE";
 	public static final String TAB_MAIN = "List";
@@ -15,6 +17,7 @@ public class Captions {
 	public static final String TAB_AUTH = "Auth";
 	public static final String TAB_TOOLS = "Tools";
 	public static final String TAB_OPTIONS = "Options";
+	public static final String TAB_PLUGINS = "Plugins";
 
 	public static final String TAB_MAIN_MESSAGE_EDITOR_ORIGINAL = "Org";
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT_MASTER = "Master";
@@ -65,11 +68,14 @@ public class Captions {
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";
 
+	public static final String PLUGINS_BUTTON_LOAD_JAR = "Load";
+
 	public static final String SELECT_PROJECT_NEW = "** Create new project **";
 
 	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose a SQLite database file for IntegratedSecurityTestEnvironment(ISTE).";
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";
 	public static final String MESSAGE_SELECT_PROJECT = "Select a project for IntegratedSecurityTestEnvironment(ISTE).";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
+	public static final String MESSAGE_CHOOSE_PLUGIN_FILE = "Choose a plugin jar file.";
 
 }

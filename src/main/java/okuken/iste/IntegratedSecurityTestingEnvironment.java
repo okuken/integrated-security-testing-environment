@@ -12,6 +12,7 @@ import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ProjectLogic;
+import okuken.iste.plugin.PluginManager;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
@@ -63,6 +64,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 	@Override
 	public void extensionUnloaded() {
 		DatabaseManager.getInstance().unloadDatabase();
+		PluginManager.getInstance().unloadAllPlugins();
 		UiUtil.disposeDockoutFrames();
 	}
 

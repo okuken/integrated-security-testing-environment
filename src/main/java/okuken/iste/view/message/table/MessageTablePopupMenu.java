@@ -3,13 +3,18 @@ package okuken.iste.view.message.table;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import com.google.common.collect.Lists;
+
+import burp.IContextMenuFactory;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.plugin.PluginContextMenuInvocation;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 
@@ -17,8 +22,13 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 	private static final long serialVersionUID = 1L;
 
-	public MessageTablePopupMenu() {
+	private List<IContextMenuFactory> pluginContextMenuFactories = Lists.newArrayList();
 
+	public MessageTablePopupMenu() {
+		init();
+	}
+	
+	private void init() {
 		JMenuItem sendRepeaterRequest = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER);
 		sendRepeaterRequest.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -105,6 +115,15 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		});
 		add(sendToComparerResponseMenuItem);
 
+		if(!pluginContextMenuFactories.isEmpty()) {
+
+			add(new JPopupMenu.Separator());
+
+			pluginContextMenuFactories.forEach(pluginContextMenuFactory -> {
+				pluginContextMenuFactory.createMenuItems(new PluginContextMenuInvocation()).forEach(this::add);
+			});
+		}
+
 		add(new JPopupMenu.Separator());
 
 		JMenuItem deleteItemMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_DELETE_ITEM);
@@ -134,11 +153,20 @@ public class MessageTablePopupMenu extends JPopupMenu {
 			}
 		});
 		add(copyTableMenuItem);
-
 	}
 
 	private boolean judgeIsUseHttps(MessageDto messageDto) {
 		return "https".equals(messageDto.getMessage().getHttpService().getProtocol());
+	}
+
+	private void refresh() {
+		removeAll();
+		init();
+	}
+
+	public void addPluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
+		this.pluginContextMenuFactories.addAll(pluginContextMenuFactories);
+		refresh();
 	}
 
 }
