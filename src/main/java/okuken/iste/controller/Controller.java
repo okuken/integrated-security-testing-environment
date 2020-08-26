@@ -33,6 +33,7 @@ import okuken.iste.logic.MessageFilterLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
+import okuken.iste.plugin.PluginInfo;
 import okuken.iste.plugin.PluginManager;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.view.SuitePanel;
@@ -296,17 +297,27 @@ public class Controller {
 		return authConfigDto;
 	}
 
-	public void loadPlugin(String pluginJarFilePath) {
-		PluginManager.getInstance().load(pluginJarFilePath);
+	public PluginInfo loadPlugin(String pluginJarFilePath) {
+		return PluginManager.getInstance().load(pluginJarFilePath);
+	}
+	public void unloadPlugin(PluginInfo pluginInfo) {
+		PluginManager.getInstance().unload(pluginInfo);
 	}
 
 	public void addPluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
 		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).addPluginContextMenuFactories(pluginContextMenuFactories);
 	}
+	public void removePluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
+		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).removePluginContextMenuFactories(pluginContextMenuFactories);
+	}
 
 	public void addPluginTabs(List<ITab> pluginTabs) {
 		pluginsPanel.addPluginTabs(pluginTabs);
 	}
+	public void removePluginTabs(List<ITab> pluginTabs) {
+		pluginsPanel.removePluginTabs(pluginTabs);
+	}
+
 
 	public void loadDatabase() {
 		List<MessageDto> messageDtos = loadMessages();

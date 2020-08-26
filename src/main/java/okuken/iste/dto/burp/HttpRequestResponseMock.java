@@ -70,4 +70,16 @@ public class HttpRequestResponseMock implements IHttpRequestResponse {
 		this.httpService = httpService;
 	}
 
+
+	@Override
+	public HttpRequestResponseMock clone() {
+		var ret = new HttpRequestResponseMock();
+		ret.setRequest(request.clone());
+		ret.setResponse(response.clone());
+		ret.setComment(comment);
+		ret.setHighlight(highlight);
+		ret.setHttpService(new HttpServiceMock(httpService.getHost(), httpService.getPort(), httpService.getProtocol()));
+		return ret;
+	}
+
 }

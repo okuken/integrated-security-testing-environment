@@ -46,6 +46,7 @@ class PluginCallbacks implements IBurpExtenderCallbacks {
 	private String pluginName;
 	private List<IContextMenuFactory> pluginContextMenuFactories;
 	private List<ITab> pluginTabs;
+	private IExtensionStateListener pluginStateListener;
 
 	PluginCallbacks(String pluginFileName) {
 		this.pluginFileName = pluginFileName;
@@ -58,6 +59,9 @@ class PluginCallbacks implements IBurpExtenderCallbacks {
 	}
 	List<ITab> getPluginTabs() {
 		return pluginTabs;
+	}
+	IExtensionStateListener getPluginStateListener() {
+		return pluginStateListener;
 	}
 
 
@@ -113,6 +117,11 @@ class PluginCallbacks implements IBurpExtenderCallbacks {
 	public String loadExtensionSetting(String name) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void registerExtensionStateListener(IExtensionStateListener listener) {
+		this.pluginStateListener = listener;
 	}
 
 	@Override
@@ -308,11 +317,6 @@ class PluginCallbacks implements IBurpExtenderCallbacks {
 	@Override
 	public String[] getHeaders(byte[] message) {
 		return BurpUtil.getCallbacks().getHeaders(message);
-	}
-
-	@Override
-	public void registerExtensionStateListener(IExtensionStateListener listener) {
-		BurpUtil.getCallbacks().registerExtensionStateListener(listener);
 	}
 
 	@Override

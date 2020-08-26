@@ -68,7 +68,7 @@ public class Captions {
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";
 
-	public static final String PLUGINS_BUTTON_LOAD_JAR = "Load";
+	public static final String PLUGINS_BUTTON_ADD_PLUGIN = "Add";
 
 	public static final String SELECT_PROJECT_NEW = "** Create new project **";
 

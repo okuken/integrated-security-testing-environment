@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.collect.Maps;
 
@@ -25,7 +26,7 @@ public class PluginManager {
 		return instance;
 	}
 
-	public void load(String pluginJarFilePath) {
+	public PluginInfo load(String pluginJarFilePath) {
 		if(classLoaders.containsKey(pluginJarFilePath)) {
 			throw new IllegalArgumentException("Duplicated load: " + pluginJarFilePath);
 		}
@@ -42,15 +43,45 @@ public class PluginManager {
 			var pluginCallbacks = new PluginCallbacks(pluginJarFile.getName());
 			plugin.registerExtenderCallbacks(pluginCallbacks);
 
-			if(pluginCallbacks.getPluginContextMenuFactories() != null) {
-				Controller.getInstance().addPluginContextMenuFactories(pluginCallbacks.getPluginContextMenuFactories());
-			}
 			if(pluginCallbacks.getPluginTabs() != null) {
 				Controller.getInstance().addPluginTabs(pluginCallbacks.getPluginTabs());
 			}
+			if(pluginCallbacks.getPluginContextMenuFactories() != null) {
+				Controller.getInstance().addPluginContextMenuFactories(pluginCallbacks.getPluginContextMenuFactories());
+			}
+
+			var ret = new PluginInfo();
+			ret.setJarFilePath(pluginJarFilePath);
+			ret.setPluginName(Optional.ofNullable(pluginCallbacks.getPluginName()).orElse(""));
+			ret.setPluginContextMenuFactories(pluginCallbacks.getPluginContextMenuFactories());
+			ret.setPluginTabs(pluginCallbacks.getPluginTabs());
+			ret.setPluginStateListener(pluginCallbacks.getPluginStateListener());
+			return ret;
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public void unload(PluginInfo pluginInfo) {
+
+		if(pluginInfo.getPluginStateListener() != null) {
+			pluginInfo.getPluginStateListener().extensionUnloaded();
+		}
+
+		if(pluginInfo.getPluginContextMenuFactories() != null) {
+			Controller.getInstance().removePluginContextMenuFactories(pluginInfo.getPluginContextMenuFactories());
+		}
+		if(pluginInfo.getPluginTabs() != null) {
+			Controller.getInstance().removePluginTabs(pluginInfo.getPluginTabs());
+		}
+
+		try {
+			var key = pluginInfo.getJarFilePath();
+			classLoaders.get(key).close();
+			classLoaders.remove(key);
+		} catch (IOException e) {
+			BurpUtil.printStderr(e);
 		}
 	}
 

@@ -169,4 +169,9 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		refresh();
 	}
 
+	public void removePluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
+		this.pluginContextMenuFactories.removeAll(pluginContextMenuFactories);
+		refresh();
+	}
+
 }

@@ -1,6 +1,7 @@
 package okuken.iste.plugin;
 
 import java.awt.event.InputEvent;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import burp.IBurpExtenderCallbacks;
@@ -8,7 +9,7 @@ import burp.IContextMenuInvocation;
 import burp.IHttpRequestResponse;
 import burp.IScanIssue;
 import okuken.iste.controller.Controller;
-import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.burp.HttpRequestResponseMock;
 
 public class PluginContextMenuInvocation implements IContextMenuInvocation {
 
@@ -25,7 +26,11 @@ public class PluginContextMenuInvocation implements IContextMenuInvocation {
 	@Override
 	public IHttpRequestResponse[] getSelectedMessages() {
 		return Controller.getInstance().getSelectedMessages().stream()
-				.map(MessageDto::getMessage)
+				.map(messageDto -> {
+					var message = ((HttpRequestResponseMock) messageDto.getMessage()).clone();
+					message.setComment(Optional.ofNullable(messageDto.getName()).orElse(""));
+					return message;
+				})
 				.collect(Collectors.toList())
 				.toArray(new IHttpRequestResponse[] {});
 	}
