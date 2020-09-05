@@ -241,7 +241,25 @@ public class Controller {
 	}
 
 	public List<ProjectMemoDto> getProjectMemos() {
-		return MemoLogic.getInstance().loadProjectMemos();
+		var ret = MemoLogic.getInstance().loadProjectMemos();
+		if(!ret.isEmpty()) {
+			return ret;
+		}
+
+		var templates = ConfigLogic.getInstance().getUserOptions().getProjectMemoTemplates();
+		if(templates == null) {
+			return ret;
+		}
+
+		return templates.stream()
+			.map(template -> {
+				var dto = new ProjectMemoDto();
+				dto.setMemo(template);
+				MemoLogic.getInstance().saveProjectMemo(dto); // [CAUTION] insert template values
+				return dto;
+			})
+			.collect(Collectors.toList());
+
 	}
 	public void saveProjectMemo(ProjectMemoDto dto) {
 		MemoLogic.getInstance().saveProjectMemo(dto);

@@ -27,7 +27,7 @@ public class ProjectMemoPanel extends AbstractDockoutableTabPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final int PROJECT_MEMO_COUNT = 4;
+	public static final int PROJECT_MEMO_COUNT = 4;
 
 	private JButton dockoutButton;
 	private JPanel memoPanel;
@@ -39,7 +39,7 @@ public class ProjectMemoPanel extends AbstractDockoutableTabPanel {
 		
 		memoPanel = new JPanel();
 		add(memoPanel, BorderLayout.CENTER);
-		memoPanel.setLayout(new GridLayout(2, 2, 0, 0));
+		memoPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JPanel headerPanel = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) headerPanel.getLayout();
@@ -60,7 +60,6 @@ public class ProjectMemoPanel extends AbstractDockoutableTabPanel {
 		headerPanel.add(dockoutButton);
 		setupDockout();
 
-		Controller.getInstance().setProjectMemoPanel(this);
 	}
 
 	private void load() {

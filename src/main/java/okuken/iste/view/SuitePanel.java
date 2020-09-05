@@ -23,7 +23,7 @@ import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.table.MessageTablePanel;
-import okuken.iste.view.option.UserOptionsPanel;
+import okuken.iste.view.option.OptionsPanel;
 import okuken.iste.view.plugin.PluginsPanel;
 import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeaterPanel;
@@ -121,8 +121,9 @@ public class SuitePanel extends JPanel {
 		JPanel messageAttrMemoPanel = new JPanel();
 		mainRightSplitPane.setRightComponent(messageAttrMemoPanel);
 		
-		JPanel projectMemoPanel = new ProjectMemoPanel();
+		ProjectMemoPanel projectMemoPanel = new ProjectMemoPanel();
 		mainTabbedPane.addTab(Captions.TAB_MEMO, null, projectMemoPanel, null);
+		Controller.getInstance().setProjectMemoPanel(projectMemoPanel);
 		
 		AuthPanel authPanel = new AuthPanel();
 		mainTabbedPane.addTab(Captions.TAB_AUTH, null, authPanel, null);
@@ -135,12 +136,8 @@ public class SuitePanel extends JPanel {
 		JPanel exportToolPanel = new ExportToolsPanel();
 		toolsPanel.add(exportToolPanel);
 		
-		JPanel optionsPanel = new JPanel();
+		JPanel optionsPanel = new OptionsPanel();
 		mainTabbedPane.addTab(Captions.TAB_OPTIONS, null, optionsPanel, null);
-		optionsPanel.setLayout(new BorderLayout(0, 0));
-		
-		JPanel userOptionsPanel = new UserOptionsPanel();
-		optionsPanel.add(userOptionsPanel, BorderLayout.CENTER);
 		
 		PluginsPanel pluginsPanel = new PluginsPanel();
 		mainTabbedPane.addTab(Captions.TAB_PLUGINS, null, pluginsPanel, null);

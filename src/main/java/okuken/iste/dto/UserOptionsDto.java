@@ -10,6 +10,7 @@ public class UserOptionsDto {
 	private String dbFilePath;
 	private String lastSelectedProjectName;
 	private List<PluginLoadInfo> plugins;
+	private List<String> projectMemoTemplates;
 
 	public String getUserName() {
 		return userName;
@@ -34,6 +35,12 @@ public class UserOptionsDto {
 	}
 	public void setPlugins(List<PluginLoadInfo> plugins) {
 		this.plugins = plugins;
+	}
+	public List<String> getProjectMemoTemplates() {
+		return projectMemoTemplates;
+	}
+	public void setProjectMemoTemplates(List<String> projectMemoTemplates) {
+		this.projectMemoTemplates = projectMemoTemplates;
 	}
 
 }

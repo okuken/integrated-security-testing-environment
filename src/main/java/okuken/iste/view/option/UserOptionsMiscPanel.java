@@ -17,13 +17,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 
-public class UserOptionsPanel extends JPanel {
+public class UserOptionsMiscPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField userNameTextField;
 	private JTextField dbFileTextField;
 
-	public UserOptionsPanel() {
+	public UserOptionsMiscPanel() {
 		setLayout(null);
 		
 		JLabel userNameLabel = new JLabel(Captions.USER_OPTIONS_USER_NAME + ":");
