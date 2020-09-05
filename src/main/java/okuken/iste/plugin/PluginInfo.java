@@ -8,18 +8,23 @@ import burp.ITab;
 
 public class PluginInfo {
 
-	private String jarFilePath;
+	private PluginLoadInfo loadInfo;
 
 	private String pluginName;
 	private List<IContextMenuFactory> pluginContextMenuFactories;
 	private List<ITab> pluginTabs;
 	private IExtensionStateListener pluginStateListener;
 
-	public String getJarFilePath() {
-		return jarFilePath;
+	public PluginInfo() {}
+	public PluginInfo(PluginLoadInfo loadInfo) {
+		this.loadInfo = loadInfo;
 	}
-	public void setJarFilePath(String jarFilePath) {
-		this.jarFilePath = jarFilePath;
+
+	public PluginLoadInfo getLoadInfo() {
+		return loadInfo;
+	}
+	public void setLoadInfo(PluginLoadInfo pluginLoadInfo) {
+		this.loadInfo = pluginLoadInfo;
 	}
 	public String getPluginName() {
 		return pluginName;

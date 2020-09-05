@@ -39,6 +39,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 			Controller controller = Controller.getInstance();
 			controller.setSuiteTab(suiteTab);
 			controller.loadDatabase();
+			controller.loadPlugins();
 
 			burpExtenderCallbacks.addSuiteTab(suiteTab);
 		});

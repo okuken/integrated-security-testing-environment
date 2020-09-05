@@ -1,10 +1,15 @@
 package okuken.iste.dto;
 
+import java.util.List;
+
+import okuken.iste.plugin.PluginLoadInfo;
+
 public class UserOptionsDto {
 
 	private String userName;
 	private String dbFilePath;
 	private String lastSelectedProjectName;
+	private List<PluginLoadInfo> plugins;
 
 	public String getUserName() {
 		return userName;
@@ -23,6 +28,12 @@ public class UserOptionsDto {
 	}
 	public void setLastSelectedProjectName(String lastSelectedProjectName) {
 		this.lastSelectedProjectName = lastSelectedProjectName;
+	}
+	public List<PluginLoadInfo> getPlugins() {
+		return plugins;
+	}
+	public void setPlugins(List<PluginLoadInfo> plugins) {
+		this.plugins = plugins;
 	}
 
 }

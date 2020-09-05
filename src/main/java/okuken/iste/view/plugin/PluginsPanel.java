@@ -10,7 +10,9 @@ import javax.swing.JTextField;
 import burp.ITab;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.plugin.PluginInfo;
+import okuken.iste.plugin.PluginLoadInfo;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
@@ -20,6 +22,7 @@ import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
@@ -124,14 +127,24 @@ public class PluginsPanel extends JPanel {
 	}
 
 	private void addPlugin(String jarFilePath) {
-		var pluginInfo = Controller.getInstance().loadPlugin(jarFilePath);
+		addPluginImpl(jarFilePath, true);
+		saveAsUserOption();
+	}
+
+	private void addPluginImpl(String jarFilePath, boolean load) {
+		PluginInfo pluginInfo;
+		if(load) {
+			pluginInfo = Controller.getInstance().loadPlugin(jarFilePath);
+		} else {
+			pluginInfo = new PluginInfo(new PluginLoadInfo(jarFilePath, load));
+		}
 		pluginInfos.add(pluginInfo);
-		tableModel.addRow(convertPluginInfoToObjectArray(pluginInfo, true));
+		tableModel.addRow(convertPluginInfoToObjectArray(pluginInfo, load));
 	}
 
 	private void loadOrUnloadPlugin(int pluginIndex, boolean load) {
 		if(load) {
-			var newPluginInfo = Controller.getInstance().loadPlugin(pluginInfos.get(pluginIndex).getJarFilePath());
+			var newPluginInfo = Controller.getInstance().loadPlugin(pluginInfos.get(pluginIndex).getLoadInfo().getJarFilePath());
 
 			pluginInfos.remove(pluginIndex);
 			pluginInfos.add(pluginIndex, newPluginInfo);
@@ -145,10 +158,27 @@ public class PluginsPanel extends JPanel {
 			tableModel.removeRow(pluginIndex);
 			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(pluginInfos.get(pluginIndex), load));
 		}
+
+		saveAsUserOption();
 	}
 
 	private Object[] convertPluginInfoToObjectArray(PluginInfo pluginInfo, boolean load) {
-		return new Object[] {load, pluginInfo.getPluginName(), pluginInfo.getJarFilePath()};
+		return new Object[] {load, pluginInfo.getPluginName(), pluginInfo.getLoadInfo().getJarFilePath()};
+	}
+
+	private void saveAsUserOption() {
+		ConfigLogic.getInstance().savePlugins(pluginInfos.stream().map(PluginInfo::getLoadInfo).collect(Collectors.toList()));
+	}
+
+	public void loadUserOption() {
+		var pluginLoadInfos = ConfigLogic.getInstance().getUserOptions().getPlugins();
+		if(pluginLoadInfos == null) {
+			return;
+		}
+
+		pluginLoadInfos.stream().forEach(pluginLoafInfo -> {
+			addPluginImpl(pluginLoafInfo.getJarFilePath(), pluginLoafInfo.isLoaded());
+		});
 	}
 
 	public void addPluginTabs(List<ITab> pluginTabs) {

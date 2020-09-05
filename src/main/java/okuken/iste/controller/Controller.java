@@ -366,4 +366,9 @@ public class Controller {
 		loadDatabase();
 	}
 
+
+	public void loadPlugins() {
+		pluginsPanel.loadUserOption();
+	}
+
 }

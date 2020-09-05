@@ -1,13 +1,18 @@
 package okuken.iste.logic;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+
+import com.google.gson.Gson;
 
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.ProcessOptionsDto;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.dto.ProjectOptionsDto;
 import okuken.iste.dto.UserOptionsDto;
+import okuken.iste.plugin.PluginLoadInfo;
 import okuken.iste.util.BurpUtil;
 
 public class ConfigLogic {
@@ -17,6 +22,7 @@ public class ConfigLogic {
 	private static final String CONFIG_KEY_USER_NAME = "userName";
 	private static final String CONFIG_KEY_DB_FILE_PATH = "dbFilePath";
 	private static final String CONFIG_KEY_LAST_SELECTED_PROJECT_NAME = "lastSelectedProjectName";
+	private static final String CONFIG_KEY_PLUGINS = "plugins";
 
 	//cache
 	private UserOptionsDto configDto;
@@ -41,7 +47,21 @@ public class ConfigLogic {
 				.orElse(System.getProperty("user.name")));
 		ret.setDbFilePath(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_DB_FILE_PATH));
 		ret.setLastSelectedProjectName(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME));
+
+		PluginLoadInfo[] pluginLoadInfos = loadUserOptionJson(CONFIG_KEY_PLUGINS, PluginLoadInfo[].class);
+		if(pluginLoadInfos != null) {
+			ret.setPlugins(Arrays.asList(pluginLoadInfos));
+		}
+
 		return ret;
+	}
+	@SuppressWarnings("unchecked")
+	private <T> T loadUserOptionJson(String configKey, Class<?> clazz) {
+		var configVal = BurpUtil.getCallbacks().loadExtensionSetting(configKey);
+		if(configVal == null) {
+			return null;
+		}
+		return (T)new Gson().fromJson(configVal, clazz);
 	}
 
 	public void saveUserName(String userName) {
@@ -60,6 +80,11 @@ public class ConfigLogic {
 	public void saveLastSelectedProjectName(String projectName) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME, projectName);
 		getUserOptions().setLastSelectedProjectName(projectName);
+	}
+
+	public void savePlugins(List<PluginLoadInfo> pluginLoadInfos) {
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_PLUGINS, new Gson().toJson(pluginLoadInfos));
+		getUserOptions().setPlugins(pluginLoadInfos);
 	}
 
 

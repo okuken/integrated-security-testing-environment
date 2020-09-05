@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import burp.IBurpExtender;
@@ -20,6 +22,7 @@ public class PluginManager {
 	private static final String PLUGIN_CLASS_NAME = "burp.IstePlugin"; // [CAUTION] If plugin class name is burp.BurpExtender, it finds ISTE itself because parent classLoader first.
 
 	private Map<String, URLClassLoader> classLoaders = Maps.newConcurrentMap();
+	private List<PluginInfo> loadedPluginInfos = Lists.newArrayList();
 
 	private PluginManager() {}
 	public static PluginManager getInstance() {
@@ -51,11 +54,14 @@ public class PluginManager {
 			}
 
 			var ret = new PluginInfo();
-			ret.setJarFilePath(pluginJarFilePath);
+			ret.setLoadInfo(new PluginLoadInfo(pluginJarFilePath, true));
 			ret.setPluginName(Optional.ofNullable(pluginCallbacks.getPluginName()).orElse(""));
 			ret.setPluginContextMenuFactories(pluginCallbacks.getPluginContextMenuFactories());
 			ret.setPluginTabs(pluginCallbacks.getPluginTabs());
 			ret.setPluginStateListener(pluginCallbacks.getPluginStateListener());
+
+			loadedPluginInfos.add(ret);
+
 			return ret;
 
 		} catch (Exception e) {
@@ -64,7 +70,21 @@ public class PluginManager {
 	}
 
 	public void unload(PluginInfo pluginInfo) {
+		pluginInfo.getLoadInfo().setLoaded(false);
 
+		unloadImpl(pluginInfo);
+		loadedPluginInfos.remove(pluginInfo);
+
+		try {
+			var key = pluginInfo.getLoadInfo().getJarFilePath();
+			classLoaders.get(key).close();
+			classLoaders.remove(key);
+		} catch (IOException e) {
+			BurpUtil.printStderr(e);
+		}
+	}
+
+	private void unloadImpl(PluginInfo pluginInfo) {
 		if(pluginInfo.getPluginStateListener() != null) {
 			pluginInfo.getPluginStateListener().extensionUnloaded();
 		}
@@ -75,17 +95,14 @@ public class PluginManager {
 		if(pluginInfo.getPluginTabs() != null) {
 			Controller.getInstance().removePluginTabs(pluginInfo.getPluginTabs());
 		}
-
-		try {
-			var key = pluginInfo.getJarFilePath();
-			classLoaders.get(key).close();
-			classLoaders.remove(key);
-		} catch (IOException e) {
-			BurpUtil.printStderr(e);
-		}
 	}
 
 	public void unloadAllPlugins() {
+		loadedPluginInfos.forEach(pluginInfo -> {
+			unloadImpl(pluginInfo);
+		});
+		loadedPluginInfos.clear();
+
 		classLoaders.values().forEach(classLoader -> {
 			try {
 				classLoader.close();
