@@ -84,10 +84,18 @@ public class MessageTableModel extends AbstractTableModel {
 	}
 
 	public String getRowsAsTsv(int[] rows) {
-		return Arrays.stream(rows).mapToObj(
+		var header = Arrays.stream(COLUMNS)
+				.map(MessageTableColumn::getCaption)
+				.collect(Collectors.joining("\t"));
+
+		var records = Arrays.stream(rows).mapToObj(
 				row -> IntStream.range(0, COLUMNS.length).mapToObj(
 				column -> Optional.ofNullable(getValueAt(row, column)).orElse("").toString())
 				.collect(Collectors.joining("\t")))
+				.collect(Collectors.toList())
+				.toArray(new String[] {});
+
+		return Lists.asList(header, records).stream()
 				.collect(Collectors.joining(System.lineSeparator()));
 	}
 
