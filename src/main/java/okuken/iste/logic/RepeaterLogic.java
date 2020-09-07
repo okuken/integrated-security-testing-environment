@@ -4,8 +4,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,6 +33,7 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.PayloadDto;
+import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.enums.ParameterType;
@@ -43,16 +46,20 @@ import okuken.iste.util.SqlUtil;
 public class RepeaterLogic {
 
 	private static final RepeaterLogic instance = new RepeaterLogic();
+
+	private final ExecutorService executorService = Executors.newCachedThreadPool();
+
 	private RepeaterLogic() {}
 	public static RepeaterLogic getInstance() {
 		return instance;
 	}
 
-	public MessageRepeatDto sendRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto, boolean needSaveHistory) {
+	public MessageRepeatDto sendRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean needSaveHistory) {
 		return sendRequest(
 				applyPayloads(orgMessageDto.getMessage().getRequest(), payloadDtos),
 				null,
 				orgMessageDto,
+				callback,
 				needSaveHistory);
 	}
 	private byte[] applyPayloads(byte[] request, List<PayloadDto> payloadDtos) {
@@ -66,49 +73,71 @@ public class RepeaterLogic {
 		return ret;
 	}
 
-	public MessageRepeatDto sendRequest(byte[] aRequest, AuthAccountDto authAccountDto, MessageDto orgMessageDto, boolean needSaveHistory) {
-		byte[] request = aRequest;
+	public MessageRepeatDto sendRequest(byte[] aRequest, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean needSaveHistory) {
+		byte[] request = applyAuthAccount(aRequest, authAccountDto);
+
+		MessageRepeatDto repeatDto = new MessageRepeatDto();
+		repeatDto.setOrgMessageId(orgMessageDto.getId());
+		repeatDto.setMessage(new HttpRequestResponseMock(request, null, orgMessageDto.getMessage().getHttpService()));
+		repeatDto.setSendDate(Calendar.getInstance().getTime());
+		repeatDto.setDifference("");//TODO: impl
 		if(authAccountDto != null && authAccountDto.getSessionId() != null) {
-			AuthConfigDto authConfig = ConfigLogic.getInstance().getAuthConfig();
-			if(authConfig == null) {
-				throw new IllegalStateException("Sessionid was set but AuthConfig has not saved.");
-			}
-			var sessionidNodeOutDto = authConfig.getAuthMessageChainDto().getNodes().get(0).getOuts().get(0);
-
-			IParameter sessionIdParam = BurpUtil.getHelpers().buildParameter(
-					sessionidNodeOutDto.getParamName(),
-					authAccountDto.getSessionId(),
-					sessionidNodeOutDto.getParamType());
-
-			request = applyParameter(request, sessionIdParam);
-		}
-
-		Date sendDate = Calendar.getInstance().getTime();
-		long timerStart = System.currentTimeMillis();
-
-		IHttpRequestResponse response = BurpUtil.getCallbacks().makeHttpRequest(
-				orgMessageDto.getMessage().getHttpService(),
-				request);
-
-		long timerEnd = System.currentTimeMillis();
-		int time = (int) (timerEnd - timerStart);
-
-		MessageRepeatDto ret = new MessageRepeatDto();
-		ret.setMessage(response);
-		ret.setStatus(response.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode() : -1);
-		ret.setLength(response.getResponse() != null ? response.getResponse().length : 0);
-		ret.setSendDate(sendDate);
-		ret.setTime(time);
-		ret.setDifference("");//TODO: impl
-		if(authAccountDto != null && authAccountDto.getSessionId() != null) {
-			ret.setUserId(authAccountDto.getUserId());
+			repeatDto.setUserId(authAccountDto.getUserId());
 		}
 
 		if(needSaveHistory) {
-			save(ret, orgMessageDto);
+			save(repeatDto);
 		}
 
-		return ret;
+		executorService.submit(() -> {
+			try {
+				long timerStart = System.currentTimeMillis();
+	
+				IHttpRequestResponse response = BurpUtil.getCallbacks().makeHttpRequest(
+						orgMessageDto.getMessage().getHttpService(),
+						request);
+	
+				long timerEnd = System.currentTimeMillis();
+				int time = (int) (timerEnd - timerStart);
+	
+				repeatDto.setMessage(response);
+				repeatDto.setStatus(response.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode() : -1);
+				repeatDto.setLength(response.getResponse() != null ? response.getResponse().length : 0);
+				repeatDto.setTime(time);
+	
+				if(needSaveHistory) {
+					updateResponse(repeatDto);
+				}
+	
+				if(callback != null) {
+					callback.accept(repeatDto);
+				}
+
+			} catch(Exception e) {
+				BurpUtil.printStderr(e);
+				throw e;
+			}
+		});
+
+		return repeatDto;
+	}
+	private byte[] applyAuthAccount(byte[] request, AuthAccountDto authAccountDto) {
+		if(authAccountDto == null || authAccountDto.getSessionId() == null) {
+			return request;
+		}
+
+		AuthConfigDto authConfig = ConfigLogic.getInstance().getAuthConfig();
+		if(authConfig == null) {
+			throw new IllegalStateException("Sessionid was set but AuthConfig has not saved.");
+		}
+		var sessionidNodeOutDto = authConfig.getAuthMessageChainDto().getNodes().get(0).getOuts().get(0);
+
+		IParameter sessionIdParam = BurpUtil.getHelpers().buildParameter(
+				sessionidNodeOutDto.getParamName(),
+				authAccountDto.getSessionId(),
+				sessionidNodeOutDto.getParamType());
+
+		return applyParameter(request, sessionIdParam);
 	}
 	private byte[] applyParameter(byte[] request, IParameter parameter) {
 		var parameterType = ParameterType.getById(parameter.getType());
@@ -139,7 +168,7 @@ public class RepeaterLogic {
 		}
 	}
 
-	private void save(MessageRepeatDto messageRepeatDto, MessageDto orgMessageDto) {
+	private void save(MessageRepeatDto messageRepeatDto) {
 		String now = SqlUtil.now();
 		DbUtil.withTransaction(session -> {
 			MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
@@ -154,9 +183,10 @@ public class RepeaterLogic {
 			messageRaw.setResponse(messageRepeatDto.getMessage().getResponse());
 			messageRaw.setPrcDate(now);
 			messageRawMapper.insert(messageRaw);
+			messageRepeatDto.setMessageRawId(messageRaw.getId());
 
 			MessageRepeat messageRepeat = new MessageRepeat();
-			messageRepeat.setFkMessageId(orgMessageDto.getId());
+			messageRepeat.setFkMessageId(messageRepeatDto.getOrgMessageId());
 			messageRepeat.setFkMessageRawId(messageRaw.getId());
 			messageRepeat.setSendDate(SqlUtil.dateToString(messageRepeatDto.getSendDate()));
 			messageRepeat.setDifference(messageRepeatDto.getDifference());
@@ -167,8 +197,28 @@ public class RepeaterLogic {
 			messageRepeat.setPrcDate(now);
 			messageRepeatMapper.insert(messageRepeat);
 			messageRepeatDto.setId(messageRepeat.getId());
+		});
+	}
 
-			orgMessageDto.addRepeat(messageRepeatDto);
+	private void updateResponse(MessageRepeatDto messageRepeatDto) {
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
+			MessageRepeatMapper messageRepeatMapper = session.getMapper(MessageRepeatMapper.class);
+
+			MessageRaw messageRaw = new MessageRaw();
+			messageRaw.setId(messageRepeatDto.getMessageRawId());
+			messageRaw.setResponse(messageRepeatDto.getMessage().getResponse());
+			messageRaw.setPrcDate(now);
+			messageRawMapper.updateByPrimaryKeySelective(messageRaw);
+
+			MessageRepeat messageRepeat = new MessageRepeat();
+			messageRepeat.setId(messageRepeatDto.getId());
+			messageRepeat.setTime(messageRepeatDto.getTime());
+			messageRepeat.setStatus(messageRepeatDto.getStatus());
+			messageRepeat.setLength(messageRepeatDto.getLength());
+			messageRepeat.setPrcDate(now);
+			messageRepeatMapper.updateByPrimaryKeySelective(messageRepeat);
 		});
 	}
 
@@ -232,7 +282,7 @@ public class RepeaterLogic {
 		}).collect(Collectors.toList());
 	}
 
-	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] aRequest, byte[] aResponse, MessageDto orgMessageDto) {
+	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] aRequest, byte[] aResponse, MessageDto orgMessageDto, Consumer<MessageRepeatRedirectDto> callback) {
 		var requestInfo = BurpUtil.getHelpers().analyzeRequest(aRequest);
 		var responseInfo = BurpUtil.getHelpers().analyzeResponse(aResponse);
 		URL redirectUrl;
@@ -242,32 +292,43 @@ public class RepeaterLogic {
 			throw new RuntimeException(e);
 		}
 
-		var request = String.format("GET %s HTTP/1.1\r\n\r\n", redirectUrl.getFile()).getBytes(); 
-		request = applyCookieForRedirect(request, redirectUrl, requestInfo, responseInfo);
+		var baseRequest = String.format("GET %s HTTP/1.1\r\n\r\n", redirectUrl.getFile()).getBytes(); 
+		var request = applyCookieForRedirect(baseRequest, redirectUrl, requestInfo, responseInfo);
 
 		// TODO: add headers
 
-		Date sendDate = Calendar.getInstance().getTime();
-		long timerStart = System.currentTimeMillis();
+		var redirectDto = new MessageRepeatRedirectDto();
+		redirectDto.setSendDate(Calendar.getInstance().getTime());
 
-		IHttpRequestResponse response = BurpUtil.getCallbacks().makeHttpRequest(
-				new HttpServiceMock(redirectUrl.getHost(), redirectUrl.getPort(), redirectUrl.getProtocol()),
-				request);
+		executorService.submit(() -> {
+			try {
+				long timerStart = System.currentTimeMillis();
+	
+				IHttpRequestResponse response = BurpUtil.getCallbacks().makeHttpRequest(
+						new HttpServiceMock(redirectUrl.getHost(), redirectUrl.getPort(), redirectUrl.getProtocol()),
+						request);
+	
+				long timerEnd = System.currentTimeMillis();
+				int time = (int) (timerEnd - timerStart);
 
-		long timerEnd = System.currentTimeMillis();
-		int time = (int) (timerEnd - timerStart);
+				redirectDto.setMessage(response);
+				redirectDto.setStatus(response.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode() : -1);
+				redirectDto.setLength(response.getResponse() != null ? response.getResponse().length : 0);
+				redirectDto.setTime(time);
 
+				//TODO: update db
 
-		var ret = new MessageRepeatRedirectDto();
-		ret.setMessage(response);
-		ret.setStatus(response.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode() : -1);
-		ret.setLength(response.getResponse() != null ? response.getResponse().length : 0);
-		ret.setSendDate(sendDate);
-		ret.setTime(time);
+				if(callback != null) {
+					callback.accept(redirectDto);
+				}
 
-		//TODO: save
+			} catch(Exception e) {
+				BurpUtil.printStderr(e);
+				throw e;
+			}
+		});
 
-		return ret;
+		return redirectDto;
 	}
 	private String extractLocationHeaderValue(IResponseInfo responseInfo) {
 		var locationHeaderPrefix = "Location:";
@@ -314,6 +375,15 @@ public class RepeaterLogic {
 	private boolean judgeIsSameOrigin(URL url1, URL url2) {
 		return url1.getProtocol().equals(url2.getProtocol()) &&//TODO: change to only check authority
 				url1.getAuthority().equals(url2.getAuthority());
+	}
+
+
+	public void shutdownExecutorService() {
+		try {
+			executorService.shutdownNow();
+		} catch(Exception e) {
+			BurpUtil.printEventLog(e.getMessage());
+		}
 	}
 
 }

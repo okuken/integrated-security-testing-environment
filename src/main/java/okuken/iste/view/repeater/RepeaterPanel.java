@@ -24,7 +24,6 @@ import okuken.iste.view.message.editor.MessageEditorPanel;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
-import java.util.concurrent.Executors;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 
@@ -89,8 +88,12 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 				if(selectedIndex < 1) {
 					return;
 				}
-				Executors.newSingleThreadExecutor().submit(() -> {
-					Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex));
+
+//				authSessionRefreshButton.setEnabled(false);
+				Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex), x -> {
+//					SwingUtilities.invokeLater(() -> {
+//						authSessionRefreshButton.setEnabled(true);
+//					});
 				});
 			}
 		});
@@ -191,27 +194,49 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	public void sendRequest() {
 		AuthAccountDto authAccountDto = authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex());
-		Executors.newSingleThreadExecutor().submit(() -> {
-			messageEditorPanel.clearResponse();
-			MessageRepeatDto messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, orgMessageDto);
+		if(authAccountDto.getId() != null && authAccountDto.getSessionId() == null) {
+			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
+				SwingUtilities.invokeLater(() -> {
+					sendRequestImpl(authAccountDto);
+				});
+			});
+			return;
+		}
+
+		sendRequestImpl(authAccountDto);
+	}
+	private void sendRequestImpl(AuthAccountDto authAccountDto) {
+		var messageRepeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, orgMessageDto, repeatedDto -> {
 			SwingUtilities.invokeLater(() -> {
-				setMessage(messageRepeatDto);
-				repeatTablePanel.setup(orgMessageDto.getRepeatList());
-				repeatTablePanel.selectLastRow();
+				if(!orgMessageDto.getId().equals(repeatedDto.getOrgMessageId())) {
+					return;
+				}
+				repeatTablePanel.applyResponseInfoToRow(repeatedDto);
+				if(!repeatTablePanel.judgeIsSelected(repeatedDto)) {
+					return;
+				}
+				setMessage(repeatedDto);
 			});
 		});
+
+		repeatTablePanel.addRow(messageRepeatDto);
+		repeatTablePanel.selectLastRow();
+		setMessage(messageRepeatDto);
 	}
 
 	private void followRedirect() {
 		var request = messageEditorPanel.getRequest();
 		var response = messageEditorPanel.getResponse();
-		Executors.newSingleThreadExecutor().submit(() -> {
-			messageEditorPanel.clearResponse();
-			var messageRepeatRedirectDto = Controller.getInstance().sendFollowRedirectRequest(request, response, orgMessageDto);
+		var messageRepeatRedirectDto = Controller.getInstance().sendFollowRedirectRequest(request, response, orgMessageDto, redirectedDto -> {
 			SwingUtilities.invokeLater(() -> {
-				setMessage(messageRepeatRedirectDto);
+//				if(!orgMessageDto.getId().equals(redirectedDto.getOrgMessageId())) { //TODO: impl
+//					return;
+//				}
+				setMessage(redirectedDto);
 			});
 		});
+
+		setMessage(messageRepeatRedirectDto);
 	}
 
 	private void refreshFollowRedirectButton(Short statusCode) {

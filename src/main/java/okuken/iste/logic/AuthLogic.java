@@ -1,6 +1,7 @@
 package okuken.iste.logic;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.mybatis.dynamic.sql.SqlBuilder;
@@ -156,35 +157,41 @@ public class AuthLogic {
 		return ret;
 	}
 
-	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto) {
-		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), false);
+	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, Consumer<MessageRepeatDto> callback) {
+		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), callback, false);
 	}
-	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, boolean isTest) {
+	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<MessageRepeatDto> callback, boolean isTest) {
 		var authChainNodeDto = authMessageChainDto.getNodes().get(0);
 
-		var messageRepeatDto = Controller.getInstance().sendAutoRequest(
+		Controller.getInstance().sendAutoRequest(
 				createLoginPayload(authAccountDto, authChainNodeDto.getIns().get(0)/**/, authChainNodeDto.getIns().get(1)/**/),
-				authChainNodeDto.getMessageDto());
+				authChainNodeDto.getMessageDto(),
+				messageRepeatDto -> {
 
-		if(messageRepeatDto.getMessage().getResponse() == null) {
-			throw new IllegalStateException("Authentication request's response is empty.");
-		}
+					if(messageRepeatDto.getMessage().getResponse() == null) {
+						throw new IllegalStateException("Authentication request's response is empty.");
+					}
 
-		var sessionIdName = authChainNodeDto.getOuts().get(0)/**/.getParamName();
-		var sessionIdType = ParameterType.getById(authChainNodeDto.getOuts().get(0)/**/.getParamType());
+					var sessionIdName = authChainNodeDto.getOuts().get(0)/**/.getParamName();
+					var sessionIdType = ParameterType.getById(authChainNodeDto.getOuts().get(0)/**/.getParamType());
 
-		var sessionIdParamOptional = extractSessionIdCandidateParams(messageRepeatDto, sessionIdType).stream()
-				.filter(sessionIdParam -> sessionIdParam.getName().equals(sessionIdName))
-				.findFirst();
+					var sessionIdParamOptional = extractSessionIdCandidateParams(messageRepeatDto, sessionIdType).stream()
+							.filter(sessionIdParam -> sessionIdParam.getName().equals(sessionIdName))
+							.findFirst();
 
-		if(sessionIdParamOptional.isEmpty()) {
-			throw new IllegalStateException(String.format("Authentication request's response doesn't have %s.", sessionIdName));
-		}
+					if(sessionIdParamOptional.isEmpty()) {
+						throw new IllegalStateException(String.format("Authentication request's response doesn't have %s.", sessionIdName));
+					}
 
-		authAccountDto.setSessionId(sessionIdParamOptional.get().getValue());
-		if(!isTest) {
-			saveAuthAccount(authAccountDto);
-		}
+					authAccountDto.setSessionId(sessionIdParamOptional.get().getValue());
+					if(!isTest) {
+						saveAuthAccount(authAccountDto);
+					}
+
+					if(callback != null) {
+						callback.accept(messageRepeatDto);
+					}
+				});
 	}
 	private List<PayloadDto> createLoginPayload(AuthAccountDto authAccountDto, MessageChainNodeInDto userIdInDto, MessageChainNodeInDto passwordInDto) {
 		List<PayloadDto> ret = Lists.newArrayList();

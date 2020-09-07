@@ -8,7 +8,6 @@ import java.awt.FlowLayout;
 import javax.swing.JComboBox;
 import java.awt.GridLayout;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
 import javax.swing.JButton;
@@ -131,8 +130,8 @@ public class AuthConfigPanel extends JPanel {
 				}
 				AuthAccountDto authAccountDto = authAccountDtos.get(0);//TODO: selected row
 
-				Executors.newSingleThreadExecutor().submit(() -> {
-					Controller.getInstance().fetchNewAuthSession(authAccountDto, createChainDto(), true);
+				testResultTextField.setText("");
+				Controller.getInstance().fetchNewAuthSession(authAccountDto, createChainDto(), x -> {
 					SwingUtilities.invokeLater(() -> {
 						if(authAccountDto.getSessionId() != null) {
 							testResultTextField.setText(authAccountDto.getSessionId());
@@ -140,7 +139,7 @@ public class AuthConfigPanel extends JPanel {
 							testResultTextField.setText("ERROR: Response doesn't have selected cookie.");
 						}
 					});
-				});
+				}, true);
 			}
 		});
 		loginTestPanel.add(testLoginButton);

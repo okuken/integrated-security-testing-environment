@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
@@ -208,23 +209,20 @@ public class Controller {
 		repeaterPanel.refreshAuthAccountsComboBox();
 	}
 
-	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto) {
-		if(authAccountDto.getId() != null && authAccountDto.getSessionId() == null) {
-			fetchNewAuthSession(authAccountDto);
-		}
-		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, true);
+	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback) {
+		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, true);
 	}
 
 	public void sendRepeaterRequest() {
 		repeaterPanel.sendRequest();
 	}
 
-	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto) {
-		return RepeaterLogic.getInstance().sendRequest(payloadDtos, orgMessageDto, false);
+	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback) {
+		return RepeaterLogic.getInstance().sendRequest(payloadDtos, orgMessageDto, callback, false);
 	}
 
-	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] request, byte[] response, MessageDto orgMessageDto) {
-		return RepeaterLogic.getInstance().sendFollowRedirectRequest(request, response, orgMessageDto);
+	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] request, byte[] response, MessageDto orgMessageDto, Consumer<MessageRepeatRedirectDto> callback) {
+		return RepeaterLogic.getInstance().sendFollowRedirectRequest(request, response, orgMessageDto, callback);
 	}
 
 	public void saveRepeatMaster(MessageDto messageDto) {
@@ -284,11 +282,11 @@ public class Controller {
 		AuthLogic.getInstance().deleteAuthAccounts(authAccountDtos);
 	}
 
-	public void fetchNewAuthSession(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, boolean isTest) {
-		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, authMessageChainDto, isTest);
+	public void fetchNewAuthSession(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<MessageRepeatDto> callback, boolean isTest) {
+		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, authMessageChainDto, callback, isTest);
 	}
-	public void fetchNewAuthSession(AuthAccountDto authAccountDto) {
-		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto);
+	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<MessageRepeatDto> callback) {
+		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, callback);
 	}
 
 	public AuthConfigDto getAuthConfig() {

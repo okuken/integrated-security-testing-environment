@@ -21,6 +21,16 @@ import javax.swing.SwingUtilities;
 public class RepeatTablePanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final int COLNUM_NO = 0;
+	private static final int COLNUM_SEND_DATE = 1;
+	private static final int COLNUM_AUTH = 2;
+	private static final int COLNUM_STATUS = 3;
+	private static final int COLNUM_LENGTH = 4;
+	private static final int COLNUM_TIME = 5;
+	private static final int COLNUM_DIFF = 6;
+	private static final int COLNUM_MEMO = 7;
+
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private JScrollPane scrollPane;
@@ -60,8 +70,14 @@ public class RepeatTablePanel extends JPanel {
 			}
 			@Override
 			public void setValueAt(Object val, int rowIndex, int columnIndex) {
+				if(columnIndex != COLNUM_MEMO) {
+					super.setValueAt(val, rowIndex, columnIndex);
+					return;
+				}
+
 				MessageRepeatDto dto = repeaterHistory.get(rowIndex);
 				if(val.equals(dto.getMemo())) {
+					super.setValueAt(val, rowIndex, columnIndex);
 					return;
 				}
 
@@ -70,20 +86,22 @@ public class RepeatTablePanel extends JPanel {
 				super.setValueAt(val, rowIndex, columnIndex);
 			}
 		});
-		table.getColumnModel().getColumn(0).setPreferredWidth(25);
-		table.getColumnModel().getColumn(1).setPreferredWidth(150);
-		table.getColumnModel().getColumn(2).setPreferredWidth(100);
-		table.getColumnModel().getColumn(3).setPreferredWidth(50);
-		table.getColumnModel().getColumn(4).setPreferredWidth(50);
-		table.getColumnModel().getColumn(5).setPreferredWidth(50);
-		table.getColumnModel().getColumn(6).setPreferredWidth(300);
-		table.getColumnModel().getColumn(7).setPreferredWidth(200);
+		table.getColumnModel().getColumn(COLNUM_NO).setPreferredWidth(25);
+		table.getColumnModel().getColumn(COLNUM_SEND_DATE).setPreferredWidth(150);
+		table.getColumnModel().getColumn(COLNUM_AUTH).setPreferredWidth(100);
+		table.getColumnModel().getColumn(COLNUM_STATUS).setPreferredWidth(50);
+		table.getColumnModel().getColumn(COLNUM_LENGTH).setPreferredWidth(50);
+		table.getColumnModel().getColumn(COLNUM_TIME).setPreferredWidth(50);
+		table.getColumnModel().getColumn(COLNUM_DIFF).setPreferredWidth(300);
+		table.getColumnModel().getColumn(COLNUM_MEMO).setPreferredWidth(200);
 
 		tableModel = (DefaultTableModel)table.getModel();
 	}
 
 	private Object[] convertHistoryIndexToRow(Integer index) {
-		var messageRepeatDto = repeaterHistory.get(index);
+		return convertHistoryToRow(index, repeaterHistory.get(index));
+	}
+	private Object[] convertHistoryToRow(int index, MessageRepeatDto messageRepeatDto) {
 		return new Object[] {
 				Integer.toString(index + 1),
 				SqlUtil.dateToString(messageRepeatDto.getSendDate()),
@@ -113,15 +131,31 @@ public class RepeatTablePanel extends JPanel {
 		repeaterHistory = null;
 	}
 
+	public void addRow(MessageRepeatDto messageRepeatDto) {
+		repeaterHistory.add(messageRepeatDto);
+		tableModel.addRow(convertHistoryToRow(tableModel.getRowCount(), messageRepeatDto));
+	}
+
+	public void applyResponseInfoToRow(MessageRepeatDto messageRepeatDto) {
+		var row = repeaterHistory.indexOf(messageRepeatDto);
+		tableModel.setValueAt(messageRepeatDto.getStatus(), row, COLNUM_STATUS);
+		tableModel.setValueAt(messageRepeatDto.getLength(), row, COLNUM_LENGTH);
+		tableModel.setValueAt(messageRepeatDto.getTime(), row, COLNUM_TIME);
+	}
+
+	public boolean judgeIsSelected(MessageRepeatDto messageRepeatDto) {
+		return table.getSelectedRow() == repeaterHistory.indexOf(messageRepeatDto);
+	}
+
 	public void clear() {
 		clearRows();
 	}
 
 	public Integer selectLastRow() {
-		if (repeaterHistory.isEmpty()) {
+		if (tableModel.getRowCount() <= 0) {
 			return null;
 		}
-		int lastIndex = repeaterHistory.size() - 1;
+		int lastIndex = tableModel.getRowCount() - 1;
 		table.setRowSelectionInterval(lastIndex, lastIndex);
 
 		SwingUtilities.invokeLater(() -> {
