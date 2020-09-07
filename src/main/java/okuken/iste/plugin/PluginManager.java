@@ -99,7 +99,11 @@ public class PluginManager {
 
 	public void unloadAllPlugins() {
 		loadedPluginInfos.forEach(pluginInfo -> {
-			unloadImpl(pluginInfo);
+			try {
+				unloadImpl(pluginInfo);
+			} catch (Exception e) {
+				BurpUtil.printEventLog(e.getMessage());
+			}
 		});
 		loadedPluginInfos.clear();
 
