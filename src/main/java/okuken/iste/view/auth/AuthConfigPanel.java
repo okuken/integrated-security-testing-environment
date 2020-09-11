@@ -8,11 +8,15 @@ import java.awt.FlowLayout;
 import javax.swing.JComboBox;
 import java.awt.GridLayout;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.IntStream;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
@@ -46,6 +50,7 @@ public class AuthConfigPanel extends JPanel {
 
 	private JComboBox<ParameterType> sessionIdParamTypeComboBox;
 	private JComboBox<MessageParamDto> sessionIdParamComboBox;
+	private JTextField sessionIdRegexTextField;
 
 	private AuthConfigDto authConfigDto;
 
@@ -102,7 +107,7 @@ public class AuthConfigPanel extends JPanel {
 		sessionIdParamTypeComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if(!refreshingFlag && e.getStateChange() == ItemEvent.SELECTED) {
-					refreshSessionIdParamComboBox();
+					refreshSessionIdParamInputField();
 				}
 			}
 		});
@@ -110,6 +115,10 @@ public class AuthConfigPanel extends JPanel {
 		
 		sessionIdParamComboBox = new JComboBox<MessageParamDto>();
 		loginResponseConfigPanel.add(sessionIdParamComboBox);
+		
+		sessionIdRegexTextField = new JTextField();
+		loginResponseConfigPanel.add(sessionIdRegexTextField);
+		sessionIdRegexTextField.setColumns(20);
 		
 		JPanel loginTestPanel = new JPanel();
 		FlowLayout flowLayout_2 = (FlowLayout) loginTestPanel.getLayout();
@@ -162,16 +171,37 @@ public class AuthConfigPanel extends JPanel {
 	}
 
 	private boolean validateAndShowPopup() {
-		boolean ret = validateInputs();
-		if(!ret) {
-			JOptionPane.showMessageDialog(BurpUtil.getBurpSuiteJFrame(), "Please fill in all fields.");
+		var validationErrorMessage = judgeIsValidAndReturnMessage();
+		if(validationErrorMessage != null) {
+			JOptionPane.showMessageDialog(BurpUtil.getBurpSuiteJFrame(), validationErrorMessage);
+			return false;
 		}
-		return ret;
+		return true;
 	}
-	private boolean validateInputs() {
-		return idParamComboBox.getSelectedIndex() > -1 &&
+	private String judgeIsValidAndReturnMessage() {
+		var validRequire = idParamComboBox.getSelectedIndex() > -1 &&
 				passwordParamComboBox.getSelectedIndex() > -1 &&
-				sessionIdParamComboBox.getSelectedIndex() > -1;
+				((sessionIdParamComboBox.getSelectedIndex() > -1) ||
+				 (judgeIsSessionIdTypeRegex() && StringUtils.isNotBlank(sessionIdRegexTextField.getText())));
+		if(!validRequire) {
+			return "Please fill in all fields.";
+		}
+
+		if(judgeIsSessionIdTypeRegex()) {
+			try {
+				if(Pattern.compile(sessionIdRegexTextField.getText()).matcher("").groupCount() != 1) {
+					return "Regex must include just one group.\n e.g. \"token\":\"([^\"]+)\"";
+				}
+			} catch(PatternSyntaxException e) {
+				return e.getMessage();
+			}
+		}
+
+		return null;
+	}
+	private boolean judgeIsSessionIdTypeRegex() {
+		return ParameterType.getById(sessionIdParamTypeComboBox.getItemAt(sessionIdParamTypeComboBox.getSelectedIndex()).getId())
+				== ParameterType.REGEX;
 	}
 
 	private void saveConfig() {
@@ -188,8 +218,12 @@ public class AuthConfigPanel extends JPanel {
 				convertToChainNodeInDto(idParamComboBox.getItemAt(idParamComboBox.getSelectedIndex())),
 				convertToChainNodeInDto(passwordParamComboBox.getItemAt(passwordParamComboBox.getSelectedIndex()))));
 
-		nodeDto.setOuts(Lists.newArrayList(
-				convertToChainNodeOutDto(sessionIdParamComboBox.getItemAt(sessionIdParamComboBox.getSelectedIndex()))));
+		if(judgeIsSessionIdTypeRegex()) {
+			nodeDto.setOuts(Lists.newArrayList(createChainNodeOutDtoForRegex(sessionIdRegexTextField.getText())));
+		} else {
+			nodeDto.setOuts(Lists.newArrayList(
+					convertToChainNodeOutDto(sessionIdParamComboBox.getItemAt(sessionIdParamComboBox.getSelectedIndex()))));
+		}
 
 		return ret;
 	}
@@ -206,6 +240,13 @@ public class AuthConfigPanel extends JPanel {
 		ret.setVarName(paramDto.getName());
 		return ret;
 	}
+	private MessageChainNodeOutDto createChainNodeOutDtoForRegex(String regex) {
+		var ret = new MessageChainNodeOutDto();
+		ret.setParamType(ParameterType.REGEX.getId());
+		ret.setParamName(regex);
+		ret.setVarName("sessionId");//FIXME
+		return ret;
+	}
 
 	public void refreshPanel(List<MessageDto> messageDtos) {
 		var refreshingFlagBk = refreshingFlag;
@@ -216,6 +257,9 @@ public class AuthConfigPanel extends JPanel {
 			messageDtos.forEach(messageDto -> {
 				loginUrlComboBox.addItem(messageDto);
 			});
+
+			sessionIdRegexTextField.setText("");
+			testResultTextField.setText("");
 
 			authConfigDto = ConfigLogic.getInstance().getAuthConfig();
 			if(authConfigDto == null) {
@@ -252,14 +296,16 @@ public class AuthConfigPanel extends JPanel {
 					return sessionIdParamTypeComboBox.getItemAt(i).getId() == sessIdOutDto.getParamType();
 					}).findFirst().getAsInt());
 
-			refreshSessionIdParamComboBox();
+			refreshSessionIdParamInputField();
 
-			sessionIdParamComboBox.setSelectedIndex(
-				IntStream.range(0, sessionIdParamComboBox.getItemCount()).filter(i -> {
-					return sessionIdParamComboBox.getItemAt(i).getName().equals(sessIdOutDto.getParamName());
-					}).findFirst().getAsInt());
-
-			testResultTextField.setText("");
+			if(ParameterType.getById(sessIdOutDto.getParamType()) == ParameterType.REGEX) {
+				sessionIdRegexTextField.setText(sessIdOutDto.getParamName());
+			} else {
+				sessionIdParamComboBox.setSelectedIndex(
+						IntStream.range(0, sessionIdParamComboBox.getItemCount()).filter(i -> {
+							return sessionIdParamComboBox.getItemAt(i).getName().equals(sessIdOutDto.getParamName());
+							}).findFirst().getAsInt());
+			}
 
 		} finally {
 			refreshingFlag = refreshingFlagBk;
@@ -292,20 +338,22 @@ public class AuthConfigPanel extends JPanel {
 			sessionIdParamTypeComboBox.setMaximumRowCount(1000);
 			sessionIdParamTypeComboBox.addItem(ParameterType.COOKIE);
 			sessionIdParamTypeComboBox.addItem(ParameterType.JSON);
+			sessionIdParamTypeComboBox.addItem(ParameterType.REGEX);
 
-			refreshSessionIdParamComboBox();
+			refreshSessionIdParamInputField();
 
 		} finally {
 			refreshingFlag = refreshingFlagBk;
 		}
 	}
 
-	private void refreshSessionIdParamComboBox() {
+	private void refreshSessionIdParamInputField() {
 		var refreshingFlagBk = refreshingFlag;
 		refreshingFlag = true;
 		try {
 			sessionIdParamComboBox.removeAllItems();
 			sessionIdParamComboBox.setMaximumRowCount(1000);
+			sessionIdRegexTextField.setEnabled(false);
 
 			var loginMessageDto = loginUrlComboBox.getItemAt(loginUrlComboBox.getSelectedIndex());
 			var parameterType = sessionIdParamTypeComboBox.getItemAt(sessionIdParamTypeComboBox.getSelectedIndex());
@@ -320,6 +368,9 @@ public class AuthConfigPanel extends JPanel {
 					loginMessageDto.getResponseJson().forEach(jsonEntry -> {
 						sessionIdParamComboBox.addItem(jsonEntry);
 					});
+					break;
+				case REGEX:
+					sessionIdRegexTextField.setEnabled(true);
 					break;
 				default:
 					throw new IllegalStateException(parameterType.toString());

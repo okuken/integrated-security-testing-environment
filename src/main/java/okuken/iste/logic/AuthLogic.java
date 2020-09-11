@@ -2,13 +2,13 @@ package okuken.iste.logic;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.mybatis.dynamic.sql.SqlBuilder;
 
 import com.google.common.collect.Lists;
 
-import okuken.iste.controller.Controller;
 import okuken.iste.dao.auto.AuthAccountDynamicSqlSupport;
 import okuken.iste.dao.auto.AuthAccountMapper;
 import okuken.iste.dao.auto.AuthConfigDynamicSqlSupport;
@@ -163,7 +163,7 @@ public class AuthLogic {
 	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<MessageRepeatDto> callback, boolean isTest) {
 		var authChainNodeDto = authMessageChainDto.getNodes().get(0);
 
-		Controller.getInstance().sendAutoRequest(
+		RepeaterLogic.getInstance().sendRequest(
 				createLoginPayload(authAccountDto, authChainNodeDto.getIns().get(0)/**/, authChainNodeDto.getIns().get(1)/**/),
 				authChainNodeDto.getMessageDto(),
 				messageRepeatDto -> {
@@ -175,15 +175,7 @@ public class AuthLogic {
 					var sessionIdName = authChainNodeDto.getOuts().get(0)/**/.getParamName();
 					var sessionIdType = ParameterType.getById(authChainNodeDto.getOuts().get(0)/**/.getParamType());
 
-					var sessionIdParamOptional = extractSessionIdCandidateParams(messageRepeatDto, sessionIdType).stream()
-							.filter(sessionIdParam -> sessionIdParam.getName().equals(sessionIdName))
-							.findFirst();
-
-					if(sessionIdParamOptional.isEmpty()) {
-						throw new IllegalStateException(String.format("Authentication request's response doesn't have %s.", sessionIdName));
-					}
-
-					authAccountDto.setSessionId(sessionIdParamOptional.get().getValue());
+					authAccountDto.setSessionId(extractSessionId(messageRepeatDto, sessionIdType, sessionIdName));
 					if(!isTest) {
 						saveAuthAccount(authAccountDto);
 					}
@@ -191,13 +183,30 @@ public class AuthLogic {
 					if(callback != null) {
 						callback.accept(messageRepeatDto);
 					}
-				});
+				}, false);
 	}
 	private List<PayloadDto> createLoginPayload(AuthAccountDto authAccountDto, MessageChainNodeInDto userIdInDto, MessageChainNodeInDto passwordInDto) {
 		List<PayloadDto> ret = Lists.newArrayList();
 		ret.add(new PayloadDto(userIdInDto.getParamName(), userIdInDto.getParamType(), authAccountDto.getUserId()));
 		ret.add(new PayloadDto(passwordInDto.getParamName(), passwordInDto.getParamType(), authAccountDto.getPassword()));
 		return ret;
+	}
+	private String extractSessionId(MessageRepeatDto messageRepeatDto, ParameterType sessionIdType, String sessionIdName) {
+		if(sessionIdType == ParameterType.REGEX) {
+			var matcher = Pattern.compile(sessionIdName).matcher(new String(messageRepeatDto.getMessage().getResponse()));
+			if(!matcher.find()) {
+				throw new IllegalStateException(String.format("Authentication request's response doesn't match: %s", sessionIdName));
+			}
+			return matcher.group(1);
+		}
+
+		var sessionIdParamOptional = extractSessionIdCandidateParams(messageRepeatDto, sessionIdType).stream()
+				.filter(sessionIdParam -> sessionIdParam.getName().equals(sessionIdName))
+				.findFirst();
+		if(sessionIdParamOptional.isEmpty()) {
+			throw new IllegalStateException(String.format("Authentication request's response doesn't have %s.", sessionIdName));
+		}
+		return sessionIdParamOptional.get().getValue();
 	}
 	private List<MessageParamDto> extractSessionIdCandidateParams(MessageRepeatDto messageRepeatDto, ParameterType sessionIdType) {
 		switch (sessionIdType) {

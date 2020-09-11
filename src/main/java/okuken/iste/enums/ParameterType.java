@@ -14,7 +14,8 @@ public enum ParameterType {
 	JSON			(IParameter.PARAM_JSON,				"Body(JSON)"),
 	XML				(IParameter.PARAM_XML,				"Body(XML)"),
 	XML_ATTR		(IParameter.PARAM_XML_ATTR,			"Body(XML(Attr))"),
-	COOKIE			(IParameter.PARAM_COOKIE,			"Cookie");
+	COOKIE			(IParameter.PARAM_COOKIE,			"Cookie"),
+	REGEX			((byte)99,							"Regex");
 
 	private final byte id;
 	private final String caption;

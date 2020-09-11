@@ -132,26 +132,23 @@ public class RepeaterLogic {
 		if(authConfig == null) {
 			throw new IllegalStateException("Sessionid was set but AuthConfig has not saved.");
 		}
+
 		var sessionidNodeOutDto = authConfig.getAuthMessageChainDto().getNodes().get(0).getOuts().get(0);
 
-		IParameter sessionIdParam = BurpUtil.getHelpers().buildParameter(
-				sessionidNodeOutDto.getParamName(),
-				authAccountDto.getSessionId(),
-				sessionidNodeOutDto.getParamType());
-
-		return applyParameter(request, sessionIdParam);
-	}
-	private byte[] applyParameter(byte[] request, IParameter parameter) {
-		var parameterType = ParameterType.getById(parameter.getType());
+		var parameterType = ParameterType.getById(sessionidNodeOutDto.getParamType());
 		switch (parameterType) {
 			case COOKIE:
-				var ret = BurpUtil.getHelpers().removeParameter(request, parameter);
-				ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
-				ret = BurpUtil.getHelpers().addParameter(ret, parameter);
-				return ret;
+				IParameter parameter = BurpUtil.getHelpers().buildParameter(
+						sessionidNodeOutDto.getParamName(),
+						authAccountDto.getSessionId(),
+						sessionidNodeOutDto.getParamType());
+
+				return applyCookieParameter(request, parameter);
+
 			case JSON:
+			case REGEX:
 				//TODO: generalize...
-				var authorizationHeader = HttpUtil.createAuthorizationBearerHeader(parameter.getValue());
+				var authorizationHeader = HttpUtil.createAuthorizationBearerHeader(authAccountDto.getSessionId());
 
 				var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
 				var headers = requestInfo.getHeaders();
@@ -168,6 +165,11 @@ public class RepeaterLogic {
 			default:
 				throw new IllegalArgumentException(String.format("Unsupported parameter type: %s", parameterType));
 		}
+	}
+	private byte[] applyCookieParameter(byte[] request, IParameter parameter) {
+		var ret = BurpUtil.getHelpers().removeParameter(request, parameter);
+		ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
+		return BurpUtil.getHelpers().addParameter(ret, parameter);
 	}
 
 	private byte[] updateContentLength(byte[] request) {
@@ -374,7 +376,7 @@ public class RepeaterLogic {
 				.collect(Collectors.toList());
 
 		for(var targetCookieParam: beforeResponseCookieParams) {
-			ret = applyParameter(ret, targetCookieParam);
+			ret = applyCookieParameter(ret, targetCookieParam);
 		}
 
 		return ret;

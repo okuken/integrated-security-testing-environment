@@ -23,7 +23,6 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
-import okuken.iste.dto.PayloadDto;
 import okuken.iste.dto.ProjectMemoDto;
 import okuken.iste.logic.AuthLogic;
 import okuken.iste.logic.ConfigLogic;
@@ -215,10 +214,6 @@ public class Controller {
 
 	public void sendRepeaterRequest() {
 		repeaterPanel.sendRequest();
-	}
-
-	public MessageRepeatDto sendAutoRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback) {
-		return RepeaterLogic.getInstance().sendRequest(payloadDtos, orgMessageDto, callback, false);
 	}
 
 	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] request, byte[] response, MessageDto orgMessageDto, Consumer<MessageRepeatRedirectDto> callback) {
