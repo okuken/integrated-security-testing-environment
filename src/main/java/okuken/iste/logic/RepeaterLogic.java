@@ -74,7 +74,7 @@ public class RepeaterLogic {
 	}
 
 	public MessageRepeatDto sendRequest(byte[] aRequest, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean needSaveHistory) {
-		byte[] request = applyAuthAccount(aRequest, authAccountDto);
+		byte[] request = buildRequest(aRequest, authAccountDto);
 
 		MessageRepeatDto repeatDto = new MessageRepeatDto();
 		repeatDto.setOrgMessageId(orgMessageDto.getId());
@@ -121,11 +121,13 @@ public class RepeaterLogic {
 
 		return repeatDto;
 	}
-	private byte[] applyAuthAccount(byte[] request, AuthAccountDto authAccountDto) {
-		if(authAccountDto == null || authAccountDto.getSessionId() == null) {
-			return request;
+	private byte[] buildRequest(byte[] request, AuthAccountDto authAccountDto) {
+		if(authAccountDto != null && authAccountDto.getSessionId() != null) {
+			return applyAuthAccount(request, authAccountDto);
 		}
-
+		return updateContentLength(request);
+	}
+	private byte[] applyAuthAccount(byte[] request, AuthAccountDto authAccountDto) {
 		AuthConfigDto authConfig = ConfigLogic.getInstance().getAuthConfig();
 		if(authConfig == null) {
 			throw new IllegalStateException("Sessionid was set but AuthConfig has not saved.");
@@ -166,6 +168,11 @@ public class RepeaterLogic {
 			default:
 				throw new IllegalArgumentException(String.format("Unsupported parameter type: %s", parameterType));
 		}
+	}
+
+	private byte[] updateContentLength(byte[] request) {
+		var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
+		return BurpUtil.getHelpers().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
 	}
 
 	private void save(MessageRepeatDto messageRepeatDto) {
