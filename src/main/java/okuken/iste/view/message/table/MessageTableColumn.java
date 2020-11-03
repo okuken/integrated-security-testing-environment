@@ -18,23 +18,23 @@ public enum MessageTableColumn {
 	PROGRESS	("Progress",		40,			true,  false, "getProgress",						"setProgress",						SecurityTestingProgress.class),
 	PROGRESS_MEMO("Progress memo",	60,			true,  false, "getProgressMemo",					"setProgressMemo",					String.class),
 	PROGRESS_TECHNICAL		("T",	18,			true,  true,  "getProgressTechnical", 				"setProgressTechnical",				String.class),
-	PROGRESS_LOGICAL		("L",	18,			true,  true,  "getProgressLogical",				"setProgressLogical",				String.class),
+	PROGRESS_LOGICAL		("L",	18,			true,  true,  "getProgressLogical",					"setProgressLogical",				String.class),
 	PROGRESS_AUTHENTICATION	("A",	18,			true,  true,  "getProgressAuthentication",			"setProgressAuthentication",		String.class),
 	PROGRESS_AUTH_FEATURE	("F",	18,			true,  true,  "getProgressAuthorizationFeature",	"setProgressAuthorizationFeature",	String.class),
 	PROGRESS_AUTH_RESOURCE	("R",	18,			true,  true,  "getProgressAuthorizationResource",	"setProgressAuthorizationResource",	String.class),
 	PROGRESS_CSRF			("C",	18,			true,  true,  "getProgressCsrf", 					"setProgressCsrf",					String.class),
-	PROTOCOL	("Protocol",		30,			false, false, "getProtocol",						null,null),
-	HOST		("Host",			80,			false, false, "getHost",							null,null),
-	PORT		("Port",			35,			false, false, "getPortIfNotDefaultStr",			null,null),
-	PATH		("Path",			150,		false, false, "getPath",							null,null),
-	QUERY		("Query",			50,			false, false, "getQuery",							null,null),
-	URL			("URL without Query", 300,		false, false, "getUrlShortest",					null,null),
-	METHOD		("Method",			35,			false, false, "getMethod",							null,null),
-	PARAMS		("Params",			25,			false, false, "getParamsStr",						null,null),
-	STATUS		("Status",			25,			false, false, "getStatusStr",						null,null),
-	LENGTH		("Length",			45,			false, false, "getLengthStr",						null,null),
-	MIME_TYPE	("MIME",			45,			false, false, "getMimeType",						null,null),
-	COOKIES		("Cookies",			400,		false, false, "getCookies",						null,null);
+	PROTOCOL	("Protocol",		30,			false, false, "getProtocol",						null,								String.class),
+	HOST		("Host",			80,			false, false, "getHost",							null,								String.class),
+	PORT		("Port",			35,			false, false, "getPortIfNotDefaultStr",				null,								String.class),
+	PATH		("Path",			150,		false, false, "getPath",							null,								String.class),
+	QUERY		("Query",			50,			false, false, "getQuery",							null,								String.class),
+	URL			("URL without Query", 300,		false, false, "getUrlShortest",						null,								String.class),
+	METHOD		("Method",			35,			false, false, "getMethod",							null,								String.class),
+	PARAMS		("Params",			25,			false, false, "getParamsStr",						null,								String.class),
+	STATUS		("Status",			25,			false, false, "getStatusStr",						null,								String.class),
+	LENGTH		("Length",			45,			false, false, "getLengthStr",						null,								String.class),
+	MIME_TYPE	("MIME",			45,			false, false, "getMimeType",						null,								String.class),
+	COOKIES		("Cookies",			400,		false, false, "getCookies",							null,								String.class);
 
 	private final String caption;
 	private final int width;
@@ -42,12 +42,14 @@ public enum MessageTableColumn {
 	private final boolean progressDetail;
 	private final Method getter;
 	private final Method setter;
+	private final Class<?> type;
 
 	MessageTableColumn(String caption, int width, boolean editable, boolean progressDetail, String getterName, String setterName, Class<?> type) {
 		this.caption = caption;
 		this.width = width;
 		this.editable = editable;
 		this.progressDetail = progressDetail;
+		this.type = type;
 
 		try {
 			if(getterName != null) {
@@ -83,6 +85,9 @@ public enum MessageTableColumn {
 	}
 	public Method getSetter() {
 		return setter;
+	}
+	public Class<?> getType() {
+		return type;
 	}
 
 	private static final Map<String, MessageTableColumn> captionToEnumMap;

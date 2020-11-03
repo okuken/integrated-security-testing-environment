@@ -120,7 +120,7 @@ public class MessageTableModel extends AbstractTableModel {
 
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		return String.class;
+		return COLUMNS[columnIndex].getType();
 	}
 
 	@Override
@@ -166,10 +166,13 @@ public class MessageTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		return getColumnValue(rows.get(rowIndex), columnIndex);
 	}
-	private String getColumnValue(MessageDto row, int columnIndex) {
+	private Object getColumnValue(MessageDto row, int columnIndex) {
 		try {
 			var value = COLUMNS[columnIndex].getGetter().invoke(row);
-			return value != null ? value.toString() : "";
+			if(COLUMNS[columnIndex].getType() == String.class) {
+				return Optional.ofNullable(value).orElse("");
+			}
+			return value;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
