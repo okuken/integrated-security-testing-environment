@@ -26,6 +26,7 @@ public class MessageMemoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JTextArea textArea;
+	private JScrollPane scrollPane;
 
 	private MessageDto currentMessageDto;
 	private UndoManager undoManager;
@@ -85,7 +86,7 @@ public class MessageMemoPanel extends JPanel {
 		undoManager = UiUtil.addUndoRedoFeature(textArea);
 		disablePanel();
 		
-		JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane = new JScrollPane(textArea);
 		add(scrollPane, BorderLayout.CENTER);
 		
 		Controller.getInstance().setMessageMemoPanel(this);
@@ -119,6 +120,10 @@ public class MessageMemoPanel extends JPanel {
 
 		nameTextField.setText(messageDto.getName());
 		nameTextField.setCaretPosition(0);
+
+		SwingUtilities.invokeLater(() -> {
+			UiUtil.initScrollBarPosition(scrollPane);
+		});
 	}
 
 }

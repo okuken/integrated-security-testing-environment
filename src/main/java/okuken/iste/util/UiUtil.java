@@ -15,6 +15,7 @@ import java.util.function.Function;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -90,6 +91,13 @@ public class UiUtil {
 		});
 
 		return undoManager;
+	}
+
+	public static void initScrollBarPosition(JScrollPane scrollPane) {
+		var verticalScrollBar = scrollPane.getVerticalScrollBar();
+		verticalScrollBar.setValue(verticalScrollBar.getMinimum());
+		var horizontalScrollBar = scrollPane.getHorizontalScrollBar();
+		horizontalScrollBar.setValue(horizontalScrollBar.getMinimum());
 	}
 
 

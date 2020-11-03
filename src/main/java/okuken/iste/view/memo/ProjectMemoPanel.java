@@ -1,7 +1,6 @@
 package okuken.iste.view.memo;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -15,6 +14,7 @@ import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.ProjectMemoDto;
 import okuken.iste.logic.MemoLogic;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 
 import java.awt.event.ActionListener;
@@ -84,8 +84,7 @@ public class ProjectMemoPanel extends AbstractDockoutableTabPanel {
 			scrollPane.setViewportView(memoTextArea);
 
 			SwingUtilities.invokeLater(() -> {
-				JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-				scrollBar.setValue(scrollBar.getMinimum());
+				UiUtil.initScrollBarPosition(scrollPane);
 			});
 		});
 	}
