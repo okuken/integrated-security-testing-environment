@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JComboBox;
 import java.awt.GridLayout;
@@ -32,7 +33,7 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageParamDto;
 import okuken.iste.enums.ParameterType;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -128,13 +129,13 @@ public class AuthConfigPanel extends JPanel {
 		JButton testLoginButton = new JButton(Captions.AUTH_CONFIG_BUTTON_LOGIN_TEST);
 		testLoginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(!validateAndShowPopup()) {
+				if(!validateAndShowPopup(testLoginButton)) {
 					return;
 				}
 
 				List<AuthAccountDto> authAccountDtos = Controller.getInstance().getAuthAccounts();
 				if(authAccountDtos.isEmpty()) {
-					JOptionPane.showMessageDialog(BurpUtil.getBurpSuiteJFrame(), "Please register one or more account information.");
+					JOptionPane.showMessageDialog(UiUtil.getParentFrame(testLoginButton), "Please register one or more account information.");
 					return;
 				}
 				AuthAccountDto authAccountDto = authAccountDtos.get(0);//TODO: selected row
@@ -161,7 +162,7 @@ public class AuthConfigPanel extends JPanel {
 		JButton saveButton = new JButton(Captions.AUTH_CONFIG_BUTTON_SAVE);
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(validateAndShowPopup()) {
+				if(validateAndShowPopup(saveButton)) {
 					saveConfig();
 				}
 			}
@@ -170,10 +171,10 @@ public class AuthConfigPanel extends JPanel {
 		
 	}
 
-	private boolean validateAndShowPopup() {
+	private boolean validateAndShowPopup(Component component) {
 		var validationErrorMessage = judgeIsValidAndReturnMessage();
 		if(validationErrorMessage != null) {
-			JOptionPane.showMessageDialog(BurpUtil.getBurpSuiteJFrame(), validationErrorMessage);
+			JOptionPane.showMessageDialog(UiUtil.getParentFrame(component), validationErrorMessage);
 			return false;
 		}
 		return true;

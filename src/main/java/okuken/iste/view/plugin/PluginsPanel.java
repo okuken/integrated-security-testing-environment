@@ -13,7 +13,6 @@ import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.plugin.PluginInfo;
 import okuken.iste.plugin.PluginLoadInfo;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
 
@@ -115,7 +114,7 @@ public class PluginsPanel extends JPanel {
 		jarFileChooseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_PLUGIN_FILE);
-				if (fileChooser.showOpenDialog(BurpUtil.getBurpSuiteJFrame()) == JFileChooser.APPROVE_OPTION) {
+				if (fileChooser.showOpenDialog(UiUtil.getParentFrame(jarFileChooseButton)) == JFileChooser.APPROVE_OPTION) {
 					jarFilePathTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
 				}
 			}

@@ -6,8 +6,8 @@ import javax.swing.JTextField;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
+import okuken.iste.util.UiUtil;
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -62,7 +62,7 @@ public class UserOptionsMiscPanel extends JPanel {
 		dbFileChooseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_DB_FILE);
-				if (fileChooser.showOpenDialog(BurpUtil.getBurpSuiteJFrame()) == JFileChooser.APPROVE_OPTION) {
+				if (fileChooser.showOpenDialog(UiUtil.getParentFrame(dbFileChooseButton)) == JFileChooser.APPROVE_OPTION) {
 					dbFileTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
 				}
 			}

@@ -1,7 +1,9 @@
 package okuken.iste.util;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -19,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.JTextComponent;
@@ -29,6 +32,10 @@ import com.google.common.collect.Lists;
 import okuken.iste.consts.Captions;
 
 public class UiUtil {
+
+	public static final Window getParentFrame(Component component) {
+		return SwingUtilities.getWindowAncestor(component);
+	}
 
 	public static final void copyToClipboard(String content) {
 		StringSelection stringSelection = new StringSelection(content);

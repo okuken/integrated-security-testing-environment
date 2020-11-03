@@ -4,8 +4,8 @@ import javax.swing.JPanel;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
+import okuken.iste.util.UiUtil;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -29,7 +29,7 @@ public class ExportToolsPanel extends JPanel {
 		exportMemoToTxtFileButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = FileUtil.createSingleFileChooser("");
-				switch (fileChooser.showSaveDialog(BurpUtil.getBurpSuiteJFrame())) {
+				switch (fileChooser.showSaveDialog(UiUtil.getParentFrame(exportMemoToTxtFileButton))) {
 					case JFileChooser.APPROVE_OPTION:
 						Controller.getInstance().exportMemoToTxtFile(fileChooser.getSelectedFile(), filterCheckBox.isSelected());
 						break;
