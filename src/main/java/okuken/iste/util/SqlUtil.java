@@ -9,23 +9,46 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 
 public class SqlUtil {
 
 	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+
 	public static final String now() {
-		return timestampFormat.format(Calendar.getInstance().getTime());
+		return Long.toString(getNowUnixtimeMs());
 	}
 	public static final String dateToString(Date date) {
-		return timestampFormat.format(date);
+		return Long.toString(convertDateToUnixtimeMs(date));
 	}
 	public static final Date stringToDate(String dateStr) {
+		if(isUnixtimeMs(dateStr)) {
+			return convertUnixtimeMsToDate(dateStr);
+		}
 		try {
-			return timestampFormat.parse(dateStr);
+			return timestampFormat.parse(dateStr); // for backward compatibility
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	public static final String dateToPresentationString(Date date) {
+		return timestampFormat.format(date);
+	}
+
+	private static final long getNowUnixtimeMs() {
+		return Calendar.getInstance().getTimeInMillis();
+	}
+	private static final boolean isUnixtimeMs(String dateStr) {
+		return StringUtils.isNumeric(dateStr); //rough but enough here
+	}
+	private static final Date convertUnixtimeMsToDate(String unixtimeMs) {
+		var cal = Calendar.getInstance();
+		cal.setTimeInMillis(Long.valueOf(unixtimeMs));
+		return cal.getTime();
+	}
+	private static final long convertDateToUnixtimeMs(Date date) {
+		return date.getTime();
 	}
 
 	public static final int loadGeneratedId(SqlSession session) {

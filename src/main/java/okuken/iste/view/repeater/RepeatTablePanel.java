@@ -104,7 +104,7 @@ public class RepeatTablePanel extends JPanel {
 	private Object[] convertHistoryToRow(int index, MessageRepeatDto messageRepeatDto) {
 		return new Object[] {
 				Integer.toString(index + 1),
-				SqlUtil.dateToString(messageRepeatDto.getSendDate()),
+				SqlUtil.dateToPresentationString(messageRepeatDto.getSendDate()),
 				Optional.ofNullable(messageRepeatDto.getUserId()).orElse(""),
 				messageRepeatDto.getStatus(),
 				messageRepeatDto.getLength(),
