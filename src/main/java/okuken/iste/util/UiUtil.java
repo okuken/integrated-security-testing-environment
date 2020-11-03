@@ -34,6 +34,9 @@ import okuken.iste.consts.Captions;
 public class UiUtil {
 
 	public static final Window getParentFrame(Component component) {
+		if(component == null) {
+			return BurpUtil.getBurpSuiteJFrame();
+		}
 		return SwingUtilities.getWindowAncestor(component);
 	}
 
@@ -151,7 +154,10 @@ public class UiUtil {
 
 
 	public static boolean getConfirmAnswer(String message) {
-		return JOptionPane.showConfirmDialog(BurpUtil.getBurpSuiteJFrame(), 
+		return getConfirmAnswer(message, null);
+	}
+	public static boolean getConfirmAnswer(String message, Component triggerComponent) {
+		return JOptionPane.showConfirmDialog(getParentFrame(triggerComponent), 
 				message, String.format("Confirm [%s]", Captions.EXTENSION_NAME_FULL), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
 	}
 

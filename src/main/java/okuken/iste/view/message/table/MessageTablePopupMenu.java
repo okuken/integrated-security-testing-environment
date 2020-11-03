@@ -129,7 +129,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		JMenuItem deleteItemMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_DELETE_ITEM);
 		deleteItemMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(UiUtil.getConfirmAnswer(Captions.MESSAGE_DELETE_ITEM)) {
+				if(UiUtil.getConfirmAnswer(Captions.MESSAGE_DELETE_ITEM, deleteItemMenuItem)) {
 					Controller.getInstance().deleteMessages();
 				}
 			}
