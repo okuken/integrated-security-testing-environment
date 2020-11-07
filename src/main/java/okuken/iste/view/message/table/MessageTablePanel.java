@@ -54,6 +54,7 @@ public class MessageTablePanel extends JPanel {
 			@Override
 			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
 				super.changeSelection(row, col, toggle, extend);
+				tableModel.fireTableCellUpdated(row, col); // for update selecting cell's color forcefully (if not, to click same row and right cell doesn't happen repaint background of the cell...)
 				Controller.getInstance().refreshMessageDetailPanels(tableModel.getRow(table.convertRowIndexToModel(row)));
 			}
 		};
