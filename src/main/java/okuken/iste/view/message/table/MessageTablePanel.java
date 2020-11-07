@@ -51,11 +51,22 @@ public class MessageTablePanel extends JPanel {
 
 		table = new JTable(tableModel) {
 			private static final long serialVersionUID = 1L;
+			private Integer lastSelectedModelRowIndex;
 			@Override
 			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
 				super.changeSelection(row, col, toggle, extend);
-				tableModel.fireTableCellUpdated(row, col); // for update selecting cell's color forcefully (if not, to click same row and right cell doesn't happen repaint background of the cell...)
-				Controller.getInstance().refreshMessageDetailPanels(tableModel.getRow(table.convertRowIndexToModel(row)));
+
+				var modelRowIndex = table.convertRowIndexToModel(row);
+				var modelColumnIndex = table.convertColumnIndexToModel(col);
+				tableModel.fireTableCellUpdated(modelRowIndex, modelColumnIndex); // for update selecting cell's color forcefully (if not, to click same row and right cell doesn't happen repaint background of the cell...)
+
+				try {
+					if(lastSelectedModelRowIndex == null || !lastSelectedModelRowIndex.equals(modelRowIndex)) {
+						Controller.getInstance().refreshMessageDetailPanels(tableModel.getRow(modelRowIndex));
+					}
+				} finally {
+					lastSelectedModelRowIndex = modelRowIndex;
+				}
 			}
 		};
 		table.setComponentPopupMenu(new MessageTablePopupMenu());
