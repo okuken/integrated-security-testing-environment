@@ -1,11 +1,17 @@
 package okuken.iste.dto;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 public class AuthConfigDto {
 
 	private Integer id;
 
 	private Integer authMessageChainId;
 	private MessageChainDto authMessageChainDto;
+
+	private List<AuthApplyConfigDto> authApplyConfigDtos = Lists.newArrayList();
 
 	public Integer getId() {
 		return id;
@@ -29,6 +35,12 @@ public class AuthConfigDto {
 		} else {
 			setAuthMessageChainId(authMessageChainDto.getId());
 		}
+	}
+	public List<AuthApplyConfigDto> getAuthApplyConfigDtos() {
+		return authApplyConfigDtos;
+	}
+	public void setAuthApplyConfigDtos(List<AuthApplyConfigDto> authApplyConfigDtos) {
+		this.authApplyConfigDtos = authApplyConfigDtos;
 	}
 
 }

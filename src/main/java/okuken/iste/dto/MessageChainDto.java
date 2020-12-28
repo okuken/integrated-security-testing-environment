@@ -2,12 +2,14 @@ package okuken.iste.dto;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 public class MessageChainDto {
 
 	private Integer id;
-	private Integer messageId; //parent message
+	private Integer messageId; //base message
 
-	private List<MessageChainNodeDto> nodes;
+	private List<MessageChainNodeDto> nodes = Lists.newArrayList();
 
 
 	public Integer getId() {

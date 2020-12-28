@@ -12,6 +12,7 @@ import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.RepeaterLogic;
+import okuken.iste.util.MessageUtil;
 
 public class MessageDto {
 
@@ -44,10 +45,10 @@ public class MessageDto {
 	private String mimeType;
 	private String cookies;
 
-	private List<MessageParamDto> messageParamList;
+	private List<MessageRequestParamDto> messageParamList;
 
 	private List<MessageCookieDto> messageCookieList;
-	private List<MessageParamDto> responseJson;
+	private List<MessageResponseParamDto> responseJson;
 
 	private Integer messageRawId;
 	private IHttpRequestResponse message;
@@ -272,13 +273,13 @@ public class MessageDto {
 	public void setCookies(String cookies) {
 		this.cookies = cookies;
 	}
-	public List<MessageParamDto> getMessageParamList() {
+	public List<MessageRequestParamDto> getMessageParamList() {
 		if(messageParamList == null) {
 			MessageLogic.getInstance().loadMessageDetail(this);
 		}
 		return messageParamList;
 	}
-	public void setMessageParamList(List<MessageParamDto> messageParamList) {
+	public void setMessageParamList(List<MessageRequestParamDto> messageParamList) {
 		this.messageParamList = messageParamList;
 	}
 	public List<MessageCookieDto> getMessageCookieList() {
@@ -290,13 +291,13 @@ public class MessageDto {
 	public void setMessageCookieList(List<MessageCookieDto> messageCookieList) {
 		this.messageCookieList = messageCookieList;
 	}
-	public List<MessageParamDto> getResponseJson() {
+	public List<MessageResponseParamDto> getResponseJson() {
 		if(responseJson == null && getMessage().getResponse() != null) {
-			responseJson = MessageLogic.getInstance().convertJsonResponseToDto(getMessage().getResponse(), getResponseInfo());
+			responseJson = MessageUtil.convertJsonResponseToDto(getMessage().getResponse(), getResponseInfo());
 		}
 		return responseJson;
 	}
-	public void setResponseJson(List<MessageParamDto> responseJson) {
+	public void setResponseJson(List<MessageResponseParamDto> responseJson) {
 		this.responseJson = responseJson;
 	}
 	public Integer getMessageRawId() {

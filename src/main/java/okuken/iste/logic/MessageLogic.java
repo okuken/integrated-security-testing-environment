@@ -2,23 +2,18 @@ package okuken.iste.logic;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mybatis.dynamic.sql.SqlBuilder;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 
-import burp.ICookie;
 import burp.IHttpRequestResponse;
 import burp.IHttpService;
 import burp.IParameter;
-import burp.IResponseInfo;
 import okuken.iste.dao.auto.MessageDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageMapper;
 import okuken.iste.dao.auto.MessageOrdDynamicSqlSupport;
@@ -28,9 +23,8 @@ import okuken.iste.dao.auto.MessageRawDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageRawMapper;
 import okuken.iste.dao.auto.MessageRepeatMasterDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageRepeatMasterMapper;
-import okuken.iste.dto.MessageCookieDto;
 import okuken.iste.dto.MessageDto;
-import okuken.iste.dto.MessageParamDto;
+import okuken.iste.dto.MessageRequestParamDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.entity.auto.Message;
@@ -38,11 +32,11 @@ import okuken.iste.entity.auto.MessageOrd;
 import okuken.iste.entity.auto.MessageParam;
 import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.entity.auto.MessageRepeatMaster;
-import okuken.iste.enums.ParameterType;
+import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
-import okuken.iste.util.HttpUtil;
+import okuken.iste.util.MessageUtil;
 import okuken.iste.util.SqlUtil;
 
 public class MessageLogic {
@@ -80,7 +74,7 @@ public class MessageLogic {
 					.collect(Collectors.joining("; ")));
 
 			dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
-					.map(cookie -> convertCookieToDto(cookie)).collect(Collectors.toList()));
+					.map(MessageUtil::convertCookieToDto).collect(Collectors.toList()));
 		}
 
 		dto.setMemo("");
@@ -107,37 +101,12 @@ public class MessageLogic {
 				new HttpServiceMock(messageRaw.getHost(), messageRaw.getPort(), messageRaw.getProtocol()));
 	}
 
-	public MessageParamDto convertParameterToDto(IParameter parameter) { //TODO: externalize to converter
-		MessageParamDto dto = new MessageParamDto();
-		dto.setType(parameter.getType());
+	public MessageRequestParamDto convertParameterToDto(IParameter parameter) { //TODO: externalize to converter
+		MessageRequestParamDto dto = new MessageRequestParamDto();
+		dto.setType(RequestParameterType.getByBurpId(parameter.getType()));
 		dto.setName(parameter.getName());
 		dto.setValue(parameter.getValue());
 		return dto;
-	}
-
-	public MessageCookieDto convertCookieToDto(ICookie cookie) { // TODO: externalize to converter
-		MessageCookieDto cookieDto = new MessageCookieDto();
-		cookieDto.setDomain(cookie.getDomain());
-		cookieDto.setPath(cookie.getPath());
-		cookieDto.setExpiration(cookie.getExpiration());
-		cookieDto.setName(cookie.getName());
-		cookieDto.setValue(cookie.getValue());
-		return cookieDto;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<MessageParamDto> convertJsonResponseToDto(byte[] response, IResponseInfo responseInfo) {
-		var responseBody = HttpUtil.extractMessageBody(response, responseInfo.getBodyOffset());
-		var responseBodyStr = new String(responseBody, StandardCharsets.UTF_8);
-		Map<String, Object> json = new Gson().fromJson(responseBodyStr, Map.class);
-
-		return json.entrySet().stream().map(entry -> {
-			var dto = new MessageParamDto();
-			dto.setName(entry.getKey());
-			dto.setValue(entry.getValue().toString());
-			dto.setType(ParameterType.JSON.getId());
-			return dto;
-		}).collect(Collectors.toList());
 	}
 
 	private void copyEditableFieldValuesToEntity(MessageDto dto, Message message) {
@@ -191,11 +160,11 @@ public class MessageLogic {
 				int messageId = SqlUtil.loadGeneratedId(session);
 				dto.setId(messageId);
 
-				for(MessageParamDto paramDto: dto.getMessageParamList()) {
+				for(MessageRequestParamDto paramDto: dto.getMessageParamList()) {
 					//TODO: auto convert
 					MessageParam messageParam = new MessageParam();
 					messageParam.setFkMessageId(messageId);
-					messageParam.setType(Byte.toUnsignedInt(paramDto.getType()));
+					messageParam.setType(Byte.toUnsignedInt(paramDto.getType().getId()));
 					messageParam.setName(paramDto.getName());
 					messageParam.setValue(paramDto.getValue());
 					messageParam.setPrcDate(now);
@@ -343,7 +312,7 @@ public class MessageLogic {
 		if(httpRequestResponse.getResponse() != null) {
 			dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(httpRequestResponse.getResponse()));
 			dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
-					.map(cookie -> convertCookieToDto(cookie)).collect(Collectors.toList()));
+					.map(MessageUtil::convertCookieToDto).collect(Collectors.toList()));
 		}
 	}
 

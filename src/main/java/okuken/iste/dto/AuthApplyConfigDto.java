@@ -1,10 +1,13 @@
 package okuken.iste.dto;
 
-public class MessageChainNodeInDto {
+import okuken.iste.enums.RequestParameterType;
+
+public class AuthApplyConfigDto {
 
 	private Integer id;
+	private Integer authConfigId;
 
-	private byte paramType; //@see IParameter
+	private RequestParameterType paramType;
 	private String paramName;
 	private String varName;
 
@@ -14,10 +17,16 @@ public class MessageChainNodeInDto {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public byte getParamType() {
+	public Integer getAuthConfigId() {
+		return authConfigId;
+	}
+	public void setAuthConfigId(Integer authConfigId) {
+		this.authConfigId = authConfigId;
+	}
+	public RequestParameterType getParamType() {
 		return paramType;
 	}
-	public void setParamType(byte paramType) {
+	public void setParamType(RequestParameterType paramType) {
 		this.paramType = paramType;
 	}
 	public String getParamName() {

@@ -85,7 +85,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		authSessionRefreshButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int selectedIndex = authAccountComboBox.getSelectedIndex();
-				if(selectedIndex < 1) {
+				if(selectedIndex < 1) { //dummy
 					return;
 				}
 
@@ -193,8 +193,8 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 	}
 
 	public void sendRequest() {
-		AuthAccountDto authAccountDto = authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex());
-		if(authAccountDto.getId() != null && authAccountDto.getSessionId() == null) {
+		AuthAccountDto authAccountDto = getSelectedAuthAccountDto();
+		if(authAccountDto != null && authAccountDto.getSessionId() == null) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				SwingUtilities.invokeLater(() -> {
 					sendRequestImpl(authAccountDto);
@@ -249,7 +249,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	public void refreshAuthAccountsComboBox() {
 		authAccountComboBox.removeAllItems();
-		authAccountComboBox.addItem(new AuthAccountDto());
+		authAccountComboBox.addItem(new AuthAccountDto()); //dummy
 		authSessionRefreshButton.setEnabled(false);
 
 		if(ConfigLogic.getInstance().getAuthConfig() == null) {
@@ -259,6 +259,14 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		Controller.getInstance().getAuthAccounts().forEach(authAccount -> {
 			authAccountComboBox.addItem(authAccount);
 		});
+	}
+
+	public AuthAccountDto getSelectedAuthAccountDto() {
+		var selectedIndex = authAccountComboBox.getSelectedIndex();
+		if(selectedIndex < 1) { //dummy
+			return null;
+		}
+		return authAccountComboBox.getItemAt(selectedIndex);
 	}
 
 	public void clear() {

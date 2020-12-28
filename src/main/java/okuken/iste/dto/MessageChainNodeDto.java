@@ -8,8 +8,8 @@ public class MessageChainNodeDto {
 
 	private MessageDto messageDto;
 
-	private List<MessageChainNodeInDto> ins;
-	private List<MessageChainNodeOutDto> outs;
+	private List<MessageChainNodeReqpDto> reqps;
+	private List<MessageChainNodeRespDto> resps;
 
 	public Integer getId() {
 		return id;
@@ -23,17 +23,17 @@ public class MessageChainNodeDto {
 	public void setMessageDto(MessageDto messageDto) {
 		this.messageDto = messageDto;
 	}
-	public List<MessageChainNodeInDto> getIns() {
-		return ins;
+	public List<MessageChainNodeReqpDto> getReqps() {
+		return reqps;
 	}
-	public void setIns(List<MessageChainNodeInDto> ins) {
-		this.ins = ins;
+	public void setReqps(List<MessageChainNodeReqpDto> reqps) {
+		this.reqps = reqps;
 	}
-	public List<MessageChainNodeOutDto> getOuts() {
-		return outs;
+	public List<MessageChainNodeRespDto> getResps() {
+		return resps;
 	}
-	public void setOuts(List<MessageChainNodeOutDto> outs) {
-		this.outs = outs;
+	public void setResps(List<MessageChainNodeRespDto> resps) {
+		this.resps = resps;
 	}
 
 }

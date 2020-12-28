@@ -18,6 +18,7 @@ import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.auth.AuthPanel;
+import okuken.iste.view.chain.ChainRepeaterPanel;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
@@ -106,6 +107,10 @@ public class SuitePanel extends JPanel {
 		repeaterPanel = new RepeaterPanel();
 		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_REPEAT, null, repeaterPanel, null);
 		Controller.getInstance().setRepeaterPanel(repeaterPanel);
+		
+		ChainRepeaterPanel chainRepeaterPanel = new ChainRepeaterPanel();
+		messageDetailTabbedPane.addTab(Captions.TAB_MAIN_MESSAGE_EDITOR_CHAIN, null, chainRepeaterPanel, null);
+		Controller.getInstance().setChainRepeaterPanel(chainRepeaterPanel);
 		
 		JPanel mainRightPanel = new JPanel();
 		mainSplitPane.setRightComponent(mainRightPanel);

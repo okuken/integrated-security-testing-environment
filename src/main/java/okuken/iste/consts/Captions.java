@@ -10,6 +10,13 @@ public class Captions {
 
 	public static final String FILECHOOSER = "...";
 
+	public static final String GROUP_CONTROL_BUTTON_ADD = "\u2795"; //+
+	public static final String GROUP_CONTROL_BUTTON_DELETE = "\u2716"; //x
+
+	public static final String TABLE_CONTROL_BUTTON_ADD = "+";
+	public static final String TABLE_CONTROL_BUTTON_DELETE = "-";
+
+
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";	
 	public static final String TAB_SUITE = "ISTE";
 	public static final String TAB_MAIN = "List";
@@ -22,11 +29,15 @@ public class Captions {
 	public static final String TAB_MAIN_MESSAGE_EDITOR_ORIGINAL = "Org";
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT_MASTER = "Master";
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT = "Repeater";
+	public static final String TAB_MAIN_MESSAGE_EDITOR_CHAIN = "Chain";
 
 	public static final String TAB_OPTIONS_PROJECT_OPTIONS = "Project options";
 	public static final String TAB_OPTIONS_USER_OPTIONS = "User options";
 	public static final String TAB_OPTIONS_USER_OPTIONS_MISC = "Misc";
 	public static final String TAB_OPTIONS_USER_OPTIONS_TEMPLATE = "Template";
+
+	public static final String TAB_MESSAGE_EDITOR_REQUEST = "Request";
+	public static final String TAB_MESSAGE_EDITOR_RESPONSE = "Response";
 
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
 
@@ -48,24 +59,25 @@ public class Captions {
 	public static final String REPEATER_BUTTON_FOLLOW_REDIRECT = "Follow redirection";
 	public static final String REPEATER_BUTTON_SAVE_AS_MASTER = "Save as master";
 
+	public static final String CHAIN_REPEATER_BUTTON_EDIT_CHAIN = "Edit request chain";
+	public static final String CHAIN_REPEATER_POPUP_TITLE_SUFFIX_EDIT_CHAIN = " - Edit request chain";
+
+	public static final String CHAIN_DEF_TABLE_TITLE_REQUEST_MANIPULATION = "Request manipulation";
+	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
+
+	public static final String CHAIN_DEF_TEST = "Test";
+	public static final String CHAIN_DEF_SAVE = "Save";
+	public static final String CHAIN_DEF_CANCEL = "Cancel";
+
 	public static final String MESSAGE_MEMO_TOGGLE_PIN = "\uD83D\uDCCC";
 
 	public static final String PROJECT_MEMO_BUTTON_WRAP = "Wrap";
 
-	public static final String AUTH_CONTROL_BUTTON_ADD = "+";
-	public static final String AUTH_CONTROL_BUTTON_DELETE = "-";
+	public static final String AUTH_CONFIG_TABLE_TITLE_ACCOUNTS = "Accounts";
+	public static final String AUTH_CONFIG_TABLE_TITLE_APPLY_CONFIG = "How to apply vars provided by authentication request chain to each repeat requests";
 
-	public static final String AUTH_TABLE_FIELD_USER_ID = "ID";
-	public static final String AUTH_TABLE_FIELD_PASSWORD = "Password";
-	public static final String AUTH_TABLE_FIELD_REMARK = "Remark";
-
-	public static final String AUTH_CONFIG_LOGIN_URL = "URL:";
-	public static final String AUTH_CONFIG_LOGIN_ID = "ID:";
-	public static final String AUTH_CONFIG_LOGIN_PW = "Password:";
-	public static final String AUTH_CONFIG_SESSIONID = "Session ID:";
-
-	public static final String AUTH_CONFIG_BUTTON_LOGIN_TEST = "Test";
-	public static final String AUTH_CONFIG_BUTTON_SAVE = "Save";
+	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN = "Edit authentication request chain";
+	public static final String AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN = "Auth config - Edit request chain";
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo to txt";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";

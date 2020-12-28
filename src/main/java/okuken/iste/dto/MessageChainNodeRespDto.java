@@ -1,12 +1,13 @@
 package okuken.iste.dto;
 
-public class MessageChainNodeOutDto {
+import okuken.iste.enums.ResponseParameterType;
+
+public class MessageChainNodeRespDto {
 
 	private Integer id;
 
-	private byte paramType; //@see IParameter
+	private ResponseParameterType paramType;
 	private String paramName;
-	private String regex;
 	private String varName;
 
 	public Integer getId() {
@@ -15,10 +16,10 @@ public class MessageChainNodeOutDto {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public byte getParamType() {
+	public ResponseParameterType getParamType() {
 		return paramType;
 	}
-	public void setParamType(byte paramType) {
+	public void setParamType(ResponseParameterType paramType) {
 		this.paramType = paramType;
 	}
 	public String getParamName() {
@@ -26,12 +27,6 @@ public class MessageChainNodeOutDto {
 	}
 	public void setParamName(String paramName) {
 		this.paramName = paramName;
-	}
-	public String getRegex() {
-		return regex;
-	}
-	public void setRegex(String regex) {
-		this.regex = regex;
 	}
 	public String getVarName() {
 		return varName;

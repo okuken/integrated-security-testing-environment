@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -17,8 +18,10 @@ import burp.IHttpRequestResponse;
 import burp.ITab;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.AuthApplyConfigDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageChainDto;
+import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
@@ -36,9 +39,11 @@ import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.plugin.PluginInfo;
 import okuken.iste.plugin.PluginManager;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.SuitePanel;
 import okuken.iste.view.SuiteTab;
 import okuken.iste.view.auth.AuthPanel;
+import okuken.iste.view.chain.ChainRepeaterPanel;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
@@ -68,6 +73,7 @@ public class Controller {
 	private MessageEditorPanel orgMessageEditorPanel;
 	private RepeatMasterPanel repeatMasterPanel;
 	private RepeaterPanel repeaterPanel;
+	private ChainRepeaterPanel chainRepeaterPanel;
 
 	private MessageMemoPanel messageMemoPanel;
 
@@ -124,6 +130,9 @@ public class Controller {
 	public void setRepeaterPanel(RepeaterPanel repeaterPanel) {
 		this.repeaterPanel = repeaterPanel;
 	}
+	public void setChainRepeaterPanel(ChainRepeaterPanel chainRepeaterPanel) {
+		this.chainRepeaterPanel = chainRepeaterPanel;
+	}
 	public void setMessageMemoPanel(MessageMemoPanel messageMemoPanel) {
 		this.messageMemoPanel = messageMemoPanel;
 	}
@@ -167,7 +176,7 @@ public class Controller {
 	}
 
 	private void refreshComponentsDependentOnMessages(List<MessageDto> messageDtos) {
-		authPanel.refreshConfigPanel(messageDtos);
+//		authPanel.refreshConfigPanel(messageDtos);
 	}
 
 	public void initSizeRatioOfParts() {
@@ -179,6 +188,10 @@ public class Controller {
 		for (int i = 0; e.hasMoreElements(); i++) {
 			e.nextElement().setPreferredWidth(MessageTableColumn.getByCaption(messageTable.getColumnName(i)).getWidth());
 		}
+	}
+
+	public List<MessageDto> getMessages() {
+		return this.messageTablePanel.getMessages();
 	}
 
 	public List<Integer> getSelectedRowIndexs() {
@@ -197,6 +210,7 @@ public class Controller {
 		this.orgMessageEditorPanel.setMessage(dto);
 		this.repeatMasterPanel.setup(dto);
 		this.repeaterPanel.setup(dto);
+		this.chainRepeaterPanel.setup(dto);
 		this.messageMemoPanel.enablePanel(dto);
 	}
 
@@ -208,8 +222,16 @@ public class Controller {
 		repeaterPanel.refreshAuthAccountsComboBox();
 	}
 
+	public AuthAccountDto getSelectedAuthAccountOnRepeater() {
+		return repeaterPanel.getSelectedAuthAccountDto();
+	}
+
+	public void sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
+		MessageChainLogic.getInstance().sendMessageChain(messageChainDto, authAccountDto, callback, forAuth, needSaveHistory);
+	}
+
 	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback) {
-		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, true);
+		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, false, true);
 	}
 
 	public void sendRepeaterRequest() {
@@ -270,18 +292,22 @@ public class Controller {
 	public List<AuthAccountDto> getAuthAccounts() {
 		return AuthLogic.getInstance().loadAuthAccounts();
 	}
-	public void saveAuthAccount(AuthAccountDto authAccountDto) {
-		AuthLogic.getInstance().saveAuthAccount(authAccountDto);
+	public void saveAuthAccount(AuthAccountDto authAccountDto, boolean keepOldSessionId) {
+		AuthLogic.getInstance().saveAuthAccount(authAccountDto, keepOldSessionId);
+		refreshComponentsDependOnAuthConfig();
 	}
 	public void deleteAuthAccounts(List<AuthAccountDto> authAccountDtos) {
 		AuthLogic.getInstance().deleteAuthAccounts(authAccountDtos);
+		refreshComponentsDependOnAuthConfig();
 	}
 
-	public void fetchNewAuthSession(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<MessageRepeatDto> callback, boolean isTest) {
-		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, authMessageChainDto, callback, isTest);
-	}
-	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<MessageRepeatDto> callback) {
+	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<MessageChainRepeatDto> callback) {
 		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, callback);
+	}
+
+	private void clearAuthAccountsSession() {
+		AuthLogic.getInstance().clearAuthAccountsSession();
+		refreshComponentsDependOnAuthConfig();
 	}
 
 	public AuthConfigDto getAuthConfig() {
@@ -291,21 +317,38 @@ public class Controller {
 		return ret;
 	}
 
-	public AuthConfigDto saveAuthConfig(MessageChainDto messageChainDto) {
+	public void saveAuthApplyConfig(AuthApplyConfigDto authApplyConfigDto) {
+		AuthLogic.getInstance().saveAuthApplyConfig(authApplyConfigDto);
+		clearAuthAccountsSession();
+	}
+	public void deleteAuthApplyConfigs(List<AuthApplyConfigDto> authApplyConfigDtos) {
+		AuthLogic.getInstance().deleteAuthApplyConfigs(authApplyConfigDtos);
+		clearAuthAccountsSession();
+	}
+
+	public AuthAccountDto getSelectedAuthAccountOnAuthConfig() {
+		var selectedAuthAccounts = authPanel.getSelectedAuthAccounts();
+		if(selectedAuthAccounts.isEmpty()) {
+			return null;
+		}
+		return selectedAuthAccounts.get(0);
+	}
+
+	public Integer getMessageChainIdByBaseMessageId(Integer messageId) {
+		return MessageChainLogic.getInstance().getMessageChainIdByBaseMessageId(messageId);
+	}
+
+	public MessageChainDto loadMessageChain(Integer messageChainId) {
+		return MessageChainLogic.getInstance().loadMessageChain(messageChainId);
+	}
+
+	public void saveMessageChain(MessageChainDto messageChainDto, boolean isAuthChain) {
 		MessageChainLogic.getInstance().saveMessageChain(messageChainDto);
 
-		var authConfigDto = ConfigLogic.getInstance().getAuthConfig();
-		if(authConfigDto == null) {
-			authConfigDto = new AuthConfigDto();
+		if(isAuthChain) {
+			ConfigLogic.getInstance().getAuthConfig().setAuthMessageChainDto(messageChainDto);
+			clearAuthAccountsSession();
 		}
-		authConfigDto.setAuthMessageChainDto(messageChainDto);
-		AuthLogic.getInstance().saveAuthConfig(authConfigDto);
-
-		AuthLogic.getInstance().clearAuthAccountsSession();
-
-		refreshComponentsDependOnAuthConfig();
-
-		return authConfigDto;
 	}
 
 	public PluginInfo loadPlugin(String pluginJarFilePath) {
@@ -373,6 +416,7 @@ public class Controller {
 		this.repeatMasterPanel.clear();
 		this.repeaterPanel.clear();
 		this.messageMemoPanel.disablePanel();
+		UiUtil.disposePopupFrames();
 
 		loadDatabase();
 	}

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -40,6 +41,11 @@ public class UiUtil {
 		return SwingUtilities.getWindowAncestor(component);
 	}
 
+	public static final void repaint(JComponent component) {
+		component.revalidate();
+		component.repaint();
+	}
+
 	public static final void copyToClipboard(String content) {
 		StringSelection stringSelection = new StringSelection(content);
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, stringSelection);
@@ -57,7 +63,8 @@ public class UiUtil {
 		table.getActionMap().put(actionMapKeyCopyCell, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				copyToClipboard(table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), columnIndexTranslator.apply(table.getSelectedColumn())).toString());
+				var val = table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), columnIndexTranslator.apply(table.getSelectedColumn()));
+				copyToClipboard(val != null ? val.toString() : "");
 			}
 		});
 	}
@@ -111,29 +118,33 @@ public class UiUtil {
 	}
 
 
+	private static final List<JFrame> popupFrames = Lists.newArrayList(); 
+	public static void disposePopupFrames() {
+		popupFrames.forEach(popupFrame -> {
+			popupFrame.dispose();
+		});
+	}
+	public static JFrame popup(String title, Container contentPane, Component triggerComponent) {
+		var ret = createAndShowFrame(title, contentPane, triggerComponent);
+		popupFrames.add(ret);
+		return ret;
+	}
+	public static void closePopup(JFrame popupFrame) {
+		popupFrame.dispose();
+		popupFrames.remove(popupFrame);
+	}
+
 	private static final List<JFrame> dockoutFrames = Lists.newArrayList(); 
 	public static void disposeDockoutFrames() {
 		dockoutFrames.forEach(dockoutFrame -> {
 			dockoutFrame.dispose();
 		});
 	}
-
 	public static JFrame dockout(String title, Container contentPane) {
-		JFrame burpSuiteFrame = BurpUtil.getBurpSuiteJFrame();
-
-		JFrame dockoutFrame = new JFrame();
-		dockoutFrame.setTitle(title);
-		dockoutFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		dockoutFrame.setBounds(burpSuiteFrame.getBounds());
-		dockoutFrame.setContentPane(contentPane);
-		dockoutFrame.setLocationRelativeTo(burpSuiteFrame);
-		dockoutFrame.setVisible(true);
-
-		dockoutFrames.add(dockoutFrame);
-
-		return dockoutFrame;
+		var ret = createAndShowFrame(title, contentPane, null);
+		dockoutFrames.add(ret);
+		return ret;
 	}
-
 	public static void dockin(Container contentPane, Container parentContainer, JFrame dockoutFrame) {
 		parentContainer.add(contentPane);
 		dockinAfterProcess(dockoutFrame);
@@ -152,6 +163,25 @@ public class UiUtil {
 		return String.format("%s - %s", tabName, Captions.EXTENSION_NAME_FULL);
 	}
 
+	private static JFrame createAndShowFrame(String title, Container contentPane, Component triggerComponent) {
+		var parentFrame = getParentFrame(triggerComponent);
+
+		JFrame popupFrame = new JFrame();
+		popupFrame.setTitle(title);
+		popupFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		popupFrame.setBounds(parentFrame.getBounds());
+		popupFrame.setContentPane(contentPane);
+		popupFrame.setLocationRelativeTo(parentFrame);
+
+		BurpUtil.getCallbacks().customizeUiComponent(popupFrame);
+		popupFrame.setVisible(true);
+
+		return popupFrame;
+	}
+
+	public static void showMessage(String message, Component triggerComponent) {
+		JOptionPane.showMessageDialog(getParentFrame(triggerComponent), message);
+	}
 
 	public static boolean getConfirmAnswer(String message) {
 		return getConfirmAnswer(message, null);

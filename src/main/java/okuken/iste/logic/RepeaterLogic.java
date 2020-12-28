@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.mybatis.dynamic.sql.BasicColumn;
@@ -28,7 +27,6 @@ import okuken.iste.dao.MessageRepeatMapper;
 import okuken.iste.dao.auto.MessageRepeatRedirDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageRepeatRedirMapper;
 import okuken.iste.dto.AuthAccountDto;
-import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
@@ -36,11 +34,10 @@ import okuken.iste.dto.PayloadDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.entity.auto.MessageRaw;
-import okuken.iste.enums.ParameterType;
 import okuken.iste.entity.MessageRepeat;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
-import okuken.iste.util.HttpUtil;
+import okuken.iste.util.MessageUtil;
 import okuken.iste.util.SqlUtil;
 
 public class RepeaterLogic {
@@ -56,33 +53,24 @@ public class RepeaterLogic {
 
 	public MessageRepeatDto sendRequest(List<PayloadDto> payloadDtos, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean needSaveHistory) {
 		return sendRequest(
-				applyPayloads(orgMessageDto.getMessage().getRequest(), payloadDtos),
+				MessageUtil.applyPayloads(orgMessageDto.getMessage().getRequest(), payloadDtos),
 				null,
 				orgMessageDto,
 				callback,
+				false,
 				needSaveHistory);
 	}
-	private byte[] applyPayloads(byte[] request, List<PayloadDto> payloadDtos) {
-		byte[] ret = request;
-		for(PayloadDto payloadDto: payloadDtos) {
-			ret = BurpUtil.getHelpers().updateParameter(ret, BurpUtil.getHelpers().buildParameter(
-					payloadDto.getTargetParamName(),
-					payloadDto.getPayload(),
-					payloadDto.getTargetParamType()));
-		}
-		return ret;
-	}
 
-	public MessageRepeatDto sendRequest(byte[] aRequest, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean needSaveHistory) {
-		byte[] request = buildRequest(aRequest, authAccountDto);
+	public MessageRepeatDto sendRequest(byte[] aRequest, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean forAuth, boolean needSaveHistory) {
+		byte[] request = buildRequest(aRequest, forAuth, authAccountDto);
 
 		MessageRepeatDto repeatDto = new MessageRepeatDto();
 		repeatDto.setOrgMessageId(orgMessageDto.getId());
 		repeatDto.setMessage(new HttpRequestResponseMock(request, null, orgMessageDto.getMessage().getHttpService()));
 		repeatDto.setSendDate(Calendar.getInstance().getTime());
 		repeatDto.setDifference("");//TODO: impl
-		if(authAccountDto != null && authAccountDto.getSessionId() != null) {
-			repeatDto.setUserId(authAccountDto.getUserId());
+		if(!forAuth && authAccountDto != null && authAccountDto.getSessionId() != null) {
+			repeatDto.setUserId(authAccountDto.getField01());
 		}
 
 		if(needSaveHistory) {
@@ -121,60 +109,21 @@ public class RepeaterLogic {
 
 		return repeatDto;
 	}
-	private byte[] buildRequest(byte[] request, AuthAccountDto authAccountDto) {
-		if(authAccountDto != null && authAccountDto.getSessionId() != null) {
+	private byte[] buildRequest(byte[] request, boolean forAuth, AuthAccountDto authAccountDto) {
+		if(!forAuth && authAccountDto != null && authAccountDto.getSessionId() != null) {
 			return applyAuthAccount(request, authAccountDto);
 		}
-		return updateContentLength(request);
+		return MessageUtil.updateContentLength(request);
 	}
 	private byte[] applyAuthAccount(byte[] request, AuthAccountDto authAccountDto) {
-		AuthConfigDto authConfig = ConfigLogic.getInstance().getAuthConfig();
-		if(authConfig == null) {
-			throw new IllegalStateException("Sessionid was set but AuthConfig has not saved.");
+		var applyConfigDtos = ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos();
+		if(applyConfigDtos.isEmpty()) {
+			throw new IllegalStateException("Sessionid was set but AuthApplyConfig has not registered.");
 		}
 
-		var sessionidNodeOutDto = authConfig.getAuthMessageChainDto().getNodes().get(0).getOuts().get(0);
-
-		var parameterType = ParameterType.getById(sessionidNodeOutDto.getParamType());
-		switch (parameterType) {
-			case COOKIE:
-				IParameter parameter = BurpUtil.getHelpers().buildParameter(
-						sessionidNodeOutDto.getParamName(),
-						authAccountDto.getSessionId(),
-						sessionidNodeOutDto.getParamType());
-
-				return applyCookieParameter(request, parameter);
-
-			case JSON:
-			case REGEX:
-				//TODO: generalize...
-				var authorizationHeader = HttpUtil.createAuthorizationBearerHeader(authAccountDto.getSessionId());
-
-				var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
-				var headers = requestInfo.getHeaders();
-				var authorizationHeaderIndex = IntStream.range(0, headers.size()).filter(i -> HttpUtil.judgeIsAuthorizationBearerHeader(headers.get(i))).findFirst();
-				if(authorizationHeaderIndex.isPresent()) {
-					headers.remove(authorizationHeaderIndex.getAsInt());
-					headers.add(authorizationHeaderIndex.getAsInt(), authorizationHeader);
-				} else {
-					headers.add(authorizationHeader);
-				}
-
-				var body = HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset());
-				return BurpUtil.getHelpers().buildHttpMessage(headers, body);
-			default:
-				throw new IllegalArgumentException(String.format("Unsupported parameter type: %s", parameterType));
-		}
-	}
-	private byte[] applyCookieParameter(byte[] request, IParameter parameter) {
-		var ret = BurpUtil.getHelpers().removeParameter(request, parameter);
-		ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
-		return BurpUtil.getHelpers().addParameter(ret, parameter);
-	}
-
-	private byte[] updateContentLength(byte[] request) {
-		var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
-		return BurpUtil.getHelpers().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
+		//TODO: support multiple sessionId
+		var authApplyConfig = applyConfigDtos.get(0);
+		return MessageUtil.applyPayload(request, authApplyConfig.getParamType(), authApplyConfig.getParamName(), authAccountDto.getSessionId());
 	}
 
 	private void save(MessageRepeatDto messageRepeatDto) {
@@ -376,7 +325,7 @@ public class RepeaterLogic {
 				.collect(Collectors.toList());
 
 		for(var targetCookieParam: beforeResponseCookieParams) {
-			ret = applyCookieParameter(ret, targetCookieParam);
+			ret = MessageUtil.applyCookiePayload(ret, targetCookieParam);
 		}
 
 		return ret;

@@ -1,15 +1,17 @@
 package okuken.iste.dto;
 
-public class MessageParamDto {
+import okuken.iste.enums.ResponseParameterType;
 
-	private byte type;
+public class MessageResponseParamDto {
+
+	private ResponseParameterType type;
 	private String name;
 	private String value;
 
-	public byte getType() {
+	public ResponseParameterType getType() {
 		return type;
 	}
-	public void setType(byte type) {
+	public void setType(ResponseParameterType type) {
 		this.type = type;
 	}
 	public String getName() {

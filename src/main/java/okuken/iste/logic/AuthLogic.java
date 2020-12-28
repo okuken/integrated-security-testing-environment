@@ -2,28 +2,25 @@ package okuken.iste.logic;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.mybatis.dynamic.sql.SqlBuilder;
-
-import com.google.common.collect.Lists;
+import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
 import okuken.iste.dao.auto.AuthAccountDynamicSqlSupport;
 import okuken.iste.dao.auto.AuthAccountMapper;
+import okuken.iste.dao.auto.AuthApplyConfigDynamicSqlSupport;
+import okuken.iste.dao.auto.AuthApplyConfigMapper;
 import okuken.iste.dao.auto.AuthConfigDynamicSqlSupport;
 import okuken.iste.dao.auto.AuthConfigMapper;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.AuthApplyConfigDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageChainDto;
-import okuken.iste.dto.MessageChainNodeInDto;
-import okuken.iste.dto.MessageParamDto;
-import okuken.iste.dto.MessageRepeatDto;
-import okuken.iste.dto.PayloadDto;
+import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.entity.auto.AuthAccount;
+import okuken.iste.entity.auto.AuthApplyConfig;
 import okuken.iste.entity.auto.AuthConfig;
-import okuken.iste.enums.ParameterType;
-import okuken.iste.util.BurpUtil;
+import okuken.iste.enums.RequestParameterType;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.SqlUtil;
 
@@ -38,7 +35,7 @@ public class AuthLogic {
 	/**
 	 * insert or update.
 	 */
-	public void saveAuthAccount(AuthAccountDto dto) {
+	public void saveAuthAccount(AuthAccountDto dto, boolean keepOldSessionId) {
 		String now = SqlUtil.now();
 		DbUtil.withTransaction(session -> {
 			AuthAccountMapper mapper = session.getMapper(AuthAccountMapper.class);
@@ -47,13 +44,20 @@ public class AuthLogic {
 			AuthAccount entity = new AuthAccount();
 			entity.setId(dto.getId());
 			entity.setFkProjectId(ConfigLogic.getInstance().getProjectId());
-			entity.setUserId(dto.getUserId());
-			entity.setPassword(dto.getPassword());
+			entity.setField01(dto.getField01());
+			entity.setField02(dto.getField02());
+			entity.setField03(dto.getField03());
+			entity.setField04(dto.getField04());
+			entity.setField05(dto.getField05());
 			entity.setRemark(dto.getRemark());
 			entity.setSessionId(dto.getSessionId());
 			entity.setPrcDate(now);
 
 			if(entity.getId() != null) {
+				if(keepOldSessionId) {
+					entity.setSessionId(mapper.selectByPrimaryKey(entity.getId()).get().getSessionId());
+				}
+
 				mapper.updateByPrimaryKey(entity);
 				return;
 			}
@@ -71,7 +75,7 @@ public class AuthLogic {
 			mapper.update(c -> c
 					.set(AuthAccountDynamicSqlSupport.sessionId).equalToNull()
 					.set(AuthAccountDynamicSqlSupport.prcDate).equalTo(now)
-					.where(AuthAccountDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+					.where(AuthAccountDynamicSqlSupport.fkProjectId, isEqualTo(ConfigLogic.getInstance().getProjectId())));
 		});
 	}
 
@@ -80,15 +84,18 @@ public class AuthLogic {
 			DbUtil.withSession(session -> {
 				AuthAccountMapper mapper = session.getMapper(AuthAccountMapper.class);
 				return mapper.select(c -> c
-						.where(AuthAccountDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId()))
+						.where(AuthAccountDynamicSqlSupport.fkProjectId, isEqualTo(ConfigLogic.getInstance().getProjectId()))
 						.orderBy(AuthAccountDynamicSqlSupport.id));
 			});
 
 		return entitys.stream().map(entity -> {//TODO: auto convert
 			AuthAccountDto dto = new AuthAccountDto();
 			dto.setId(entity.getId());
-			dto.setUserId(entity.getUserId());
-			dto.setPassword(entity.getPassword());
+			dto.setField01(entity.getField01());
+			dto.setField02(entity.getField02());
+			dto.setField03(entity.getField03());
+			dto.setField04(entity.getField04());
+			dto.setField05(entity.getField05());
 			dto.setRemark(entity.getRemark());
 			dto.setSessionId(entity.getSessionId());
 			return dto;
@@ -103,6 +110,17 @@ public class AuthLogic {
 				mapper.deleteByPrimaryKey(dto.getId());
 			});
 		});
+	}
+
+	public AuthConfigDto initAuthConfig() {
+		var messageChainDto = new MessageChainDto();
+		MessageChainLogic.getInstance().saveMessageChain(messageChainDto);
+
+		var authConfigDto = new AuthConfigDto();
+		authConfigDto.setAuthMessageChainDto(messageChainDto);
+		saveAuthConfig(authConfigDto);
+
+		return authConfigDto;
 	}
 
 	/**
@@ -128,14 +146,14 @@ public class AuthLogic {
 			mapper.insert(entity);
 			dto.setId(entity.getId());
 		});
-
-		ConfigLogic.getInstance().setAuthConfig(dto);
 	}
 
 	public AuthConfigDto loadAuthConfig() {
 		var ret = DbUtil.withSession(session -> {
-			var mapper = session.getMapper(AuthConfigMapper.class);
-			var entityOptional = mapper.selectOne(c -> c.where(AuthConfigDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+			var authConfigMapper = session.getMapper(AuthConfigMapper.class);
+			var authApplyConfigMapper = session.getMapper(AuthApplyConfigMapper.class);
+
+			var entityOptional = authConfigMapper.selectOne(c -> c.where(AuthConfigDynamicSqlSupport.fkProjectId, isEqualTo(ConfigLogic.getInstance().getProjectId())));
 			if(entityOptional.isEmpty()) {
 				return null;
 			}
@@ -144,6 +162,21 @@ public class AuthLogic {
 			var dto = new AuthConfigDto();
 			dto.setId(entity.getId());
 			dto.setAuthMessageChainId(entity.getFkMessageChainId());
+
+			dto.setAuthApplyConfigDtos(
+				authApplyConfigMapper.select(c -> c
+					.where(AuthApplyConfigDynamicSqlSupport.fkAuthConfigId, isEqualTo(dto.getId()))
+					.orderBy(AuthApplyConfigDynamicSqlSupport.id))
+					.stream().map(applyEntity -> {
+						var applyDto = new AuthApplyConfigDto();
+						applyDto.setId(applyEntity.getId());
+						applyDto.setAuthConfigId(dto.getId());
+						applyDto.setParamType(RequestParameterType.getById((byte)(int)applyEntity.getParamType()));
+						applyDto.setParamName(applyEntity.getParamName());
+						applyDto.setVarName(applyEntity.getVarName());
+						return applyDto;
+					}).collect(Collectors.toList()));
+
 			return dto;
 		});
 
@@ -157,70 +190,67 @@ public class AuthLogic {
 		return ret;
 	}
 
-	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, Consumer<MessageRepeatDto> callback) {
+	/**
+	 * insert or update.
+	 */
+	public void saveAuthApplyConfig(AuthApplyConfigDto dto) {
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			AuthApplyConfigMapper mapper = session.getMapper(AuthApplyConfigMapper.class);
+
+			//TODO: auto convert
+			AuthApplyConfig entity = new AuthApplyConfig();
+			entity.setId(dto.getId());
+			entity.setFkAuthConfigId(dto.getAuthConfigId());
+			entity.setParamType((int)dto.getParamType().getId());
+			entity.setParamName(dto.getParamName());
+			entity.setVarName(dto.getVarName());
+			entity.setPrcDate(now);
+
+			if(entity.getId() != null) {
+				mapper.updateByPrimaryKey(entity);
+				return;
+			}
+
+			mapper.insert(entity);
+			dto.setId(entity.getId());
+		});
+	}
+
+	public void deleteAuthApplyConfigs(List<AuthApplyConfigDto> dtos) {
+		DbUtil.withTransaction(session -> {
+			AuthApplyConfigMapper mapper = session.getMapper(AuthApplyConfigMapper.class);
+
+			dtos.forEach(dto -> {
+				mapper.deleteByPrimaryKey(dto.getId());
+			});
+		});
+	}
+
+	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, Consumer<MessageChainRepeatDto> callback) {
 		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), callback, false);
 	}
-	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<MessageRepeatDto> callback, boolean isTest) {
-		var authChainNodeDto = authMessageChainDto.getNodes().get(0);
-
-		RepeaterLogic.getInstance().sendRequest(
-				createLoginPayload(authAccountDto, authChainNodeDto.getIns().get(0)/**/, authChainNodeDto.getIns().get(1)/**/),
-				authChainNodeDto.getMessageDto(),
-				messageRepeatDto -> {
-
-					if(messageRepeatDto.getMessage().getResponse() == null) {
-						throw new IllegalStateException("Authentication request's response is empty.");
-					}
-
-					var sessionIdName = authChainNodeDto.getOuts().get(0)/**/.getParamName();
-					var sessionIdType = ParameterType.getById(authChainNodeDto.getOuts().get(0)/**/.getParamType());
-
-					authAccountDto.setSessionId(extractSessionId(messageRepeatDto, sessionIdType, sessionIdName));
-					if(!isTest) {
-						saveAuthAccount(authAccountDto);
-					}
-
-					if(callback != null) {
-						callback.accept(messageRepeatDto);
-					}
-				}, false);
-	}
-	private List<PayloadDto> createLoginPayload(AuthAccountDto authAccountDto, MessageChainNodeInDto userIdInDto, MessageChainNodeInDto passwordInDto) {
-		List<PayloadDto> ret = Lists.newArrayList();
-		ret.add(new PayloadDto(userIdInDto.getParamName(), userIdInDto.getParamType(), authAccountDto.getUserId()));
-		ret.add(new PayloadDto(passwordInDto.getParamName(), passwordInDto.getParamType(), authAccountDto.getPassword()));
-		return ret;
-	}
-	private String extractSessionId(MessageRepeatDto messageRepeatDto, ParameterType sessionIdType, String sessionIdName) {
-		if(sessionIdType == ParameterType.REGEX) {
-			var matcher = Pattern.compile(sessionIdName).matcher(new String(messageRepeatDto.getMessage().getResponse()));
-			if(!matcher.find()) {
-				throw new IllegalStateException(String.format("Authentication request's response doesn't match: %s", sessionIdName));
+	private void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<MessageChainRepeatDto> callback, boolean isTest) {
+		MessageChainLogic.getInstance().sendMessageChain(authMessageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
+			if(index + 1 < authMessageChainDto.getNodes().size()) {
+				return;
 			}
-			return matcher.group(1);
-		}
 
-		var sessionIdParamOptional = extractSessionIdCandidateParams(messageRepeatDto, sessionIdType).stream()
-				.filter(sessionIdParam -> sessionIdParam.getName().equals(sessionIdName))
-				.findFirst();
-		if(sessionIdParamOptional.isEmpty()) {
-			throw new IllegalStateException(String.format("Authentication request's response doesn't have %s.", sessionIdName));
-		}
-		return sessionIdParamOptional.get().getValue();
-	}
-	private List<MessageParamDto> extractSessionIdCandidateParams(MessageRepeatDto messageRepeatDto, ParameterType sessionIdType) {
-		switch (sessionIdType) {
-			case COOKIE:
-				return BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()).getCookies().stream()
-					.map(cookie -> MessageLogic.getInstance().convertCookieToDto(cookie))
-					.collect(Collectors.toList());
-			case JSON:
-				return MessageLogic.getInstance().convertJsonResponseToDto(
-						messageRepeatDto.getMessage().getResponse(),
-						BurpUtil.getHelpers().analyzeResponse(messageRepeatDto.getMessage().getResponse()));
-			default:
-				throw new IllegalArgumentException(String.format("Unsupported sessionIdType: %s", sessionIdType));
-		}
+			//TODO: support multiple authApplyConfigs case
+			var varName = ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().get(0).getVarName();
+			if(messageChainRepeatDto.getVars().containsKey(varName)) {
+				authAccountDto.setSessionId(messageChainRepeatDto.getVars().get(varName));
+
+				if(!isTest) {
+					saveAuthAccount(authAccountDto, false);
+				}
+			}
+
+			if(callback != null) {
+				callback.accept(messageChainRepeatDto);
+			}
+
+		}, true, false);
 	}
 
 }

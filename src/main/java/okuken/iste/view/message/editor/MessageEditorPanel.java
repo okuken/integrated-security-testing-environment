@@ -5,11 +5,13 @@ import java.util.Optional;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 
 import burp.IHttpRequestResponse;
 import burp.IHttpService;
 import burp.IMessageEditor;
 import burp.IMessageEditorController;
+import okuken.iste.consts.Captions;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.util.BurpUtil;
 
@@ -29,6 +31,9 @@ public class MessageEditorPanel extends JPanel {
 		this(null, requestEditable, responseEditable);
 	}
 	public MessageEditorPanel(IMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable) {
+		this(aMessageEditorController, requestEditable, responseEditable, false);
+	}
+	public MessageEditorPanel(IMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable, boolean tabMode) {
 		setLayout(new BorderLayout(0, 0));
 
 		var messageEditorController = aMessageEditorController;
@@ -38,6 +43,14 @@ public class MessageEditorPanel extends JPanel {
 
 		requestMessageEditor = BurpUtil.getCallbacks().createMessageEditor(messageEditorController, requestEditable);
 		responseMessageEditor = BurpUtil.getCallbacks().createMessageEditor(messageEditorController, responseEditable);
+
+		if(tabMode) {
+			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+			tabbedPane.addTab(Captions.TAB_MESSAGE_EDITOR_REQUEST, null, requestMessageEditor.getComponent(), null);
+			tabbedPane.addTab(Captions.TAB_MESSAGE_EDITOR_RESPONSE, null, responseMessageEditor.getComponent(), null);
+			add(tabbedPane);
+			return;
+		}
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				requestMessageEditor.getComponent(),

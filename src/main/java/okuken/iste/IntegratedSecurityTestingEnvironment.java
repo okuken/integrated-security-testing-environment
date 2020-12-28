@@ -69,6 +69,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 		PluginManager.getInstance().unloadAllPlugins();
 		DatabaseManager.getInstance().unloadDatabase();
 		UiUtil.disposeDockoutFrames();
+		UiUtil.disposePopupFrames();
 	}
 
 }

@@ -2,9 +2,9 @@ package okuken.iste.dto;
 
 import java.util.Date;
 
-import burp.IParameter;
+import okuken.iste.enums.ResponseParameterType;
 
-public class MessageCookieDto extends MessageParamDto {
+public class MessageCookieDto extends MessageResponseParamDto {
 
 	private String domain;
 	private String path;
@@ -30,8 +30,8 @@ public class MessageCookieDto extends MessageParamDto {
 	}
 
 	@Override
-	public byte getType() {
-		return IParameter.PARAM_COOKIE;
+	public ResponseParameterType getType() {
+		return ResponseParameterType.COOKIE;
 	}
 	@Override
 	public String toString() {

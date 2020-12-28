@@ -105,8 +105,15 @@ public class ConfigLogic {
 	}
 	private ProjectOptionsDto loadProjectOptions() {
 		var ret = new ProjectOptionsDto();
-		ret.setAuthConfigDto(AuthLogic.getInstance().loadAuthConfig());
+		ret.setAuthConfigDto(loadOrInitAuthConfig());
 		return ret;
+	}
+	private AuthConfigDto loadOrInitAuthConfig() {
+		var authConfigDto = AuthLogic.getInstance().loadAuthConfig();
+		if(authConfigDto == null) {
+			return AuthLogic.getInstance().initAuthConfig();
+		}
+		return authConfigDto;
 	}
 
 	public void resetProjectOptionsDto() {

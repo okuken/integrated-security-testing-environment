@@ -1,25 +1,33 @@
 package okuken.iste.logic;
 
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import org.mybatis.dynamic.sql.SqlBuilder;
+import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
 import okuken.iste.dao.auto.MessageChainMapper;
 import okuken.iste.dao.auto.MessageChainNodeDynamicSqlSupport;
-import okuken.iste.dao.auto.MessageChainNodeInDynamicSqlSupport;
-import okuken.iste.dao.auto.MessageChainNodeInMapper;
+import okuken.iste.dao.auto.MessageChainNodeReqpDynamicSqlSupport;
+import okuken.iste.dao.auto.MessageChainNodeReqpMapper;
 import okuken.iste.dao.auto.MessageChainNodeMapper;
-import okuken.iste.dao.auto.MessageChainNodeOutDynamicSqlSupport;
-import okuken.iste.dao.auto.MessageChainNodeOutMapper;
+import okuken.iste.dao.auto.MessageChainNodeRespDynamicSqlSupport;
+import okuken.iste.dao.auto.MessageChainNodeRespMapper;
+import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
-import okuken.iste.dto.MessageChainNodeInDto;
-import okuken.iste.dto.MessageChainNodeOutDto;
+import okuken.iste.dto.MessageChainNodeReqpDto;
+import okuken.iste.dto.MessageChainNodeRespDto;
+import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.entity.auto.MessageChain;
 import okuken.iste.entity.auto.MessageChainNode;
-import okuken.iste.entity.auto.MessageChainNodeIn;
-import okuken.iste.entity.auto.MessageChainNodeOut;
+import okuken.iste.entity.auto.MessageChainNodeReqp;
+import okuken.iste.entity.auto.MessageChainNodeResp;
+import okuken.iste.enums.RequestParameterType;
+import okuken.iste.enums.ResponseParameterType;
+import okuken.iste.enums.SourceType;
 import okuken.iste.util.DbUtil;
+import okuken.iste.util.MessageUtil;
 import okuken.iste.util.SqlUtil;
 
 public class MessageChainLogic {
@@ -38,67 +46,62 @@ public class MessageChainLogic {
 		DbUtil.withTransaction(session -> {
 			var messageChainMapper = session.getMapper(MessageChainMapper.class);
 			var messageChainNodeMapper = session.getMapper(MessageChainNodeMapper.class);
-			var messageChainNodeInMapper = session.getMapper(MessageChainNodeInMapper.class);
-			var messageChainNodeOutMapper = session.getMapper(MessageChainNodeOutMapper.class);
+			var messageChainNodeReqpMapper = session.getMapper(MessageChainNodeReqpMapper.class);
+			var messageChainNodeRespMapper = session.getMapper(MessageChainNodeRespMapper.class);
 
 			//TODO: auto convert
 			var chain = new MessageChain();
 			chain.setId(chainDto.getId());
 			chain.setFkMessageId(chainDto.getMessageId());
 			chain.setPrcDate(now);
-			if(chainDto.getId() != null) {
+			boolean isUpdate = chainDto.getId() != null;
+			if(isUpdate) {
 				messageChainMapper.updateByPrimaryKey(chain);
 			} else {
 				messageChainMapper.insert(chain);
 				chainDto.setId(chain.getId());
 			}
 
-			//TODO: ****(DELETE-INSERT)****
+			if(isUpdate) {
+				// DELETE
+				messageChainNodeMapper.select(c -> c.where(MessageChainNodeDynamicSqlSupport.fkMessageChainId, isEqualTo(chain.getId())))
+					.forEach(node -> {
+						messageChainNodeReqpMapper.delete(c -> c.where(MessageChainNodeReqpDynamicSqlSupport.fkMessageChainNodeId, isEqualTo(node.getId())));
+						messageChainNodeRespMapper.delete(c -> c.where(MessageChainNodeRespDynamicSqlSupport.fkMessageChainNodeId, isEqualTo(node.getId())));
+				});
+				messageChainNodeMapper.delete(c -> c.where(MessageChainNodeDynamicSqlSupport.fkMessageChainId, isEqualTo(chain.getId())));
+			}
 
+			// INSERT
 			chainDto.getNodes().forEach(nodeDto -> {
 				var node = new MessageChainNode();
-				node.setId(nodeDto.getId());
 				node.setFkMessageChainId(chainDto.getId());
 				node.setFkMessageId(nodeDto.getMessageDto().getId());
 				node.setPrcDate(now);
-				if(nodeDto.getId() != null) {
-					messageChainNodeMapper.updateByPrimaryKey(node);
-				} else {
-					messageChainNodeMapper.insert(node);
-					nodeDto.setId(node.getId());
-				}
+				messageChainNodeMapper.insert(node);
+				nodeDto.setId(node.getId());
 
-				nodeDto.getIns().forEach(inDto -> {
-					var inEntity = new MessageChainNodeIn();
-					inEntity.setId(inDto.getId());
-					inEntity.setFkMessageChainNodeId(nodeDto.getId());
-					inEntity.setParamType(Byte.toUnsignedInt(inDto.getParamType()));
-					inEntity.setParamName(inDto.getParamName());
-					inEntity.setVarName(inDto.getVarName());
-					inEntity.setPrcDate(now);
-					if(inDto.getId() != null) {
-						messageChainNodeInMapper.updateByPrimaryKey(inEntity);
-					} else {
-						messageChainNodeInMapper.insert(inEntity);
-						inDto.setId(inEntity.getId());
-					}
+				nodeDto.getReqps().forEach(reqpDto -> {
+					var reqpEntity = new MessageChainNodeReqp();
+					reqpEntity.setFkMessageChainNodeId(nodeDto.getId());
+					reqpEntity.setParamType(Byte.toUnsignedInt(reqpDto.getParamType().getId()));
+					reqpEntity.setParamName(reqpDto.getParamName());
+					reqpEntity.setSourceType(Byte.toUnsignedInt(reqpDto.getSourceType().getId()));
+					reqpEntity.setSourceName(reqpDto.getSourceName());
+					reqpEntity.setPrcDate(now);
+					messageChainNodeReqpMapper.insert(reqpEntity);
+					reqpDto.setId(reqpEntity.getId());
 				});
 
-				nodeDto.getOuts().forEach(outDto -> {
-					var outEntity = new MessageChainNodeOut();
-					outEntity.setId(outDto.getId());
-					outEntity.setFkMessageChainNodeId(nodeDto.getId());
-					outEntity.setParamType(Byte.toUnsignedInt(outDto.getParamType()));
-					outEntity.setParamName(outDto.getParamName());
-					outEntity.setRegex(outDto.getRegex());
-					outEntity.setVarName(outDto.getVarName());
-					outEntity.setPrcDate(now);
-					if(outDto.getId() != null) {
-						messageChainNodeOutMapper.updateByPrimaryKey(outEntity);
-					} else {
-						messageChainNodeOutMapper.insert(outEntity);
-						outDto.setId(outEntity.getId());
-					}
+				nodeDto.getResps().forEach(respDto -> {
+					var respEntity = new MessageChainNodeResp();
+					respEntity.setFkMessageChainNodeId(nodeDto.getId());
+					respEntity.setParamType(Byte.toUnsignedInt(respDto.getParamType().getId()));
+					respEntity.setParamName(respDto.getParamName());
+					respEntity.setVarName(respDto.getVarName());
+					respEntity.setPrcDate(now);
+					messageChainNodeRespMapper.insert(respEntity);
+					respDto.setId(respEntity.getId());
 				});
 			});
 		});
@@ -109,8 +112,8 @@ public class MessageChainLogic {
 		return DbUtil.withSession(session -> {
 			var messageChainMapper = session.getMapper(MessageChainMapper.class);
 			var messageChainNodeMapper = session.getMapper(MessageChainNodeMapper.class);
-			var messageChainNodeInMapper = session.getMapper(MessageChainNodeInMapper.class);
-			var messageChainNodeOutMapper = session.getMapper(MessageChainNodeOutMapper.class);
+			var messageChainNodeReqpMapper = session.getMapper(MessageChainNodeReqpMapper.class);
+			var messageChainNodeRespMapper = session.getMapper(MessageChainNodeRespMapper.class);
 
 			var chain = messageChainMapper.selectByPrimaryKey(chainId).get();
 			var ret = new MessageChainDto();
@@ -118,7 +121,7 @@ public class MessageChainLogic {
 			ret.setMessageId(chain.getFkMessageId());
 
 			var nodes = messageChainNodeMapper.select(c -> c
-					.where(MessageChainNodeDynamicSqlSupport.fkMessageChainId, SqlBuilder.isEqualTo(ret.getId()))
+					.where(MessageChainNodeDynamicSqlSupport.fkMessageChainId, isEqualTo(ret.getId()))
 					.orderBy(MessageChainNodeDynamicSqlSupport.id));
 
 			var nodeDtos = nodes.stream().map(node -> {
@@ -126,31 +129,31 @@ public class MessageChainLogic {
 				nodeDto.setId(node.getId());
 				nodeDto.setMessageDto(MessageLogic.getInstance().loadMessage(node.getFkMessageId()));
 
-				nodeDto.setIns(
-					messageChainNodeInMapper.select(c -> c
-						.where(MessageChainNodeInDynamicSqlSupport.fkMessageChainNodeId, SqlBuilder.isEqualTo(nodeDto.getId()))
-						.orderBy(MessageChainNodeInDynamicSqlSupport.id))
-						.stream().map(inEntity -> {
-							var inDto = new MessageChainNodeInDto();
-							inDto.setId(inEntity.getId());
-							inDto.setParamType((byte)(int)inEntity.getParamType());
-							inDto.setParamName(inEntity.getParamName());
-							inDto.setVarName(inEntity.getVarName());
-							return inDto;
+				nodeDto.setReqps(
+					messageChainNodeReqpMapper.select(c -> c
+						.where(MessageChainNodeReqpDynamicSqlSupport.fkMessageChainNodeId, isEqualTo(nodeDto.getId()))
+						.orderBy(MessageChainNodeReqpDynamicSqlSupport.id))
+						.stream().map(reqpEntity -> {
+							var reqpDto = new MessageChainNodeReqpDto();
+							reqpDto.setId(reqpEntity.getId());
+							reqpDto.setParamType(RequestParameterType.getById((byte)(int)reqpEntity.getParamType()));
+							reqpDto.setParamName(reqpEntity.getParamName());
+							reqpDto.setSourceType(SourceType.getById((byte)(int)Optional.ofNullable(reqpEntity.getSourceType()).orElse(0)));
+							reqpDto.setSourceName(reqpEntity.getSourceName());
+							return reqpDto;
 						}).collect(Collectors.toList()));
 
-				nodeDto.setOuts(
-					messageChainNodeOutMapper.select(c -> c
-						.where(MessageChainNodeOutDynamicSqlSupport.fkMessageChainNodeId, SqlBuilder.isEqualTo(nodeDto.getId()))
-						.orderBy(MessageChainNodeOutDynamicSqlSupport.id))
-						.stream().map(outEntity -> {
-							var outDto = new MessageChainNodeOutDto();
-							outDto.setId(outEntity.getId());
-							outDto.setParamType((byte)(int)outEntity.getParamType());
-							outDto.setParamName(outEntity.getParamName());
-							outDto.setRegex(outEntity.getRegex());
-							outDto.setVarName(outEntity.getVarName());
-							return outDto;
+				nodeDto.setResps(
+					messageChainNodeRespMapper.select(c -> c
+						.where(MessageChainNodeRespDynamicSqlSupport.fkMessageChainNodeId, isEqualTo(nodeDto.getId()))
+						.orderBy(MessageChainNodeRespDynamicSqlSupport.id))
+						.stream().map(respEntity -> {
+							var respDto = new MessageChainNodeRespDto();
+							respDto.setId(respEntity.getId());
+							respDto.setParamType(ResponseParameterType.getById((byte)(int)respEntity.getParamType()));
+							respDto.setParamName(respEntity.getParamName());
+							respDto.setVarName(respEntity.getVarName());
+							return respDto;
 						}).collect(Collectors.toList()));
 
 				return nodeDto;
@@ -158,6 +161,65 @@ public class MessageChainLogic {
 
 			ret.setNodes(nodeDtos);
 			return ret;
+		});
+	}
+
+	public Integer getMessageChainIdByBaseMessageId(Integer messageId) {
+		return DbUtil.withSession(session -> {
+			var messageChainMapper = session.getMapper(MessageChainMapper.class);
+
+			var entity = messageChainMapper.selectOne(c -> c
+					.where(MessageChainNodeDynamicSqlSupport.fkMessageId, isEqualTo(messageId)));
+
+			if(entity.isPresent()) {
+				return entity.get().getId();
+			}
+			return null;
+		});
+	}
+
+	public void sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
+		var messageChainRepeatDto = new MessageChainRepeatDto(messageChainDto);
+		if(messageChainDto.getNodes().isEmpty()) {
+			if(callback != null) {
+				callback.accept(messageChainRepeatDto , -1);
+			}
+			return;
+		}
+
+		sendMessageChainImpl(messageChainRepeatDto, authAccountDto, callback, forAuth, needSaveHistory);
+	}
+	private void sendMessageChainImpl(MessageChainRepeatDto messageChainRepeatDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
+		var node = messageChainRepeatDto.getCurrentNodeDto();
+
+		var request = MessageUtil.applyPayloads(node.getMessageDto().getMessage().getRequest(), node.getReqps(), messageChainRepeatDto.getVars(), authAccountDto);
+
+		RepeaterLogic.getInstance().sendRequest(
+				request,
+				authAccountDto,
+				node.getMessageDto(),
+				(messageRepeatDto) -> {
+					messageChainRepeatDto.getMessageRepeatDtos().add(messageRepeatDto);
+					updateVars(messageChainRepeatDto);
+
+					if(callback != null) {
+						callback.accept(messageChainRepeatDto, messageChainRepeatDto.getCurrentIndex());
+					}
+
+					if(messageChainRepeatDto.hasNext()) {
+						messageChainRepeatDto.next();
+						sendMessageChainImpl(messageChainRepeatDto, authAccountDto, callback, forAuth, needSaveHistory);
+					}
+				}, forAuth, needSaveHistory);
+	}
+
+	private void updateVars(MessageChainRepeatDto messageChainRepeatDto) {
+		var response = messageChainRepeatDto.getMessageRepeatDtos().get(messageChainRepeatDto.getCurrentIndex()).getMessage().getResponse();
+		messageChainRepeatDto.getCurrentNodeDto().getResps().forEach(resp -> {
+			var paramValue = MessageUtil.extractResponseParam(response, resp.getParamType(), resp.getParamName());
+			if(paramValue != null) {
+				messageChainRepeatDto.getVars().put(resp.getVarName(), paramValue);
+			}
 		});
 	}
 

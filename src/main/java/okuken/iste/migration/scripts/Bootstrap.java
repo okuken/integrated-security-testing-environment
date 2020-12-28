@@ -160,7 +160,6 @@ public class Bootstrap implements BootstrapScript {
 				"  FK_MESSAGE_CHAIN_NODE_ID INTEGER  NOT NULL,\n" + 
 				"  PARAM_TYPE               INTEGER  NOT NULL,\n" + 
 				"  PARAM_NAME               TEXT,\n" + 
-				"  REGEX                    TEXT,\n" + 
 				"  VAR_NAME                 TEXT     NOT NULL,\n" + 
 				"  PRC_DATE                 TEXT     NOT NULL,\n" + 
 				"  FOREIGN KEY(FK_MESSAGE_CHAIN_NODE_ID) REFERENCES ISTE_MESSAGE_CHAIN_NODE(ID)\n" + 
