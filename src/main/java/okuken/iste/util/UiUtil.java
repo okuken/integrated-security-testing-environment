@@ -8,10 +8,13 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.swing.AbstractAction;
@@ -124,8 +127,8 @@ public class UiUtil {
 			popupFrame.dispose();
 		});
 	}
-	public static JFrame popup(String title, Container contentPane, Component triggerComponent) {
-		var ret = createAndShowFrame(title, contentPane, triggerComponent);
+	public static JFrame popup(String title, Container contentPane, Component triggerComponent, Consumer<WindowEvent> closeProcedure) {
+		var ret = createAndShowFrame(title, contentPane, triggerComponent, closeProcedure);
 		popupFrames.add(ret);
 		return ret;
 	}
@@ -140,8 +143,8 @@ public class UiUtil {
 			dockoutFrame.dispose();
 		});
 	}
-	public static JFrame dockout(String title, Container contentPane) {
-		var ret = createAndShowFrame(title, contentPane, null);
+	public static JFrame dockout(String title, Container contentPane, Consumer<WindowEvent> closeProcedure) {
+		var ret = createAndShowFrame(title, contentPane, null, closeProcedure);
 		dockoutFrames.add(ret);
 		return ret;
 	}
@@ -163,15 +166,27 @@ public class UiUtil {
 		return String.format("%s - %s", tabName, Captions.EXTENSION_NAME_FULL);
 	}
 
-	private static JFrame createAndShowFrame(String title, Container contentPane, Component triggerComponent) {
+	private static JFrame createAndShowFrame(String title, Container contentPane, Component triggerComponent, Consumer<WindowEvent> closeProcedure) {
 		var parentFrame = getParentFrame(triggerComponent);
 
 		JFrame popupFrame = new JFrame();
 		popupFrame.setTitle(title);
-		popupFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		popupFrame.setBounds(parentFrame.getBounds());
 		popupFrame.setContentPane(contentPane);
 		popupFrame.setLocationRelativeTo(parentFrame);
+
+		popupFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		popupFrame.addWindowListener(new WindowListener() {
+			@Override public void windowOpened(WindowEvent e) {}
+			@Override public void windowIconified(WindowEvent e) {}
+			@Override public void windowDeiconified(WindowEvent e) {}
+			@Override public void windowDeactivated(WindowEvent e) {}
+			@Override public void windowClosing(WindowEvent e) {
+				closeProcedure.accept(e);
+			}
+			@Override public void windowClosed(WindowEvent e) {}
+			@Override public void windowActivated(WindowEvent e) {}
+		});
 
 		BurpUtil.getCallbacks().customizeUiComponent(popupFrame);
 		popupFrame.setVisible(true);

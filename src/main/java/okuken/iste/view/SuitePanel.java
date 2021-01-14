@@ -183,15 +183,18 @@ public class SuitePanel extends JPanel {
 	}
 	private void dockoutOrDockin() {
 		if (dockoutFrame == null) {
-			dockoutFrame = UiUtil.dockout(Captions.EXTENSION_NAME_FULL, mainTabbedPane);
+			dockoutFrame = UiUtil.dockout(Captions.EXTENSION_NAME_FULL, mainTabbedPane, we -> {dockin();});
 			setDockoutTabTitle(Captions.DOCKIN);
 			this.repaint();
+			mainTabbedPane.setSelectedIndex(0);
 		} else {
-			UiUtil.dockin(mainTabbedPane, this, dockoutFrame);
-			dockoutFrame = null;
-			setDockoutTabTitle(Captions.DOCKOUT);
+			dockin();
 		}
-
+	}
+	private void dockin() {
+		UiUtil.dockin(mainTabbedPane, this, dockoutFrame);
+		dockoutFrame = null;
+		setDockoutTabTitle(Captions.DOCKOUT);
 		mainTabbedPane.setSelectedIndex(0);
 	}
 

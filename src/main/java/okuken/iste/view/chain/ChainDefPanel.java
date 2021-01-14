@@ -177,7 +177,7 @@ public class ChainDefPanel extends JPanel {
 		messageChainId = messageChainDto.getId();
 	}
 
-	private void cancel() {
+	public void cancel() {
 		UiUtil.closePopup(popupFrame);
 	}
 

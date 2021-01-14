@@ -34,7 +34,7 @@ public class AuthConfigPanel extends JPanel {
 		chainEditButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				var chainDefPanel = new ChainDefPanel(null, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId());
-				chainDefPanel.setPopupFrame(UiUtil.popup(Captions.AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN, chainDefPanel, chainEditButton));
+				chainDefPanel.setPopupFrame(UiUtil.popup(Captions.AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN, chainDefPanel, chainEditButton, we -> {chainDefPanel.cancel();}));
 			}
 		});
 		

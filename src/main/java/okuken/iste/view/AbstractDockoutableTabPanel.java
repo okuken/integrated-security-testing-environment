@@ -41,13 +41,16 @@ public abstract class AbstractDockoutableTabPanel extends JPanel {
 
 	private void dockoutOrDockin() {
 		if(dockoutFrame == null) {
-			dockoutFrame = UiUtil.dockout(UiUtil.createDockoutTitleByTabName(getTabName()), this);
+			dockoutFrame = UiUtil.dockout(UiUtil.createDockoutTitleByTabName(getTabName()), this, we -> {dockin();});
 			getDockoutButton().setText(Captions.DOCKIN);
 		} else {
-			UiUtil.dockin(getTabName(), this, getTabIndex(), getParentTabbedPane(), dockoutFrame);
-			dockoutFrame = null;
-			getDockoutButton().setText(Captions.DOCKOUT);
+			dockin();
 		}
+	}
+	private void dockin() {
+		UiUtil.dockin(getTabName(), this, getTabIndex(), getParentTabbedPane(), dockoutFrame);
+		dockoutFrame = null;
+		getDockoutButton().setText(Captions.DOCKOUT);
 	}
 
 }
