@@ -19,16 +19,26 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 public class ChainDefPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final int TIMES_DEFAULT = 1;
+
 	private Integer messageId;
 	private Integer messageChainId;
+
+	private JSpinner timesSpinner;
+	private JLabel timesCountdownLabel;
 
 	private JFrame popupFrame;
 	private JPanel nodesPanel;
@@ -71,6 +81,16 @@ public class ChainDefPanel extends JPanel {
 				test();
 			}
 		});
+		
+		JLabel timesLabel = new JLabel(" x ");
+		controlCenterPanel.add(timesLabel);
+		
+		timesSpinner = new JSpinner();
+		timesSpinner.setModel(new SpinnerNumberModel(TIMES_DEFAULT, 1, 999, 1));
+		controlCenterPanel.add(timesSpinner);
+		
+		timesCountdownLabel = new JLabel("");
+		controlCenterPanel.add(timesCountdownLabel);
 		
 		JPanel controlRightPanel = new JPanel();
 		controlPanel.add(controlRightPanel, BorderLayout.EAST);
@@ -154,8 +174,14 @@ public class ChainDefPanel extends JPanel {
 			return;
 		}
 
-		chainDefNodePanels.forEach(nodePanel -> {
-			nodePanel.clearMessage();
+		testImpl(chainDefNodePanels, getTimes());
+	}
+	private void testImpl(List<ChainDefNodePanel> chainDefNodePanels, int times) {
+		SwingUtilities.invokeLater(() -> {
+			chainDefNodePanels.forEach(nodePanel -> {
+				nodePanel.clearMessage();
+			});
+			timesCountdownLabel.setText(Integer.toString(times));
 		});
 
 		var authAccount = judgeIsAuthChain() ? Controller.getInstance().getSelectedAuthAccountOnAuthConfig() : Controller.getInstance().getSelectedAuthAccountOnRepeater();
@@ -164,7 +190,26 @@ public class ChainDefPanel extends JPanel {
 			SwingUtilities.invokeLater(() -> {
 				chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage());
 			});
+			if(index + 1 >= chainDefNodePanels.size()) { //case: last node
+				if(times - 1 > 0) {
+					testImpl(chainDefNodePanels, times - 1); //recursive
+				} else {
+					SwingUtilities.invokeLater(() -> {
+						timesCountdownLabel.setText(Captions.CHAIN_DEF_TEST_DONE);
+					});
+				}
+			}
 		}, judgeIsAuthChain(),  false);
+	}
+
+	private int getTimes() {
+		try {
+			timesSpinner.commitEdit();
+		} catch (ParseException e) {
+			return TIMES_DEFAULT; //case: not satisfy the SpinnerNumberModel
+		}
+
+		return (Integer)timesSpinner.getValue();
 	}
 
 	private boolean judgeIsAuthChain() {

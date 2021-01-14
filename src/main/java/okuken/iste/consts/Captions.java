@@ -66,6 +66,8 @@ public class Captions {
 	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
 
 	public static final String CHAIN_DEF_TEST = "Test";
+	public static final String CHAIN_DEF_TEST_DONE = "done";
+
 	public static final String CHAIN_DEF_SAVE = "Save";
 	public static final String CHAIN_DEF_CANCEL = "Cancel";
 
