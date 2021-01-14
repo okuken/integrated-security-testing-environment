@@ -174,6 +174,7 @@ public class ChainDefPanel extends JPanel {
 	private void save() {
 		var messageChainDto = makeChainDto();
 		Controller.getInstance().saveMessageChain(messageChainDto, judgeIsAuthChain());
+		messageChainId = messageChainDto.getId();
 	}
 
 	private void cancel() {
