@@ -52,6 +52,7 @@ import okuken.iste.view.message.table.MessageTableColumn;
 import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.message.table.MessageTablePopupMenu;
+import okuken.iste.view.option.ProjectOptionsPanel;
 import okuken.iste.view.plugin.PluginsPanel;
 import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeaterPanel;
@@ -80,6 +81,8 @@ public class Controller {
 	private ProjectMemoPanel projectMemoPanel;
 
 	private AuthPanel authPanel;
+
+	private ProjectOptionsPanel projectOptionsPanel;
 
 	private PluginsPanel pluginsPanel;
 
@@ -141,6 +144,9 @@ public class Controller {
 	}
 	public void setAuthPanel(AuthPanel authPanel) {
 		this.authPanel = authPanel;
+	}
+	public void setProjectOptionsPanel(ProjectOptionsPanel projectOptionsPanel) {
+		this.projectOptionsPanel = projectOptionsPanel;
 	}
 	public void setPluginsPanel(PluginsPanel pluginsPanel) {
 		this.pluginsPanel = pluginsPanel;
@@ -401,11 +407,24 @@ public class Controller {
 		return messageTablePanel.applyFilter(messageFilterDto);
 	}
 
+	public void updateProjectName(String projectName) {
+		ProjectLogic.getInstance().updateProjectName(projectName);
+		refreshComponentsDependOnProjectName();
+	}
+
+	private void refreshComponentsDependOnProjectName() {
+		mainHeaderPanel.refreshProjectName();
+		projectOptionsPanel.refreshProjectName();
+	}
+
 	public void changeDatabase(String dbFilePath) {
 		ConfigLogic.getInstance().saveDbFilePath(dbFilePath);
 		DatabaseManager.getInstance().changeDatabase(dbFilePath);
-		ProjectLogic.getInstance().selectProject();
-		mainHeaderPanel.refreshProjectName();
+		changeProject(true);
+	}
+	public void changeProject(boolean autoSelect) {
+		ProjectLogic.getInstance().selectProject(autoSelect);
+		refreshComponentsDependOnProjectName();
 		ConfigLogic.getInstance().resetProjectOptionsDto();
 		reloadDatabase();
 	}

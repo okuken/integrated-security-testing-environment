@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
@@ -67,6 +68,19 @@ public class BurpUtil {
 		return (JFrame) Arrays.stream(Frame.getFrames())
 				.filter(frame -> frame.isVisible() && frame.getTitle().startsWith(("Burp Suite")))
 				.collect(Collectors.toList()).get(0);
+	}
+
+	public static String getBurpSuiteProjectName() {
+		var matcher = Pattern.compile("^[^-]+ - (.+) - licensed to .+$").matcher(getBurpSuiteJFrame().getTitle());
+		if(!matcher.find()) {
+			return null;
+		}
+
+		var burpSuiteProjectName = matcher.group(1);
+		if(burpSuiteProjectName.equals("Temporary Project")) {
+			return null;
+		}
+		return burpSuiteProjectName;
 	}
 
 }

@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.controller.Controller;
 
 import java.awt.BorderLayout;
 
@@ -17,8 +18,9 @@ public class OptionsPanel extends JPanel {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		add(tabbedPane);
 		
-		JPanel projectOptionsPanel = new JPanel();
+		ProjectOptionsPanel projectOptionsPanel = new ProjectOptionsPanel();
 		tabbedPane.addTab(Captions.TAB_OPTIONS_PROJECT_OPTIONS, null, projectOptionsPanel, null);
+		Controller.getInstance().setProjectOptionsPanel(projectOptionsPanel);
 		
 		JPanel userOptionsPanel = new JPanel();
 		tabbedPane.addTab(Captions.TAB_OPTIONS_USER_OPTIONS, null, userOptionsPanel, null);

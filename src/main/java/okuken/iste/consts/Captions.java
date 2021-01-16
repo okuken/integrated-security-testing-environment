@@ -39,6 +39,7 @@ public class Captions {
 	public static final String TAB_MESSAGE_EDITOR_REQUEST = "Request";
 	public static final String TAB_MESSAGE_EDITOR_RESPONSE = "Response";
 
+	public static final String MAIN_HEADER_BUTTON_CHANGE_PROJECT = "...";
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
 
 	public static final String TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER = "Send request (Repeater)";
@@ -83,6 +84,9 @@ public class Captions {
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo to txt";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";
+
+	public static final String PROJECT_OPTIONS_PROJECT_NAME = "Project name";
+	public static final String PROJECT_OPTIONS_BUTTON_SAVE = "Save";
 
 	public static final String USER_OPTIONS_TEMPLATE_MEMO_BUTTON_SAVE = "Save";
 	public static final String USER_OPTIONS_USER_NAME = "User name";

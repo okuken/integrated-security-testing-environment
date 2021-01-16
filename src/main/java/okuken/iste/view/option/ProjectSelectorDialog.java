@@ -13,6 +13,7 @@ import okuken.iste.consts.Captions;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ProjectLogic;
+import okuken.iste.util.BurpUtil;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -57,7 +58,7 @@ public class ProjectSelectorDialog extends JDialog {
 				public void actionPerformed(ActionEvent e) {
 					if(projectsComboBox.getSelectedIndex() == 0) {
 						newProjectNameTextField.setEnabled(true);
-						newProjectNameTextField.setText(new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + "_projectname");
+						newProjectNameTextField.setText(createDefaultNewProjectName());
 					} else {
 						newProjectNameTextField.setEnabled(false);
 						newProjectNameTextField.setText("");
@@ -104,6 +105,18 @@ public class ProjectSelectorDialog extends JDialog {
 				getRootPane().setDefaultButton(okButton);
 			}
 		}
+	}
+
+	private String createDefaultNewProjectName() {
+		var burpSuiteProjectName = BurpUtil.getBurpSuiteProjectName();
+		if(burpSuiteProjectName != null) {
+			return burpSuiteProjectName;
+		}
+		return new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + "_projectname";
+	}
+
+	public void setSelectNewProject() {
+		projectsComboBox.setSelectedIndex(0);
 	}
 
 	public ProjectDto getSelectedProject() {

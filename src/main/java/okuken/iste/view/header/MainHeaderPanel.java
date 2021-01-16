@@ -77,6 +77,14 @@ public class MainHeaderPanel extends JPanel {
 		centerPanel.add(projectNameLabel);
 		add(centerPanel, BorderLayout.CENTER);
 		
+		JButton changeProjectButton = new JButton(Captions.MAIN_HEADER_BUTTON_CHANGE_PROJECT);
+		changeProjectButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Controller.getInstance().changeProject(false);
+			}
+		});
+		centerPanel.add(changeProjectButton);
+		
 		JPanel rightPanel = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) rightPanel.getLayout();
 		flowLayout.setAlignment(FlowLayout.RIGHT);

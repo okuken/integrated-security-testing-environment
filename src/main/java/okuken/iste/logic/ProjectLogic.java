@@ -4,6 +4,7 @@ import java.awt.Frame;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.mybatis.dynamic.sql.SqlBuilder.*;
 import org.mybatis.dynamic.sql.select.SelectDSLCompleter;
 
 import okuken.iste.dao.auto.ProjectDynamicSqlSupport;
@@ -24,8 +25,26 @@ public class ProjectLogic {
 	}
 
 	public void selectProject() {
+		selectProject(true);
+	}
+	public void selectProject(boolean autoSelect) {
+		if(autoSelect) {
+			var burpSuiteProjectName = BurpUtil.getBurpSuiteProjectName();
+			if(burpSuiteProjectName != null) {
+				var projectDto = loadProjectByName(burpSuiteProjectName);
+				if(projectDto != null) {
+					ConfigLogic.getInstance().setProject(projectDto);
+					ConfigLogic.getInstance().saveLastSelectedProjectName(projectDto.getName());
+					return;
+				}
+			}
+		}
+
 		Frame burpFrame = BurpUtil.getBurpSuiteJFrame();
 		ProjectSelectorDialog projectSelectorDialog = new ProjectSelectorDialog(burpFrame);
+		if(autoSelect) {
+			projectSelectorDialog.setSelectNewProject();
+		}
 		BurpUtil.getCallbacks().customizeUiComponent(projectSelectorDialog);
 		projectSelectorDialog.setLocationRelativeTo(burpFrame);
 		projectSelectorDialog.setVisible(true);
@@ -38,6 +57,14 @@ public class ProjectLogic {
 		ConfigLogic.getInstance().saveLastSelectedProjectName(projectDto.getName());
 	}
 
+	private ProjectDto convertEntityToDto(Project entity) {
+		ProjectDto dto = new ProjectDto();
+		dto.setId(entity.getId());
+		dto.setName(entity.getName());
+		dto.setExplanation(entity.getExplanation());
+		return dto;
+	}
+
 	public List<ProjectDto> loadProjects() {
 		List<Project> projects =
 			DbUtil.withSession(session -> {
@@ -45,13 +72,20 @@ public class ProjectLogic {
 				return projectMapper.select(SelectDSLCompleter.allRowsOrderedBy(ProjectDynamicSqlSupport.id));
 			});
 
-		return projects.stream().map(entity -> { //TODO:converter
-			ProjectDto dto = new ProjectDto();
-			dto.setId(entity.getId());
-			dto.setName(entity.getName());
-			dto.setExplanation(entity.getExplanation());
-			return dto;
-		}).collect(Collectors.toList());
+		return projects.stream().map(this::convertEntityToDto).collect(Collectors.toList());
+	}
+
+	public ProjectDto loadProjectByName(String projectName) {
+		var project =
+			DbUtil.withSession(session -> {
+				ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
+				return projectMapper.selectOne(c -> c.where(ProjectDynamicSqlSupport.name, isEqualTo(projectName)));
+			});
+
+		if(project.isEmpty()) {
+			return null;
+		}
+		return convertEntityToDto(project.get());
 	}
 
 	public void saveProject(ProjectDto dto) {
@@ -69,6 +103,22 @@ public class ProjectLogic {
 
 			dto.setId(id);
 		});
+	}
+
+	public void updateProjectName(String projectName) {
+		String now = SqlUtil.now();
+		DbUtil.withTransaction(session -> {
+			ProjectMapper projectMapper = session.getMapper(ProjectMapper.class);
+
+			Project entity = new Project();
+			entity.setId(ConfigLogic.getInstance().getProjectId());
+			entity.setName(projectName);
+			entity.setPrcDate(now);
+
+			projectMapper.updateByPrimaryKeySelective(entity);
+		});
+		ConfigLogic.getInstance().getProcessOptions().getProjectDto().setName(projectName);
+		ConfigLogic.getInstance().saveLastSelectedProjectName(projectName);
 	}
 
 }
