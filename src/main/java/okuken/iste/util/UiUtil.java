@@ -211,4 +211,16 @@ public class UiUtil {
 		return timestampFormat.format(Calendar.getInstance().getTime());
 	}
 
+	public static final String omitString(String str, int length) {
+		if(str == null || str.length() <= length) {
+			return str;
+		}
+		int remainLength = length / 2;
+		return new StringBuilder()
+				.append(str.substring(0, remainLength))
+				.append("...")
+				.append(str.substring(str.length() - remainLength, str.length()))
+				.toString();
+	}
+
 }

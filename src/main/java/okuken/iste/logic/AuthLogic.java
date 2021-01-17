@@ -16,7 +16,6 @@ import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageChainDto;
-import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.entity.auto.AuthAccount;
 import okuken.iste.entity.auto.AuthApplyConfig;
 import okuken.iste.entity.auto.AuthConfig;
@@ -227,10 +226,10 @@ public class AuthLogic {
 		});
 	}
 
-	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, Consumer<MessageChainRepeatDto> callback) {
+	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, Consumer<AuthAccountDto> callback) {
 		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), callback, false);
 	}
-	private void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<MessageChainRepeatDto> callback, boolean isTest) {
+	private void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<AuthAccountDto> callback, boolean isTest) {
 		MessageChainLogic.getInstance().sendMessageChain(authMessageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
 			if(index + 1 < authMessageChainDto.getNodes().size()) {
 				return;
@@ -247,7 +246,7 @@ public class AuthLogic {
 			}
 
 			if(callback != null) {
-				callback.accept(messageChainRepeatDto);
+				callback.accept(authAccountDto);
 			}
 
 		}, true, false);

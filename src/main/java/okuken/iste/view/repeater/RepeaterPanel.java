@@ -18,6 +18,7 @@ import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 
@@ -26,10 +27,13 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 
 public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final int SESSION_VALUE_DISPLAY_LENGTH = 10;
 
 	private JSplitPane splitPane;
 	private RepeatTablePanel repeatTablePanel;
@@ -37,6 +41,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	private JComboBox<AuthAccountDto> authAccountComboBox;
 	private JButton authSessionRefreshButton;
+	private JLabel authSessionValueLabel;
 
 	private JButton followRedirectButton;
 
@@ -76,7 +81,9 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		authAccountComboBox = new JComboBox<AuthAccountDto>();
 		authAccountComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				authSessionRefreshButton.setEnabled(authAccountComboBox.getSelectedIndex() > 0);
+				int index = authAccountComboBox.getSelectedIndex();
+				authSessionRefreshButton.setEnabled(index > 0);
+				authSessionValueLabel.setText(index > 0 ? UiUtil.omitString(authAccountComboBox.getItemAt(index).getSessionId(), SESSION_VALUE_DISPLAY_LENGTH) : null);
 			}
 		});
 		controlLeftPanel.add(authAccountComboBox);
@@ -89,15 +96,19 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 					return;
 				}
 
-//				authSessionRefreshButton.setEnabled(false);
-				Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex), x -> {
-//					SwingUtilities.invokeLater(() -> {
-//						authSessionRefreshButton.setEnabled(true);
-//					});
+				Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex), authAccountDto -> {
+					SwingUtilities.invokeLater(() -> {
+						if(authAccountDto.getId().equals(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()).getId())) {
+							authSessionValueLabel.setText(UiUtil.omitString(authAccountDto.getSessionId(), SESSION_VALUE_DISPLAY_LENGTH));
+						}
+					});
 				});
 			}
 		});
 		controlLeftPanel.add(authSessionRefreshButton);
+		
+		authSessionValueLabel = new JLabel();
+		controlLeftPanel.add(authSessionValueLabel);
 		
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
 		copyOrgButton.addActionListener(new ActionListener() {
@@ -197,6 +208,9 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		if(authAccountDto != null && authAccountDto.getSessionId() == null) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				SwingUtilities.invokeLater(() -> {
+					if(authAccountDto.getId().equals(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()).getId())) {
+						authSessionValueLabel.setText(UiUtil.omitString(authAccountDto.getSessionId(), SESSION_VALUE_DISPLAY_LENGTH));
+					}
 					sendRequestImpl(authAccountDto);
 				});
 			});
@@ -251,6 +265,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		authAccountComboBox.removeAllItems();
 		authAccountComboBox.addItem(new AuthAccountDto()); //dummy
 		authSessionRefreshButton.setEnabled(false);
+		authSessionValueLabel.setText(null);
 
 		if(ConfigLogic.getInstance().getAuthConfig() == null) {
 			return;

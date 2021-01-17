@@ -307,7 +307,7 @@ public class Controller {
 		refreshComponentsDependOnAuthConfig();
 	}
 
-	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<MessageChainRepeatDto> callback) {
+	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<AuthAccountDto> callback) {
 		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, callback);
 	}
 
