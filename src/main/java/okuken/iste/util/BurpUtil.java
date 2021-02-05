@@ -70,8 +70,9 @@ public class BurpUtil {
 				.collect(Collectors.toList()).get(0);
 	}
 
+	private static final Pattern burpSuiteProjectNamePattern = Pattern.compile("^[^-]+ - (.+) - licensed to .+$");
 	public static String getBurpSuiteProjectName() {
-		var matcher = Pattern.compile("^[^-]+ - (.+) - licensed to .+$").matcher(getBurpSuiteJFrame().getTitle());
+		var matcher = burpSuiteProjectNamePattern.matcher(getBurpSuiteJFrame().getTitle());
 		if(!matcher.find()) {
 			return null;
 		}
@@ -81,6 +82,14 @@ public class BurpUtil {
 			return null;
 		}
 		return burpSuiteProjectName;
+	}
+
+	private static Boolean professionalEdition;
+	public static boolean isProfessionalEdition() {
+		if(professionalEdition == null) {
+			professionalEdition = burpExtenderCallbacks.getBurpVersion()[0].contains("Professional");
+		}
+		return professionalEdition;
 	}
 
 }

@@ -44,6 +44,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream()
 					.filter(messageDto -> messageDto.getMessage().getResponse() != null)
+					.filter(messageDto -> BurpUtil.getCallbacks().isInScope(messageDto.getUrl()))
 					.forEach(messageDto -> 
 						BurpUtil.getCallbacks().doPassiveScan(
 							messageDto.getMessage().getHttpService().getHost(),
@@ -53,19 +54,23 @@ public class MessageTablePopupMenu extends JPopupMenu {
 							messageDto.getMessage().getResponse()));
 			}
 		});
+		doPassiveScanMenuItem.setEnabled(BurpUtil.isProfessionalEdition());
 		add(doPassiveScanMenuItem);
 
 		JMenuItem doActiveScanMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_DO_ACTIVE_SCAN);
 		doActiveScanMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Controller.getInstance().getSelectedMessages().stream().forEach(messageDto -> 
-					BurpUtil.getCallbacks().doActiveScan(
-						messageDto.getMessage().getHttpService().getHost(),
-						messageDto.getMessage().getHttpService().getPort(),
-						judgeIsUseHttps(messageDto),
-						messageDto.getMessage().getRequest()));
+				Controller.getInstance().getSelectedMessages().stream()
+					.filter(messageDto -> BurpUtil.getCallbacks().isInScope(messageDto.getUrl()))
+					.forEach(messageDto -> 
+						BurpUtil.getCallbacks().doActiveScan(
+							messageDto.getMessage().getHttpService().getHost(),
+							messageDto.getMessage().getHttpService().getPort(),
+							judgeIsUseHttps(messageDto),
+							messageDto.getMessage().getRequest()));
 			}
 		});
+		doActiveScanMenuItem.setEnabled(BurpUtil.isProfessionalEdition());
 		add(doActiveScanMenuItem);
 
 		add(new JPopupMenu.Separator());
