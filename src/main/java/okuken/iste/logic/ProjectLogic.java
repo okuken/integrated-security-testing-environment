@@ -28,21 +28,19 @@ public class ProjectLogic {
 		selectProject(true);
 	}
 	public void selectProject(boolean autoSelect) {
-		if(autoSelect) {
-			var burpSuiteProjectName = BurpUtil.getBurpSuiteProjectName();
-			if(burpSuiteProjectName != null) {
-				var projectDto = loadProjectByName(burpSuiteProjectName);
-				if(projectDto != null) {
-					ConfigLogic.getInstance().setProject(projectDto);
-					ConfigLogic.getInstance().saveLastSelectedProjectName(projectDto.getName());
-					return;
-				}
+		var burpSuiteProjectName = BurpUtil.getBurpSuiteProjectName();
+		if(autoSelect && burpSuiteProjectName != null) {
+			var projectDto = loadProjectByName(burpSuiteProjectName);
+			if(projectDto != null) {
+				ConfigLogic.getInstance().setProject(projectDto);
+				ConfigLogic.getInstance().saveLastSelectedProjectName(projectDto.getName());
+				return;
 			}
 		}
 
 		Frame burpFrame = BurpUtil.getBurpSuiteJFrame();
 		ProjectSelectorDialog projectSelectorDialog = new ProjectSelectorDialog(burpFrame);
-		if(autoSelect) {
+		if(autoSelect && burpSuiteProjectName != null) {
 			projectSelectorDialog.setSelectNewProject();
 		}
 		BurpUtil.getCallbacks().customizeUiComponent(projectSelectorDialog);

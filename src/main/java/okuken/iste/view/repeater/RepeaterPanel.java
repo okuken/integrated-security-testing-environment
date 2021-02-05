@@ -141,7 +141,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 				followRedirect();
 			}
 		});
-		controlCenterPanel.add(followRedirectButton);
+//		controlCenterPanel.add(followRedirectButton); //TODO: impl
 		
 		JPanel controlRightPanel = new JPanel();
 		controlPanel.add(controlRightPanel, BorderLayout.EAST);
@@ -264,16 +264,18 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 	public void refreshAuthAccountsComboBox() {
 		authAccountComboBox.removeAllItems();
 		authAccountComboBox.addItem(new AuthAccountDto()); //dummy
+		authAccountComboBox.setEnabled(false);
 		authSessionRefreshButton.setEnabled(false);
 		authSessionValueLabel.setText(null);
 
-		if(ConfigLogic.getInstance().getAuthConfig() == null) {
+		if(!ConfigLogic.getInstance().isAuthConfigReady()) {
 			return;
 		}
 
 		Controller.getInstance().getAuthAccounts().forEach(authAccount -> {
 			authAccountComboBox.addItem(authAccount);
 		});
+		authAccountComboBox.setEnabled(authAccountComboBox.getItemCount() > 1);
 	}
 
 	public AuthAccountDto getSelectedAuthAccountDto() {

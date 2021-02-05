@@ -14,6 +14,7 @@ import okuken.iste.util.UiUtil;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
 
 public class ChainRepeaterPanel extends JPanel {
 
@@ -44,6 +45,9 @@ public class ChainRepeaterPanel extends JPanel {
 		
 		JPanel controlCenterPanel = new JPanel();
 		controlPanel.add(controlCenterPanel, BorderLayout.CENTER);
+		
+		JLabel experimentalFeatureLabel = new JLabel("This is an experimental feature.");
+		controlCenterPanel.add(experimentalFeatureLabel);
 		
 		JPanel controlRightPanel = new JPanel();
 		controlPanel.add(controlRightPanel, BorderLayout.EAST);

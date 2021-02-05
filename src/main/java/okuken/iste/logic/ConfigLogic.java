@@ -123,6 +123,10 @@ public class ConfigLogic {
 	public AuthConfigDto getAuthConfig() {
 		return getProjectOptionsDto().getAuthConfigDto();
 	}
+	public boolean isAuthConfigReady() {
+		var authConfig = getAuthConfig();
+		return authConfig != null && authConfig.isReady();
+	}
 
 	public void setAuthConfig(AuthConfigDto authConfigDto) {
 		getProjectOptionsDto().setAuthConfigDto(authConfigDto);

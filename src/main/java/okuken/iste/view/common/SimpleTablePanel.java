@@ -151,6 +151,9 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 	}
 
 	private void addRow() {
+		if(dtos.size() >= getMaxRowSize()) {
+			return; //TODO: show error message
+		}
 		addRow(createRowDto());
 	}
 	public void addRow(T dto) {
@@ -209,6 +212,10 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 
 	public List<T> getRows() {
 		return dtos;
+	}
+
+	protected int getMaxRowSize() {
+		return Integer.MAX_VALUE;
 	}
 
 	abstract protected List<ColumnDef> getColumnDefs();

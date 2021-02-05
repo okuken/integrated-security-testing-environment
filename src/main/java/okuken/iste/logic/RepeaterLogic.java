@@ -116,13 +116,12 @@ public class RepeaterLogic {
 		return MessageUtil.updateContentLength(request);
 	}
 	private byte[] applyAuthAccount(byte[] request, AuthAccountDto authAccountDto) {
-		var applyConfigDtos = ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos();
-		if(applyConfigDtos.isEmpty()) {
+		if(!ConfigLogic.getInstance().isAuthConfigReady()) {
 			throw new IllegalStateException("Sessionid was set but AuthApplyConfig has not registered.");
 		}
 
 		//TODO: support multiple sessionId
-		var authApplyConfig = applyConfigDtos.get(0);
+		var authApplyConfig = ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().get(0);
 		return MessageUtil.applyPayload(request, authApplyConfig.getParamType(), authApplyConfig.getParamName(), authAccountDto.getSessionId());
 	}
 

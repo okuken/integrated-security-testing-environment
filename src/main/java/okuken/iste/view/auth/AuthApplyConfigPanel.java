@@ -30,6 +30,11 @@ public class AuthApplyConfigPanel extends SimpleTablePanel<AuthApplyConfigDto> {
 		new ColumnDef(VAR_NAME,   "Source var name",            200, true, "getVarName",   "setVarName",    String.class, DTO_CLASS));
 
 	@Override
+	protected int getMaxRowSize() {
+		return 1; //TODO: support multiple apply config
+	}
+
+	@Override
 	protected List<ColumnDef> getColumnDefs() {
 		return columns;
 	}

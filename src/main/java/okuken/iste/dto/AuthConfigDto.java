@@ -2,6 +2,9 @@ package okuken.iste.dto;
 
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 public class AuthConfigDto {
@@ -41,6 +44,14 @@ public class AuthConfigDto {
 	}
 	public void setAuthApplyConfigDtos(List<AuthApplyConfigDto> authApplyConfigDtos) {
 		this.authApplyConfigDtos = authApplyConfigDtos;
+	}
+
+	public boolean isReady() {
+		return CollectionUtils.isNotEmpty(getAuthApplyConfigDtos()) &&
+				StringUtils.isNotEmpty(getAuthApplyConfigDtos().get(0).getParamName()) &&
+				StringUtils.isNotEmpty(getAuthApplyConfigDtos().get(0).getVarName()) &&
+				getAuthMessageChainDto() != null &&
+				CollectionUtils.isNotEmpty(getAuthMessageChainDto().getNodes());
 	}
 
 }
