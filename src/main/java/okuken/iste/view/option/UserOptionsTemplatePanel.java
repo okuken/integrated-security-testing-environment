@@ -1,7 +1,6 @@
 package okuken.iste.view.option;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
@@ -10,6 +9,7 @@ import com.google.common.collect.Lists;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.memo.ProjectMemoPanel;
 
 import java.awt.BorderLayout;
@@ -40,10 +40,10 @@ public class UserOptionsTemplatePanel extends JPanel {
 		tabbedPane.addTab(Captions.TAB_MEMO, null, projectMemoPanel, null);
 		projectMemoPanel.setLayout(new BorderLayout(0, 0));
 		
-		JPanel projectMemoHeaderPanel = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) projectMemoHeaderPanel.getLayout();
+		JPanel projectMemoFooterPanel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) projectMemoFooterPanel.getLayout();
 		flowLayout.setAlignment(FlowLayout.RIGHT);
-		projectMemoPanel.add(projectMemoHeaderPanel, BorderLayout.NORTH);
+		projectMemoPanel.add(projectMemoFooterPanel, BorderLayout.SOUTH);
 		
 		JButton projectMemoSaveButton = new JButton(Captions.USER_OPTIONS_TEMPLATE_MEMO_BUTTON_SAVE);
 		projectMemoSaveButton.addActionListener(new ActionListener() {
@@ -51,7 +51,7 @@ public class UserOptionsTemplatePanel extends JPanel {
 				saveProjectMemoTemplates();
 			}
 		});
-		projectMemoHeaderPanel.add(projectMemoSaveButton);
+		projectMemoFooterPanel.add(projectMemoSaveButton);
 		
 		projectMemoBodyPanel = new JPanel();
 		projectMemoPanel.add(projectMemoBodyPanel, BorderLayout.CENTER);
@@ -67,8 +67,7 @@ public class UserOptionsTemplatePanel extends JPanel {
 			var textArea = new JTextArea();
 			scrollPane.setViewportView(textArea);
 			SwingUtilities.invokeLater(() -> {
-				JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-				scrollBar.setValue(scrollBar.getMinimum());
+				UiUtil.initScrollBarPosition(scrollPane);
 			});
 			
 			projectMemoTextAreas.add(textArea);

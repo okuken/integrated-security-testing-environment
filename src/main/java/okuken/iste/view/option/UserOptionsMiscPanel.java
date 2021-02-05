@@ -20,41 +20,41 @@ import java.awt.Font;
 public class UserOptionsMiscPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private JTextField userNameTextField;
+//	private JTextField userNameTextField; //TODO: impl
 	private JTextField dbFileTextField;
 
 	public UserOptionsMiscPanel() {
 		setLayout(null);
 		
-		JLabel userNameLabel = new JLabel(Captions.USER_OPTIONS_USER_NAME + ":");
-		userNameLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 12));
-		userNameLabel.setBounds(30, 10, 100, 30);
-		add(userNameLabel);
-		
-		userNameTextField = new JTextField();
-		userNameTextField.setBounds(140, 10, 210, 30);
-		add(userNameTextField);
-		userNameTextField.setColumns(20);
-		userNameTextField.setText(ConfigLogic.getInstance().getUserOptions().getUserName());
-		
-		JButton userNameSaveButton = new JButton("Save");
-		userNameSaveButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				//TODO: validation
-				ConfigLogic.getInstance().saveUserName(userNameTextField.getText());
-			}
-		});
-		userNameSaveButton.setBounds(400, 10, 120, 30);
-		add(userNameSaveButton);
+//		JLabel userNameLabel = new JLabel(Captions.USER_OPTIONS_USER_NAME + ":");
+//		userNameLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 12));
+//		userNameLabel.setBounds(30, 60, 100, 30);
+//		add(userNameLabel);
+//		
+//		userNameTextField = new JTextField();
+//		userNameTextField.setBounds(140, 60, 210, 30);
+//		add(userNameTextField);
+//		userNameTextField.setColumns(20);
+//		userNameTextField.setText(ConfigLogic.getInstance().getUserOptions().getUserName());
+//		
+//		JButton userNameSaveButton = new JButton("Save");
+//		userNameSaveButton.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				//TODO: validation
+//				ConfigLogic.getInstance().saveUserName(userNameTextField.getText());
+//			}
+//		});
+//		userNameSaveButton.setBounds(400, 60, 120, 30);
+//		add(userNameSaveButton);
 		
 		JLabel dbFileLabel = new JLabel(Captions.USER_OPTIONS_DB_FILE_PATH + ":");
 		dbFileLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 12));
-		dbFileLabel.setBounds(30, 60, 100, 30);
+		dbFileLabel.setBounds(30, 10, 100, 30);
 		add(dbFileLabel);
 		
 		dbFileTextField = new JTextField();
 		dbFileTextField.setColumns(20);
-		dbFileTextField.setBounds(140, 60, 210, 30);
+		dbFileTextField.setBounds(140, 10, 210, 30);
 		add(dbFileTextField);
 		dbFileTextField.setText(ConfigLogic.getInstance().getUserOptions().getDbFilePath());
 		
@@ -67,7 +67,7 @@ public class UserOptionsMiscPanel extends JPanel {
 				}
 			}
 		});
-		dbFileChooseButton.setBounds(350, 60, 20, 30);
+		dbFileChooseButton.setBounds(350, 10, 20, 30);
 		add(dbFileChooseButton);
 		
 		JButton dbFileSaveButton = new JButton("Save & Reload");
@@ -77,7 +77,7 @@ public class UserOptionsMiscPanel extends JPanel {
 				Controller.getInstance().changeDatabase(dbFileTextField.getText());
 			}
 		});
-		dbFileSaveButton.setBounds(400, 60, 120, 30);
+		dbFileSaveButton.setBounds(400, 10, 120, 30);
 		add(dbFileSaveButton);
 
 	}

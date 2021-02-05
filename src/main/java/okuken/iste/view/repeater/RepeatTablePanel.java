@@ -93,7 +93,9 @@ public class RepeatTablePanel extends JPanel {
 		table.getColumnModel().getColumn(COLNUM_LENGTH).setPreferredWidth(50);
 		table.getColumnModel().getColumn(COLNUM_TIME).setPreferredWidth(50);
 		table.getColumnModel().getColumn(COLNUM_DIFF).setPreferredWidth(300);
-		table.getColumnModel().getColumn(COLNUM_MEMO).setPreferredWidth(200);
+		table.getColumnModel().getColumn(COLNUM_MEMO).setPreferredWidth(400);
+
+		table.removeColumn(table.getColumnModel().getColumn(COLNUM_DIFF)); //TODO: impl
 
 		tableModel = (DefaultTableModel)table.getModel();
 	}
