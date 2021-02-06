@@ -3,6 +3,7 @@ package okuken.iste.view.chain;
 import javax.swing.JPanel;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.dto.MessageDto;
@@ -110,7 +111,7 @@ public class ChainDefNodePanel extends JPanel {
 		refreshingFlag = true;
 		try {
 			urlComboBox.removeAllItems();
-			urlComboBox.setMaximumRowCount(1000);
+			urlComboBox.setMaximumRowCount(Sizes.MAX_ROW_COUNT_COMBOBOX);
 			messageDtos.forEach(messageDto -> {
 				urlComboBox.addItem(messageDto);
 			});

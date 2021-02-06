@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Sizes;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ProjectLogic;
@@ -65,7 +66,7 @@ public class ProjectSelectorDialog extends JDialog {
 					}
 				}
 			});
-			projectsComboBox.setMaximumRowCount(1000);
+			projectsComboBox.setMaximumRowCount(Sizes.MAX_ROW_COUNT_COMBOBOX);
 
 			projectsComboBox.addItem(new ProjectDto());
 			List<ProjectDto> projects = ProjectLogic.getInstance().loadProjects();

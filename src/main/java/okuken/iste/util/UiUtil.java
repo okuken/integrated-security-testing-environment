@@ -212,15 +212,27 @@ public class UiUtil {
 	}
 
 	public static final String omitString(String str, int length) {
-		if(str == null || str.length() <= length) {
+		if(judgeIsNotNeedOmit(str, length)) {
 			return str;
 		}
 		int remainLength = length / 2;
 		return new StringBuilder()
 				.append(str.substring(0, remainLength))
-				.append("...")
+				.append(Captions.OMIT_STRING)
 				.append(str.substring(str.length() - remainLength, str.length()))
 				.toString();
+	}
+	public static final String omitStringTail(String str, int length) {
+		if(judgeIsNotNeedOmit(str, length)) {
+			return str;
+		}
+		return new StringBuilder()
+				.append(str.substring(0, length))
+				.append(Captions.OMIT_STRING)
+				.toString();
+	}
+	private static final boolean judgeIsNotNeedOmit(String str, int length) {
+		return str == null || str.length() <= length;
 	}
 
 }

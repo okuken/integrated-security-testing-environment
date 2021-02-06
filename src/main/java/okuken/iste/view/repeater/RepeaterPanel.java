@@ -18,7 +18,6 @@ import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
-import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 
@@ -32,8 +31,6 @@ import javax.swing.JLabel;
 public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final int SESSION_VALUE_DISPLAY_LENGTH = 10;
 
 	private JSplitPane splitPane;
 	private RepeatTablePanel repeatTablePanel;
@@ -83,7 +80,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 			public void actionPerformed(ActionEvent e) {
 				int index = authAccountComboBox.getSelectedIndex();
 				authSessionRefreshButton.setEnabled(index > 0);
-				authSessionValueLabel.setText(index > 0 ? UiUtil.omitString(authAccountComboBox.getItemAt(index).getSessionId(), SESSION_VALUE_DISPLAY_LENGTH) : null);
+				authSessionValueLabel.setText(index > 0 ? authAccountComboBox.getItemAt(index).getSessionIdForDisplay() : null);
 			}
 		});
 		controlLeftPanel.add(authAccountComboBox);
@@ -99,7 +96,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 				Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex), authAccountDto -> {
 					SwingUtilities.invokeLater(() -> {
 						if(authAccountDto.getId().equals(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()).getId())) {
-							authSessionValueLabel.setText(UiUtil.omitString(authAccountDto.getSessionId(), SESSION_VALUE_DISPLAY_LENGTH));
+							authSessionValueLabel.setText(authAccountDto.getSessionIdForDisplay());
 						}
 					});
 				});
@@ -209,7 +206,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				SwingUtilities.invokeLater(() -> {
 					if(authAccountDto.getId().equals(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()).getId())) {
-						authSessionValueLabel.setText(UiUtil.omitString(authAccountDto.getSessionId(), SESSION_VALUE_DISPLAY_LENGTH));
+						authSessionValueLabel.setText(authAccountDto.getSessionIdForDisplay());
 					}
 					sendRequestImpl(authAccountDto);
 				});

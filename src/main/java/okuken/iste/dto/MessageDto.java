@@ -2,17 +2,20 @@ package okuken.iste.dto;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
+import okuken.iste.consts.Sizes;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.util.MessageUtil;
+import okuken.iste.util.UiUtil;
 
 public class MessageDto {
 
@@ -355,7 +358,9 @@ public class MessageDto {
 
 	@Override
 	public String toString() {
-		return String.format("%s [%s]", name, getUrlShort());
+		return String.format("%s [%s]", 
+				UiUtil.omitString(Optional.ofNullable(name).orElse(""), Sizes.OMIT_STRING_SIZE_MESSAGE_NAME),
+				UiUtil.omitStringTail(getUrlShort(), Sizes.OMIT_STRING_SIZE_MESSAGE_URL));
 	}
 
 }

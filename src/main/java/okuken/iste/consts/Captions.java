@@ -5,6 +5,8 @@ public class Captions {
 	public static final String EXTENSION_NAME = "Integrated Security Testing Environment";
 	public static final String EXTENSION_NAME_FULL = "ISTE: Integrated Security Testing Environment";
 
+	public static final String OMIT_STRING = "...";
+
 	public static final String DOCKOUT = "\u2197";
 	public static final String DOCKIN = "\u2199";
 

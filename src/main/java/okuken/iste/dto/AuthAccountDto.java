@@ -2,6 +2,9 @@ package okuken.iste.dto;
 
 import java.util.Optional;
 
+import okuken.iste.consts.Sizes;
+import okuken.iste.util.UiUtil;
+
 public class AuthAccountDto {
 
 	private Integer id;
@@ -64,6 +67,10 @@ public class AuthAccountDto {
 		this.sessionId = sessionId;
 	}
 
+	public String getSessionIdForDisplay() {
+		return UiUtil.omitString(getSessionId(), Sizes.OMIT_STRING_SIZE_AUTH_SESSION_VALUE);
+	}
+
 	public String getField(String fieldId) {
 		switch (Integer.parseInt(fieldId.toUpperCase().replace("FIELD", "").trim())) {
 		case 1: return field01;
@@ -78,7 +85,7 @@ public class AuthAccountDto {
 	@Override
 	public String toString() {
 		return String.format("%s - %s", 
-				Optional.ofNullable(field01).orElse(""),
-				Optional.ofNullable(remark).orElse(""));
+				UiUtil.omitString(Optional.ofNullable(field01).orElse(""), Sizes.OMIT_STRING_SIZE_AUTH_USERID),
+				UiUtil.omitStringTail(Optional.ofNullable(remark).orElse(""), Sizes.OMIT_STRING_SIZE_AUTH_REMARK));
 	}
 }
