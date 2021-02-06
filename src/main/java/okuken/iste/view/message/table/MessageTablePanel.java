@@ -164,6 +164,7 @@ public class MessageTablePanel extends JPanel {
 		if(messageFilterDto.getProgresses() == null) {
 			return table.getRowCount();
 		}
+		var selectedRowIndexs = getSelectedRowIndexs(); // memorize selection
 
 		var tableRowSorter = new TableRowSorter<MessageTableModel>(tableModel);
 		tableRowSorter.setRowFilter(new RowFilter<MessageTableModel, Integer>() {
@@ -179,6 +180,10 @@ public class MessageTablePanel extends JPanel {
 		});
 
 		table.setRowSorter(tableRowSorter);
+
+		selectedRowIndexs.stream()
+			.map(table::convertRowIndexToView)
+			.forEach(row -> {table.getSelectionModel().addSelectionInterval(row, row);}); // apply selection
 
 		return table.getRowCount();
 	}
