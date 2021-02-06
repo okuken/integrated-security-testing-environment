@@ -206,7 +206,8 @@ public class MessageTablePanel extends JPanel {
 
 	public String getSelectedMessagesForCopyToClipboad() {
 		return tableModel.getRowsAsTsv(
-				Arrays.stream(table.getSelectedRows()).map(table::convertRowIndexToModel).toArray());
+				Arrays.stream(table.getSelectedRows()).map(table::convertRowIndexToModel).toArray(),
+				IntStream.range(0, table.getColumnCount()).map(table::convertColumnIndexToModel).toArray());
 	}
 
 }

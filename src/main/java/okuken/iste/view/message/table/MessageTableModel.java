@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -83,13 +82,14 @@ public class MessageTableModel extends AbstractTableModel {
 		return rows;
 	}
 
-	public String getRowsAsTsv(int[] rows) {
-		var header = Arrays.stream(COLUMNS)
+	public String getRowsAsTsv(int[] rows, int[] columns) {
+		var header = Arrays.stream(columns)
+				.mapToObj(column -> COLUMNS[column])
 				.map(MessageTableColumn::getCaption)
 				.collect(Collectors.joining("\t"));
 
 		var records = Arrays.stream(rows).mapToObj(
-				row -> IntStream.range(0, COLUMNS.length).mapToObj(
+				row -> Arrays.stream(columns).mapToObj(
 				column -> Optional.ofNullable(getValueAt(row, column)).orElse("").toString())
 				.collect(Collectors.joining("\t")))
 				.collect(Collectors.toList())
