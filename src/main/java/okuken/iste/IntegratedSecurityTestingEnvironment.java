@@ -25,7 +25,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 	public void registerExtenderCallbacks(IBurpExtenderCallbacks burpExtenderCallbacks) {
 		BurpUtil.init(burpExtenderCallbacks);
 
-		burpExtenderCallbacks.setExtensionName(Captions.EXTENSION_NAME);
+		burpExtenderCallbacks.setExtensionName(Captions.EXTENSION_NAME_FULL);
 
 		burpExtenderCallbacks.registerContextMenuFactory(ContextMenuFactory.create());
 

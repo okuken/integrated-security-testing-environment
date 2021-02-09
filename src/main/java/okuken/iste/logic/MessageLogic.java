@@ -59,7 +59,8 @@ public class MessageLogic {
 		dto.setProgress(SecurityTestingProgress.NOT_YET);
 		dto.setMethod(dto.getRequestInfo().getMethod());
 		dto.setUrl(dto.getRequestInfo().getUrl());
-		dto.setParams(dto.getRequestInfo().getParameters().size());
+		dto.setParams((int)dto.getRequestInfo().getParameters().stream()
+				.filter(param -> param.getType() != RequestParameterType.COOKIE.getBurpId()).count());
 
 		dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
 				.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
@@ -70,7 +71,7 @@ public class MessageLogic {
 			dto.setLength(dto.getMessage().getResponse().length);
 			dto.setMimeType(dto.getResponseInfo().getStatedMimeType());
 			dto.setCookies(dto.getResponseInfo().getCookies().stream()
-					.map(cookie -> String.format("%s=%s;", cookie.getName(), cookie.getValue()))
+					.map(cookie -> String.format("%s=%s", cookie.getName(), cookie.getValue()))
 					.collect(Collectors.joining("; ")));
 
 			dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
