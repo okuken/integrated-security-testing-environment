@@ -50,7 +50,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 	private void setupDatabase() {
 		ConfigLogic configLogic = ConfigLogic.getInstance();
 		if(Strings.isNullOrEmpty(configLogic.getUserOptions().getDbFilePath())) {
-			JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_DB_FILE);
+			JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_DB_FILE, configLogic.getDefaultDbFile());
 			switch (fileChooser.showSaveDialog(BurpUtil.getBurpSuiteJFrame())) {
 				case JFileChooser.APPROVE_OPTION:
 					configLogic.saveDbFilePath(fileChooser.getSelectedFile().getAbsolutePath());

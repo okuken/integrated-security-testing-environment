@@ -61,7 +61,7 @@ public class UserOptionsMiscPanel extends JPanel {
 		JButton dbFileChooseButton = new JButton(Captions.FILECHOOSER);
 		dbFileChooseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_DB_FILE);
+				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_DB_FILE, dbFileTextField.getText());
 				if (fileChooser.showOpenDialog(UiUtil.getParentFrame(dbFileChooseButton)) == JFileChooser.APPROVE_OPTION) {
 					dbFileTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
 				}

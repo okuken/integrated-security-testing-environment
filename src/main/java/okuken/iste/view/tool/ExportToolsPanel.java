@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
 
@@ -28,7 +29,8 @@ public class ExportToolsPanel extends JPanel {
 		JButton exportMemoToTxtFileButton = new JButton(Captions.TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE);
 		exportMemoToTxtFileButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = FileUtil.createSingleFileChooser("");
+				String defaultFileName = String.format("%s_%s.md", ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName(), UiUtil.nowForFilename());
+				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_EXPORT_FILE, defaultFileName);
 				switch (fileChooser.showSaveDialog(UiUtil.getParentFrame(exportMemoToTxtFileButton))) {
 					case JFileChooser.APPROVE_OPTION:
 						Controller.getInstance().exportMemoToTxtFile(fileChooser.getSelectedFile(), filterCheckBox.isSelected());

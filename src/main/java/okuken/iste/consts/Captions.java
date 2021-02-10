@@ -84,7 +84,7 @@ public class Captions {
 	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN = "Edit authentication request chain";
 	public static final String AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN = "Auth config - Edit request chain";
 
-	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo to txt";
+	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo (.md)";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";
 
 	public static final String PROJECT_OPTIONS_PROJECT_NAME = "Project name";
@@ -102,6 +102,7 @@ public class Captions {
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";
 	public static final String MESSAGE_SELECT_PROJECT = "Select a project for IntegratedSecurityTestEnvironment(ISTE).";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
+	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export memo (.md)";
 	public static final String MESSAGE_CHOOSE_PLUGIN_FILE = "Choose a plugin jar file.";
 
 }

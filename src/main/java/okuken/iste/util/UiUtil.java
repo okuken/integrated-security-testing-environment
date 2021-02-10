@@ -211,6 +211,11 @@ public class UiUtil {
 		return timestampFormat.format(Calendar.getInstance().getTime());
 	}
 
+	private static final DateFormat timestampForFilenameFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+	public static final String nowForFilename() {
+		return timestampForFilenameFormat.format(Calendar.getInstance().getTime());
+	}
+
 	public static final String omitString(String str, int length) {
 		if(judgeIsNotNeedOmit(str, length)) {
 			return str;

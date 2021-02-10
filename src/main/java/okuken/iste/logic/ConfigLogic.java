@@ -72,8 +72,11 @@ public class ConfigLogic {
 		getUserOptions().setUserName(userName);
 	}
 
+	public File getDefaultDbFile() {
+		return new File(System.getProperty("user.home"), "iste.db");
+	}
 	public String getDefaultDbFilePath() {
-		return new File(System.getProperty("user.home"), "iste.db").getAbsolutePath();
+		return getDefaultDbFile().getAbsolutePath();
 	}
 	public void saveDbFilePath(String dbFilePath) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_DB_FILE_PATH, dbFilePath);
