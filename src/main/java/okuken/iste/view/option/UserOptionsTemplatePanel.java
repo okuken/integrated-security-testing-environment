@@ -22,6 +22,7 @@ import java.util.stream.IntStream;
 import javax.swing.JTextArea;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
 
 public class UserOptionsTemplatePanel extends JPanel {
 
@@ -45,10 +46,14 @@ public class UserOptionsTemplatePanel extends JPanel {
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 		projectMemoPanel.add(projectMemoFooterPanel, BorderLayout.SOUTH);
 		
+		JLabel projectMemoSaveMessageLabel = UiUtil.createTemporaryMessageArea();
+		projectMemoFooterPanel.add(projectMemoSaveMessageLabel);
+		
 		JButton projectMemoSaveButton = new JButton(Captions.USER_OPTIONS_TEMPLATE_MEMO_BUTTON_SAVE);
 		projectMemoSaveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				saveProjectMemoTemplates();
+				UiUtil.showTemporaryMessage(projectMemoSaveMessageLabel, Captions.MESSAGE_SAVED);
 			}
 		});
 		projectMemoFooterPanel.add(projectMemoSaveButton);

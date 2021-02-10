@@ -69,7 +69,7 @@ public class Captions {
 	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
 
 	public static final String CHAIN_DEF_TEST = "Run";
-	public static final String CHAIN_DEF_TEST_DONE = "done";
+	public static final String CHAIN_DEF_TEST_DONE = "Done.";
 
 	public static final String CHAIN_DEF_SAVE = "Save";
 	public static final String CHAIN_DEF_CANCEL = "Cancel";
@@ -97,6 +97,11 @@ public class Captions {
 	public static final String PLUGINS_BUTTON_ADD_PLUGIN = "Add";
 
 	public static final String SELECT_PROJECT_NEW = "** Create new project **";
+
+
+	public static final String MESSAGE_EMPTY = "          ";
+	public static final String MESSAGE_SAVED = "Saved.";
+	public static final String MESSAGE_DONE = "Done.";
 
 	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose a SQLite database file for IntegratedSecurityTestEnvironment(ISTE).";
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";

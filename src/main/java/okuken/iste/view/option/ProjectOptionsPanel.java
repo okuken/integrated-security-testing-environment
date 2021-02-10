@@ -6,6 +6,7 @@ import javax.swing.JTextField;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.util.UiUtil;
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ public class ProjectOptionsPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField projectNameTextField;
+	private JLabel projectNameMessageLabel;
 
 	public ProjectOptionsPanel() {
 		setLayout(null);
@@ -38,10 +40,15 @@ public class ProjectOptionsPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				//TODO: validation
 				Controller.getInstance().updateProjectName(projectNameTextField.getText());
+				UiUtil.showTemporaryMessage(projectNameMessageLabel, Captions.MESSAGE_SAVED);
 			}
 		});
 		projectNameSaveButton.setBounds(400, 10, 120, 30);
 		add(projectNameSaveButton);
+		
+		projectNameMessageLabel = UiUtil.createTemporaryMessageArea();
+		projectNameMessageLabel.setBounds(530, 10, 200, 30);
+		add(projectNameMessageLabel);
 
 	}
 

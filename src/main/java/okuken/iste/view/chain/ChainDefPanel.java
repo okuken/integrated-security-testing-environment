@@ -6,6 +6,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
@@ -90,16 +91,21 @@ public class ChainDefPanel extends JPanel {
 		controlCenterPanel.add(timesSpinner);
 		
 		timesCountdownLabel = new JLabel("");
+		timesCountdownLabel.setForeground(Colors.CHARACTER_HIGHLIGHT);
 		controlCenterPanel.add(timesCountdownLabel);
 		
 		JPanel controlRightPanel = new JPanel();
 		controlPanel.add(controlRightPanel, BorderLayout.EAST);
+		
+		JLabel saveMessageLabel = UiUtil.createTemporaryMessageArea();
+		controlRightPanel.add(saveMessageLabel);
 		
 		JButton saveButton = new JButton(Captions.CHAIN_DEF_SAVE);
 		controlRightPanel.add(saveButton);
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				save();
+				UiUtil.showTemporaryMessage(saveMessageLabel, Captions.MESSAGE_SAVED);
 			}
 		});
 		

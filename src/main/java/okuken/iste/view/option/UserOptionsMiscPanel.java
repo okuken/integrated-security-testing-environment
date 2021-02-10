@@ -22,6 +22,7 @@ public class UserOptionsMiscPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 //	private JTextField userNameTextField; //TODO: impl
 	private JTextField dbFileTextField;
+	private JLabel dbFileMessageLabel;
 
 	public UserOptionsMiscPanel() {
 		setLayout(null);
@@ -75,10 +76,15 @@ public class UserOptionsMiscPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				//TODO: validation
 				Controller.getInstance().changeDatabase(dbFileTextField.getText());
+				UiUtil.showTemporaryMessage(dbFileMessageLabel, Captions.MESSAGE_DONE);
 			}
 		});
 		dbFileSaveButton.setBounds(400, 10, 120, 30);
 		add(dbFileSaveButton);
+		
+		dbFileMessageLabel = UiUtil.createTemporaryMessageArea();
+		dbFileMessageLabel.setBounds(530, 10, 200, 30);
+		add(dbFileMessageLabel);
 
 	}
 }

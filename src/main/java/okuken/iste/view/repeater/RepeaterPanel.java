@@ -18,6 +18,7 @@ import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 
@@ -143,6 +144,9 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		JPanel controlRightPanel = new JPanel();
 		controlPanel.add(controlRightPanel, BorderLayout.EAST);
 		
+		JLabel saveAsMasterMessageLabel = UiUtil.createTemporaryMessageArea();
+		controlRightPanel.add(saveAsMasterMessageLabel);
+		
 		JButton saveAsMasterButton = new JButton(Captions.REPEATER_BUTTON_SAVE_AS_MASTER);
 		saveAsMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -151,6 +155,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 						messageEditorPanel.getResponse(),
 						orgMessageDto.getMessage().getHttpService()));
 				Controller.getInstance().saveRepeatMaster(orgMessageDto);
+				UiUtil.showTemporaryMessage(saveAsMasterMessageLabel, Captions.MESSAGE_SAVED);
 			}
 		});
 		controlRightPanel.add(saveAsMasterButton);

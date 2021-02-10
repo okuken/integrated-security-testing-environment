@@ -14,12 +14,15 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -34,6 +37,7 @@ import javax.swing.undo.UndoManager;
 import com.google.common.collect.Lists;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Colors;
 
 public class UiUtil {
 
@@ -47,6 +51,23 @@ public class UiUtil {
 	public static final void repaint(JComponent component) {
 		component.revalidate();
 		component.repaint();
+	}
+
+	public static final JLabel createTemporaryMessageArea() {
+		var ret = new JLabel(Captions.MESSAGE_EMPTY);
+		ret.setForeground(Colors.CHARACTER_HIGHLIGHT);
+		return ret;
+	}
+	public static final void showTemporaryMessage(JLabel messageArea, String message) {
+		messageArea.setText(message);
+		new Timer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				SwingUtilities.invokeLater(() -> {
+					messageArea.setText(Captions.MESSAGE_EMPTY);
+				});
+			}
+		}, 1000);
 	}
 
 	public static final void copyToClipboard(String content) {
