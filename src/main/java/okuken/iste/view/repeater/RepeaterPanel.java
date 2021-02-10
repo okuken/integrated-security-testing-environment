@@ -20,6 +20,7 @@ import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
+import okuken.iste.view.chain.ChainDefPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 
 import javax.swing.AbstractButton;
@@ -159,6 +160,15 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 			}
 		});
 		controlRightPanel.add(saveAsMasterButton);
+		
+		JButton chainButton = new JButton(Captions.REPEATER_BUTTON_CHAIN);
+		chainButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var chainDefPanel = new ChainDefPanel(orgMessageDto.getId(), Controller.getInstance().getMessageChainIdByBaseMessageId(orgMessageDto.getId()));
+				chainDefPanel.setPopupFrame(UiUtil.popup(orgMessageDto.getName() + Captions.REPEATER_POPUP_TITLE_SUFFIX_CHAIN, chainDefPanel, chainButton, we -> {chainDefPanel.cancel();}));
+			}
+		});
+		controlRightPanel.add(chainButton);
 		
 		dockoutButton = new JButton();
 		controlRightPanel.add(dockoutButton);

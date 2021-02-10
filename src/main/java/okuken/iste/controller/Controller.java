@@ -43,7 +43,6 @@ import okuken.iste.util.UiUtil;
 import okuken.iste.view.SuitePanel;
 import okuken.iste.view.SuiteTab;
 import okuken.iste.view.auth.AuthPanel;
-import okuken.iste.view.chain.ChainRepeaterPanel;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
@@ -74,7 +73,7 @@ public class Controller {
 	private MessageEditorPanel orgMessageEditorPanel;
 	private RepeatMasterPanel repeatMasterPanel;
 	private RepeaterPanel repeaterPanel;
-	private ChainRepeaterPanel chainRepeaterPanel;
+//	private ChainRepeaterPanel chainRepeaterPanel;
 
 	private MessageMemoPanel messageMemoPanel;
 
@@ -133,9 +132,9 @@ public class Controller {
 	public void setRepeaterPanel(RepeaterPanel repeaterPanel) {
 		this.repeaterPanel = repeaterPanel;
 	}
-	public void setChainRepeaterPanel(ChainRepeaterPanel chainRepeaterPanel) {
-		this.chainRepeaterPanel = chainRepeaterPanel;
-	}
+//	public void setChainRepeaterPanel(ChainRepeaterPanel chainRepeaterPanel) {
+//		this.chainRepeaterPanel = chainRepeaterPanel;
+//	}
 	public void setMessageMemoPanel(MessageMemoPanel messageMemoPanel) {
 		this.messageMemoPanel = messageMemoPanel;
 	}
@@ -216,7 +215,7 @@ public class Controller {
 		this.orgMessageEditorPanel.setMessage(dto);
 		this.repeatMasterPanel.setup(dto);
 		this.repeaterPanel.setup(dto);
-		this.chainRepeaterPanel.setup(dto);
+//		this.chainRepeaterPanel.setup(dto);
 		this.messageMemoPanel.enablePanel(dto);
 	}
 

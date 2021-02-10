@@ -61,6 +61,9 @@ public class Captions {
 	public static final String REPEATER_BUTTON_COPY_MASTER = "Master";
 	public static final String REPEATER_BUTTON_FOLLOW_REDIRECT = "Follow redirection";
 	public static final String REPEATER_BUTTON_SAVE_AS_MASTER = "Save as master";
+	public static final String REPEATER_BUTTON_CHAIN = "Chain";
+
+	public static final String REPEATER_POPUP_TITLE_SUFFIX_CHAIN = " - Chain";
 
 	public static final String CHAIN_REPEATER_BUTTON_EDIT_CHAIN = "Edit request chain";
 	public static final String CHAIN_REPEATER_POPUP_TITLE_SUFFIX_EDIT_CHAIN = " - Edit request chain";
