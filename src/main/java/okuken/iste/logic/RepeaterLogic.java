@@ -62,6 +62,9 @@ public class RepeaterLogic {
 	}
 
 	public MessageRepeatDto sendRequest(byte[] aRequest, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean forAuth, boolean needSaveHistory) {
+		return sendRequest(aRequest, authAccountDto, orgMessageDto, callback, forAuth, needSaveHistory, false);
+	}
+	public MessageRepeatDto sendRequest(byte[] aRequest, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean forAuth, boolean needSaveHistory, boolean isChainNode) {
 		byte[] request = buildRequest(aRequest, forAuth, authAccountDto);
 
 		MessageRepeatDto repeatDto = new MessageRepeatDto();
@@ -72,6 +75,7 @@ public class RepeaterLogic {
 		if(!forAuth && authAccountDto != null && authAccountDto.getSessionId() != null) {
 			repeatDto.setUserId(authAccountDto.getField01());
 		}
+		repeatDto.setChainFlag(isChainNode);
 
 		if(needSaveHistory) {
 			save(repeatDto);
@@ -151,6 +155,7 @@ public class RepeaterLogic {
 			messageRepeat.setTime(messageRepeatDto.getTime());
 			messageRepeat.setStatus(messageRepeatDto.getStatus());
 			messageRepeat.setLength(messageRepeatDto.getLength());
+			messageRepeat.setChainFlg(messageRepeatDto.isChainFlag());
 			messageRepeat.setPrcDate(now);
 			messageRepeatMapper.insert(messageRepeat);
 			messageRepeatDto.setId(messageRepeat.getId());
@@ -216,6 +221,7 @@ public class RepeaterLogic {
 			dto.setOrgMessageId(messageRepeat.getFkMessageId());
 			dto.setMessageRawId(messageRepeat.getFkMessageRawId());
 			dto.setSendDate(SqlUtil.stringToDate(messageRepeat.getSendDate()));
+			dto.setChainFlag(messageRepeat.getChainFlg());
 			dto.setDifference(messageRepeat.getDifference());
 			dto.setUserId(messageRepeat.getUserId());
 			dto.setTime(messageRepeat.getTime());

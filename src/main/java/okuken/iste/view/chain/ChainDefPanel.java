@@ -11,6 +11,7 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
+import okuken.iste.dto.MessageDto;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.UiUtil;
 
@@ -36,7 +37,7 @@ public class ChainDefPanel extends JPanel {
 
 	private static final int TIMES_DEFAULT = 1;
 
-	private Integer messageId;
+	private MessageDto messageDto;
 	private Integer messageChainId;
 
 	private JSpinner timesSpinner;
@@ -45,8 +46,8 @@ public class ChainDefPanel extends JPanel {
 	private JFrame popupFrame;
 	private JPanel nodesPanel;
 
-	public ChainDefPanel(Integer messageId, Integer messageChainId) {
-		this.messageId = messageId;
+	public ChainDefPanel(MessageDto messageDto, Integer messageChainId) {
+		this.messageDto = messageDto;
 		this.messageChainId = messageChainId;
 		
 		setLayout(new BorderLayout(0, 0));
@@ -116,12 +117,16 @@ public class ChainDefPanel extends JPanel {
 	private void init() {
 		nodesPanel.add(createAddButtonPanel());
 		if(messageChainId == null) {
+			var nodeDto = new MessageChainNodeDto();
+			nodeDto.setMessageDto(messageDto);
+			nodeDto.setMain(true);
+			addNodeTail(nodeDto);
 			return;
 		}
 
 		var messageChainDto = Controller.getInstance().loadMessageChain(messageChainId);
 		messageChainDto.getNodes().stream().forEach(nodeDto -> {
-			addNode(nodeDto, nodesPanel.getComponents().length - 1);
+			addNodeTail(nodeDto);
 		});
 	}
 
@@ -143,6 +148,9 @@ public class ChainDefPanel extends JPanel {
 	private void addNode(JPanel clickedButtonPanel) {
 		var index = Arrays.asList(nodesPanel.getComponents()).indexOf(clickedButtonPanel);
 		addNode(null, index);
+	}
+	private void addNodeTail(MessageChainNodeDto nodeDto) {
+		addNode(nodeDto, nodesPanel.getComponents().length - 1);
 	}
 	private void addNode(MessageChainNodeDto nodeDto, int baseIndex) {
 		nodesPanel.add(new ChainDefNodePanel(nodeDto, this), baseIndex + 1);
@@ -166,7 +174,7 @@ public class ChainDefPanel extends JPanel {
 				.filter(component -> component instanceof ChainDefNodePanel)
 				.map(nodePanel -> ((ChainDefNodePanel)nodePanel).makeNodeDto())
 				.collect(Collectors.toList()));
-		chainDto.setMessageId(messageId);
+		chainDto.setMessageId(messageDto != null ? messageDto.getId() : null);
 
 		return chainDto;
 	}
@@ -206,11 +214,18 @@ public class ChainDefPanel extends JPanel {
 			timesCountdownLabel.setText(Integer.toString(times));
 		});
 
+		var needSaveHistory = !judgeIsAuthChain();
 		Controller.getInstance().sendMessageChain(messageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
 			SwingUtilities.invokeLater(() -> {
 				chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage());
 			});
 			if(index + 1 >= chainDefNodePanels.size()) { //case: last node
+				if(needSaveHistory) {//TODO:improve...
+					SwingUtilities.invokeLater(() -> {
+						Controller.getInstance().refreshRepeatTablePanel(messageChainDto.getMainNode().get().getMessageDto().getId());
+					});
+				}
+
 				if(times - 1 > 0) {
 					runImpl(chainDefNodePanels, messageChainDto, authAccountDto, times - 1); //recursive
 				} else {
@@ -219,7 +234,7 @@ public class ChainDefPanel extends JPanel {
 					});
 				}
 			}
-		}, judgeIsAuthChain(),  false);
+		}, judgeIsAuthChain(), needSaveHistory);
 	}
 
 	private int getTimes() {
@@ -232,8 +247,12 @@ public class ChainDefPanel extends JPanel {
 		return (Integer)timesSpinner.getValue();
 	}
 
+	private Boolean isAuthChain;
 	public boolean judgeIsAuthChain() {
-		return ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId().equals(messageChainId);
+		if(isAuthChain == null) {
+			isAuthChain = ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId().equals(messageChainId);
+		}
+		return isAuthChain;
 	}
 
 	private void save() {

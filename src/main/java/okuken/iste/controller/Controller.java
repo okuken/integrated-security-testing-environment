@@ -223,6 +223,14 @@ public class Controller {
 		repeaterPanel.setMessage(rowIndex);
 	}
 
+	public void refreshRepeatTablePanel(Integer messageId) {
+		//TODO: improve...
+		getMessages().stream().filter(messageDto -> messageId.equals(messageDto.getId())).findFirst().get().setRepeatList(null);
+		if(messageId.equals(repeaterPanel.getOrgMessageDto().getId())) {
+			repeaterPanel.refresh();
+		}
+	}
+
 	public void refreshComponentsDependOnAuthConfig() {
 		repeaterPanel.refreshAuthAccountsComboBox();
 	}

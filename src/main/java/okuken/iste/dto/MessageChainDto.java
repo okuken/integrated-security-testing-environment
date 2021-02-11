@@ -1,6 +1,7 @@
 package okuken.iste.dto;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
@@ -31,4 +32,7 @@ public class MessageChainDto {
 		this.nodes = nodes;
 	}
 
+	public Optional<MessageChainNodeDto> getMainNode() {
+		return nodes.stream().filter(MessageChainNodeDto::isMain).findFirst();
+	}
 }

@@ -25,6 +25,8 @@ public class MessageRepeatDto {
 
 	private Integer orgMessageId;
 
+	private boolean chainFlag;
+
 	private List<MessageRepeatRedirectDto> messageRepeatRedirectDtos;
 
 	public Integer getId() {
@@ -95,6 +97,12 @@ public class MessageRepeatDto {
 	}
 	public void setOrgMessageId(Integer orgMessageId) {
 		this.orgMessageId = orgMessageId;
+	}
+	public boolean isChainFlag() {
+		return chainFlag;
+	}
+	public void setChainFlag(boolean chainFlag) {
+		this.chainFlag = chainFlag;
 	}
 
 	public List<MessageRepeatRedirectDto> getMessageRepeatRedirectDtos() {

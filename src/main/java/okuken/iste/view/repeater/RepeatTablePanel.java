@@ -9,6 +9,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.logic.RepeaterLogic;
@@ -28,8 +29,9 @@ public class RepeatTablePanel extends JPanel {
 	private static final int COLNUM_STATUS = 3;
 	private static final int COLNUM_LENGTH = 4;
 	private static final int COLNUM_TIME = 5;
-	private static final int COLNUM_DIFF = 6;
-	private static final int COLNUM_MEMO = 7;
+	private static final int COLNUM_CHAIN = 6;
+	private static final int COLNUM_DIFF = 7;
+	private static final int COLNUM_MEMO = 8;
 
 	private JTable table;
 	private DefaultTableModel tableModel;
@@ -56,14 +58,14 @@ public class RepeatTablePanel extends JPanel {
 		scrollPane.setViewportView(table);
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
-				{null, null, null, null, null, null, null, null},
+				{null, null, null, null, null, null, null, null, null},
 			},
 			new String[] {
-				"No", "Send date", "Auth", "Status", "Length", "Time", "Diff", "Memo"
+				"No", "Send date", "Auth", "Status", "Length", "Time", "Chain", "Diff", "Memo"
 			}
 		) {
 			boolean[] columnEditables = new boolean[] {
-				false, false, false, false, false, false, false, true
+				false, false, false, false, false, false, false, false, true
 			};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
@@ -92,6 +94,7 @@ public class RepeatTablePanel extends JPanel {
 		table.getColumnModel().getColumn(COLNUM_STATUS).setPreferredWidth(50);
 		table.getColumnModel().getColumn(COLNUM_LENGTH).setPreferredWidth(50);
 		table.getColumnModel().getColumn(COLNUM_TIME).setPreferredWidth(50);
+		table.getColumnModel().getColumn(COLNUM_CHAIN).setPreferredWidth(35);
 		table.getColumnModel().getColumn(COLNUM_DIFF).setPreferredWidth(300);
 		table.getColumnModel().getColumn(COLNUM_MEMO).setPreferredWidth(400);
 
@@ -111,6 +114,7 @@ public class RepeatTablePanel extends JPanel {
 				messageRepeatDto.getStatus(),
 				messageRepeatDto.getLength(),
 				messageRepeatDto.getTime(),
+				messageRepeatDto.isChainFlag() ? Captions.CHECK : "",
 				messageRepeatDto.getDifference(),
 				Optional.ofNullable(messageRepeatDto.getMemo()).orElse("")};
 	}

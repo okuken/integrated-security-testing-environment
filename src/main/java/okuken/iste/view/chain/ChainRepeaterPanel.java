@@ -66,7 +66,7 @@ public class ChainRepeaterPanel extends JPanel {
 	}
 
 	private void openChainEditor(Component triggerComponent) {
-		var chainDefPanel = new ChainDefPanel(messageDto.getId(), Controller.getInstance().getMessageChainIdByBaseMessageId(messageDto.getId()));
+		var chainDefPanel = new ChainDefPanel(messageDto, Controller.getInstance().getMessageChainIdByBaseMessageId(messageDto.getId()));
 		chainDefPanel.setPopupFrame(UiUtil.popup(messageDto.getName() + Captions.CHAIN_REPEATER_POPUP_TITLE_SUFFIX_EDIT_CHAIN, chainDefPanel, triggerComponent, we -> {chainDefPanel.cancel();}));
 	}
 

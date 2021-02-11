@@ -2,14 +2,18 @@ package okuken.iste.dto;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 public class MessageChainNodeDto {
 
 	private Integer id;
 
 	private MessageDto messageDto;
 
-	private List<MessageChainNodeReqpDto> reqps;
-	private List<MessageChainNodeRespDto> resps;
+	private List<MessageChainNodeReqpDto> reqps = Lists.newArrayList();
+	private List<MessageChainNodeRespDto> resps = Lists.newArrayList();
+
+	private boolean main;
 
 	private byte[] editedRequest;
 
@@ -42,6 +46,12 @@ public class MessageChainNodeDto {
 	}
 	public void setEditedRequest(byte[] editedRequest) {
 		this.editedRequest = editedRequest;
+	}
+	public boolean isMain() {
+		return main;
+	}
+	public void setMain(boolean main) {
+		this.main = main;
 	}
 
 	public byte[] getRequest() {

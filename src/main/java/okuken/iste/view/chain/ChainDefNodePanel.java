@@ -35,6 +35,8 @@ public class ChainDefNodePanel extends JPanel {
 
 	private ChainDefPanel parentChainDefPanel;
 
+	private boolean isMainNode;
+
 	private JComboBox<MessageDto> urlComboBox;
 	private ChainDefNodeRequestParamsPanel requestParamsPanel;
 	private ChainDefNodeResponseParamsPanel responseParamsPanel;
@@ -45,6 +47,7 @@ public class ChainDefNodePanel extends JPanel {
 
 	public ChainDefNodePanel(MessageChainNodeDto nodeDto, ChainDefPanel parentChainDefPanel) {
 		this.parentChainDefPanel = parentChainDefPanel;
+		this.isMainNode = nodeDto != null && nodeDto.isMain();
 		
 		setLayout(new BorderLayout(0, 0));
 		setBorder(new LineBorder(Color.GRAY));
@@ -72,6 +75,7 @@ public class ChainDefNodePanel extends JPanel {
 				}
 			}
 		});
+		urlComboBox.setEnabled(!isMainNode);
 		urlPanel.add(urlComboBox);
 		
 		requestParamsPanel = new ChainDefNodeRequestParamsPanel();
@@ -97,6 +101,7 @@ public class ChainDefNodePanel extends JPanel {
 				removeNode();
 			}
 		});
+		btnDelete.setEnabled(!isMainNode);
 		leftPanel.add(btnDelete);
 		
 		initPanel(nodeDto);
@@ -147,6 +152,7 @@ public class ChainDefNodePanel extends JPanel {
 	public MessageChainNodeDto makeNodeDto() {
 		//TODO: validation
 		var nodeDto = new MessageChainNodeDto();
+		nodeDto.setMain(isMainNode);
 		nodeDto.setMessageDto(urlComboBox.getItemAt(urlComboBox.getSelectedIndex()));
 		nodeDto.setReqps(requestParamsPanel.getRows());
 		nodeDto.setResps(responseParamsPanel.getRows());

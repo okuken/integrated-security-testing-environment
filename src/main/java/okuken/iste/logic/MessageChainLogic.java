@@ -77,6 +77,7 @@ public class MessageChainLogic {
 				var node = new MessageChainNode();
 				node.setFkMessageChainId(chainDto.getId());
 				node.setFkMessageId(nodeDto.getMessageDto().getId());
+				node.setMainFlg(nodeDto.isMain());
 				node.setPrcDate(now);
 				messageChainNodeMapper.insert(node);
 				nodeDto.setId(node.getId());
@@ -128,6 +129,7 @@ public class MessageChainLogic {
 				var nodeDto = new MessageChainNodeDto();
 				nodeDto.setId(node.getId());
 				nodeDto.setMessageDto(MessageLogic.getInstance().loadMessage(node.getFkMessageId()));
+				nodeDto.setMain(node.getMainFlg());
 
 				nodeDto.setReqps(
 					messageChainNodeReqpMapper.select(c -> c
@@ -210,7 +212,7 @@ public class MessageChainLogic {
 						messageChainRepeatDto.next();
 						sendMessageChainImpl(messageChainRepeatDto, authAccountDto, callback, forAuth, needSaveHistory);
 					}
-				}, forAuth, needSaveHistory);
+				}, forAuth, needSaveHistory && node.isMain(), true);
 	}
 
 	private void updateVars(MessageChainRepeatDto messageChainRepeatDto) {

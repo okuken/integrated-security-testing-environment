@@ -2,7 +2,7 @@
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
   <context id="context1">
-    <jdbcConnection connectionURL="jdbc:sqlite:C:/work/iste.db" driverClass="org.sqlite.JDBC" />
+    <jdbcConnection connectionURL="jdbc:sqlite:C:/iste_clean.db" driverClass="org.sqlite.JDBC" />
     <javaModelGenerator targetPackage="okuken.iste.entity.auto" targetProject="integrated-security-testing-environment/src/main/java/" />
     <javaClientGenerator targetPackage="okuken.iste.dao.auto" targetProject="integrated-security-testing-environment/src/main/java/" type="XMLMAPPER" />
     <table tableName="ISTE_%">
@@ -12,6 +12,8 @@
         <!-- columnOverride column="PRC_DATE" javaType="java.sql.Date" / -->
         <columnOverride column="STATUS"     javaType="Short" />
         <columnOverride column="DELETE_FLG" javaType="boolean" />
+        <columnOverride column="MAIN_FLG"   javaType="Boolean" />
+        <columnOverride column="CHAIN_FLG"  javaType="Boolean" />
         <columnOverride column="REQUEST"    javaType="byte[]" jdbcType="BINARY" />
         <columnOverride column="RESPONSE"   javaType="byte[]" jdbcType="BINARY" />
     </table>

@@ -158,7 +158,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		JButton chainButton = new JButton(Captions.REPEATER_BUTTON_CHAIN);
 		chainButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				var chainDefPanel = new ChainDefPanel(orgMessageDto.getId(), Controller.getInstance().getMessageChainIdByBaseMessageId(orgMessageDto.getId()));
+				var chainDefPanel = new ChainDefPanel(orgMessageDto, Controller.getInstance().getMessageChainIdByBaseMessageId(orgMessageDto.getId()));
 				chainDefPanel.setPopupFrame(UiUtil.popup(orgMessageDto.getName() + Captions.REPEATER_POPUP_TITLE_SUFFIX_CHAIN, chainDefPanel, chainButton, we -> {chainDefPanel.cancel();}));
 			}
 		});
@@ -178,6 +178,9 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	public void setup(MessageDto orgMessageDto) {
 		this.orgMessageDto = orgMessageDto;
+		refresh();
+	}
+	public void refresh() {
 		repeatTablePanel.setup(orgMessageDto.getRepeatList());
 
 		Integer lastRowIndex = repeatTablePanel.selectLastRow();
@@ -291,6 +294,10 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 			return null;
 		}
 		return authAccountComboBox.getItemAt(selectedIndex);
+	}
+
+	public MessageDto getOrgMessageDto() {
+		return orgMessageDto;
 	}
 
 	public void clear() {

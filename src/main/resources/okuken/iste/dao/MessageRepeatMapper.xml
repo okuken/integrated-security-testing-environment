@@ -13,6 +13,7 @@
     <result column="PRC_DATE" jdbcType="VARCHAR" property="prcDate" />
     <result column="MEMO" jdbcType="VARCHAR" property="memo" />
     <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+    <result column="CHAIN_FLG" jdbcType="BOOLEAN" property="chainFlg" />
     <collection property="messageRepeatRedirs" ofType="okuken.iste.entity.auto.MessageRepeatRedir" columnPrefix="mrr_">
         <id column="FK_MESSAGE_REPEAT_ID" jdbcType="INTEGER" property="fkMessageRepeatId" />
         <id column="ID" jdbcType="INTEGER" property="id" />
