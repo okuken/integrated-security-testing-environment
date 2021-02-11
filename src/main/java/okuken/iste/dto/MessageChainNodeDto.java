@@ -11,6 +11,8 @@ public class MessageChainNodeDto {
 	private List<MessageChainNodeReqpDto> reqps;
 	private List<MessageChainNodeRespDto> resps;
 
+	private byte[] editedRequest;
+
 	public Integer getId() {
 		return id;
 	}
@@ -34,6 +36,19 @@ public class MessageChainNodeDto {
 	}
 	public void setResps(List<MessageChainNodeRespDto> resps) {
 		this.resps = resps;
+	}
+	public byte[] getEditedRequest() {
+		return editedRequest;
+	}
+	public void setEditedRequest(byte[] editedRequest) {
+		this.editedRequest = editedRequest;
+	}
+
+	public byte[] getRequest() {
+		if(editedRequest != null) {
+			return editedRequest;
+		}
+		return messageDto.getMessage().getRequest();
 	}
 
 }

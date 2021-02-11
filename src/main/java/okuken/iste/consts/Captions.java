@@ -71,8 +71,8 @@ public class Captions {
 	public static final String CHAIN_DEF_TABLE_TITLE_REQUEST_MANIPULATION = "Request manipulation";
 	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
 
-	public static final String CHAIN_DEF_TEST = "Run";
-	public static final String CHAIN_DEF_TEST_DONE = "Done.";
+	public static final String CHAIN_DEF_RUN = "Run";
+	public static final String CHAIN_DEF_RUN_DONE = "Done.";
 
 	public static final String CHAIN_DEF_SAVE = "Save";
 	public static final String CHAIN_DEF_CANCEL = "Cancel";

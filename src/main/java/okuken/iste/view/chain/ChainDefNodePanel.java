@@ -84,7 +84,7 @@ public class ChainDefNodePanel extends JPanel {
 		flowLayout_2.setAlignment(FlowLayout.LEFT);
 		mainPanel.add(responseParamsPanel);
 		
-		messageEditorPanel = new MessageEditorPanel(null, false, false, true);
+		messageEditorPanel = new MessageEditorPanel(null, !parentChainDefPanel.judgeIsAuthChain(), false, true);
 		centerPanel.add(messageEditorPanel, BorderLayout.CENTER);
 		messageEditorPanel.setPreferredSize(MESSAGE_EDITOR_PREFERRED_SIZE);
 		
@@ -150,6 +150,7 @@ public class ChainDefNodePanel extends JPanel {
 		nodeDto.setMessageDto(urlComboBox.getItemAt(urlComboBox.getSelectedIndex()));
 		nodeDto.setReqps(requestParamsPanel.getRows());
 		nodeDto.setResps(responseParamsPanel.getRows());
+		nodeDto.setEditedRequest(messageEditorPanel.getRequest());
 		return nodeDto;
 	}
 

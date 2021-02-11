@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.logic.ConfigLogic;
@@ -75,11 +76,11 @@ public class ChainDefPanel extends JPanel {
 		JPanel controlCenterPanel = new JPanel();
 		controlPanel.add(controlCenterPanel, BorderLayout.CENTER);
 		
-		JButton testButton = new JButton(Captions.CHAIN_DEF_TEST);
-		controlCenterPanel.add(testButton);
-		testButton.addActionListener(new ActionListener() {
+		JButton runButton = new JButton(Captions.CHAIN_DEF_RUN);
+		controlCenterPanel.add(runButton);
+		runButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				test();
+				run();
 			}
 		});
 		
@@ -170,7 +171,7 @@ public class ChainDefPanel extends JPanel {
 		return chainDto;
 	}
 
-	private void test() {
+	private void run() {
 		var chainDefNodePanels = Arrays.asList(nodesPanel.getComponents()).stream()
 				.filter(component -> component instanceof ChainDefNodePanel)
 				.map(chainDefNodePanel -> (ChainDefNodePanel)chainDefNodePanel)
@@ -180,9 +181,24 @@ public class ChainDefPanel extends JPanel {
 			return;
 		}
 
-		testImpl(chainDefNodePanels, getTimes());
+		var chainDto = makeChainDto();
+		var times = getTimes();
+
+		if(judgeIsAuthChain()) {
+			runImpl(chainDefNodePanels, chainDto, Controller.getInstance().getSelectedAuthAccountOnAuthConfig(), times);
+			return;
+		}
+
+		var authAccountDto = Controller.getInstance().getSelectedAuthAccountOnRepeater();
+		if(authAccountDto != null && authAccountDto.getSessionId() == null) {
+			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
+				runImpl(chainDefNodePanels, chainDto, authAccountDto, times);
+			});
+			return;
+		}
+		runImpl(chainDefNodePanels, chainDto, authAccountDto, times);
 	}
-	private void testImpl(List<ChainDefNodePanel> chainDefNodePanels, int times) {
+	private void runImpl(List<ChainDefNodePanel> chainDefNodePanels, MessageChainDto messageChainDto, AuthAccountDto authAccountDto, int times) {
 		SwingUtilities.invokeLater(() -> {
 			chainDefNodePanels.forEach(nodePanel -> {
 				nodePanel.clearMessage();
@@ -190,18 +206,16 @@ public class ChainDefPanel extends JPanel {
 			timesCountdownLabel.setText(Integer.toString(times));
 		});
 
-		var authAccount = judgeIsAuthChain() ? Controller.getInstance().getSelectedAuthAccountOnAuthConfig() : Controller.getInstance().getSelectedAuthAccountOnRepeater();
-
-		Controller.getInstance().sendMessageChain(makeChainDto(), authAccount, (messageChainRepeatDto, index) -> {
+		Controller.getInstance().sendMessageChain(messageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
 			SwingUtilities.invokeLater(() -> {
 				chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage());
 			});
 			if(index + 1 >= chainDefNodePanels.size()) { //case: last node
 				if(times - 1 > 0) {
-					testImpl(chainDefNodePanels, times - 1); //recursive
+					runImpl(chainDefNodePanels, messageChainDto, authAccountDto, times - 1); //recursive
 				} else {
 					SwingUtilities.invokeLater(() -> {
-						timesCountdownLabel.setText(Captions.CHAIN_DEF_TEST_DONE);
+						timesCountdownLabel.setText(Captions.CHAIN_DEF_RUN_DONE);
 					});
 				}
 			}
@@ -218,7 +232,7 @@ public class ChainDefPanel extends JPanel {
 		return (Integer)timesSpinner.getValue();
 	}
 
-	private boolean judgeIsAuthChain() {
+	public boolean judgeIsAuthChain() {
 		return ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId().equals(messageChainId);
 	}
 

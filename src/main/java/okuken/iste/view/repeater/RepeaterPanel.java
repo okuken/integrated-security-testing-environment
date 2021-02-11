@@ -95,13 +95,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 					return;
 				}
 
-				Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex), authAccountDto -> {
-					SwingUtilities.invokeLater(() -> {
-						if(authAccountDto.getId().equals(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()).getId())) {
-							authSessionValueLabel.setText(authAccountDto.getSessionIdForDisplay());
-						}
-					});
-				});
+				Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex), null);
 			}
 		});
 		controlLeftPanel.add(authSessionRefreshButton);
@@ -215,16 +209,17 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		refreshFollowRedirectButton(BurpUtil.getHelpers().analyzeResponse(message.getResponse()).getStatusCode());
 	}
 
+	public void refreshAuthSessionValueLabel() {
+		SwingUtilities.invokeLater(() -> {
+			authSessionValueLabel.setText(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()).getSessionIdForDisplay());
+		});
+	}
+
 	public void sendRequest() {
 		AuthAccountDto authAccountDto = getSelectedAuthAccountDto();
 		if(authAccountDto != null && authAccountDto.getSessionId() == null) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
-				SwingUtilities.invokeLater(() -> {
-					if(authAccountDto.getId().equals(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()).getId())) {
-						authSessionValueLabel.setText(authAccountDto.getSessionIdForDisplay());
-					}
-					sendRequestImpl(authAccountDto);
-				});
+				sendRequestImpl(authAccountDto);
 			});
 			return;
 		}

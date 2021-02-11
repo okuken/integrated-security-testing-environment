@@ -307,7 +307,12 @@ public class Controller {
 	}
 
 	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<AuthAccountDto> callback) {
-		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, callback);
+		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, x -> {
+			repeaterPanel.refreshAuthSessionValueLabel();
+			if(callback != null) {
+				callback.accept(x);
+			}
+		});
 	}
 
 	private void clearAuthAccountsSession() {

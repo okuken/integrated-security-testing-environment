@@ -192,7 +192,7 @@ public class MessageChainLogic {
 	private void sendMessageChainImpl(MessageChainRepeatDto messageChainRepeatDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
 		var node = messageChainRepeatDto.getCurrentNodeDto();
 
-		var request = MessageUtil.applyPayloads(node.getMessageDto().getMessage().getRequest(), node.getReqps(), messageChainRepeatDto.getVars(), authAccountDto);
+		var request = MessageUtil.applyPayloads(node.getRequest(), node.getReqps(), messageChainRepeatDto.getVars(), authAccountDto);
 
 		RepeaterLogic.getInstance().sendRequest(
 				request,
