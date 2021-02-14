@@ -32,6 +32,7 @@ public abstract class AbstractDockoutableTabPanel extends JPanel {
 	protected void setupDockout() {
 		var dockoutButton = getDockoutButton();
 		dockoutButton.setText(Captions.DOCKOUT);
+		dockoutButton.setToolTipText(Captions.DOCKOUT_TT);
 		dockoutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dockoutOrDockin();
@@ -42,7 +43,9 @@ public abstract class AbstractDockoutableTabPanel extends JPanel {
 	private void dockoutOrDockin() {
 		if(dockoutFrame == null) {
 			dockoutFrame = UiUtil.dockout(UiUtil.createDockoutTitleByTabName(getTabName()), this, we -> {dockin();});
-			getDockoutButton().setText(Captions.DOCKIN);
+			var dockoutButton = getDockoutButton();
+			dockoutButton.setText(Captions.DOCKIN);
+			dockoutButton.setToolTipText(Captions.DOCKIN_TT);
 		} else {
 			dockin();
 		}
@@ -50,7 +53,9 @@ public abstract class AbstractDockoutableTabPanel extends JPanel {
 	private void dockin() {
 		UiUtil.dockin(getTabName(), this, getTabIndex(), getParentTabbedPane(), dockoutFrame);
 		dockoutFrame = null;
-		getDockoutButton().setText(Captions.DOCKOUT);
+		var dockoutButton = getDockoutButton();
+		dockoutButton.setText(Captions.DOCKOUT);
+		dockoutButton.setToolTipText(Captions.DOCKOUT_TT);
 	}
 
 }

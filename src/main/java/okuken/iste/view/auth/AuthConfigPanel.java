@@ -30,6 +30,7 @@ public class AuthConfigPanel extends JPanel {
 		add(loginRequestConfigPanel, BorderLayout.NORTH);
 		
 		JButton chainEditButton = new JButton(Captions.AUTH_CONFIG_BUTTON_EDIT_CHAIN);
+		chainEditButton.setToolTipText(Captions.AUTH_CONFIG_BUTTON_EDIT_CHAIN_TT);
 		loginRequestConfigPanel.add(chainEditButton);
 		chainEditButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -70,6 +70,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlPanel.add(controlLeftPanel, BorderLayout.WEST);
 		
 		JButton sendButton = new JButton(Captions.REPEATER_BUTTON_SEND);
+		sendButton.setToolTipText(Captions.REPEATER_BUTTON_SEND_TT);
 		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				sendRequest();
@@ -78,6 +79,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlLeftPanel.add(sendButton);
 		
 		authAccountComboBox = new JComboBox<AuthAccountDto>();
+		authAccountComboBox.setToolTipText(Captions.REPEATER_COMBOBOX_ACCOUNT_TT);
 		authAccountComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = authAccountComboBox.getSelectedIndex();
@@ -88,6 +90,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlLeftPanel.add(authAccountComboBox);
 		
 		authSessionRefreshButton = new JButton(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH);
+		authSessionRefreshButton.setToolTipText(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH_TT);
 		authSessionRefreshButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int selectedIndex = authAccountComboBox.getSelectedIndex();
@@ -104,6 +107,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlLeftPanel.add(authSessionValueLabel);
 		
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
+		copyOrgButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_ORG_TT);
 		copyOrgButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				messageEditorPanel.clearMessage();
@@ -113,6 +117,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlLeftPanel.add(copyOrgButton);
 		
 		JButton copyMasterButton = new JButton(Captions.REPEATER_BUTTON_COPY_MASTER);
+		copyMasterButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_MASTER_TT);
 		copyMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				messageEditorPanel.clearMessage();
@@ -143,6 +148,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlRightPanel.add(saveAsMasterMessageLabel);
 		
 		JButton saveAsMasterButton = new JButton(Captions.REPEATER_BUTTON_SAVE_AS_MASTER);
+		saveAsMasterButton.setToolTipText(Captions.REPEATER_BUTTON_SAVE_AS_MASTER_TT);
 		saveAsMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				orgMessageDto.setRepeatMasterMessage(new HttpRequestResponseMock(
@@ -156,6 +162,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlRightPanel.add(saveAsMasterButton);
 		
 		JButton chainButton = new JButton(Captions.REPEATER_BUTTON_CHAIN);
+		chainButton.setToolTipText(Captions.REPEATER_BUTTON_CHAIN_TT);
 		chainButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				var chainDefPanel = new ChainDefPanel(orgMessageDto, Controller.getInstance().getMessageChainIdByBaseMessageId(orgMessageDto.getId()));

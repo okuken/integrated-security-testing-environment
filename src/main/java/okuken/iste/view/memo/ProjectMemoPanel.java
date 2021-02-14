@@ -47,6 +47,7 @@ public class ProjectMemoPanel extends AbstractDockoutableTabPanel {
 		add(headerPanel, BorderLayout.NORTH);
 		
 		JButton wrapButton = new JButton(Captions.PROJECT_MEMO_BUTTON_WRAP);
+		wrapButton.setToolTipText(Captions.PROJECT_MEMO_BUTTON_WRAP_TT);
 		wrapButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				memoTextAreas.forEach(memoTextArea -> {

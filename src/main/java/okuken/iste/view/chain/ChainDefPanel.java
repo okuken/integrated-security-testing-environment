@@ -78,6 +78,7 @@ public class ChainDefPanel extends JPanel {
 		controlPanel.add(controlCenterPanel, BorderLayout.CENTER);
 		
 		JButton runButton = new JButton(Captions.CHAIN_DEF_RUN);
+		runButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
 		controlCenterPanel.add(runButton);
 		runButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -134,7 +135,8 @@ public class ChainDefPanel extends JPanel {
 		var buttonPanel = new JPanel();
 		((FlowLayout) buttonPanel.getLayout()).setAlignment(FlowLayout.LEFT);
 
-		var addButton = new JButton(Captions.GROUP_CONTROL_BUTTON_ADD);
+		var addButton = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_ADD);
+		addButton.setToolTipText(Captions.CHAIN_DEF_NODE_BUTTON_ADD_TT);
 		buttonPanel.add(addButton);
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

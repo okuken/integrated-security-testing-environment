@@ -148,6 +148,7 @@ public class SuitePanel extends JPanel {
 		Controller.getInstance().setPluginsPanel(pluginsPanel);
 		
 		mainTabbedPane.addTab(Captions.DOCKOUT, null);
+		mainTabbedPane.setToolTipTextAt(getDockoutTabIndex(), Captions.DOCKOUT_TT);
 		mainTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -177,13 +178,15 @@ public class SuitePanel extends JPanel {
 	private int getDockoutTabIndex() {
 		return mainTabbedPane.getTabCount() - 1;
 	}
-	private void setDockoutTabTitle(String title) {
-		mainTabbedPane.setTitleAt(getDockoutTabIndex(), title);
+	private void setDockoutTabTitle(String title, String toolTip) {
+		var dockoutTabIndex = getDockoutTabIndex();
+		mainTabbedPane.setTitleAt(dockoutTabIndex, title);
+		mainTabbedPane.setToolTipTextAt(dockoutTabIndex, toolTip);
 	}
 	private void dockoutOrDockin() {
 		if (dockoutFrame == null) {
 			dockoutFrame = UiUtil.dockout(Captions.EXTENSION_NAME_FULL, mainTabbedPane, we -> {dockin();});
-			setDockoutTabTitle(Captions.DOCKIN);
+			setDockoutTabTitle(Captions.DOCKIN, Captions.DOCKIN_TT);
 			this.repaint();
 			mainTabbedPane.setSelectedIndex(0);
 		} else {
@@ -193,7 +196,7 @@ public class SuitePanel extends JPanel {
 	private void dockin() {
 		UiUtil.dockin(mainTabbedPane, this, dockoutFrame);
 		dockoutFrame = null;
-		setDockoutTabTitle(Captions.DOCKOUT);
+		setDockoutTabTitle(Captions.DOCKOUT, Captions.DOCKOUT_TT);
 		mainTabbedPane.setSelectedIndex(0);
 	}
 

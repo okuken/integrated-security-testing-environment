@@ -95,7 +95,8 @@ public class ChainDefNodePanel extends JPanel {
 		JPanel leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);
 		
-		JButton btnDelete = new JButton(Captions.GROUP_CONTROL_BUTTON_DELETE);
+		JButton btnDelete = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_DELETE);
+		btnDelete.setToolTipText(Captions.CHAIN_DEF_NODE_BUTTON_DELETE_TT);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				removeNode();

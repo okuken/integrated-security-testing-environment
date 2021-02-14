@@ -42,6 +42,7 @@ public class MessageMemoPanel extends JPanel {
 		headerPanel.setLayout(new BorderLayout(0, 0));
 		
 		pinToggleButton = new JToggleButton(Captions.MESSAGE_MEMO_TOGGLE_PIN);
+		pinToggleButton.setToolTipText(Captions.MESSAGE_MEMO_TOGGLE_PIN_TT);
 		headerPanel.add(pinToggleButton, BorderLayout.WEST);
 		
 		nameTextField = new JTextField();

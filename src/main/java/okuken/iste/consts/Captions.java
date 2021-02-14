@@ -9,12 +9,11 @@ public class Captions {
 	public static final String CHECK = "\u2714";
 
 	public static final String DOCKOUT = "\u2197";
+	public static final String DOCKOUT_TT = "Undock";
 	public static final String DOCKIN = "\u2199";
+	public static final String DOCKIN_TT = "Dock";
 
 	public static final String FILECHOOSER = "...";
-
-	public static final String GROUP_CONTROL_BUTTON_ADD = "\u2795"; //+
-	public static final String GROUP_CONTROL_BUTTON_DELETE = "\u2716"; //x
 
 	public static final String TABLE_CONTROL_BUTTON_ADD = "+";
 	public static final String TABLE_CONTROL_BUTTON_DELETE = "-";
@@ -42,8 +41,12 @@ public class Captions {
 	public static final String TAB_MESSAGE_EDITOR_REQUEST = "Request";
 	public static final String TAB_MESSAGE_EDITOR_RESPONSE = "Response";
 
+	public static final String MAIN_HEADER_CHECKBOX_FILTER_PROGRESS_TT = "Filter rows by progress";
+	public static final String MAIN_HEADER_INPUT_FILTER_TERM_TT = "Filter rows by search term";
 	public static final String MAIN_HEADER_BUTTON_CHANGE_PROJECT = "...";
+	public static final String MAIN_HEADER_BUTTON_CHANGE_PROJECT_TT = "Select ISTE project";
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
+	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH_TT = "Adjust layout";
 
 	public static final String TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER = "Send request (Repeater)";
 	public static final String TABLE_CONTEXT_MENU_DO_PASSIVE_SCAN = "Do passive scan";
@@ -57,39 +60,56 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
 	public static final String REPEATER_BUTTON_SEND = "Send";
+	public static final String REPEATER_BUTTON_SEND_TT = "Send request in message editor as selected account";
+	public static final String REPEATER_COMBOBOX_ACCOUNT_TT = "Select account";
 	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH = "\uD83D\uDD04";
+	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH_TT = "Refresh session of selected account";
 	public static final String REPEATER_BUTTON_COPY_ORG = "Org";
+	public static final String REPEATER_BUTTON_COPY_ORG_TT = "Set original message to message editor";
 	public static final String REPEATER_BUTTON_COPY_MASTER = "Master";
+	public static final String REPEATER_BUTTON_COPY_MASTER_TT = "Set master message to message editor";
 	public static final String REPEATER_BUTTON_FOLLOW_REDIRECT = "Follow redirection";
 	public static final String REPEATER_BUTTON_SAVE_AS_MASTER = "Save as master";
+	public static final String REPEATER_BUTTON_SAVE_AS_MASTER_TT = "Save message in message editor as master";
 	public static final String REPEATER_BUTTON_CHAIN = "Chain";
+	public static final String REPEATER_BUTTON_CHAIN_TT = "Open request chain window";
 
 	public static final String REPEATER_POPUP_TITLE_SUFFIX_CHAIN = " - Chain";
 
 	public static final String CHAIN_REPEATER_BUTTON_EDIT_CHAIN = "Edit request chain";
 	public static final String CHAIN_REPEATER_POPUP_TITLE_SUFFIX_EDIT_CHAIN = " - Edit request chain";
 
+	public static final String CHAIN_DEF_NODE_BUTTON_ADD = "\u2795"; //+
+	public static final String CHAIN_DEF_NODE_BUTTON_ADD_TT = "Add request here";
+	public static final String CHAIN_DEF_NODE_BUTTON_DELETE = "\u2716"; //x
+	public static final String CHAIN_DEF_NODE_BUTTON_DELETE_TT = "Remove this request from chain";
+
 	public static final String CHAIN_DEF_TABLE_TITLE_REQUEST_MANIPULATION = "Request manipulation";
 	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
 
 	public static final String CHAIN_DEF_RUN = "Run";
+	public static final String CHAIN_DEF_RUN_TT = "Run request chain for specified number of times";
 	public static final String CHAIN_DEF_RUN_DONE = "Done.";
 
 	public static final String CHAIN_DEF_SAVE = "Save";
 	public static final String CHAIN_DEF_CANCEL = "Cancel";
 
 	public static final String MESSAGE_MEMO_TOGGLE_PIN = "\uD83D\uDCCC";
+	public static final String MESSAGE_MEMO_TOGGLE_PIN_TT = "Pin the memo";
 
-	public static final String PROJECT_MEMO_BUTTON_WRAP = "Wrap";
+	public static final String PROJECT_MEMO_BUTTON_WRAP = "\u21A9";
+	public static final String PROJECT_MEMO_BUTTON_WRAP_TT = "Wrap text";
 
 	public static final String AUTH_CONFIG_TABLE_TITLE_ACCOUNTS = "Accounts";
 	public static final String AUTH_CONFIG_TABLE_TITLE_APPLY_CONFIG = "How to apply vars provided by authentication request chain to each repeat requests";
 
 	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN = "Edit authentication request chain";
+	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN_TT = "Open authentication request chain window";
 	public static final String AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN = "Auth config - Edit request chain";
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo (.md)";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";
+	public static final String TOOLS_EXPORT_CHECKBOX_FILTER_TT = "Apply filter of List tab to export memo";
 
 	public static final String PROJECT_OPTIONS_PROJECT_NAME = "Project name";
 	public static final String PROJECT_OPTIONS_BUTTON_SAVE = "Save";
@@ -107,11 +127,11 @@ public class Captions {
 	public static final String MESSAGE_SAVED = "Saved.";
 	public static final String MESSAGE_DONE = "Done.";
 
-	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose a SQLite database file for IntegratedSecurityTestEnvironment(ISTE).";
+	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose SQLite database file for ISTE";
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";
-	public static final String MESSAGE_SELECT_PROJECT = "Select a project for IntegratedSecurityTestEnvironment(ISTE).";
+	public static final String MESSAGE_SELECT_PROJECT = "Select ISTE project";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
 	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export memo (.md)";
-	public static final String MESSAGE_CHOOSE_PLUGIN_FILE = "Choose a plugin jar file.";
+	public static final String MESSAGE_CHOOSE_PLUGIN_FILE = "Choose ISTE plugin jar file";
 
 }

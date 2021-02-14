@@ -46,6 +46,7 @@ public class MainHeaderPanel extends JPanel {
 		progressCheckboxs = Lists.newArrayList();
 		Arrays.stream(SecurityTestingProgress.values()).forEach(progress -> {
 			var progressCheckbox = new JCheckBox(progress.getCaption());
+			progressCheckbox.setToolTipText(Captions.MAIN_HEADER_CHECKBOX_FILTER_PROGRESS_TT);
 			progressCheckbox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					applyMessageFilter();
@@ -57,6 +58,7 @@ public class MainHeaderPanel extends JPanel {
 		});
 		
 		searchTextField = new JTextField();
+		searchTextField.setToolTipText(Captions.MAIN_HEADER_INPUT_FILTER_TERM_TT);
 		leftPanel.add(searchTextField);
 		searchTextField.setColumns(20);
 		searchTextField.getDocument().addDocumentListener(new DocumentListener() {
@@ -78,6 +80,7 @@ public class MainHeaderPanel extends JPanel {
 		add(centerPanel, BorderLayout.CENTER);
 		
 		JButton changeProjectButton = new JButton(Captions.MAIN_HEADER_BUTTON_CHANGE_PROJECT);
+		changeProjectButton.setToolTipText(Captions.MAIN_HEADER_BUTTON_CHANGE_PROJECT_TT);
 		changeProjectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().changeProject(false);
@@ -90,6 +93,7 @@ public class MainHeaderPanel extends JPanel {
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 		
 		JButton initColumnWidthButton = new JButton(Captions.MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH);
+		initColumnWidthButton.setToolTipText(Captions.MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH_TT);
 		initColumnWidthButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().initSizeRatioOfParts();

@@ -43,6 +43,7 @@ public class ExportToolsPanel extends JPanel {
 		add(exportMemoToTxtFileButton);
 		
 		filterCheckBox = new JCheckBox(Captions.TOOLS_EXPORT_CHECKBOX_FILTER);
+		filterCheckBox.setToolTipText(Captions.TOOLS_EXPORT_CHECKBOX_FILTER_TT);
 		add(filterCheckBox);
 
 	}
