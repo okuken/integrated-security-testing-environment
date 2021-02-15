@@ -61,7 +61,7 @@ public class RepeatTablePanel extends JPanel {
 				{null, null, null, null, null, null, null, null, null},
 			},
 			new String[] {
-				"No", "Send date", "Auth", "Status", "Length", "Time", "Chain", "Diff", "Memo"
+				"No", "Send date", "Auth", "Status", "Length", "Time", "Chain", "Diff", "Notes"
 			}
 		) {
 			boolean[] columnEditables = new boolean[] {

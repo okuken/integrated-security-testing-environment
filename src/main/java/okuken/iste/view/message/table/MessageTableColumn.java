@@ -16,7 +16,7 @@ public enum MessageTableColumn {
 	AUTH		("Auth",			30,			true,  false, "getAuthMatrix",						"setAuthMatrix",					String.class),
 	PRIORITY	("Priority",		15,			true,  false, "getPriority",						"setPriority",						String.class),
 	PROGRESS	("Progress",		40,			true,  false, "getProgress",						"setProgress",						SecurityTestingProgress.class),
-	PROGRESS_MEMO("Progress memo",	60,			true,  false, "getProgressMemo",					"setProgressMemo",					String.class),
+	PROGRESS_MEMO("Progress notes",	60,			true,  false, "getProgressMemo",					"setProgressMemo",					String.class),
 	PROGRESS_TECHNICAL		("T",	18,			true,  true,  "getProgressTechnical", 				"setProgressTechnical",				String.class),
 	PROGRESS_LOGICAL		("L",	18,			true,  true,  "getProgressLogical",					"setProgressLogical",				String.class),
 	PROGRESS_AUTHENTICATION	("A",	18,			true,  true,  "getProgressAuthentication",			"setProgressAuthentication",		String.class),

@@ -22,7 +22,7 @@ public class Captions {
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";	
 	public static final String TAB_SUITE = "ISTE";
 	public static final String TAB_MAIN = "List";
-	public static final String TAB_MEMO = "Memo";
+	public static final String TAB_MEMO = "Notes";
 	public static final String TAB_AUTH = "Auth";
 	public static final String TAB_TOOLS = "Tools";
 	public static final String TAB_OPTIONS = "Options";
@@ -45,7 +45,7 @@ public class Captions {
 	public static final String MAIN_HEADER_INPUT_FILTER_TERM_TT = "Filter rows by search term";
 	public static final String MAIN_HEADER_BUTTON_CHANGE_PROJECT = "...";
 	public static final String MAIN_HEADER_BUTTON_CHANGE_PROJECT_TT = "Select ISTE project";
-	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "> <";
+	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "\u2194";
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH_TT = "Adjust layout";
 
 	public static final String TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER = "Send request (Repeater)";
@@ -95,7 +95,7 @@ public class Captions {
 	public static final String CHAIN_DEF_CANCEL = "Cancel";
 
 	public static final String MESSAGE_MEMO_TOGGLE_PIN = "\uD83D\uDCCC";
-	public static final String MESSAGE_MEMO_TOGGLE_PIN_TT = "Pin the memo";
+	public static final String MESSAGE_MEMO_TOGGLE_PIN_TT = "Pin the notes";
 
 	public static final String PROJECT_MEMO_BUTTON_WRAP = "\u21A9";
 	public static final String PROJECT_MEMO_BUTTON_WRAP_TT = "Wrap text";
@@ -107,9 +107,9 @@ public class Captions {
 	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN_TT = "Open authentication request chain window";
 	public static final String AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN = "Auth config - Edit request chain";
 
-	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export memo (.md)";
+	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export notes (.md)";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";
-	public static final String TOOLS_EXPORT_CHECKBOX_FILTER_TT = "Apply filter of List tab to export memo";
+	public static final String TOOLS_EXPORT_CHECKBOX_FILTER_TT = "Apply filter of List tab to export notes";
 
 	public static final String PROJECT_OPTIONS_PROJECT_NAME = "Project name";
 	public static final String PROJECT_OPTIONS_BUTTON_SAVE = "Save";
@@ -131,7 +131,7 @@ public class Captions {
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";
 	public static final String MESSAGE_SELECT_PROJECT = "Select ISTE project";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
-	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export memo (.md)";
+	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export notes (.md)";
 	public static final String MESSAGE_CHOOSE_PLUGIN_FILE = "Choose ISTE plugin jar file";
 
 }

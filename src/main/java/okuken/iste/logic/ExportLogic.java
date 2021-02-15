@@ -34,7 +34,7 @@ public class ExportLogic {
 			bw.newLine();
 
 			for(int i = 0; i < projectMemos.size(); i++) {
-				writeln(bw, String.format("## Project memo %d", i + 1));
+				writeln(bw, String.format("## Project notes %d", i + 1));
 
 				if(StringUtils.isNotBlank(projectMemos.get(i).getMemo())) {
 					writeln(bw, "```");
@@ -45,7 +45,7 @@ public class ExportLogic {
 				bw.newLine();
 			}
 
-			writeln(bw, "## Request memo");
+			writeln(bw, "## Request notes");
 			bw.newLine();
 
 			for(MessageDto messageDto: messageDtos) {
