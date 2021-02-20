@@ -1,6 +1,5 @@
 package okuken.iste.util;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,10 +37,13 @@ public class MessageUtil {
 		}
 	}
 
+	/**
+	 * CAUTION: not support to apply multibyte character
+	 */
 	private static byte[] applyRegexPayload(byte[] request, String regex, String paramValue) {
-		var requestStr = new String(request);
+		var requestStr = new String(request, ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET);
 		var appliedRequestStr = RegexUtil.replaceOneGroup(requestStr, regex, paramValue);
-		return updateContentLength(appliedRequestStr.getBytes());
+		return updateContentLength(appliedRequestStr.getBytes(ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET));
 	}
 
 	public static byte[] applyCookiePayload(byte[] request, IParameter parameter) {
@@ -119,13 +121,15 @@ public class MessageUtil {
 		return BurpUtil.getHelpers().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
 	}
 
-
+	/**
+	 * CAUTION: not support to extract multibyte character
+	 */
 	public static String extractResponseParam(byte[] response, ResponseParameterType paramType, String paramName) {
 		if(!paramType.isExtractable()) {
 			throw new IllegalArgumentException("The parameter type is not extractable: " + paramType);
 		}
 		if(paramType == ResponseParameterType.REGEX) {
-			return RegexUtil.extractOneGroup(new String(response), paramName);
+			return RegexUtil.extractOneGroup(new String(response, ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET), paramName);
 		}
 
 		var paramOptional = extractResponseCandidateParams(response, paramType).stream()
@@ -164,7 +168,7 @@ public class MessageUtil {
 	@SuppressWarnings("unchecked")
 	public static List<MessageResponseParamDto> convertJsonResponseToDto(byte[] response, IResponseInfo responseInfo) {
 		var responseBody = HttpUtil.extractMessageBody(response, responseInfo.getBodyOffset());
-		var responseBodyStr = new String(responseBody, StandardCharsets.UTF_8);
+		var responseBodyStr = new String(responseBody, ByteUtil.detectEncoding(response));
 		Map<String, Object> json = new Gson().fromJson(responseBodyStr, Map.class);
 
 		//TODO: support multiple levels json
