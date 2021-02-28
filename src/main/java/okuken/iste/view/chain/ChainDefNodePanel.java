@@ -3,6 +3,7 @@ package okuken.iste.view.chain;
 import javax.swing.JPanel;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Colors;
 import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageChainNodeDto;
@@ -20,7 +21,6 @@ import javax.swing.border.LineBorder;
 import burp.IHttpRequestResponse;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
@@ -50,7 +50,7 @@ public class ChainDefNodePanel extends JPanel {
 		this.isMainNode = nodeDto != null && nodeDto.isMain();
 		
 		setLayout(new BorderLayout(0, 0));
-		setBorder(new LineBorder(Color.GRAY));
+		setBorder(new LineBorder(Colors.BLOCK_BORDER));
 		
 		JPanel centerPanel = new JPanel(new BorderLayout(0, 0));
 		add(centerPanel, BorderLayout.CENTER);

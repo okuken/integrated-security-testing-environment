@@ -27,9 +27,8 @@ import okuken.iste.view.option.OptionsPanel;
 import okuken.iste.view.plugin.PluginsPanel;
 import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeaterPanel;
-import okuken.iste.view.tool.ExportToolsPanel;
+import okuken.iste.view.tool.ToolsPanel;
 
-import java.awt.GridLayout;
 import java.util.List;
 
 public class SuitePanel extends JPanel {
@@ -133,12 +132,8 @@ public class SuitePanel extends JPanel {
 		mainTabbedPane.addTab(Captions.TAB_AUTH, null, authPanel, null);
 		Controller.getInstance().setAuthPanel(authPanel);
 		
-		JPanel toolsPanel = new JPanel();
+		JPanel toolsPanel = new ToolsPanel();
 		mainTabbedPane.addTab(Captions.TAB_TOOLS, null, toolsPanel, null);
-		toolsPanel.setLayout(new GridLayout(5, 1, 0, 0));
-		
-		JPanel exportToolPanel = new ExportToolsPanel();
-		toolsPanel.add(exportToolPanel);
 		
 		JPanel optionsPanel = new OptionsPanel();
 		mainTabbedPane.addTab(Captions.TAB_OPTIONS, null, optionsPanel, null);

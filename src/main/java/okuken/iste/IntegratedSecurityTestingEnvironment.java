@@ -16,6 +16,7 @@ import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.plugin.PluginManager;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
+import okuken.iste.util.ThreadUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.ContextMenuFactory;
 import okuken.iste.view.SuiteTab;
@@ -70,6 +71,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 	@Override
 	public void extensionUnloaded() {
 		RepeaterLogic.getInstance().shutdownExecutorService();
+		ThreadUtil.shutdownExecutorService();
 		PluginManager.getInstance().unloadAllPlugins();
 		DatabaseManager.getInstance().unloadDatabase();
 		UiUtil.disposeDockoutFrames();
