@@ -27,6 +27,8 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 
 ![ISTE > Auth](docs/images/auth.png)
 
+![ISTE > Auth > Edit chain](docs/images/auth_chain.png)
+
 ### Experimental Features
 
 | 機能　　　　　　　　　　 | 説明 | 備考 |
@@ -35,15 +37,13 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 | 診断メモのエクスポート | 簡易なMarkdown形式で診断メモをエクスポートする機能。 | 色々考慮できていないが、診断メモを他者に共有したい場合に最低限使える程度の機能ではある。また、診断メモの検索機能が未実装なので、エクスポート＆テキストエディタで検索等の使い方も。 |
 | プラグイン | ISTEの拡張機能を開発できる拡張ポイントを提供。 | ISTEの機能は基本的に本体に実装していくが、極めて個人的な機能(自作アプリとの連携機能など)は、プラグインとして外出し実装する。現状はかなり制約が厳しいのでサンプルプラグインは提供しないが、作者の実用には辛うじて耐えている。 |
 
-![ISTE > Auth > Edit chain](docs/images/auth_chain.png)
-
 ## Prerequisites
 
 [Burp Suite Professional](https://portswigger.net/burp/pro) or [Burp Suite Community Edition](https://portswigger.net/burp/communitydownload)
 
 ## Installing ISTE
 
-1. [Releases](https://github.com/okuken/integrated-security-testing-environment/releases) から iste-x.x.x.jar ファイルをダウンロード
+1. [Releases](https://github.com/okuken/integrated-security-testing-environment/releases) から Latest release の iste-x.x.x.jar ファイルをダウンロード
 1. Burp Suite を起動し、Extender > Extensions にて Add ボタンを押下
 1. 下記のとおり指定して Next ボタンを押下
    * Extension type: Java

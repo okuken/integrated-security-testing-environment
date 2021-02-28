@@ -78,7 +78,7 @@ public class ChainDefNodePanel extends JPanel {
 		urlComboBox.setEnabled(!isMainNode);
 		urlPanel.add(urlComboBox);
 		
-		requestParamsPanel = new ChainDefNodeRequestParamsPanel();
+		requestParamsPanel = new ChainDefNodeRequestParamsPanel(this);
 		FlowLayout flowLayout_1 = (FlowLayout) requestParamsPanel.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		mainPanel.add(requestParamsPanel);
@@ -166,6 +166,10 @@ public class ChainDefNodePanel extends JPanel {
 	}
 	public void setMessage(IHttpRequestResponse message) {
 		messageEditorPanel.setMessage(message);
+	}
+
+	public ChainDefPanel getParentChainDefPanel() {
+		return parentChainDefPanel;
 	}
 
 }

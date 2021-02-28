@@ -57,6 +57,7 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE = "Send to Comparer (response)";
 	public static final String TABLE_CONTEXT_MENU_DELETE_ITEM = "Delete item";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
+	public static final String TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY = "Copy URL without Query";
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
 	public static final String REPEATER_BUTTON_SEND = "Send";
@@ -117,6 +118,7 @@ public class Captions {
 	public static final String USER_OPTIONS_TEMPLATE_MEMO_BUTTON_SAVE = "Save";
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";
+	public static final String USER_OPTIONS_DB_FILE_BUTTON_SAVE = "Save & Load";
 
 	public static final String PLUGINS_BUTTON_ADD_PLUGIN = "Add";
 

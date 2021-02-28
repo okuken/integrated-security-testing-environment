@@ -6,15 +6,17 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 public enum SourceType {
-	VAR                ((byte) 0, "Var"),
-	AUTH_ACCOUNT_TABLE ((byte) 1, "Account table");
+	VAR                ((byte) 0, "Var"          , false),
+	AUTH_ACCOUNT_TABLE ((byte) 1, "Account table", true);
 
 	private final byte id;
 	private final String caption;
+	private final boolean authOnly;
 
-	private SourceType(byte id, String caption) {
+	private SourceType(byte id, String caption, boolean authOnly) {
 		this.id = id;
 		this.caption = caption;
+		this.authOnly = authOnly;
 	}
 
 	public byte getId() {
@@ -22,6 +24,9 @@ public enum SourceType {
 	}
 	public String getCaption() {
 		return caption;
+	}
+	public boolean isAuthOnly() {
+		return authOnly;
 	}
 
 	@Override
