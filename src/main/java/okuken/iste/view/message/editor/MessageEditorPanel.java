@@ -82,8 +82,20 @@ public class MessageEditorPanel extends JPanel {
 		return requestMessageEditor.getMessage();
 	}
 
+	public int[] getRequestSelectionBounds() {
+		return requestMessageEditor.getSelectionBounds();
+	}
+
 	public byte[] getResponse() {
 		return responseMessageEditor.getMessage();
+	}
+
+	public IHttpService getHttpService() {
+		return httpService;
+	}
+
+	public void setRequest(byte[] request) {
+		requestMessageEditor.setMessage(request, true);
 	}
 
 	public void setMessage(MessageDto dto) {

@@ -13,6 +13,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
+import com.google.common.collect.Lists;
+
 import burp.IContextMenuFactory;
 import burp.IHttpRequestResponse;
 import burp.ITab;
@@ -47,6 +49,7 @@ import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
+import okuken.iste.view.message.selector.MessageSelectorPanel;
 import okuken.iste.view.message.table.MessageTableColumn;
 import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
@@ -82,6 +85,10 @@ public class Controller {
 	private ProjectMemoPanel projectMemoPanel;
 
 	private AuthPanel authPanel;
+
+	private JTabbedPane toolsTabbedPane;
+
+	private List<MessageSelectorPanel> messageSelectPanels = Lists.newArrayList();
 
 	private ProjectOptionsPanel projectOptionsPanel;
 
@@ -146,8 +153,17 @@ public class Controller {
 	public void setProjectMemoPanel(ProjectMemoPanel projectMemoPanel) {
 		this.projectMemoPanel = projectMemoPanel;
 	}
+	public void addMessageSelectPanel(MessageSelectorPanel messageSelectPanel) {
+		messageSelectPanels.add(messageSelectPanel);
+	}
 	public void setAuthPanel(AuthPanel authPanel) {
 		this.authPanel = authPanel;
+	}
+	public void setToolsTabbedPane(JTabbedPane toolsTabbedPane) {
+		this.toolsTabbedPane = toolsTabbedPane;
+	}
+	public JTabbedPane getToolsTabbedPane() {
+		return toolsTabbedPane;
 	}
 	public void setProjectOptionsPanel(ProjectOptionsPanel projectOptionsPanel) {
 		this.projectOptionsPanel = projectOptionsPanel;
@@ -187,6 +203,7 @@ public class Controller {
 
 	private void refreshComponentsDependentOnMessages(List<MessageDto> messageDtos) {
 //		authPanel.refreshConfigPanel(messageDtos);
+		messageSelectPanels.forEach(panel -> panel.refreshPanel(messageDtos));
 	}
 
 	public void initSizeRatioOfParts() {

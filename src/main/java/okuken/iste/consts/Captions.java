@@ -33,6 +33,9 @@ public class Captions {
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT = "Repeater";
 	public static final String TAB_MAIN_MESSAGE_EDITOR_CHAIN = "Chain";
 
+	public static final String TAB_TOOLS_EXPORT = "Export";
+	public static final String TAB_TOOLS_BSQLI = "BSQLi";
+
 	public static final String TAB_OPTIONS_PROJECT_OPTIONS = "Project options";
 	public static final String TAB_OPTIONS_USER_OPTIONS = "User options";
 	public static final String TAB_OPTIONS_USER_OPTIONS_MISC = "Misc";
@@ -111,6 +114,31 @@ public class Captions {
 	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN = "Edit authentication request chain";
 	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN_TT = "Open authentication request chain window";
 	public static final String AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN = "Auth config - Edit request chain";
+
+	public static final String TOOLS_EXPLOIT_ATTACK = "Start attack";
+	public static final String TOOLS_EXPLOIT_STOP = "Stop";
+	public static final String TOOLS_EXPLOIT_SET = "Set";
+	public static final String TOOLS_EXPLOIT_USE_CHAIN = "Use chain (*not implemented now)";
+	public static final String TOOLS_EXPLOIT_NEED_URLENCODE = "Need URL-encode";
+	public static final String TOOLS_EXPLOIT_INTERVAL_TIME = "Interval time (ms)";
+	public static final String TOOLS_EXPLOIT_START_INDEX = "Start index";
+	public static final String TOOLS_EXPLOIT_MAX_INDEX = "Max index (for safety)";
+
+	public static final String TOOLS_EXPLOIT_BSQLI_TITLE = "[Experimental feature] Blind SQL injection tool. It performs binary search using ASCII characters(0x00-0x7F).";
+	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY = "Determine if the test value is correct by";
+	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_LENGTH = "Length";
+	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_TIME = "Time";
+	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_REGEX = "Regex";
+	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_REGEX_INVERSE = "Inverse";
+	public static final String TOOLS_EXPLOIT_BSQLI_BUTTON_INDEX_TT  = "Insert an INDEX position marker.\n"
+	                                                                + "e.g. 'and((SELECT(ASCII(SUBSTRING(version(),3,1))))<64)and''='\n"
+	                                                                + "  -> 'and((SELECT(ASCII(SUBSTRING(version(),%s,1))))%s)and''='";
+	public static final String TOOLS_EXPLOIT_BSQLI_BUTTON_OPEVAL_TT = "Insert an OPERATOR and VALUE position marker.\n"
+                                                                    + "e.g. 'and((SELECT(ASCII(SUBSTRING(version(),3,1))))<64)and''='\n"
+                                                                    + "  -> 'and((SELECT(ASCII(SUBSTRING(version(),%s,1))))%s)and''='";
+	public static final String TOOLS_EXPLOIT_BSQLI_BUTTON_VALUE_TT  = "Insert a VALUE position marker.\n"
+                                                                    + "e.g. 'and(SELECT ASCII(SUBSTRING(version(),3,1)))BETWEEN 0 and 64 and''='\n"
+                                                                    + "  -> 'and(SELECT ASCII(SUBSTRING(version(),%s,1)))BETWEEN 0 and %s and''='";
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export notes (.md)";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";

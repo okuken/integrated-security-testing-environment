@@ -44,7 +44,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream()
 					.filter(messageDto -> messageDto.getMessage().getResponse() != null)
-					.filter(messageDto -> BurpUtil.getCallbacks().isInScope(messageDto.getUrl()))
+					.filter(messageDto -> BurpUtil.isInScope(messageDto.getUrl()))
 					.forEach(messageDto -> 
 						BurpUtil.getCallbacks().doPassiveScan(
 							messageDto.getMessage().getHttpService().getHost(),
@@ -61,7 +61,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		doActiveScanMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream()
-					.filter(messageDto -> BurpUtil.getCallbacks().isInScope(messageDto.getUrl()))
+					.filter(messageDto -> BurpUtil.isInScope(messageDto.getUrl()))
 					.forEach(messageDto -> 
 						BurpUtil.getCallbacks().doActiveScan(
 							messageDto.getMessage().getHttpService().getHost(),
