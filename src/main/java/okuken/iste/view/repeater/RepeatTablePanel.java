@@ -1,7 +1,9 @@
 package okuken.iste.view.repeater;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.swing.JPanel;
@@ -39,8 +41,11 @@ public class RepeatTablePanel extends JPanel {
 
 	private List<MessageRepeatDto> repeaterHistory;
 
+	private RepeaterPanel parentRepeaterPanel;
+
 	@SuppressWarnings("serial")
-	public RepeatTablePanel() {
+	public RepeatTablePanel(RepeaterPanel parentRepeaterPanel) {
+		this.parentRepeaterPanel = parentRepeaterPanel;
 		setLayout(new BorderLayout(0, 0));
 		
 		scrollPane = new JScrollPane();
@@ -54,7 +59,7 @@ public class RepeatTablePanel extends JPanel {
 			}
 		};
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		scrollPane.setViewportView(table);
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
@@ -99,6 +104,8 @@ public class RepeatTablePanel extends JPanel {
 		table.getColumnModel().getColumn(COLNUM_MEMO).setPreferredWidth(400);
 
 		table.removeColumn(table.getColumnModel().getColumn(COLNUM_DIFF)); //TODO: impl
+
+		table.setComponentPopupMenu(new RepeatTablePopupMenu(this));
 
 		tableModel = (DefaultTableModel)table.getModel();
 	}
@@ -174,6 +181,16 @@ public class RepeatTablePanel extends JPanel {
 
 	public MessageRepeatDto getRow(int rowIndex) {
 		return repeaterHistory.get(rowIndex);
+	}
+
+	public List<MessageRepeatDto> getSelectedRows() {
+		return Arrays.stream(table.getSelectedRows())
+				.mapToObj(repeaterHistory::get)
+				.collect(Collectors.toList());
+	}
+
+	public RepeaterPanel getParentRepeaterPanel() {
+		return parentRepeaterPanel;
 	}
 
 }

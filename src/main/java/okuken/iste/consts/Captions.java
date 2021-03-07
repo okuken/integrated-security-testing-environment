@@ -54,7 +54,11 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_INTRUDER = "Send to Intruder";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_REPEATER = "Send to Repeater";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_REQUEST = "Send to Comparer (request)";
+	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_REQUEST_WITH_ORG = "Send to Comparer (request) with Org";
+	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_REQUEST_WITH_MST = "Send to Comparer (request) with Master";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE = "Send to Comparer (response)";
+	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_ORG = "Send to Comparer (response) with Org";
+	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_MST = "Send to Comparer (response) with Master";
 	public static final String TABLE_CONTEXT_MENU_DELETE_ITEM = "Delete item";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY = "Copy URL without Query";

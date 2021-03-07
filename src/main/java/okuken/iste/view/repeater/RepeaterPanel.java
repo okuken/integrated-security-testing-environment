@@ -59,7 +59,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		splitPane.setLeftComponent(headerPanel);
 		headerPanel.setLayout(new BorderLayout(0, 0));
 		
-		repeatTablePanel = new RepeatTablePanel();
+		repeatTablePanel = new RepeatTablePanel(this);
 		headerPanel.add(repeatTablePanel, BorderLayout.CENTER);
 		
 		JPanel controlPanel = new JPanel();
@@ -121,11 +121,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		copyMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				messageEditorPanel.clearMessage();
-				if(orgMessageDto.getRepeatMasterMessage() != null) {
-					setMessage(orgMessageDto.getRepeatMasterMessage());
-				} else {
-					setMessage(orgMessageDto);
-				}
+				setMessage(getMasterMessage());
 			}
 		});
 		controlLeftPanel.add(copyMasterButton);
@@ -305,6 +301,13 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	public MessageDto getOrgMessageDto() {
 		return orgMessageDto;
+	}
+
+	public IHttpRequestResponse getMasterMessage() {
+		if(orgMessageDto.getRepeatMasterMessage() == null) {
+			return orgMessageDto.getMessage();
+		}
+		return orgMessageDto.getRepeatMasterMessage();
 	}
 
 	public void clear() {

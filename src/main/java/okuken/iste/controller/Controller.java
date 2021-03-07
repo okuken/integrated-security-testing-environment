@@ -54,6 +54,7 @@ import okuken.iste.view.message.table.MessageTablePopupMenu;
 import okuken.iste.view.option.ProjectOptionsPanel;
 import okuken.iste.view.plugin.PluginsPanel;
 import okuken.iste.view.repeater.RepeatMasterPanel;
+import okuken.iste.view.repeater.RepeatTablePopupMenu;
 import okuken.iste.view.repeater.RepeaterPanel;
 
 public class Controller {
@@ -73,6 +74,7 @@ public class Controller {
 	private MessageEditorPanel orgMessageEditorPanel;
 	private RepeatMasterPanel repeatMasterPanel;
 	private RepeaterPanel repeaterPanel;
+	private RepeatTablePopupMenu repeatTablePopupMenu;
 //	private ChainRepeaterPanel chainRepeaterPanel;
 
 	private MessageMemoPanel messageMemoPanel;
@@ -131,6 +133,9 @@ public class Controller {
 	}
 	public void setRepeaterPanel(RepeaterPanel repeaterPanel) {
 		this.repeaterPanel = repeaterPanel;
+	}
+	public void setRepeatTablePopupMenu(RepeatTablePopupMenu repeatTablePopupMenu) {
+		this.repeatTablePopupMenu = repeatTablePopupMenu;
 	}
 //	public void setChainRepeaterPanel(ChainRepeaterPanel chainRepeaterPanel) {
 //		this.chainRepeaterPanel = chainRepeaterPanel;
@@ -378,9 +383,11 @@ public class Controller {
 
 	public void addPluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
 		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).addPluginContextMenuFactories(pluginContextMenuFactories);
+		repeatTablePopupMenu.addPluginContextMenuFactories(pluginContextMenuFactories);
 	}
 	public void removePluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
 		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).removePluginContextMenuFactories(pluginContextMenuFactories);
+		repeatTablePopupMenu.removePluginContextMenuFactories(pluginContextMenuFactories);
 	}
 
 	public void addPluginTabs(List<ITab> pluginTabs) {
