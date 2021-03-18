@@ -1,8 +1,12 @@
 package okuken.iste.util;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class HttpUtil {
+
+	public static final Charset DEFAULT_HTTP_HEADER_CHARSET = StandardCharsets.US_ASCII;
 
 	public static byte[] removeDustAtEndOfCookieHeader(byte[] request) {
 		var endIndexOfCookie = HttpUtil.endIndexOfCookie(request);
@@ -18,9 +22,9 @@ public class HttpUtil {
 		return request;
 	}
 
-	private static final byte[] COOKIE_START = "\r\nCookie:".getBytes();
-	private static final byte[] COOKIE_END = "\r\n".getBytes();
-	private static final byte[] HEADER_END = "\r\n\r\n".getBytes();
+	private static final byte[] COOKIE_START = "\r\nCookie:".getBytes(DEFAULT_HTTP_HEADER_CHARSET);
+	private static final byte[] COOKIE_END = "\r\n".getBytes(DEFAULT_HTTP_HEADER_CHARSET);
+	private static final byte[] HEADER_END = "\r\n\r\n".getBytes(DEFAULT_HTTP_HEADER_CHARSET);
 	private static int endIndexOfCookie(byte[] request) {
 		return ByteUtil.endIndexOf(request, HEADER_END, COOKIE_START, COOKIE_END);
 	}

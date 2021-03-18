@@ -6,7 +6,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
 
-version '0.1.0'
+version '0.1.1'
 
 shadowJar{
   archiveName = "iste-${version}.${extension}"
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.portswigger.burp.extender:burp-extender-api:2.1'
+    compileOnly 'net.portswigger.burp.extender:burp-extender-api:2.1'
     testRuntimeOnly files('C:\\Program Files\\BurpSuitePro\\burpsuite_pro.jar') // set your local path to burpsuite jar
 
     implementation 'org.mybatis:mybatis:3.5.5'
@@ -40,6 +40,7 @@ dependencies {
     implementation 'com.google.guava:guava:28.1-jre'
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'

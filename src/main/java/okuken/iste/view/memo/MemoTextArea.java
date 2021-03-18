@@ -44,7 +44,9 @@ public class MemoTextArea extends JTextArea {
 			@Override
 			public void focusLost(FocusEvent e) {
 				if(memoChanged) {
-					saver.accept(getText());
+					if(saver != null) {
+						saver.accept(getText());
+					}
 					memoChanged = false;
 				}
 			}

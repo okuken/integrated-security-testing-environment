@@ -87,13 +87,7 @@ public class MessageEditorPanel extends JPanel {
 	}
 
 	public void setMessage(MessageDto dto) {
-		requestMessageEditor.setMessage(
-				dto.getMessage().getRequest(),
-				true);
-		responseMessageEditor.setMessage(
-				Optional.ofNullable(dto.getMessage().getResponse()).orElse(new byte[] {}),
-				false);
-		httpService = dto.getMessage().getHttpService();
+		setMessage(dto.getMessage());
 	}
 
 	public void setMessage(IHttpRequestResponse message) {

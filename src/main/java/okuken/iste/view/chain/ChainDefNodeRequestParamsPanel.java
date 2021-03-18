@@ -29,6 +29,14 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTablePanel<MessageChai
 		new ColumnDef(SOURCE_TYPE, "Source type",  100, true, "getSourceType", "setSourceType", SourceType.class, DTO_CLASS),
 		new ColumnDef(SOURCE_NAME, "Source name",  200, true, "getSourceName", "setSourceName", String.class, DTO_CLASS));
 
+	private ChainDefNodePanel parentChainDefNodePanel;
+
+	public ChainDefNodeRequestParamsPanel(ChainDefNodePanel parentChainDefNodePanel) {
+		super();
+		this.parentChainDefNodePanel = parentChainDefNodePanel;
+		afterInit();
+	}
+
 	@Override
 	protected List<ColumnDef> getColumnDefs() {
 		return columns;
@@ -46,6 +54,8 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTablePanel<MessageChai
 
 	@Override
 	protected void afterInit(JTable table, DefaultTableModel tableModel) {
+	}
+	private void afterInit() {
 		setupParamTypeColumn(table);
 		setupSourceTypeColumn(table);
 	}
@@ -93,7 +103,9 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTablePanel<MessageChai
 	}
 	private void setupSourceTypeColumn(JTable table) {
 		var comboBox = new JComboBox<SourceType>();
-		Arrays.stream(SourceType.values()).forEach(item -> comboBox.addItem(item));
+		Arrays.stream(SourceType.values())
+			.filter(type -> !type.isAuthOnly() || parentChainDefNodePanel.getParentChainDefPanel().judgeIsAuthChain())
+			.forEach(item -> comboBox.addItem(item));
 		table.getColumnModel().getColumn(SOURCE_TYPE).setCellEditor(new DefaultCellEditor(comboBox));
 	}
 

@@ -151,6 +151,16 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		});
 		add(copyUrlMenuItem);
 
+		JMenuItem copyUrlWithoutQueryMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY);
+		copyUrlWithoutQueryMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessages().stream()
+						.map(messageDto -> messageDto.getUrlShortest())
+						.collect(Collectors.joining(System.lineSeparator())));
+			}
+		});
+		add(copyUrlWithoutQueryMenuItem);
+
 		JMenuItem copyTableMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_TABLE);
 		copyTableMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

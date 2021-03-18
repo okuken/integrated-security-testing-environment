@@ -1,6 +1,15 @@
 package okuken.iste.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import org.mozilla.universalchardet.UniversalDetector;
+
 public class ByteUtil {
+
+	public static final Charset DEFAULT_SINGLE_BYTE_CHARSET = StandardCharsets.ISO_8859_1;
 
 	public static byte[] remove(byte[] target, int removeIndex) {
 		byte[] ret = new byte[target.length - 1];
@@ -46,6 +55,29 @@ public class ByteUtil {
 			}
 		}
 		return true;
+	}
+
+	public static Charset detectEncoding(byte[] bytes) {
+		try {
+			var is = new ByteArrayInputStream(bytes);
+			var buf = new byte[4096];
+			var detector = new UniversalDetector(null);
+			int nread;
+			while ((nread = is.read(buf)) > 0 && !detector.isDone()) {
+				detector.handleData(buf, 0, nread);
+			}
+			detector.dataEnd();
+
+			String encoding = detector.getDetectedCharset();
+			if(encoding == null) {
+				return DEFAULT_SINGLE_BYTE_CHARSET;
+			}
+
+			return Charset.forName(encoding);
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

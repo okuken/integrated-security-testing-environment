@@ -37,6 +37,7 @@ import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.entity.MessageRepeat;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
+import okuken.iste.util.HttpUtil;
 import okuken.iste.util.MessageUtil;
 import okuken.iste.util.SqlUtil;
 
@@ -255,7 +256,7 @@ public class RepeaterLogic {
 			throw new RuntimeException(e);
 		}
 
-		var baseRequest = String.format("GET %s HTTP/1.1\r\n\r\n", redirectUrl.getFile()).getBytes(); 
+		var baseRequest = String.format("GET %s HTTP/1.1\r\n\r\n", redirectUrl.getFile()).getBytes(HttpUtil.DEFAULT_HTTP_HEADER_CHARSET);
 		var request = applyCookieForRedirect(baseRequest, redirectUrl, requestInfo, responseInfo);
 
 		// TODO: add headers
@@ -296,7 +297,7 @@ public class RepeaterLogic {
 	private String extractLocationHeaderValue(IResponseInfo responseInfo) {
 		var locationHeaderPrefix = "Location:";
 
-		var locationHeaders = responseInfo.getHeaders().stream().filter(header -> new String(header.getBytes()).startsWith(locationHeaderPrefix)).collect(Collectors.toList());
+		var locationHeaders = responseInfo.getHeaders().stream().filter(header -> header.startsWith(locationHeaderPrefix)).collect(Collectors.toList());
 		if(locationHeaders.isEmpty() || locationHeaders.size() > 1) {
 			throw new IllegalArgumentException(String.format("Response includes %d Location headers. It should be one.", locationHeaders.size()));
 		}

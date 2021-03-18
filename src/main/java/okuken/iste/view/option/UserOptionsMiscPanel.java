@@ -71,7 +71,7 @@ public class UserOptionsMiscPanel extends JPanel {
 		dbFileChooseButton.setBounds(350, 10, 20, 30);
 		add(dbFileChooseButton);
 		
-		JButton dbFileSaveButton = new JButton("Save & Reload");
+		JButton dbFileSaveButton = new JButton(Captions.USER_OPTIONS_DB_FILE_BUTTON_SAVE);
 		dbFileSaveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//TODO: validation
