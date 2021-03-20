@@ -422,6 +422,7 @@ public class Controller {
 		this.projectMemoPanel.refreshPanel();
 		this.authPanel.refreshPanel(messageDtos);
 		refreshComponentsDependOnAuthConfig();
+		refreshComponentsDependentOnMessages(messageDtos);
 	}
 
 	private List<MessageDto> loadMessages() {

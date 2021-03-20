@@ -127,7 +127,7 @@ public class Captions {
 	public static final String TOOLS_EXPLOIT_BSQLI_TITLE = "[Experimental feature] Blind SQL injection tool. It performs binary search using ASCII characters(0x00-0x7F).";
 	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY = "Determine if the test value is correct by";
 	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_LENGTH = "Length";
-	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_TIME = "Time";
+	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_TIME = "Time(ms)";
 	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_REGEX = "Regex";
 	public static final String TOOLS_EXPLOIT_BSQLI_JUDGEBY_REGEX_INVERSE = "Inverse";
 	public static final String TOOLS_EXPLOIT_BSQLI_BUTTON_INDEX_TT  = "Insert an INDEX position marker.\n"
