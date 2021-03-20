@@ -3,6 +3,7 @@ package okuken.iste.util;
 import java.awt.Frame;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,8 +15,10 @@ import javax.swing.JTabbedPane;
 
 import burp.IBurpExtenderCallbacks;
 import burp.IExtensionHelpers;
+import burp.IHttpService;
 import burp.ITab;
 import okuken.iste.consts.Colors;
+import okuken.iste.dto.burp.HttpRequestResponseMock;
 
 public class BurpUtil {
 
@@ -31,6 +34,13 @@ public class BurpUtil {
 
 	public static IExtensionHelpers getHelpers() {
 		return getCallbacks().getHelpers();
+	}
+
+	public static boolean isInScope(byte[] request, IHttpService httpService) {
+		return isInScope(getHelpers().analyzeRequest(new HttpRequestResponseMock(request, null, httpService)).getUrl());
+	}
+	public static boolean isInScope(URL url) {
+		return burpExtenderCallbacks.isInScope(url);
 	}
 
 	public static void printEventLog(String msg) {

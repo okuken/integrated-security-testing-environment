@@ -10,6 +10,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.UndoableEditEvent;
@@ -68,6 +73,19 @@ public class UiUtil {
 				});
 			}
 		}, 1000);
+	}
+
+	/**
+	 * CAUTION: support ASCII only
+	 */
+	public static final PrintStream createTextAreaPrintStream(JTextArea messageTextArea) {
+		return new PrintStream(new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				messageTextArea.append(String.valueOf((char)b));
+				messageTextArea.setCaretPosition(messageTextArea.getDocument().getLength());
+			}
+		}, false, StandardCharsets.US_ASCII);
 	}
 
 	public static final void copyToClipboard(String content) {
