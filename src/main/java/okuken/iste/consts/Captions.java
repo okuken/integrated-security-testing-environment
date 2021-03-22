@@ -51,7 +51,7 @@ public class Captions {
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "\u2194";
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH_TT = "Adjust layout";
 
-	public static final String TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER = "Send request (Repeater)";
+	public static final String TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER = "Issue request (Repeater)";
 	public static final String TABLE_CONTEXT_MENU_DO_PASSIVE_SCAN = "Do passive scan";
 	public static final String TABLE_CONTEXT_MENU_DO_ACTIVE_SCAN = "Do active scan";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_INTRUDER = "Send to Intruder";
@@ -68,7 +68,7 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
 	public static final String REPEATER_BUTTON_SEND = "Send";
-	public static final String REPEATER_BUTTON_SEND_TT = "Send request in message editor as selected account";
+	public static final String REPEATER_BUTTON_SEND_TT = "Issue request in message editor as selected account";
 	public static final String REPEATER_COMBOBOX_ACCOUNT_TT = "Select account";
 	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH = "\uD83D\uDD04";
 	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH_TT = "Refresh session of selected account";
