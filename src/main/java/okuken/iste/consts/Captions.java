@@ -52,6 +52,8 @@ public class Captions {
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH_TT = "Adjust layout";
 
 	public static final String TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER = "Issue request (Repeater)";
+	public static final String TABLE_CONTEXT_MENU_EXPLOIT_TOOL = "Exploit";
+	public static final String TABLE_CONTEXT_MENU_EXPLOIT_TOOL_BSQLI = "Blind SQL injection";
 	public static final String TABLE_CONTEXT_MENU_DO_PASSIVE_SCAN = "Do passive scan";
 	public static final String TABLE_CONTEXT_MENU_DO_ACTIVE_SCAN = "Do active scan";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_INTRUDER = "Send to Intruder";
@@ -139,6 +141,8 @@ public class Captions {
 	public static final String TOOLS_EXPLOIT_BSQLI_BUTTON_VALUE_TT  = "Insert a VALUE position marker.\n"
                                                                     + "e.g. 'and(SELECT ASCII(SUBSTRING(version(),3,1)))BETWEEN 0 and 64 and''='\n"
                                                                     + "  -> 'and(SELECT ASCII(SUBSTRING(version(),%s,1)))BETWEEN 0 and %s and''='";
+
+	public static final String TOOLS_EXPLOIT_BSQLI_POPUP_TITLE_SUFFIX = " - BSQLi";
 
 	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export notes (.md)";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";

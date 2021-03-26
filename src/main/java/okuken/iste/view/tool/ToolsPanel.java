@@ -8,7 +8,6 @@ import javax.swing.JTabbedPane;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
-import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
 
 public class ToolsPanel extends JPanel {
 
@@ -28,8 +27,8 @@ public class ToolsPanel extends JPanel {
 		JPanel exportMemoPanel = new ExportToolsPanel();
 		exportPanel.add(exportMemoPanel);
 		
-		JPanel bsqliPanel = new BlindSqlInjectionPanel();
-		tabbedPane.addTab(Captions.TAB_TOOLS_BSQLI, null, bsqliPanel, null);
+//		JPanel bsqliPanel = new BlindSqlInjectionPanel();
+//		tabbedPane.addTab(Captions.TAB_TOOLS_BSQLI, null, bsqliPanel, null);
 		
 	}
 

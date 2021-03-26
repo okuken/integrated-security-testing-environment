@@ -1,5 +1,6 @@
 package okuken.iste.view.repeater;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -9,7 +10,9 @@ import burp.IContextMenuFactory;
 import burp.IHttpRequestResponse;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
+import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -30,6 +33,24 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 	}
 
 	private void init() {
+
+		JMenu exploitMenu = new JMenu(Captions.TABLE_CONTEXT_MENU_EXPLOIT_TOOL);
+		add(exploitMenu);
+
+		JMenuItem bsqliMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_EXPLOIT_TOOL_BSQLI);
+		bsqliMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var orgMessageDto = parentRepeatTablePanel.getParentRepeaterPanel().getOrgMessageDto();
+				var selectedRows = parentRepeatTablePanel.getSelectedRows();
+				UiUtil.popup(
+					orgMessageDto.getName() + Captions.TOOLS_EXPLOIT_BSQLI_POPUP_TITLE_SUFFIX,
+					new BlindSqlInjectionPanel(orgMessageDto.getId(), selectedRows.get(selectedRows.size() - 1).getMessage(), true),
+					parentRepeatTablePanel);
+			}
+		});
+		exploitMenu.add(bsqliMenuItem);
+
+		add(new JPopupMenu.Separator());
 
 		JMenuItem sendToComparerRequestMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_TO_COMPARER_REQUEST);
 		sendToComparerRequestMenuItem.addActionListener(new ActionListener() {

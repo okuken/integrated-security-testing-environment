@@ -70,7 +70,7 @@ public class MessageTablePanel extends JPanel {
 				}
 			}
 		};
-		table.setComponentPopupMenu(new MessageTablePopupMenu());
+		table.setComponentPopupMenu(new MessageTablePopupMenu(this));
 		setupTable();
 		Controller.getInstance().setMessageTable(table);	
 

@@ -10,6 +10,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import burp.IHttpRequestResponse;
 import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
@@ -25,6 +26,9 @@ public class MessageSelectorPanel extends JPanel {
 	private boolean refreshingFlag = false;
 
 	public MessageSelectorPanel() {
+		this(null, null, false);
+	}
+	public MessageSelectorPanel(Integer messageId, IHttpRequestResponse message, boolean popup) {
 		setLayout(new BorderLayout(0, 0));
 		
 		JPanel urlPanel = new JPanel();
@@ -45,10 +49,19 @@ public class MessageSelectorPanel extends JPanel {
 		messageEditorPanel = new MessageEditorPanel(null, true, false, true);
 		add(messageEditorPanel, BorderLayout.CENTER);
 		
-		Controller.getInstance().addMessageSelectPanel(this);
+		if(!popup) {
+			Controller.getInstance().addMessageSelectPanel(this);
+		}
 		
 		SwingUtilities.invokeLater(() -> {
-			refreshPanel(Controller.getInstance().getMessages());
+			var messageDtos = Controller.getInstance().getMessages();
+			refreshPanel(messageDtos);
+			
+			if(messageId != null) {
+				selectMessage(messageDtos, messageId);
+				urlComboBox.setEnabled(false);
+				messageEditorPanel.setMessage(message);
+			}
 		});
 	}
 
@@ -65,16 +78,20 @@ public class MessageSelectorPanel extends JPanel {
 			});
 
 			if(selectedMessageId != null) {
-				var selectedMessageDtoOptional = messageDtos.stream().filter(messageDto -> messageDto.getId().equals(selectedMessageId)).findFirst();
-				if(selectedMessageDtoOptional.isPresent()) {
-					urlComboBox.setSelectedItem(selectedMessageDtoOptional.get());
-				}
+				selectMessage(messageDtos, selectedMessageId);
 			}
 
 			refreshMessageEditorPanel();
 
 		} finally {
 			refreshingFlag = refreshingFlagBk;
+		}
+	}
+
+	private void selectMessage(List<MessageDto> messageDtos, Integer selectedMessageId) {
+		var selectedMessageDtoOptional = messageDtos.stream().filter(messageDto -> messageDto.getId().equals(selectedMessageId)).findFirst();
+		if(selectedMessageDtoOptional.isPresent()) {
+			urlComboBox.setSelectedItem(selectedMessageDtoOptional.get());
 		}
 	}
 

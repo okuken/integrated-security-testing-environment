@@ -166,6 +166,9 @@ public class UiUtil {
 			popupFrame.dispose();
 		});
 	}
+	public static JFrame popup(String title, Container contentPane, Component triggerComponent) {
+		return popup(title, contentPane, triggerComponent, null);
+	}
 	public static JFrame popup(String title, Container contentPane, Component triggerComponent, Consumer<WindowEvent> closeProcedure) {
 		var ret = createAndShowFrame(title, contentPane, triggerComponent, closeProcedure);
 		popupFrames.add(ret);
@@ -221,6 +224,10 @@ public class UiUtil {
 			@Override public void windowDeiconified(WindowEvent e) {}
 			@Override public void windowDeactivated(WindowEvent e) {}
 			@Override public void windowClosing(WindowEvent e) {
+				if(closeProcedure == null) {
+					closePopup(popupFrame);
+					return;
+				}
 				closeProcedure.accept(e);
 			}
 			@Override public void windowClosed(WindowEvent e) {}

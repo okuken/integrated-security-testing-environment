@@ -1,6 +1,8 @@
 package okuken.iste.view.message.table;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import com.google.common.collect.Lists;
@@ -9,6 +11,7 @@ import burp.IContextMenuFactory;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
 import okuken.iste.plugin.PluginContextMenuInvocation;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
@@ -24,10 +27,13 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 	private List<IContextMenuFactory> pluginContextMenuFactories = Lists.newArrayList();
 
-	public MessageTablePopupMenu() {
+	private JPanel parentPanel;
+
+	public MessageTablePopupMenu(JPanel parentPanel) {
+		this.parentPanel = parentPanel;
 		init();
 	}
-	
+
 	private void init() {
 		JMenuItem sendRepeaterRequest = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER);
 		sendRepeaterRequest.addActionListener(new ActionListener() {
@@ -36,6 +42,22 @@ public class MessageTablePopupMenu extends JPopupMenu {
 			}
 		});
 		add(sendRepeaterRequest);
+
+		JMenu exploitMenu = new JMenu(Captions.TABLE_CONTEXT_MENU_EXPLOIT_TOOL);
+		add(exploitMenu);
+
+		JMenuItem bsqliMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_EXPLOIT_TOOL_BSQLI);
+		bsqliMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var selectedMessages = Controller.getInstance().getSelectedMessages();
+				var selectedMessage = selectedMessages.get(selectedMessages.size() - 1);
+				UiUtil.popup(
+					selectedMessage.getName() + Captions.TOOLS_EXPLOIT_BSQLI_POPUP_TITLE_SUFFIX,
+					new BlindSqlInjectionPanel(selectedMessage.getId(), selectedMessage.getMessage(), true),
+					parentPanel);
+			}
+		});
+		exploitMenu.add(bsqliMenuItem);
 
 		add(new JPopupMenu.Separator());
 
