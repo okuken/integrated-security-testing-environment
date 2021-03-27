@@ -18,6 +18,8 @@ public class Captions {
 	public static final String TABLE_CONTROL_BUTTON_ADD = "+";
 	public static final String TABLE_CONTROL_BUTTON_DELETE = "-";
 
+	public static final String COPY = "Copy";
+
 
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";	
 	public static final String TAB_SUITE = "ISTE";
@@ -70,7 +72,7 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
 
 	public static final String REPEATER_BUTTON_SEND = "Send";
-	public static final String REPEATER_BUTTON_SEND_TT = "Issue request in message editor as selected account";
+	public static final String REPEATER_BUTTON_SEND_TT = "Issue request in message editor as selected account {Shift: with refresh session}";
 	public static final String REPEATER_COMBOBOX_ACCOUNT_TT = "Select account";
 	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH = "\uD83D\uDD04";
 	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH_TT = "Refresh session of selected account";

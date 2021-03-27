@@ -269,8 +269,8 @@ public class Controller {
 		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, false, true);
 	}
 
-	public void sendRepeaterRequest() {
-		repeaterPanel.sendRequest();
+	public void sendRepeaterRequest(boolean forceAuthSessionRefresh) {
+		repeaterPanel.sendRequest(forceAuthSessionRefresh);
 	}
 
 	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] request, byte[] response, MessageDto orgMessageDto, Consumer<MessageRepeatRedirectDto> callback) {

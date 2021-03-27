@@ -38,7 +38,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		JMenuItem sendRepeaterRequest = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_REQUEST_REPEATER);
 		sendRepeaterRequest.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Controller.getInstance().sendRepeaterRequest();
+				Controller.getInstance().sendRepeaterRequest(UiUtil.judgeIsForceRefresh(e));
 			}
 		});
 		add(sendRepeaterRequest);

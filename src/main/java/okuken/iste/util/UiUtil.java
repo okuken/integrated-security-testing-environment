@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
@@ -22,12 +23,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -111,6 +115,18 @@ public class UiUtil {
 		});
 	}
 
+	public static final JPopupMenu createCopyPopupMenu(Supplier<String> supplier) {
+		var menu = new JPopupMenu();
+		var menuItem = new JMenuItem(Captions.COPY);
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				copyToClipboard(supplier.get());
+			}
+		});
+		menu.add(menuItem);
+		return menu;
+	}
+
 	public static final UndoManager addUndoRedoFeature(JTextComponent textComponent) {
 		UndoManager undoManager = new UndoManager();
 		textComponent.getDocument().addUndoableEditListener(new UndoableEditListener() {
@@ -150,6 +166,10 @@ public class UiUtil {
 		});
 
 		return undoManager;
+	}
+
+	public static boolean judgeIsForceRefresh(ActionEvent e) {
+		return (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
 	}
 
 	public static void initScrollBarPosition(JScrollPane scrollPane) {

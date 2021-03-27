@@ -98,24 +98,28 @@ public class MessageEditorPanel extends JPanel {
 		requestMessageEditor.setMessage(request, true);
 	}
 
+	public void setResponse(byte[] response) {
+		responseMessageEditor.setMessage(Optional.ofNullable(response).orElse(new byte[] {}), false);
+	}
+
 	public void setMessage(MessageDto dto) {
 		setMessage(dto.getMessage());
 	}
 
 	public void setMessage(IHttpRequestResponse message) {
-		requestMessageEditor.setMessage(message.getRequest(), true);
-		responseMessageEditor.setMessage(Optional.ofNullable(message.getResponse()).orElse(new byte[] {}), false);
+		setRequest(message.getRequest());
+		setResponse(message.getResponse());
 		httpService = message.getHttpService();
 	}
 
 	public void clearMessage() {
-		requestMessageEditor.setMessage(new byte[] {}, true);
-		responseMessageEditor.setMessage(new byte[] {}, false);
+		setRequest(new byte[] {});
+		setResponse(new byte[] {});
 		httpService = null;
 	}
 
 	public void clearResponse() {
-		responseMessageEditor.setMessage(new byte[] {}, false);
+		setResponse(new byte[] {});
 	}
 
 }
