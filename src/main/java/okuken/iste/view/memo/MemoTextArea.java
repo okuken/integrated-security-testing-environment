@@ -9,6 +9,7 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import okuken.iste.consts.Sizes;
 import okuken.iste.util.UiUtil;
 
 public class MemoTextArea extends JTextArea {
@@ -51,7 +52,7 @@ public class MemoTextArea extends JTextArea {
 				}
 			}
 		});
-		setTabSize(4);
+		setTabSize(Sizes.TAB_SIZE);
 		UiUtil.addUndoRedoFeature(this);
 	}
 

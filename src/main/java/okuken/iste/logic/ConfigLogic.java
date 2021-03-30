@@ -23,6 +23,7 @@ public class ConfigLogic {
 	private static final String CONFIG_KEY_DB_FILE_PATH = "dbFilePath";
 	private static final String CONFIG_KEY_LAST_SELECTED_PROJECT_NAME = "lastSelectedProjectName";
 	private static final String CONFIG_KEY_PLUGINS = "plugins";
+	private static final String CONFIG_KEY_MESSAGE_MEMO_TEMPLATE = "messageMemoTemplate";
 	private static final String CONFIG_KEY_PROJECT_MEMO_TEMPLATES = "projectMemoTemplates";
 
 	//cache
@@ -54,6 +55,7 @@ public class ConfigLogic {
 			ret.setPlugins(Arrays.asList(pluginLoadInfos));
 		}
 
+		ret.setMessageMemoTemplate(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_MESSAGE_MEMO_TEMPLATE));
 		ret.setProjectMemoTemplates(loadUserOptionJson(CONFIG_KEY_PROJECT_MEMO_TEMPLATES, List.class));
 
 		return ret;
@@ -91,6 +93,11 @@ public class ConfigLogic {
 	public void savePlugins(List<PluginLoadInfo> pluginLoadInfos) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_PLUGINS, new Gson().toJson(pluginLoadInfos));
 		getUserOptions().setPlugins(pluginLoadInfos);
+	}
+
+	public void saveMessageMemoTemplate(String messageMemoTemplate) {
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_MESSAGE_MEMO_TEMPLATE, messageMemoTemplate);
+		getUserOptions().setMessageMemoTemplate(messageMemoTemplate);
 	}
 
 	public void saveProjectMemoTemplates(List<String> projectMemoTemplates) {

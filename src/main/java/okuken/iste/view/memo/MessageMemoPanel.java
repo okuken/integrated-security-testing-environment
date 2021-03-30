@@ -11,6 +11,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.undo.UndoManager;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.util.UiUtil;
@@ -82,7 +83,7 @@ public class MessageMemoPanel extends JPanel {
 			}
 		});
 		textArea.setRows(10);
-		textArea.setTabSize(4);
+		textArea.setTabSize(Sizes.TAB_SIZE);
 //		textArea.setLineWrap(true);
 		undoManager = UiUtil.addUndoRedoFeature(textArea);
 		disablePanel();

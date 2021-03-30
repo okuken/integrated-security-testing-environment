@@ -78,7 +78,7 @@ public class MessageLogic {
 					.map(MessageUtil::convertCookieToDto).collect(Collectors.toList()));
 		}
 
-		dto.setMemo("");
+		dto.setMemo(Optional.ofNullable(ConfigLogic.getInstance().getUserOptions().getMessageMemoTemplate()).orElse(""));
 
 		return dto;
 	}
