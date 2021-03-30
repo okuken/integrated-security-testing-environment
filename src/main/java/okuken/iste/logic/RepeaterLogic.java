@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -94,8 +95,8 @@ public class RepeaterLogic {
 				int time = (int) (timerEnd - timerStart);
 	
 				repeatDto.setMessage(response);
-				repeatDto.setStatus(response.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode() : -1);
-				repeatDto.setLength(response.getResponse() != null ? response.getResponse().length : 0);
+				repeatDto.setStatus(MessageUtil.extractResponseStatus(response.getResponse()));
+				repeatDto.setLength(MessageUtil.extractResponseLength(response.getResponse()));
 				repeatDto.setTime(time);
 	
 				if(needSaveHistory) {
@@ -130,6 +131,18 @@ public class RepeaterLogic {
 		return MessageUtil.applyPayload(request, authApplyConfig.getParamType(), authApplyConfig.getParamName(), authAccountDto.getSessionId());
 	}
 
+	public void saveAsRepeatHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages, String memoPrefix) {
+		messages.stream().map(message -> {
+			var repeatDto = new MessageRepeatDto();
+			repeatDto.setOrgMessageId(targetMessageDto.getId());
+			repeatDto.setMessage(new HttpRequestResponseMock(message.getRequest(), message.getResponse(), message.getHttpService()));
+			repeatDto.setStatus(MessageUtil.extractResponseStatus(message.getResponse()));
+			repeatDto.setLength(MessageUtil.extractResponseLength(message.getResponse()));
+			repeatDto.setMemo(memoPrefix + Optional.ofNullable(message.getComment()).orElse(""));
+			return repeatDto;
+		}).forEach(this::save);
+	}
+
 	private void save(MessageRepeatDto messageRepeatDto) {
 		String now = SqlUtil.now();
 		DbUtil.withTransaction(session -> {
@@ -157,6 +170,7 @@ public class RepeaterLogic {
 			messageRepeat.setStatus(messageRepeatDto.getStatus());
 			messageRepeat.setLength(messageRepeatDto.getLength());
 			messageRepeat.setChainFlg(messageRepeatDto.isChainFlag());
+			messageRepeat.setMemo(messageRepeatDto.getMemo());
 			messageRepeat.setPrcDate(now);
 			messageRepeatMapper.insert(messageRepeat);
 			messageRepeatDto.setId(messageRepeat.getId());
@@ -276,8 +290,8 @@ public class RepeaterLogic {
 				int time = (int) (timerEnd - timerStart);
 
 				redirectDto.setMessage(response);
-				redirectDto.setStatus(response.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(response.getResponse()).getStatusCode() : -1);
-				redirectDto.setLength(response.getResponse() != null ? response.getResponse().length : 0);
+				redirectDto.setStatus(MessageUtil.extractResponseStatus(response.getResponse()));
+				redirectDto.setLength(MessageUtil.extractResponseLength(response.getResponse()));
 				redirectDto.setTime(time);
 
 				//TODO: update db

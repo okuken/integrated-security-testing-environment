@@ -155,6 +155,14 @@ public class MessageUtil {
 		}
 	}
 
+	public static short extractResponseStatus(byte[] response) {
+		return response != null ? BurpUtil.getHelpers().analyzeResponse(response).getStatusCode() : -1;
+	}
+
+	public static int extractResponseLength(byte[] response) {
+		return response != null ? response.length : 0;
+	}
+
 	public static MessageCookieDto convertCookieToDto(ICookie cookie) {
 		MessageCookieDto cookieDto = new MessageCookieDto();
 		cookieDto.setDomain(cookie.getDomain());

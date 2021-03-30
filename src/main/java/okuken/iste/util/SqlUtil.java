@@ -14,12 +14,17 @@ import org.apache.ibatis.session.SqlSession;
 
 public class SqlUtil {
 
+	private static final String UNIXTIME_STR_NULL = "0";
+
 	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
 	public static final String now() {
 		return Long.toString(getNowUnixtimeMs());
 	}
 	public static final String dateToString(Date date) {
+		if(date == null) {
+			return UNIXTIME_STR_NULL;
+		}
 		return Long.toString(convertDateToUnixtimeMs(date));
 	}
 	public static final Date stringToDate(String dateStr) {
@@ -33,6 +38,9 @@ public class SqlUtil {
 		}
 	}
 	public static final String dateToPresentationString(Date date) {
+		if(date == null) {
+			return "";
+		}
 		return timestampFormat.format(date);
 	}
 
@@ -43,6 +51,9 @@ public class SqlUtil {
 		return StringUtils.isNumeric(dateStr); //rough but enough here
 	}
 	private static final Date convertUnixtimeMsToDate(String unixtimeMs) {
+		if(UNIXTIME_STR_NULL.equals(unixtimeMs)) {
+			return null;
+		}
 		var cal = Calendar.getInstance();
 		cal.setTimeInMillis(Long.valueOf(unixtimeMs));
 		return cal.getTime();

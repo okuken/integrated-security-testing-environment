@@ -19,6 +19,7 @@ import burp.IContextMenuFactory;
 import burp.IHttpRequestResponse;
 import burp.ITab;
 import okuken.iste.DatabaseManager;
+import okuken.iste.consts.Captions;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
 import okuken.iste.dto.AuthConfigDto;
@@ -187,6 +188,12 @@ public class Controller {
 		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
 	}
 
+	public void sendMessagesToSuiteTabHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages) {
+		BurpUtil.highlightTab(suiteTab);
+		RepeaterLogic.getInstance().saveAsRepeatHistory(targetMessageDto, messages, Captions.CONTEXT_MENU_SEND_TO_HISTORY_PREFIX);
+		refreshRepeatTablePanel(targetMessageDto);
+	}
+
 	public void deleteMessages() {
 		var selectedRowIndexs = getSelectedRowIndexs();
 		Collections.reverse(selectedRowIndexs);
@@ -246,9 +253,12 @@ public class Controller {
 	}
 
 	public void refreshRepeatTablePanel(Integer messageId) {
+		refreshRepeatTablePanel(getMessages().stream().filter(messageDto -> messageId.equals(messageDto.getId())).findFirst().get());
+	}
+	public void refreshRepeatTablePanel(MessageDto messageDto) {
 		//TODO: improve...
-		getMessages().stream().filter(messageDto -> messageId.equals(messageDto.getId())).findFirst().get().setRepeatList(null);
-		if(messageId.equals(repeaterPanel.getOrgMessageDto().getId())) {
+		messageDto.setRepeatList(null);
+		if(repeaterPanel.getOrgMessageDto() != null && repeaterPanel.getOrgMessageDto().getId().equals(messageDto.getId())) {
 			repeaterPanel.refresh();
 		}
 	}

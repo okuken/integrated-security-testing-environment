@@ -21,7 +21,10 @@ public class Captions {
 	public static final String COPY = "Copy";
 
 
-	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";	
+	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";
+	public static final String CONTEXT_MENU_SEND_TO_HISTORY = "Send to ISTE as history of repeat";
+	public static final String CONTEXT_MENU_SEND_TO_HISTORY_PREFIX = "[Send to ISTE]";
+
 	public static final String TAB_SUITE = "ISTE";
 	public static final String TAB_MAIN = "List";
 	public static final String TAB_MEMO = "Notes";
@@ -170,6 +173,7 @@ public class Captions {
 	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose SQLite database file for ISTE";
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";
 	public static final String MESSAGE_SELECT_PROJECT = "Select ISTE project";
+	public static final String MESSAGE_SELECT_SEND_TO_HISTORY_TARGET = "To which history do you want to add the selected item?";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
 	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export notes (.md)";
 	public static final String MESSAGE_CHOOSE_PLUGIN_FILE = "Choose ISTE plugin jar file";
