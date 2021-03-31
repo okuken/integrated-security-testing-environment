@@ -19,7 +19,6 @@ import burp.IContextMenuFactory;
 import burp.IHttpRequestResponse;
 import burp.ITab;
 import okuken.iste.DatabaseManager;
-import okuken.iste.consts.Captions;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
 import okuken.iste.dto.AuthConfigDto;
@@ -190,7 +189,7 @@ public class Controller {
 
 	public void sendMessagesToSuiteTabHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages) {
 		BurpUtil.highlightTab(suiteTab);
-		RepeaterLogic.getInstance().saveAsRepeatHistory(targetMessageDto, messages, Captions.CONTEXT_MENU_SEND_TO_HISTORY_PREFIX);
+		RepeaterLogic.getInstance().saveAsRepeatHistory(targetMessageDto, messages);
 		refreshRepeatTablePanel(targetMessageDto);
 	}
 

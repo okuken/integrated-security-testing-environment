@@ -23,7 +23,6 @@ public class Captions {
 
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";
 	public static final String CONTEXT_MENU_SEND_TO_HISTORY = "Send to ISTE as history of repeat";
-	public static final String CONTEXT_MENU_SEND_TO_HISTORY_PREFIX = "[Send to ISTE]";
 
 	public static final String TAB_SUITE = "ISTE";
 	public static final String TAB_MAIN = "List";
@@ -73,6 +72,8 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY = "Copy URL without Query";
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
+
+	public static final String REPEAT_HISTORY_CAPTION_BY_SEND_TO = "[Send to ISTE]";
 
 	public static final String REPEATER_BUTTON_SEND = "Send";
 	public static final String REPEATER_BUTTON_SEND_TT = "Issue request in message editor as selected account {Shift: with refresh session}";

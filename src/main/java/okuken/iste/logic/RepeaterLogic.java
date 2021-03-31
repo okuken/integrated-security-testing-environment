@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -131,14 +130,14 @@ public class RepeaterLogic {
 		return MessageUtil.applyPayload(request, authApplyConfig.getParamType(), authApplyConfig.getParamName(), authAccountDto.getSessionId());
 	}
 
-	public void saveAsRepeatHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages, String memoPrefix) {
+	public void saveAsRepeatHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages) {
 		messages.stream().map(message -> {
 			var repeatDto = new MessageRepeatDto();
 			repeatDto.setOrgMessageId(targetMessageDto.getId());
 			repeatDto.setMessage(new HttpRequestResponseMock(message.getRequest(), message.getResponse(), message.getHttpService()));
 			repeatDto.setStatus(MessageUtil.extractResponseStatus(message.getResponse()));
 			repeatDto.setLength(MessageUtil.extractResponseLength(message.getResponse()));
-			repeatDto.setMemo(memoPrefix + Optional.ofNullable(message.getComment()).orElse(""));
+			repeatDto.setMemo(message.getComment());
 			return repeatDto;
 		}).forEach(this::save);
 	}
