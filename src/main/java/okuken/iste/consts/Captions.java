@@ -52,6 +52,7 @@ public class Captions {
 	public static final String MAIN_HEADER_INPUT_FILTER_TERM_TT = "Filter rows by search term";
 	public static final String MAIN_HEADER_BUTTON_CHANGE_PROJECT = "...";
 	public static final String MAIN_HEADER_BUTTON_CHANGE_PROJECT_TT = "Select ISTE project";
+	public static final String MAIN_HEADER_ALERT_PROJECT_TT = "Selected ISTE project's name is different from Burp's one.";
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH = "\u2194";
 	public static final String MAIN_HEADER_BUTTON_INIT_COLUMN_WIDTH_TT = "Adjust layout";
 
