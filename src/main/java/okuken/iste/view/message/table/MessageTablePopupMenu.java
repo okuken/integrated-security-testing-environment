@@ -12,12 +12,16 @@ import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
+import okuken.iste.logic.ConfigLogic;
+import okuken.iste.logic.TemplateLogic;
 import okuken.iste.plugin.PluginContextMenuInvocation;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 
@@ -163,24 +167,16 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		});
 		add(deleteItemMenuItem);
 
+		JMenuItem copyNameMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_NAME);
+		addActionListenerForCopy(copyNameMenuItem, messageDto -> messageDto.getName());
+		add(copyNameMenuItem);
+
 		JMenuItem copyUrlMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_URL);
-		copyUrlMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessages().stream()
-						.map(messageDto -> messageDto.getUrlShort())
-						.collect(Collectors.joining(System.lineSeparator())));
-			}
-		});
+		addActionListenerForCopy(copyUrlMenuItem, messageDto -> messageDto.getUrlShort());
 		add(copyUrlMenuItem);
 
 		JMenuItem copyUrlWithoutQueryMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY);
-		copyUrlWithoutQueryMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessages().stream()
-						.map(messageDto -> messageDto.getUrlShortest())
-						.collect(Collectors.joining(System.lineSeparator())));
-			}
-		});
+		addActionListenerForCopy(copyUrlWithoutQueryMenuItem, messageDto -> messageDto.getUrlShortest());
 		add(copyUrlWithoutQueryMenuItem);
 
 		JMenuItem copyTableMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_TABLE);
@@ -190,13 +186,43 @@ public class MessageTablePopupMenu extends JPopupMenu {
 			}
 		});
 		add(copyTableMenuItem);
+
+
+		var loadedCopyTemplates = ConfigLogic.getInstance().getUserOptions().getCopyTemplates();
+		if(loadedCopyTemplates != null) {
+
+			add(new JPopupMenu.Separator());
+
+			loadedCopyTemplates.entrySet().forEach(template -> {
+				JMenuItem menuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_BY_TEMPLATE_PREFIX + template.getKey());
+				menuItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessages().stream()
+								.map(messageDto -> TemplateLogic.getInstance().evaluateTemplate(template.getValue(), messageDto))
+								.collect(Collectors.joining(System.lineSeparator())));
+					}
+				});
+				add(menuItem);
+			});
+		}
+
 	}
 
 	private boolean judgeIsUseHttps(MessageDto messageDto) {
 		return "https".equals(messageDto.getMessage().getHttpService().getProtocol());
 	}
 
-	private void refresh() {
+	private void addActionListenerForCopy(JMenuItem menuItem, Function<MessageDto, String> mapper) {
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessages().stream()
+						.map(messageDto -> Optional.ofNullable(mapper.apply(messageDto)).orElse(""))
+						.collect(Collectors.joining(System.lineSeparator())));
+			}
+		});
+	}
+
+	public void refresh() {
 		removeAll();
 		init();
 	}

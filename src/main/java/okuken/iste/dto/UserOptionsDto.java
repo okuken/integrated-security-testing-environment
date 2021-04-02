@@ -1,6 +1,7 @@
 package okuken.iste.dto;
 
 import java.util.List;
+import java.util.Map;
 
 import okuken.iste.plugin.PluginLoadInfo;
 
@@ -12,6 +13,7 @@ public class UserOptionsDto {
 	private List<PluginLoadInfo> plugins;
 	private String messageMemoTemplate;
 	private List<String> projectMemoTemplates;
+	private Map<String, String> copyTemplates;
 
 	public String getUserName() {
 		return userName;
@@ -48,6 +50,12 @@ public class UserOptionsDto {
 	}
 	public void setProjectMemoTemplates(List<String> projectMemoTemplates) {
 		this.projectMemoTemplates = projectMemoTemplates;
+	}
+	public Map<String, String> getCopyTemplates() {
+		return copyTemplates;
+	}
+	public void setCopyTemplates(Map<String, String> copyTemplates) {
+		this.copyTemplates = copyTemplates;
 	}
 
 }

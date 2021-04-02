@@ -2,7 +2,9 @@ package okuken.iste.logic;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.google.gson.Gson;
@@ -25,6 +27,7 @@ public class ConfigLogic {
 	private static final String CONFIG_KEY_PLUGINS = "plugins";
 	private static final String CONFIG_KEY_MESSAGE_MEMO_TEMPLATE = "messageMemoTemplate";
 	private static final String CONFIG_KEY_PROJECT_MEMO_TEMPLATES = "projectMemoTemplates";
+	private static final String CONFIG_KEY_COPY_TEMPLATES = "copyTemplates";
 
 	//cache
 	private UserOptionsDto configDto;
@@ -57,6 +60,7 @@ public class ConfigLogic {
 
 		ret.setMessageMemoTemplate(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_MESSAGE_MEMO_TEMPLATE));
 		ret.setProjectMemoTemplates(loadUserOptionJson(CONFIG_KEY_PROJECT_MEMO_TEMPLATES, List.class));
+		ret.setCopyTemplates(loadUserOptionJson(CONFIG_KEY_COPY_TEMPLATES, LinkedHashMap.class));
 
 		return ret;
 	}
@@ -103,6 +107,11 @@ public class ConfigLogic {
 	public void saveProjectMemoTemplates(List<String> projectMemoTemplates) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_PROJECT_MEMO_TEMPLATES, new Gson().toJson(projectMemoTemplates));
 		getUserOptions().setProjectMemoTemplates(projectMemoTemplates);
+	}
+
+	public void saveCopyTemplates(Map<String, String> copyTemplates) {
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_COPY_TEMPLATES, new Gson().toJson(copyTemplates));
+		getUserOptions().setCopyTemplates(copyTemplates);
 	}
 
 

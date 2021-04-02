@@ -239,6 +239,10 @@ public class Controller {
 		return this.messageTablePanel.getSelectedMessagesForCopyToClipboad();
 	}
 
+	public void refreshMessageTablePopupMenu() {
+		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).refresh();
+	}
+
 	public void refreshMessageDetailPanels(MessageDto dto) {
 		this.orgMessageEditorPanel.setMessage(dto);
 		this.repeatMasterPanel.setup(dto);

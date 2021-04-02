@@ -32,6 +32,9 @@ public class OptionsPanel extends JPanel {
 		JPanel templatePanel = new UserOptionsTemplatePanel();
 		userOptionsTabbedPane.addTab(Captions.TAB_OPTIONS_USER_OPTIONS_TEMPLATE, null, templatePanel, null);
 		
+		JPanel copyTemplatesPanel = new UserOptionsCopyTemplatesPanel();
+		userOptionsTabbedPane.addTab(Captions.TAB_OPTIONS_USER_OPTIONS_COPY_TEMPLATE, null, copyTemplatesPanel, null);
+		
 		JPanel miscPanel = new UserOptionsMiscPanel();
 		userOptionsTabbedPane.addTab(Captions.TAB_OPTIONS_USER_OPTIONS_MISC, null, miscPanel, null);
 		

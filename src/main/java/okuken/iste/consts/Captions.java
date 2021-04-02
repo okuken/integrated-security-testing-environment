@@ -15,9 +15,12 @@ public class Captions {
 
 	public static final String FILECHOOSER = "...";
 
+	public static final String ADD = "\u2795"; //+
+	public static final String DELETE = "\u2716"; //x
 	public static final String TABLE_CONTROL_BUTTON_ADD = "+";
 	public static final String TABLE_CONTROL_BUTTON_DELETE = "-";
 
+	public static final String SAVE = "Save";
 	public static final String COPY = "Copy";
 
 
@@ -43,7 +46,8 @@ public class Captions {
 	public static final String TAB_OPTIONS_PROJECT_OPTIONS = "Project options";
 	public static final String TAB_OPTIONS_USER_OPTIONS = "User options";
 	public static final String TAB_OPTIONS_USER_OPTIONS_MISC = "Misc";
-	public static final String TAB_OPTIONS_USER_OPTIONS_TEMPLATE = "Template";
+	public static final String TAB_OPTIONS_USER_OPTIONS_TEMPLATE = "Note templates";
+	public static final String TAB_OPTIONS_USER_OPTIONS_COPY_TEMPLATE = "Copy templates";
 
 	public static final String TAB_MESSAGE_EDITOR_REQUEST = "Request";
 	public static final String TAB_MESSAGE_EDITOR_RESPONSE = "Response";
@@ -70,9 +74,11 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_ORG = "Send to Comparer (response) with Org";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_MST = "Send to Comparer (response) with Master";
 	public static final String TABLE_CONTEXT_MENU_DELETE_ITEM = "Delete item";
+	public static final String TABLE_CONTEXT_MENU_COPY_NAME = "Copy name";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY = "Copy URL without Query";
-	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy table";
+	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy as table";
+	public static final String TABLE_CONTEXT_MENU_COPY_BY_TEMPLATE_PREFIX = "Copy ";
 
 	public static final String REPEAT_HISTORY_CAPTION_BY_SEND_TO = "[Send to ISTE]";
 
@@ -159,6 +165,9 @@ public class Captions {
 	public static final String PROJECT_OPTIONS_BUTTON_SAVE = "Save";
 
 	public static final String USER_OPTIONS_TEMPLATE_MEMO_BUTTON_SAVE = "Save";
+	public static final String USER_OPTIONS_COPY_TEMPLATE_EXPLANATION = "\u2139 Templates for copying to clipboad. This setting adds context menu items of ISTE > List.";
+	public static final String USER_OPTIONS_COPY_TEMPLATE_NAME_TT = "Template name";
+	public static final String USER_OPTIONS_COPY_TEMPLATE_TEMPLATE_TT = "Template";
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";
 	public static final String USER_OPTIONS_DB_FILE_BUTTON_SAVE = "Save & Load";
