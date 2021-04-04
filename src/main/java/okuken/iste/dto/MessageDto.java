@@ -15,6 +15,7 @@ import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.RepeaterLogic;
+import okuken.iste.util.HttpUtil;
 import okuken.iste.util.MessageUtil;
 import okuken.iste.util.UiUtil;
 
@@ -341,6 +342,36 @@ public class MessageDto {
 			MessageLogic.getInstance().loadMessageDetail(this);
 		}
 		return message;
+	}
+	public byte[] getRequest() {
+		var message = getMessage();
+		if(message == null) {
+			return null;
+		}
+		return message.getRequest();
+	}
+	@TemplateReference(key = "Request")
+	public String getRequestStr() {
+		var request = getRequest();
+		if(request == null) {
+			return null;
+		}
+		return HttpUtil.convertMessageBytesToString(request, requestInfo.getHeaders(), requestInfo.getBodyOffset());
+	}
+	public byte[] getResponse() {
+		var message = getMessage();
+		if(message == null) {
+			return null;
+		}
+		return message.getResponse();
+	}
+	@TemplateReference(key = "Response")
+	public String getResponseStr() {
+		var response = getResponse();
+		if(response == null) {
+			return null;
+		}
+		return HttpUtil.convertMessageBytesToString(response, responseInfo.getHeaders(), responseInfo.getBodyOffset());
 	}
 	public void setMessage(IHttpRequestResponse message) {
 		this.message = message;

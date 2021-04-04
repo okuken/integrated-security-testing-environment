@@ -165,7 +165,7 @@ public class Captions {
 	public static final String PROJECT_OPTIONS_BUTTON_SAVE = "Save";
 
 	public static final String USER_OPTIONS_TEMPLATE_MEMO_BUTTON_SAVE = "Save";
-	public static final String USER_OPTIONS_COPY_TEMPLATE_EXPLANATION = "\u2139 Templates for copying to clipboad. This setting adds context menu items of ISTE > List.";
+	public static final String USER_OPTIONS_COPY_TEMPLATE_EXPLANATION = "\u2139 Templates for copying to clipboad. This setting adds context menu items of \"ISTE > List\". It uses Apache Velocity 2 as the template engine.";
 	public static final String USER_OPTIONS_COPY_TEMPLATE_NAME_TT = "Template name";
 	public static final String USER_OPTIONS_COPY_TEMPLATE_TEMPLATE_TT = "Template";
 	public static final String USER_OPTIONS_USER_NAME = "User name";

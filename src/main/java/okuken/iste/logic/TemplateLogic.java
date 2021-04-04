@@ -28,7 +28,7 @@ public class TemplateLogic {
 				.map(method -> method.getAnnotation(TemplateReference.class))
 				.filter(TemplateReference::general)
 				.map(TemplateReference::key)
-				.map(key -> "$" + key)
+				.map(this::createVelocityKey)
 				.sorted()
 				.collect(Collectors.toList());
 	}
@@ -55,6 +55,13 @@ public class TemplateLogic {
 		StringWriter writer = new StringWriter();
 		Velocity.evaluate(velocityContext, writer, "", template);
 		return writer.toString();
+	}
+
+	private String createVelocityKey(String key) {
+		return new StringBuilder("${")
+				.append(key)
+				.append("}")
+				.toString();
 	}
 
 }

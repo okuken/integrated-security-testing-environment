@@ -80,7 +80,7 @@ public class ByteUtil {
 
 			String encoding = detector.getDetectedCharset();
 			if(encoding == null) {
-				return DEFAULT_SINGLE_BYTE_CHARSET;
+				return null;
 			}
 
 			return Charset.forName(encoding);
