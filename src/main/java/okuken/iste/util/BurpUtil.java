@@ -80,9 +80,13 @@ public class BurpUtil {
 				.collect(Collectors.toList()).get(0);
 	}
 
-	private static final Pattern burpSuiteProjectNamePattern = Pattern.compile("^[^-]+ - (.+) - licensed to .+$");
 	public static String getBurpSuiteProjectName() {
-		var matcher = burpSuiteProjectNamePattern.matcher(getBurpSuiteJFrame().getTitle());
+		return extractBurpSuiteProjectNameFromFrameTitle(getBurpSuiteJFrame().getTitle());
+	}
+
+	private static final Pattern burpSuiteProjectNamePattern = Pattern.compile("^.+? - (.+) - licensed to .+$");
+	public static String extractBurpSuiteProjectNameFromFrameTitle(String frameTitle) {
+		var matcher = burpSuiteProjectNamePattern.matcher(frameTitle);
 		if(!matcher.find()) {
 			return null;
 		}

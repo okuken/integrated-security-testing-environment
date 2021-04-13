@@ -30,10 +30,10 @@ public enum MessageTableColumn {
 	QUERY		("Query",			50,			false, false, "getQuery",							null,								String.class),
 	URL			("URL without Query", 300,		false, false, "getUrlShortest",						null,								String.class),
 	METHOD		("Method",			35,			false, false, "getMethod",							null,								String.class),
-	PARAMS		("Params",			25,			false, false, "getParamsStr",						null,								String.class),
+	PARAMS		("Param count",		25,			false, false, "getParamsStr",						null,								String.class),
 	STATUS		("Status",			25,			false, false, "getStatusStr",						null,								String.class),
 	LENGTH		("Length",			45,			false, false, "getLengthStr",						null,								String.class),
-	MIME_TYPE	("MIME",			45,			false, false, "getMimeType",						null,								String.class),
+	MIME_TYPE	("MIME type",		45,			false, false, "getMimeType",						null,								String.class),
 	COOKIES		("Cookies",			400,		false, false, "getCookies",							null,								String.class);
 
 	private final String caption;

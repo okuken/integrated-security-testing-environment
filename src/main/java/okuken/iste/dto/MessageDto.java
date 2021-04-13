@@ -263,7 +263,7 @@ public class MessageDto {
 	public Integer getParams() {
 		return params;
 	}
-	@TemplateReference(key = "Params")
+	@TemplateReference(key = "ParamCount")
 	public String getParamsStr() {
 		return Integer.toString(getParams());
 	}
@@ -290,7 +290,7 @@ public class MessageDto {
 	public void setLength(Integer length) {
 		this.length = length;
 	}
-	@TemplateReference(key = "MIME")
+	@TemplateReference(key = "MIMEType")
 	public String getMimeType() {
 		return mimeType;
 	}
