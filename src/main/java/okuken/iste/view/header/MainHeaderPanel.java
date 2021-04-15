@@ -5,10 +5,12 @@ import javax.swing.JPanel;
 import com.google.common.collect.Lists;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.util.BurpUtil;
 
 import java.awt.FlowLayout;
 
@@ -135,7 +137,17 @@ public class MainHeaderPanel extends JPanel {
 	}
 
 	public void refreshProjectName() {
-		projectNameLabel.setText(ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName());
+		var projectName = ConfigLogic.getInstance().getProcessOptions().getProjectDto().getName();
+		projectNameLabel.setText(projectName);
+
+		var burpProjectName = BurpUtil.getBurpSuiteProjectName();
+		if(burpProjectName != null && !burpProjectName.equals(projectName)) {
+			projectNameLabel.setForeground(Colors.CHARACTER_ALERT);
+			projectNameLabel.setToolTipText(Captions.MAIN_HEADER_ALERT_PROJECT_TT);
+		} else {
+			projectNameLabel.setForeground(Colors.CHARACTER_NORMAL);
+			projectNameLabel.setToolTipText(null);
+		}
 	}
 
 	public JButton getDockoutButton() {

@@ -32,7 +32,10 @@ public class RegexUtil {
 	}
 
 	public static String extractOneGroup(String str, String regex) {
-		var matcher = Pattern.compile(regex).matcher(str);
+		return extractOneGroup(str, Pattern.compile(regex));
+	}
+	public static String extractOneGroup(String str, Pattern regexPattern) {
+		var matcher = regexPattern.matcher(str);
 		if(!matcher.find()) {
 			return null;
 		}

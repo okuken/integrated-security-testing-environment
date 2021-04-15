@@ -13,6 +13,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
+import com.google.common.collect.Lists;
+
 import burp.IContextMenuFactory;
 import burp.IHttpRequestResponse;
 import burp.ITab;
@@ -47,6 +49,7 @@ import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
 import okuken.iste.view.memo.ProjectMemoPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
+import okuken.iste.view.message.selector.MessageSelectorPanel;
 import okuken.iste.view.message.table.MessageTableColumn;
 import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
@@ -82,6 +85,10 @@ public class Controller {
 	private ProjectMemoPanel projectMemoPanel;
 
 	private AuthPanel authPanel;
+
+	private JTabbedPane toolsTabbedPane;
+
+	private List<MessageSelectorPanel> messageSelectPanels = Lists.newArrayList();
 
 	private ProjectOptionsPanel projectOptionsPanel;
 
@@ -146,8 +153,17 @@ public class Controller {
 	public void setProjectMemoPanel(ProjectMemoPanel projectMemoPanel) {
 		this.projectMemoPanel = projectMemoPanel;
 	}
+	public void addMessageSelectPanel(MessageSelectorPanel messageSelectPanel) {
+		messageSelectPanels.add(messageSelectPanel);
+	}
 	public void setAuthPanel(AuthPanel authPanel) {
 		this.authPanel = authPanel;
+	}
+	public void setToolsTabbedPane(JTabbedPane toolsTabbedPane) {
+		this.toolsTabbedPane = toolsTabbedPane;
+	}
+	public JTabbedPane getToolsTabbedPane() {
+		return toolsTabbedPane;
 	}
 	public void setProjectOptionsPanel(ProjectOptionsPanel projectOptionsPanel) {
 		this.projectOptionsPanel = projectOptionsPanel;
@@ -171,6 +187,12 @@ public class Controller {
 		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
 	}
 
+	public void sendMessagesToSuiteTabHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages) {
+		BurpUtil.highlightTab(suiteTab);
+		RepeaterLogic.getInstance().saveAsRepeatHistory(targetMessageDto, messages);
+		refreshRepeatTablePanel(targetMessageDto);
+	}
+
 	public void deleteMessages() {
 		var selectedRowIndexs = getSelectedRowIndexs();
 		Collections.reverse(selectedRowIndexs);
@@ -187,6 +209,7 @@ public class Controller {
 
 	private void refreshComponentsDependentOnMessages(List<MessageDto> messageDtos) {
 //		authPanel.refreshConfigPanel(messageDtos);
+		messageSelectPanels.forEach(panel -> panel.refreshPanel(messageDtos));
 	}
 
 	public void initSizeRatioOfParts() {
@@ -216,6 +239,10 @@ public class Controller {
 		return this.messageTablePanel.getSelectedMessagesForCopyToClipboad();
 	}
 
+	public void refreshMessageTablePopupMenu() {
+		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).refresh();
+	}
+
 	public void refreshMessageDetailPanels(MessageDto dto) {
 		this.orgMessageEditorPanel.setMessage(dto);
 		this.repeatMasterPanel.setup(dto);
@@ -229,9 +256,12 @@ public class Controller {
 	}
 
 	public void refreshRepeatTablePanel(Integer messageId) {
+		refreshRepeatTablePanel(getMessages().stream().filter(messageDto -> messageId.equals(messageDto.getId())).findFirst().get());
+	}
+	public void refreshRepeatTablePanel(MessageDto messageDto) {
 		//TODO: improve...
-		getMessages().stream().filter(messageDto -> messageId.equals(messageDto.getId())).findFirst().get().setRepeatList(null);
-		if(messageId.equals(repeaterPanel.getOrgMessageDto().getId())) {
+		messageDto.setRepeatList(null);
+		if(repeaterPanel.getOrgMessageDto() != null && repeaterPanel.getOrgMessageDto().getId().equals(messageDto.getId())) {
 			repeaterPanel.refresh();
 		}
 	}
@@ -252,8 +282,8 @@ public class Controller {
 		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, false, true);
 	}
 
-	public void sendRepeaterRequest() {
-		repeaterPanel.sendRequest();
+	public void sendRepeaterRequest(boolean forceAuthSessionRefresh) {
+		repeaterPanel.sendRequest(forceAuthSessionRefresh);
 	}
 
 	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] request, byte[] response, MessageDto orgMessageDto, Consumer<MessageRepeatRedirectDto> callback) {
@@ -405,6 +435,7 @@ public class Controller {
 		this.projectMemoPanel.refreshPanel();
 		this.authPanel.refreshPanel(messageDtos);
 		refreshComponentsDependOnAuthConfig();
+		refreshComponentsDependentOnMessages(messageDtos);
 	}
 
 	private List<MessageDto> loadMessages() {

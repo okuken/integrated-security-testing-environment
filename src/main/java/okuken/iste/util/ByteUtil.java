@@ -25,6 +25,16 @@ public class ByteUtil {
 		return ret;
 	}
 
+	public static byte[] replace(byte[] target, int startIndex, int endIndex, String asciiStr) {
+		var targetStr = new String(target, DEFAULT_SINGLE_BYTE_CHARSET);
+		return new StringBuilder()
+			.append(targetStr.substring(0, startIndex))
+			.append(asciiStr)
+			.append(targetStr.substring(endIndex))
+			.toString()
+			.getBytes(ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET);
+	}
+
 	public static int endIndexOf(byte[] target, byte[] targetBreak, byte[] searchStart, byte[] searchEnd) {
 		for(int i = 0; i < target.length; i++) {
 			if(judgeMatch(target, i, targetBreak)) {
@@ -70,7 +80,7 @@ public class ByteUtil {
 
 			String encoding = detector.getDetectedCharset();
 			if(encoding == null) {
-				return DEFAULT_SINGLE_BYTE_CHARSET;
+				return null;
 			}
 
 			return Charset.forName(encoding);

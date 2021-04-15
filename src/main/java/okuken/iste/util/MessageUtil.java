@@ -2,6 +2,7 @@ package okuken.iste.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
@@ -155,6 +156,14 @@ public class MessageUtil {
 		}
 	}
 
+	public static short extractResponseStatus(byte[] response) {
+		return response != null ? BurpUtil.getHelpers().analyzeResponse(response).getStatusCode() : -1;
+	}
+
+	public static int extractResponseLength(byte[] response) {
+		return response != null ? response.length : 0;
+	}
+
 	public static MessageCookieDto convertCookieToDto(ICookie cookie) {
 		MessageCookieDto cookieDto = new MessageCookieDto();
 		cookieDto.setDomain(cookie.getDomain());
@@ -168,7 +177,7 @@ public class MessageUtil {
 	@SuppressWarnings("unchecked")
 	public static List<MessageResponseParamDto> convertJsonResponseToDto(byte[] response, IResponseInfo responseInfo) {
 		var responseBody = HttpUtil.extractMessageBody(response, responseInfo.getBodyOffset());
-		var responseBodyStr = new String(responseBody, ByteUtil.detectEncoding(response));
+		var responseBodyStr = new String(responseBody, Optional.ofNullable(ByteUtil.detectEncoding(response)).orElse(HttpUtil.DEFAULT_HTTP_BODY_CHARSET));
 		Map<String, Object> json = new Gson().fromJson(responseBodyStr, Map.class);
 
 		//TODO: support multiple levels json

@@ -1,15 +1,19 @@
 package okuken.iste.view.option;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import okuken.iste.consts.Captions;
+import okuken.iste.consts.Colors;
 import okuken.iste.consts.Sizes;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.logic.ConfigLogic;
@@ -18,6 +22,8 @@ import okuken.iste.util.BurpUtil;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -37,6 +43,7 @@ public class ProjectSelectorDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
+	@SuppressWarnings("serial")
 	public ProjectSelectorDialog(Frame owner) {
 		super(owner);
 
@@ -72,6 +79,22 @@ public class ProjectSelectorDialog extends JDialog {
 			List<ProjectDto> projects = ProjectLogic.getInstance().loadProjects();
 			Collections.reverse(projects);
 			projects.stream().forEach(dto -> projectsComboBox.addItem(dto));
+
+			var burpProjectName = BurpUtil.getBurpSuiteProjectName();
+			if(burpProjectName != null) {
+				SwingUtilities.invokeLater(() -> {
+					projectsComboBox.setRenderer(new DefaultListCellRenderer() {
+						@Override
+						public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+							var component =  super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+							if (burpProjectName.equals(((ProjectDto)value).getName())) {
+								component.setForeground(Colors.COMBOBOX_FOREGROUND_HIGHLIGHT);
+							}
+							return component;
+						}
+					});
+				});
+			}
 
 			projectsComboBox.setSelectedIndex(0);
 			String lastSelectedProjectName = ConfigLogic.getInstance().getUserOptions().getLastSelectedProjectName();

@@ -12,4 +12,7 @@ public class Sizes {
 	public static final int OMIT_STRING_SIZE_AUTH_REMARK = 20;
 	public static final int OMIT_STRING_SIZE_AUTH_SESSION_VALUE = 10;
 
+
+	public static final int TAB_SIZE = 4;
+
 }

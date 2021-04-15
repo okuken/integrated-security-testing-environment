@@ -6,7 +6,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
 
-version '0.1.1'
+version '0.2.0'
 
 shadowJar{
   archiveName = "iste-${version}.${extension}"
@@ -38,6 +38,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.guava:guava:28.1-jre'
+    implementation 'org.apache.velocity:velocity-engine-core:2.3'
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'

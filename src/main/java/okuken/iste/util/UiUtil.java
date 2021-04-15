@@ -6,10 +6,15 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -18,15 +23,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.UndoableEditEvent;
@@ -70,6 +79,19 @@ public class UiUtil {
 		}, 1000);
 	}
 
+	/**
+	 * CAUTION: support ASCII only
+	 */
+	public static final PrintStream createTextAreaPrintStream(JTextArea messageTextArea) {
+		return new PrintStream(new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				messageTextArea.append(String.valueOf((char)b));
+				messageTextArea.setCaretPosition(messageTextArea.getDocument().getLength());
+			}
+		}, false, StandardCharsets.US_ASCII);
+	}
+
 	public static final void copyToClipboard(String content) {
 		StringSelection stringSelection = new StringSelection(content);
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, stringSelection);
@@ -91,6 +113,18 @@ public class UiUtil {
 				copyToClipboard(val != null ? val.toString() : "");
 			}
 		});
+	}
+
+	public static final JPopupMenu createCopyPopupMenu(Supplier<String> supplier) {
+		var menu = new JPopupMenu();
+		var menuItem = new JMenuItem(Captions.COPY);
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				copyToClipboard(supplier.get());
+			}
+		});
+		menu.add(menuItem);
+		return menu;
 	}
 
 	public static final UndoManager addUndoRedoFeature(JTextComponent textComponent) {
@@ -134,6 +168,10 @@ public class UiUtil {
 		return undoManager;
 	}
 
+	public static boolean judgeIsForceRefresh(ActionEvent e) {
+		return (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
+	}
+
 	public static void initScrollBarPosition(JScrollPane scrollPane) {
 		var verticalScrollBar = scrollPane.getVerticalScrollBar();
 		verticalScrollBar.setValue(verticalScrollBar.getMinimum());
@@ -147,6 +185,9 @@ public class UiUtil {
 		popupFrames.forEach(popupFrame -> {
 			popupFrame.dispose();
 		});
+	}
+	public static JFrame popup(String title, Container contentPane, Component triggerComponent) {
+		return popup(title, contentPane, triggerComponent, null);
 	}
 	public static JFrame popup(String title, Container contentPane, Component triggerComponent, Consumer<WindowEvent> closeProcedure) {
 		var ret = createAndShowFrame(title, contentPane, triggerComponent, closeProcedure);
@@ -203,6 +244,10 @@ public class UiUtil {
 			@Override public void windowDeiconified(WindowEvent e) {}
 			@Override public void windowDeactivated(WindowEvent e) {}
 			@Override public void windowClosing(WindowEvent e) {
+				if(closeProcedure == null) {
+					closePopup(popupFrame);
+					return;
+				}
 				closeProcedure.accept(e);
 			}
 			@Override public void windowClosed(WindowEvent e) {}
