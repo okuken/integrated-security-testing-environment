@@ -7,14 +7,14 @@ import javax.swing.JPopupMenu;
 
 import com.google.common.collect.Lists;
 
-import burp.IContextMenuFactory;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.TemplateLogic;
-import okuken.iste.plugin.PluginContextMenuInvocation;
+import okuken.iste.plugin.IsteContextMenuInvocation;
+import okuken.iste.plugin.api.IIsteContextMenuFactory;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
@@ -29,7 +29,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<IContextMenuFactory> pluginContextMenuFactories = Lists.newArrayList();
+	private List<IIsteContextMenuFactory> isteContextMenuFactories = Lists.newArrayList();
 
 	private JPanel parentPanel;
 
@@ -146,12 +146,12 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		});
 		add(sendToComparerResponseMenuItem);
 
-		if(!pluginContextMenuFactories.isEmpty()) {
+		if(!isteContextMenuFactories.isEmpty()) {
 
 			add(new JPopupMenu.Separator());
 
-			pluginContextMenuFactories.forEach(pluginContextMenuFactory -> {
-				pluginContextMenuFactory.createMenuItems(new PluginContextMenuInvocation()).forEach(this::add);
+			isteContextMenuFactories.forEach(isteContextMenuFactory -> {
+				isteContextMenuFactory.createMenuItems(new IsteContextMenuInvocation()).forEach(this::add);
 			});
 		}
 
@@ -227,13 +227,13 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		init();
 	}
 
-	public void addPluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
-		this.pluginContextMenuFactories.addAll(pluginContextMenuFactories);
+	public void addIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		this.isteContextMenuFactories.addAll(isteContextMenuFactories);
 		refresh();
 	}
 
-	public void removePluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
-		this.pluginContextMenuFactories.removeAll(pluginContextMenuFactories);
+	public void removeIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		this.isteContextMenuFactories.removeAll(isteContextMenuFactories);
 		refresh();
 	}
 

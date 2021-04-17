@@ -50,6 +50,9 @@ public class BurpUtil {
 	public static void printStderr(Exception e) {
 		e.printStackTrace(new PrintWriter(burpExtenderCallbacks.getStderr(), true));
 	}
+	public static void printStderr(String msg) {
+		burpExtenderCallbacks.printError(msg);
+	}
 
 	public static PrintStream getStdoutPrintStream() {
 		return new PrintStream(burpExtenderCallbacks.getStdout());

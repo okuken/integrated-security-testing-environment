@@ -7,12 +7,12 @@ import java.awt.FlowLayout;
 
 import javax.swing.JTextField;
 
-import burp.ITab;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.plugin.PluginInfo;
 import okuken.iste.plugin.PluginLoadInfo;
+import okuken.iste.plugin.api.IIstePluginTab;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
 
@@ -28,11 +28,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 public class PluginsPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+
+	private JTextField jarFilePathTextField;
 
 	private JTabbedPane tabbedPane;
 	private JTable table;
@@ -56,7 +60,7 @@ public class PluginsPanel extends JPanel {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		configPanel.add(configHeaderPanel, BorderLayout.NORTH);
 		
-		JTextField jarFilePathTextField = new JTextField();
+		jarFilePathTextField = new JTextField();
 		configHeaderPanel.add(jarFilePathTextField);
 		jarFilePathTextField.setColumns(30);
 		
@@ -69,7 +73,13 @@ public class PluginsPanel extends JPanel {
 		JScrollPane pluginTableScrollPane = new JScrollPane();
 		configPanel.add(pluginTableScrollPane, BorderLayout.CENTER);
 		
-		table = new JTable();
+		table = new JTable() {
+			@Override
+			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
+				super.changeSelection(row, col, toggle, extend);
+				jarFilePathTextField.setText(pluginInfos.get(row).getLoadInfo().getJarFilePath());
+			}
+		};
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
@@ -113,7 +123,7 @@ public class PluginsPanel extends JPanel {
 		});
 		jarFileChooseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_PLUGIN_FILE);
+				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_PLUGIN_FILE, jarFilePathTextField.getText());
 				if (fileChooser.showOpenDialog(UiUtil.getParentFrame(jarFileChooseButton)) == JFileChooser.APPROVE_OPTION) {
 					jarFilePathTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
 				}
@@ -126,6 +136,11 @@ public class PluginsPanel extends JPanel {
 	}
 
 	private void addPlugin(String jarFilePath) {
+		if(StringUtils.isBlank(jarFilePath) ||
+			pluginInfos.stream().filter(info -> info.getLoadInfo().getJarFilePath().equals(jarFilePath)).findAny().isPresent()) {
+			return;
+		}
+
 		addPluginImpl(jarFilePath, true);
 		saveAsUserOption();
 	}
@@ -138,7 +153,7 @@ public class PluginsPanel extends JPanel {
 			pluginInfo = new PluginInfo(new PluginLoadInfo(jarFilePath, load));
 		}
 		pluginInfos.add(pluginInfo);
-		tableModel.addRow(convertPluginInfoToObjectArray(pluginInfo, load));
+		tableModel.addRow(convertPluginInfoToObjectArray(pluginInfo));
 	}
 
 	private void loadOrUnloadPlugin(int pluginIndex, boolean load) {
@@ -149,20 +164,20 @@ public class PluginsPanel extends JPanel {
 			pluginInfos.add(pluginIndex, newPluginInfo);
 
 			tableModel.removeRow(pluginIndex);
-			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(newPluginInfo, load));
+			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(newPluginInfo));
 
 		} else {
 			Controller.getInstance().unloadPlugin(pluginInfos.get(pluginIndex));
 
 			tableModel.removeRow(pluginIndex);
-			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(pluginInfos.get(pluginIndex), load));
+			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(pluginInfos.get(pluginIndex)));
 		}
 
 		saveAsUserOption();
 	}
 
-	private Object[] convertPluginInfoToObjectArray(PluginInfo pluginInfo, boolean load) {
-		return new Object[] {load, pluginInfo.getPluginName(), pluginInfo.getLoadInfo().getJarFilePath()};
+	private Object[] convertPluginInfoToObjectArray(PluginInfo pluginInfo) {
+		return new Object[] {pluginInfo.getLoadInfo().isLoaded(), pluginInfo.getPluginName(), pluginInfo.getLoadInfo().getJarFilePath()};
 	}
 
 	private void saveAsUserOption() {
@@ -180,7 +195,7 @@ public class PluginsPanel extends JPanel {
 		});
 	}
 
-	public void addPluginTabs(List<ITab> pluginTabs) {
+	public void addPluginTabs(List<IIstePluginTab> pluginTabs) {
 		pluginTabs.forEach(tab -> {
 			if(tabbedPane.indexOfTab(tab.getTabCaption()) >= 0) {
 				throw new RuntimeException("Duplicated plugin tab name: " + tab.getTabCaption());
@@ -189,7 +204,7 @@ public class PluginsPanel extends JPanel {
 		});
 	}
 
-	public void removePluginTabs(List<ITab> pluginTabs) {
+	public void removePluginTabs(List<IIstePluginTab> pluginTabs) {
 		pluginTabs.forEach(tab -> {
 			var tabIndex = tabbedPane.indexOfTab(tab.getTabCaption());
 			if(tabIndex < 0) {
