@@ -1,7 +1,9 @@
+English / [Japanese](README.ja.md)
+
 # ISTE: Integrated Security Testing Environment
 
-Webアプリケーションの脆弱性診断をトータルサポートする Burp extension（Burp Suiteの拡張機能）です。  
-診断員を煩雑な作業から解放し、全集中へと導きます。
+ISTE is a Burp extension that provides total support for security testing of web applications.  
+ISTE puts you in a flow state.
 
 ![ISTE > List](docs/images/list.png)
 
@@ -9,21 +11,21 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 
 ### Basic Features
 
-| 機能　　　　　　　　　　 | 説明 | 備考 |
+| Feature　　　　　 | Explanation | Remark |
 | :-- | :-- | :-- |
-| URL一覧 | 診断対象となるURLをプロジェクト単位で一覧管理する機能。名称や備考の記入、並べ替えやフィルタリング、TSVやテンプレート形式でのクリップボードへのコピー、各種 Send To 機能等も提供。 | URLと生ログを紐づけてDB（SQLite）に保存するので、スプレッドシート等でURL一覧を作成した際に生じるURL一覧と生ログの目マッピングが不要に。 |
-| 診断メモ | プロジェクト単位、URL単位、リピート単位のメモ機能。 | 生ログを横目にメモを書け、生ログに紐づけてDBに保存する。メモの保存はフォーカスアウトのタイミング。 |
-| 進捗管理 | URL一覧において進捗記入列を提供。進捗に応じた自動色付け、フィルタリングが可能。 | URL一覧と進捗管理表のダブルメンテや書式維持に消耗する時間が不要に。フィルタリング操作も軽快。 |
-| リピート履歴管理 | URL一覧の各URLについて、リピート実行機能とリピート履歴管理機能を提供。 | 純正 Repeater の不満解消。 |
+| URL list | A feature to manage URLs to be tested in a project. It also provides features such as editing names and remarks, sorting and filtering, copying to clipboard in TSV or template format, and various Send-To menus. | Since URLs and raw logs are linked and saved in the DB (SQLite), there is no need to map the URL list and raw logs, which occurs when creating a URL list in a spreadsheet, etc. |
+| Notes | Notes for each project, each URL, and each repeat. | You can write notes while viewing the raw log, and they will be linked to the raw log and saved in the DB. The notes are saved when they are focused out. |
+| Progress management | Provides a column to enter the progress in the URL list. Automatic coloring and filtering based on progress is possible. | No more time consuming double maintenance and formatting of the URL list and progress list. Filtering operations are light. |
+| Repeat history | For each URL in the URL list, it provides a feature of issuing repeat request and managing history. | Eliminate frustration about repeater history. |
 
 ### Advanced Features
 
-| 機能　　　　　　　　　　 | 説明 | 備考 |
+| Feature　　　　　 | Explanation | Remark |
 | :-- | :-- | :-- |
-| リピートマスタ | URL一覧の各URLについて、リピート実行のためのベースリクエスト(Master)を定義し、リクエスト編集のベースとして呼び出し可能とする機能。 | 繰り返し試験値を変化させながらリピート実行する際に、ベースとしたいリクエストを適宜保存しておくと便利。 |
-| **アカウント指定リピート** | 対象システムのアカウントを指定してリピート実行する機能。セッション再取得ボタンも提供。 | 認可制御の診断を強力サポート！ |
-| アカウント管理 | 対象システムのアカウントを一覧管理する機能。 | 登録したアカウントはアカウント指定リピートで使用可能。 |
-| 認証定義 | 対象システムの認証フロー、および認証フローの結果として得たセッションID等をリピートリクエストに反映する方法を定義する機能。この定義を使用して、アカウント指定リピートを実行する。 | 認証フローの実体はリクエストチェーン（後述）。 |
+| Master for repeat | For each URL in the URL list, this feature defines a base request (Master) for repeat, which can be used as the base for request editing. | It is useful to save the request that you want to use as a base when repeatedly testing while changing the payload. |
+| **Repeat as a specific account** | A feature to issue repeat request as a specific account of the target system. It also provides a button to refresh the session. | Powerful support for testing of broken access control! |
+| Account management | A feature to manages the accounts of the target system. | Registered accounts can be used in "Repeat as a specific account". |
+| Authentication settings | A feature to define the authentication flow of the target system and how to apply values provided by authentication flow to each repeat requests. | The entity of the authentication flow is the request chain described below. |
 
 ![ISTE > Auth](docs/images/auth.png)
 
@@ -31,19 +33,19 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 
 ### Experimental Features
 
-| 機能　　　　　　　　　　 | 説明 | 備考 |
+| Feature　　　　　 | Explanation | Remark |
 | :-- | :-- | :-- |
-| リクエストチェーン | URL一覧の各URLについて、リクエストチェーン（複数リクエストの連なりおよびパラメータ引継ぎを定義したもの）を定義し、リピート実行する機能。 | 現状は使い勝手が悪い（引継ぎ設定項目のプルダウン化、設定の半自動化、ステップ実行、等々やりたい改善多数）。 |
-| 診断メモのエクスポート | 簡易なMarkdown形式で診断メモをエクスポートする機能。 | 色々考慮できていないが、診断メモを他者に共有したい場合に最低限使える程度の機能ではある。また、診断メモの検索機能が未実装なので、エクスポート＆テキストエディタで検索等の使い方も。 |
-| プラグイン | ISTEの拡張機能を開発できる拡張ポイントを提供。 | ISTEの機能は基本的に本体に実装していくが、極めて個人的な機能(自作アプリとの連携機能など)は、プラグインとして外出し実装する。現状はかなり制約が厳しいのでサンプルプラグインは提供しないが、作者の実用には辛うじて耐えている。 |
+| Request chain | For each URL in the URL list, the feature to define a request chain, i.e., a sequence of multiple requests and parameter transfer, and issue it repeatedly. | Currently, it is not easy to use. There are many improvements I would like to make, such as making the transfer setting items configurable with combo boxes, semi-automating the settings, allowing step-by-step execution, etc. |
+| Export notes | A feature to export notes in a simple Markdown format. | I haven't been able to take a lot of things into account, but it's the least I can do when I want to share my notes with others. Also, since the search function of the notes is not implemented yet, you can use it to export and search with a text editor. |
+| Plugin | Provides an extension point for ISTE. | The features of ISTE will basically be implemented in ISTE itself, but extremely personal features, such as the ability to link with self-made applications, will be implemented as plug-ins. Currently, I do not provide sample plug-ins because they are quite restrictive, but they barely stand up to my practical use. |
 
 #### Exploit Features
 
-※本機能群は特に、対象システムの管理者の許可なく実行しないようご注意ください。不正アクセス禁止法等の法令違反に当たる可能性があります。
+CAUTION: Please note that this group of features must not be executed without the permission of the administrator of the target system.
 
-| 機能　　　　　　　　　　 | 説明 | 備考 |
+| Feature　　　　　 | Explanation | Remark |
 | :-- | :-- | :-- |
-| Blind SQL Injection | 検出済みの Blind SQL Injection 脆弱性を利用したデータ抽出作業を自動化する機能。脆弱性が利用可能であることの証明を目的として、データベースのバージョン情報等を抽出する際に用いる。 | 汎用性を優先した玄人向け機能。ASCIIコード(10進)を探索範囲とする二分探索を実施。 |
+| Blind SQL Injection | A feature that automates the process of retrieving data using a detected Blind SQL Injection vulnerability. The purpose of this feature is to make it clear to the administrator of the target system that the vulnerability is available. | This is a feature for experts, with priority given to versatility. This feature performs a binary search using ASCII codes as the search range. |
 
 ![ISTE > Tools > BSQLi](docs/images/bsqli.png)
 
@@ -53,79 +55,71 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 
 ## Installing ISTE
 
-1. [Releases](https://github.com/okuken/integrated-security-testing-environment/releases) から Latest release の iste-x.x.x.jar ファイルをダウンロード
-1. Burp Suite を起動し、Extender > Extensions にて Add ボタンを押下
-1. 下記のとおり指定して Next ボタンを押下
+1. Download the iste-x.x.x.jar file of the latest release from [Releases](https://github.com/okuken/integrated-security-testing-environment/releases).
+1. Launch Burp Suite and click the Add button under Extender > Extensions.
+1. Enter the information as follows and click the Next button.
    * Extension type: Java
-   * Extension file (.jar): 上記でダウンロードした jar ファイルを選択
+   * Extension file (.jar): Select the jar file you downloaded above.
 
 ## Getting Started
 
-### ISTE起動時
-1. DBファイル(SQLite3(.db))のパスを指定 ※初回のみ
-   * 変更方法：ISTE > Options > User options > Misc
-1. ISTEプロジェクトを選択
-   * 初回や新たに診断案件を開始する場合は、「** Create new project **」を選択してISTEプロジェクトを新規作成する
-   * Burp Suite Professional を使用している場合は、ISTEプロジェクト名をBurpプロジェクト名と同じにしておくと、次回以降はISTEプロジェクトが自動選択されるのでお勧め
-   * 変更方法：ISTE > List のプロジェクト名横にある「...」ボタン
+### At ISTE Startup
+1. Set the path to the DB file (SQLite3(.db)) *First time only
+   * To change: ISTE > Options > User options > Misc
+1. Select the ISTE project
+   * If this is the first time or you are starting a new security testing project, select "** Create new project **" to create a new ISTE project.
+   * If you are using Burp Suite Professional, it is recommended to set the ISTE project name as the same as the Burp project name, so that the ISTE project will be automatically selected next time.
+   * To change: ISTE > List, click the "..." button next to the project name
 
-### 基本の流れ
-1. 診断案件の基本情報をメモ
-   * ISTE > Notes に記入する（プロジェクト単位のメモ）
-   * なお、プロジェクト単位のメモはテンプレを設定できる。ISTE > Options > User options > Note templates > Notes
-1. 診断対象となるURL一覧の作成
-   * Burp Suiteをプロキシに設定した状態で、診断対象システムを巡回する
-   * Proxy > HTTP history において診断対象のURLを選択し、コンテキストメニューの Send to ISTE を実行することで、ISTE > List にURLを追加する
-   * ISTE > List の Name 列には、デフォルトで Proxy > HTTP history の Comment の内容が入力されるので、必要に応じて編集する。Remark 列等にも必要に応じて備考を記入する
-1. 診断作業を実施
-   * ISTE > List において診断対象URLを選択し、画面右側のメモ欄にメモをとりながら診断作業を実施する
-   * なお、URL単位のメモはテンプレを設定できる。ISTE > Options > User options > Note templates > List
-   * 診断を終えたURLは、進捗(Progress)列の値を Done にする
-   * 必要に応じて画面上方の進捗フィルタを使って残数を確認しつつ作業を進める
+### Basic Flow
+1. Write notes about basic information of the security testing project.
+   * Write notes in ISTE > Notes. It is a notes for each ISTE project.
+   * Template setting: ISTE > Options > User options > Note templates > Notes
+1. Creating a list of target URLs to be security tested
+   * Crawl the target system with Burp Suite as a proxy
+   * Select the URLs to be tested on Proxy > HTTP history, and add the URLs to ISTE > List by clicking "Send to ISTE" in the context menu.
+   * The Name column in ISTE > List is populated with the content of Comment in Proxy > HTTP history by default, so edit it if necessary. Fill in Remark columns, etc. as needed.
+1. Perform security testing
+   * Select the URL to be tested in ISTE > List, and take notes in the Notes field on the right side of the screen while performing the security testing.
+   * Template setting:  ISTE > Options > User options > Note templates > List
+   * Change the value of the progress column of the URL that has completed testing to Done.
+   * If necessary, use the progress filter at the top of the screen to check the number of remaining items and proceed with the testing.
 
-### 高度な使い方
+### Advanced Usage
 
-#### リピート機能の使用
-* ISTE > List においてリピート実行対象のURLを選択し、画面下方の Repeat タブにて、リクエストを適宜編集して Send ボタンで送信する
-* リピート履歴テーブルが同タブの上方に表示されるので、適宜メモ列にメモをとりながら診断を進める
-* リクエスト編集欄をオリジナルのリクエストに戻したい場合は Org ボタンを押下する
-* オリジナルのリクエストとは別に診断のベースとしたいリクエストができた場合は、Save as master ボタンで保存しておく。保存したリクエストは Master ボタンで呼び出せる
-* なお、Burp Suite 2020.11 で追加された INSPECTOR 機能には未対応（Burp Extender API に追加されたら対応したい）
+#### Using Repeater
+* Select the URL to be repeated in ISTE > List, edit the request in the Repeat tab at the bottom of the screen, and issue it with the Send button.
+* The repeat history table will be displayed upper half of the tab, so proceed with the testing while taking notes in the Notes column as appropriate.
+* If you want to return the message editor to the original request, click the Org button.
+* If you have a request that you want to use as a base for testing in addition to the original request, save it using the "Save as master" button. The saved request can be set to message editor using the Master button.
+* The INSPECTOR feature, added in Burp Suite 2020.11, is not yet supported. I would like to support it when it is added to the Burp Extender API.
 
-#### アカウント指定リピートの使用
-1. ISTE > Auth において以下の設定を行う
-   * Accounts テーブルにアカウントを登録する
-      * 基本的には Field 1 にユーザID、 Field 2 にパスワードを入力する
-   * 認証フローを定義する
-      1. Edit authentication request chain ボタンを押下し、リクエストチェーン画面を開く
-      1. 認証フローに必要なリクエストを追加し、必要に応じてパラメータ引継ぎの設定を行う
-      1. ユーザID、パスワードをパラメータとするリクエストでは、Request manipulation テーブルに設定を追加し、 Source type 列には Account table を、Source name にはフィールド番号(ユーザIDなら1、パスワードなら2など）をそれぞれ指定する
-      1. 動作確認したい場合は Run ボタンを押下する。診断対象システムへのアクセスが発生するので注意すること
-      1. 認証の結果として得たセッションID等の値は、Response memorization テーブルにて登録しておく
-      1. フローを組み終えたら、Save ボタンで保存してから画面を閉じる
-   * 認証結果をリピートリクエストに反映する方法を定義する
-      * How to apply vars provided by authentication request chain to each repeat requests テーブルに反映先を登録する  
-        例）Cookie「sessionid」をセッションIDとしてセッション管理しているシステムの場合：
+#### Using Repeater as a specific account
+1. Configure the settings in ISTE > Auth
+   * Register accounts in the Accounts table
+      * Basically, enter the user ID in Field 1 and the password in Field 2.
+   * Define the authentication flow
+      1. Click the "Edit authentication request chain" button to open the request chain window.
+      1. Add the necessary requests to the authentication flow and set up parameter transfer as needed.
+      1. For requests with user ID and password as parameters, add the settings to the "Request manipulation" table, specifying the "Account table" in the "Source type" column and the field number in the "Source name", e.g. 1 for user ID, 2 for password, etc.
+      1. If you want to check the behavior, click the Run button. Be aware that requests will be issued to the target system.
+      1. Set the session ID and other values obtained as a result of the authentication to the "Response memorization" table.
+      1. When you have finished setting the flow, click the Save button and close the window.
+   * Define how to apply values provided by authentication request chain to each repeat requests
+      * Register the applicable destination in table "How to apply vars provided by authentication request chain to each repeat requests".  
+        For example, in the case of a system that uses the cookie "sessionid" as the session ID for session management:
          * Request param type: Cookie
          * Request param name: sessionid
-         * Source var name: 認証フローにおいて Response memorization テーブルに登録した Var name
-1. アカウントを指定してリピート実行を行う
-   * ISTE > List においてリピート実行対象のURLを選択し、画面下方の Repeat タブを開き、アカウントプルダウンにてアカウントを選択して Send ボタンを押下する
-   * セッションを取り直したい場合は、アカウントプルダウン横の更新ボタンを押下する
-   * セッションを取り直した上でリピート実行したい場合は、Shiftキーを押しながら Send ボタン押下
+         * Source var name: Var name registered in the "Response memorization" table in the authentication flow
+1. Issue repeat request as a specific account
+   * Select the URL to be repeated in ISTE > List, open the Repeat tab at the bottom of the screen, select an account in the Account combo box, and click the Send button.
+   * If you want to refresh the session, click the Refresh button next to the Account combo box.
+   * If you want to refresh the session and repeat it, hold down the Shift key and click the Send button.
 
 ## Notes
 
-* 一人用です
-  * 診断メモ共有目的でのdbファイル受け渡しは想定内ですが、１つのISTEプロジェクトへの複数ISTEからの同時アクセスには対応していません（データ不整合が発生し得ます）
-* 作者の普段使い用として開発を始めた経緯もあり、やっつけ実装です
-  * 特に非機能面が緩く、入力チェックやエラーメッセージほぼなし、テキトーな英語、ソースコードの可読性・保守性厳しめ、…
-  * 大きなRequest/ResponseはISTEに送らないのが吉です（制御を入れていないので、メモリを食いつぶしたり、dbファイルの肥大化を招きます）
-  * DBは定期的にバックアップをとることを推奨します（SQLiteなのでdbファイルのコピペでOK）
-    * 特に、ISTEのバージョンアップにはDBマイグレーションが含まれる場合があるため、バージョンアップ前には必ずバックアップをとってください（DBマイグレーションはISTE起動時に走ります。一応確認ダイアログは出していますが）
-  * 作者が普段使いする上で困らない程度の品質ではあります（優しく扱っている限りはきっと大丈夫です）
-* 作者の直近の困りごと駆動で開発していきます
-* **作者は本ソフトウェアに起因あるいは関連して生じた損害等について、一切の責任を負いません**
+* It does not support simultaneous access from multiple ISTEs to an ISTE project. It can make the data inconsistent.
+* **The author assumes no responsibility for any damage caused by or related to this software.**
 
 ## License
 
