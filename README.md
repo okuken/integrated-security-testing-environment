@@ -5,7 +5,8 @@ English / [Japanese](README.ja.md)
 ISTE is a Burp extension that provides total support for security testing of web applications.  
 ISTE puts you in a flow state.
 
-![ISTE > List](docs/images/list.png)
+![iste_demo_01_repeat_as](https://user-images.githubusercontent.com/942241/115988566-51a0df00-a5f5-11eb-98f4-ba5e52b6a379.gif)
+\* I used [OWASP Mutillidae II](https://github.com/webpwnized/mutillidae) in my demonstration.
 
 ## Features
 
@@ -39,6 +40,8 @@ ISTE puts you in a flow state.
 | Export notes | A feature to export notes in a simple Markdown format. | I haven't been able to take a lot of things into account, but it's the least I can do when I want to share my notes with others. Also, since the search function of the notes is not implemented yet, you can use it to export and search with a text editor. |
 | Plugin | Provides an extension point for ISTE. | The features of ISTE will basically be implemented in ISTE itself, but extremely personal features, such as the ability to link with self-made applications, will be implemented as plug-ins. Currently, I do not provide sample plug-ins because they are quite restrictive, but they barely stand up to my practical use. |
 
+![iste_demo_02_chain](https://user-images.githubusercontent.com/942241/115988586-6b422680-a5f5-11eb-9031-de10310ed97f.gif)
+
 #### Exploit Features
 
 CAUTION: Please note that this group of features must not be executed without the permission of the administrator of the target system.
@@ -47,7 +50,7 @@ CAUTION: Please note that this group of features must not be executed without th
 | :-- | :-- | :-- |
 | Blind SQL Injection | A feature that automates the process of retrieving data using a detected Blind SQL Injection vulnerability. The purpose of this feature is to make it clear to the administrator of the target system that the vulnerability is available. | This is a feature for experts, with priority given to versatility. This feature performs a binary search using ASCII codes as the search range. |
 
-![ISTE > Tools > BSQLi](docs/images/bsqli.png)
+![iste_demo_03_bsqli](https://user-images.githubusercontent.com/942241/115988605-785f1580-a5f5-11eb-93f2-1ad9004cf9f0.gif)
 
 ## Prerequisites
 

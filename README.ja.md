@@ -5,7 +5,8 @@
 Webアプリケーションの脆弱性診断をトータルサポートする Burp extension（Burp Suiteの拡張機能）です。  
 診断員を煩雑な作業から解放し、全集中へと導きます。
 
-![ISTE > List](docs/images/list.png)
+![iste_demo_01_repeat_as](https://user-images.githubusercontent.com/942241/115988566-51a0df00-a5f5-11eb-98f4-ba5e52b6a379.gif)
+\* I used [OWASP Mutillidae II](https://github.com/webpwnized/mutillidae) in my demonstration.
 
 ## Features
 
@@ -39,6 +40,8 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 | 診断メモのエクスポート | 簡易なMarkdown形式で診断メモをエクスポートする機能。 | 色々考慮できていないが、診断メモを他者に共有したい場合に最低限使える程度の機能ではある。また、診断メモの検索機能が未実装なので、エクスポート＆テキストエディタで検索等の使い方も。 |
 | プラグイン | ISTEの拡張機能を開発できる拡張ポイントを提供。 | ISTEの機能は基本的に本体に実装していくが、極めて個人的な機能(自作アプリとの連携機能など)は、プラグインとして外出し実装する。現状はかなり制約が厳しいのでサンプルプラグインは提供しないが、作者の実用には辛うじて耐えている。 |
 
+![iste_demo_02_chain](https://user-images.githubusercontent.com/942241/115988586-6b422680-a5f5-11eb-9031-de10310ed97f.gif)
+
 #### Exploit Features
 
 ※本機能群は特に、対象システムの管理者の許可なく実行しないようご注意ください。不正アクセス禁止法等の法令違反に当たる可能性があります。
@@ -47,7 +50,7 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 | :-- | :-- | :-- |
 | Blind SQL Injection | 検出済みの Blind SQL Injection 脆弱性を利用したデータ抽出作業を自動化する機能。脆弱性が利用可能であることの証明を目的として、データベースのバージョン情報等を抽出する際に用いる。 | 汎用性を優先した玄人向け機能。ASCIIコード(10進)を探索範囲とする二分探索を実施。 |
 
-![ISTE > Tools > BSQLi](docs/images/bsqli.png)
+![iste_demo_03_bsqli](https://user-images.githubusercontent.com/942241/115988605-785f1580-a5f5-11eb-93f2-1ad9004cf9f0.gif)
 
 ## Prerequisites
 
