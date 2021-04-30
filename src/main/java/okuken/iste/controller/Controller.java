@@ -175,9 +175,11 @@ public class Controller {
 
 	public void sendMessagesToSuiteTab(List<IHttpRequestResponse> messages) {
 		BurpUtil.highlightTab(suiteTab);
-		List<MessageDto> messageDtos = messages.stream()
+		addMessages(messages.stream()
 				.map(message -> MessageLogic.getInstance().convertHttpRequestResponseToDto(message))
-				.collect(Collectors.toList());
+				.collect(Collectors.toList()));
+	}
+	public void addMessages(List<MessageDto> messageDtos) {
 		MessageLogic.getInstance().saveMessages(messageDtos);
 		this.messageTableModel.addRows(messageDtos);
 		MessageLogic.getInstance().saveMessageOrder(this.messageTableModel.getRows()); // TODO: join transaction...
@@ -268,6 +270,13 @@ public class Controller {
 
 	public void refreshComponentsDependOnAuthConfig() {
 		repeaterPanel.refreshAuthAccountsComboBox();
+	}
+
+	public List<MessageRepeatDto> getSelectedMessageRepeats() {
+		return repeaterPanel.getSelectedMessageRepeatDtos();
+	}
+	public MessageDto getSelectedMessageRepeatOrg() {
+		return repeaterPanel.getOrgMessageDto();
 	}
 
 	public AuthAccountDto getSelectedAuthAccountOnRepeater() {
@@ -413,11 +422,16 @@ public class Controller {
 
 	public void addIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
 		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).addIsteContextMenuFactories(isteContextMenuFactories);
-		repeatTablePopupMenu.addIsteContextMenuFactories(isteContextMenuFactories);
 	}
 	public void removeIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
 		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).removeIsteContextMenuFactories(isteContextMenuFactories);
-		repeatTablePopupMenu.removeIsteContextMenuFactories(isteContextMenuFactories);
+	}
+
+	public void addIsteRepeaterContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		repeatTablePopupMenu.addIsteRepeaterContextMenuFactories(isteContextMenuFactories);
+	}
+	public void removeIsteRepeaterContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		repeatTablePopupMenu.removeIsteRepeaterContextMenuFactories(isteContextMenuFactories);
 	}
 
 	public void addPluginTabs(List<IIstePluginTab> pluginTabs) {

@@ -10,6 +10,7 @@ import burp.IHttpRequestResponse;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
+import okuken.iste.plugin.PluginHelper;
 import okuken.iste.plugin.api.IIsteContextMenuFactory;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
@@ -23,7 +24,7 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<IIsteContextMenuFactory> isteContextMenuFactories = Lists.newArrayList();
+	private List<IIsteContextMenuFactory> isteRepeaterContextMenuFactories = Lists.newArrayList();
 
 	private RepeatTablePanel parentRepeatTablePanel;
 
@@ -110,15 +111,14 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		});
 		add(sendToComparerResponseWithMasterMenuItem);
 
-		//TODO: impl
-//		if(!isteContextMenuFactories.isEmpty()) {
-//
-//			add(new JPopupMenu.Separator());
-//
-//			isteContextMenuFactories.forEach(isteContextMenuFactory -> {
-//				isteContextMenuFactory.createMenuItems(new IsteContextMenuInvocation()).forEach(this::add);
-//			});
-//		}
+		if(!isteRepeaterContextMenuFactories.isEmpty()) {
+
+			add(new JPopupMenu.Separator());
+
+			isteRepeaterContextMenuFactories.forEach(isteRepeaterContextMenuFactory -> {
+				PluginHelper.createJMenuItems(isteRepeaterContextMenuFactory).forEach(this::add);
+			});
+		}
 
 //		add(new JPopupMenu.Separator());
 //
@@ -152,13 +152,13 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		return Optional.ofNullable(bytes).orElse(new byte[] {});
 	}
 
-	public void addIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
-		this.isteContextMenuFactories.addAll(isteContextMenuFactories);
+	public void addIsteRepeaterContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		this.isteRepeaterContextMenuFactories.addAll(isteContextMenuFactories);
 		refresh();
 	}
 
-	public void removeIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
-		this.isteContextMenuFactories.removeAll(isteContextMenuFactories);
+	public void removeIsteRepeaterContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		this.isteRepeaterContextMenuFactories.removeAll(isteContextMenuFactories);
 		refresh();
 	}
 

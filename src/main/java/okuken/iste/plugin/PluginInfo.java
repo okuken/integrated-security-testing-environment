@@ -13,6 +13,7 @@ public class PluginInfo {
 
 	private String pluginName;
 	private List<IIsteContextMenuFactory> isteContextMenuFactories;
+	private List<IIsteContextMenuFactory> isteRepeaterContextMenuFactories;
 	private List<IIstePluginTab> pluginTabs;
 
 	public PluginInfo(PluginLoadInfo loadInfo) {
@@ -42,6 +43,13 @@ public class PluginInfo {
 	}
 	public void setIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
 		this.isteContextMenuFactories = isteContextMenuFactories;
+	}
+	public List<IIsteContextMenuFactory> getIsteRepeaterContextMenuFactories() {
+		return isteRepeaterContextMenuFactories;
+	}
+	public void setIsteRepeaterContextMenuFactories(
+			List<IIsteContextMenuFactory> isteRepeaterContextMenuFactories) {
+		this.isteRepeaterContextMenuFactories = isteRepeaterContextMenuFactories;
 	}
 	public List<IIstePluginTab> getPluginTabs() {
 		return pluginTabs;

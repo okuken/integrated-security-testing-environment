@@ -2,10 +2,13 @@ package okuken.iste.plugin;
 
 import java.io.OutputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.controller.Controller;
 import okuken.iste.plugin.api.IIsteContextMenuFactory;
+import okuken.iste.plugin.api.IIsteImportMessage;
 import okuken.iste.plugin.api.IIstePluginCallbacks;
 import okuken.iste.plugin.api.IIstePluginTab;
 import okuken.iste.util.BurpUtil;
@@ -14,6 +17,7 @@ class PluginCallbacks implements IIstePluginCallbacks {
 
 	private String pluginName;
 	private List<IIsteContextMenuFactory> isteContextMenuFactories = Lists.newArrayList();
+	private List<IIsteContextMenuFactory> isteRepeaterContextMenuFactories = Lists.newArrayList();
 	private List<IIstePluginTab> pluginTabs = Lists.newArrayList();
 
 	String getPluginName() {
@@ -21,6 +25,9 @@ class PluginCallbacks implements IIstePluginCallbacks {
 	}
 	List<IIsteContextMenuFactory> getIsteContextMenuFactories() {
 		return isteContextMenuFactories;
+	}
+	List<IIsteContextMenuFactory> getIsteRepeaterContextMenuFactories() {
+		return isteRepeaterContextMenuFactories;
 	}
 	List<IIstePluginTab> getPluginTabs() {
 		return pluginTabs;
@@ -32,23 +39,36 @@ class PluginCallbacks implements IIstePluginCallbacks {
 	}
 
 	@Override
+	public void addIstePluginTab(IIstePluginTab tab) {
+		pluginTabs.add(tab);
+	}
+	@Override
+	public void removeIstePluginTab(IIstePluginTab tab) {
+		pluginTabs.remove(tab);
+	}
+
+	@Override
 	public void registerIsteContextMenuFactory(IIsteContextMenuFactory factory) {
 		isteContextMenuFactories.add(factory);
 	}
-
 	@Override
 	public void removeIsteContextMenuFactory(IIsteContextMenuFactory factory) {
 		isteContextMenuFactories.remove(factory);
 	}
 
 	@Override
-	public void addIstePluginTab(IIstePluginTab tab) {
-		pluginTabs.add(tab);
+	public void registerIsteRepeaterContextMenuFactory(IIsteContextMenuFactory factory) {
+		isteRepeaterContextMenuFactories.add(factory);
+	}
+	@Override
+	public void removeIsteRepeaterContextMenuFactory(IIsteContextMenuFactory factory) {
+		isteRepeaterContextMenuFactories.remove(factory);
 	}
 
 	@Override
-	public void removeIstePluginTab(IIstePluginTab tab) {
-		pluginTabs.remove(tab);
+	public void importIsteMessages(List<IIsteImportMessage> importMessages) {
+		Controller.getInstance().addMessages(
+				importMessages.stream().map(PluginHelper::convertIsteImportMessageToMessageDto).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -56,7 +76,6 @@ class PluginCallbacks implements IIstePluginCallbacks {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public String loadIstePluginProjectOption(String name) {
 		// TODO Auto-generated method stub
@@ -68,7 +87,6 @@ class PluginCallbacks implements IIstePluginCallbacks {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public String loadIstePluginUserOption(String name) {
 		// TODO Auto-generated method stub
@@ -79,7 +97,6 @@ class PluginCallbacks implements IIstePluginCallbacks {
 	public OutputStream getStdout() {
 		return BurpUtil.getCallbacks().getStdout();
 	}
-
 	@Override
 	public OutputStream getStderr() {
 		return BurpUtil.getCallbacks().getStderr();

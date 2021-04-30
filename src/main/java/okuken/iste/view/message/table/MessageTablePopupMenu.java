@@ -13,7 +13,7 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.TemplateLogic;
-import okuken.iste.plugin.IsteContextMenuInvocation;
+import okuken.iste.plugin.PluginHelper;
 import okuken.iste.plugin.api.IIsteContextMenuFactory;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
@@ -151,7 +151,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 			add(new JPopupMenu.Separator());
 
 			isteContextMenuFactories.forEach(isteContextMenuFactory -> {
-				isteContextMenuFactory.createMenuItems(new IsteContextMenuInvocation()).forEach(this::add);
+				PluginHelper.createJMenuItems(isteContextMenuFactory).forEach(this::add);
 			});
 		}
 

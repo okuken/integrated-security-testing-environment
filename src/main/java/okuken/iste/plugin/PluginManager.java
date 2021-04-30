@@ -71,10 +71,12 @@ public class PluginManager {
 
 			ret.setPluginName(Optional.ofNullable(pluginCallbacks.getPluginName()).orElse(""));
 			ret.setIsteContextMenuFactories(pluginCallbacks.getIsteContextMenuFactories());
+			ret.setIsteRepeaterContextMenuFactories(pluginCallbacks.getIsteRepeaterContextMenuFactories());
 			ret.setPluginTabs(pluginCallbacks.getPluginTabs());
 
 			Controller.getInstance().addPluginTabs(ret.getPluginTabs());
 			Controller.getInstance().addIsteContextMenuFactories(ret.getIsteContextMenuFactories());
+			Controller.getInstance().addIsteRepeaterContextMenuFactories(ret.getIsteRepeaterContextMenuFactories());
 
 			ret.getLoadInfo().setLoaded(true);
 			loadedPluginInfos.add(ret);
@@ -101,6 +103,9 @@ public class PluginManager {
 	}
 
 	private void unloadImpl(PluginInfo pluginInfo) {
+		if(pluginInfo.getIsteRepeaterContextMenuFactories() != null) {
+			Controller.getInstance().removeIsteRepeaterContextMenuFactories(pluginInfo.getIsteRepeaterContextMenuFactories());
+		}
 		if(pluginInfo.getIsteContextMenuFactories() != null) {
 			Controller.getInstance().removeIsteContextMenuFactories(pluginInfo.getIsteContextMenuFactories());
 		}
