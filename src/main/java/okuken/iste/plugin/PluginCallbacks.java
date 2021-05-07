@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Lists;
 
 import okuken.iste.controller.Controller;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.plugin.api.IIsteContextMenuFactory;
 import okuken.iste.plugin.api.IIsteImportMessage;
 import okuken.iste.plugin.api.IIstePluginCallbacks;
@@ -73,13 +74,11 @@ class PluginCallbacks implements IIstePluginCallbacks {
 
 	@Override
 	public void saveIstePluginProjectOption(String name, String value) {
-		// TODO Auto-generated method stub
-		
+		ConfigLogic.getInstance().savePluginProjectOption(pluginName, name, value);
 	}
 	@Override
 	public String loadIstePluginProjectOption(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return ConfigLogic.getInstance().getPluginProjectOption(pluginName, name);
 	}
 
 	@Override

@@ -89,6 +89,16 @@ public class PluginManager {
 		}
 	}
 
+	public void invokeProjectChanged() {
+		loadedPluginInfos.forEach(pluginInfo -> {
+			try {
+				pluginInfo.getPlugin().projectChanged();
+			} catch (Exception e) {
+				BurpUtil.printStderr(e);
+			}
+		});
+	}
+
 	public void unload(PluginInfo pluginInfo) {
 		pluginInfo.getLoadInfo().setLoaded(false);
 

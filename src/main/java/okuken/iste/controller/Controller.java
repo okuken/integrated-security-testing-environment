@@ -491,6 +491,8 @@ public class Controller {
 		refreshComponentsDependOnProjectName();
 		ConfigLogic.getInstance().resetProjectOptionsDto();
 		reloadDatabase();
+
+		PluginManager.getInstance().invokeProjectChanged();
 	}
 	private void reloadDatabase() {
 		this.messageTableModel.clearRows();
