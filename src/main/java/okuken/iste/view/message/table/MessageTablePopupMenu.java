@@ -5,21 +5,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import com.google.common.collect.Lists;
-
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.TemplateLogic;
-import okuken.iste.plugin.PluginHelper;
-import okuken.iste.plugin.api.IIsteContextMenuFactory;
+import okuken.iste.plugin.PluginPopupMenuListener;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,13 +25,17 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<IIsteContextMenuFactory> isteContextMenuFactories = Lists.newArrayList();
-
 	private JPanel parentPanel;
+
+	private PluginPopupMenuListener pluginPopupMenuListener;
+	private JPopupMenu.Separator pluginMenuItemsStartSeparator;
 
 	public MessageTablePopupMenu(JPanel parentPanel) {
 		this.parentPanel = parentPanel;
 		init();
+
+		pluginPopupMenuListener = new PluginPopupMenuListener(this, pluginMenuItemsStartSeparator);
+		addPopupMenuListener(pluginPopupMenuListener);
 	}
 
 	private void init() {
@@ -146,14 +146,8 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		});
 		add(sendToComparerResponseMenuItem);
 
-		if(!isteContextMenuFactories.isEmpty()) {
-
-			add(new JPopupMenu.Separator());
-
-			isteContextMenuFactories.forEach(isteContextMenuFactory -> {
-				PluginHelper.createJMenuItems(isteContextMenuFactory).forEach(this::add);
-			});
-		}
+		pluginMenuItemsStartSeparator = new JPopupMenu.Separator();
+		add(pluginMenuItemsStartSeparator);
 
 		add(new JPopupMenu.Separator());
 
@@ -227,14 +221,8 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		init();
 	}
 
-	public void addIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
-		this.isteContextMenuFactories.addAll(isteContextMenuFactories);
-		refresh();
-	}
-
-	public void removeIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
-		this.isteContextMenuFactories.removeAll(isteContextMenuFactories);
-		refresh();
+	public PluginPopupMenuListener getPluginPopupMenuListener() {
+		return pluginPopupMenuListener;
 	}
 
 }

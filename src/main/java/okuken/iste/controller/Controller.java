@@ -421,17 +421,17 @@ public class Controller {
 	}
 
 	public void addIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
-		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).addIsteContextMenuFactories(isteContextMenuFactories);
+		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).getPluginPopupMenuListener().addIsteContextMenuFactories(isteContextMenuFactories);
 	}
 	public void removeIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
-		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).removeIsteContextMenuFactories(isteContextMenuFactories);
+		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).getPluginPopupMenuListener().removeIsteContextMenuFactories(isteContextMenuFactories);
 	}
 
 	public void addIsteRepeaterContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
-		repeatTablePopupMenu.addIsteRepeaterContextMenuFactories(isteContextMenuFactories);
+		repeatTablePopupMenu.getPluginPopupMenuListener().addIsteContextMenuFactories(isteContextMenuFactories);
 	}
 	public void removeIsteRepeaterContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
-		repeatTablePopupMenu.removeIsteRepeaterContextMenuFactories(isteContextMenuFactories);
+		repeatTablePopupMenu.getPluginPopupMenuListener().removeIsteContextMenuFactories(isteContextMenuFactories);
 	}
 
 	public void addPluginTabs(List<IIstePluginTab> pluginTabs) {
