@@ -9,6 +9,7 @@ import okuken.iste.plugin.api.IIstePluginTab;
 public class PluginInfo {
 
 	private PluginLoadInfo loadInfo;
+	private boolean fromClasspath;
 	private IIstePlugin plugin;
 
 	private String pluginName;
@@ -25,6 +26,12 @@ public class PluginInfo {
 	}
 	public void setLoadInfo(PluginLoadInfo pluginLoadInfo) {
 		this.loadInfo = pluginLoadInfo;
+	}
+	public boolean isFromClasspath() {
+		return fromClasspath;
+	}
+	public void setFromClasspath(boolean fromClasspath) {
+		this.fromClasspath = fromClasspath;
 	}
 	public IIstePlugin getPlugin() {
 		return plugin;

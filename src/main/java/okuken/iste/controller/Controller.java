@@ -416,6 +416,9 @@ public class Controller {
 	public PluginInfo loadPlugin(String pluginJarFilePath) {
 		return PluginManager.getInstance().load(pluginJarFilePath);
 	}
+	public PluginInfo loadPluginFromClasspath() {
+		return PluginManager.getInstance().loadFromClasspath();
+	}
 	public void unloadPlugin(PluginInfo pluginInfo) {
 		PluginManager.getInstance().unload(pluginInfo);
 	}

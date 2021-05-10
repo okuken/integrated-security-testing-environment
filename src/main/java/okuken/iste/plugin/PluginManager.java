@@ -65,6 +65,32 @@ public class PluginManager {
 		}
 		ret.setPlugin(plugin);
 
+		return loadImpl(plugin, ret);
+	}
+
+	/**
+	 * for debugging plugin
+	 */
+	public PluginInfo loadFromClasspath() {
+		try {
+			var pluginClass = Class.forName(PLUGIN_CLASS_NAME);
+			var plugin = (IIstePlugin)pluginClass.getDeclaredConstructor().newInstance();
+
+			var ret = new PluginInfo(new PluginLoadInfo("", false));
+			ret.setFromClasspath(true);
+			ret.setPlugin(plugin);
+
+			return loadImpl(plugin, ret);
+
+		} catch (ClassNotFoundException e) {
+			return null; // general case
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			return null;
+		}
+	}
+
+	private PluginInfo loadImpl(IIstePlugin plugin, PluginInfo ret) {
 		try {
 			var pluginCallbacks = new PluginCallbacks();
 			plugin.registerCallbacks(pluginCallbacks);
@@ -109,6 +135,9 @@ public class PluginManager {
 		}
 		loadedPluginInfos.remove(pluginInfo);
 
+		if(pluginInfo.isFromClasspath()) {
+			return;
+		}
 		closeClassLoader(pluginInfo.getLoadInfo().getJarFilePath());
 	}
 

@@ -37,12 +37,16 @@ public class PluginsPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JTextField jarFilePathTextField;
+	private JButton jarFileChooseButton;
+	private JButton addButton;
 
 	private JTabbedPane tabbedPane;
 	private JTable table;
 	private DefaultTableModel tableModel;
 
 	private List<PluginInfo> pluginInfos = Lists.newArrayList();
+
+	private boolean existPluginInClasspath;
 
 	@SuppressWarnings("serial")
 	public PluginsPanel() {
@@ -64,10 +68,10 @@ public class PluginsPanel extends JPanel {
 		configHeaderPanel.add(jarFilePathTextField);
 		jarFilePathTextField.setColumns(30);
 		
-		JButton jarFileChooseButton = new JButton(Captions.FILECHOOSER);
+		jarFileChooseButton = new JButton(Captions.FILECHOOSER);
 		configHeaderPanel.add(jarFileChooseButton);
 		
-		JButton addButton = new JButton(Captions.PLUGINS_BUTTON_ADD_PLUGIN);
+		addButton = new JButton(Captions.PLUGINS_BUTTON_ADD_PLUGIN);
 		configHeaderPanel.add(addButton);
 		
 		JScrollPane pluginTableScrollPane = new JScrollPane();
@@ -152,13 +156,27 @@ public class PluginsPanel extends JPanel {
 		} else {
 			pluginInfo = new PluginInfo(new PluginLoadInfo(jarFilePath, load));
 		}
+		addPluginInfo(pluginInfo);
+	}
+
+	private void addPluginInfo(PluginInfo pluginInfo) {
 		pluginInfos.add(pluginInfo);
 		tableModel.addRow(convertPluginInfoToObjectArray(pluginInfo));
 	}
 
+	private boolean addPluginFromClasspath() {
+		var pluginInfo = Controller.getInstance().loadPluginFromClasspath();
+		if(pluginInfo == null) {
+			return false;
+		}
+
+		addPluginInfo(pluginInfo);
+		return true;
+	}
+
 	private void loadOrUnloadPlugin(int pluginIndex, boolean load) {
 		if(load) {
-			var newPluginInfo = Controller.getInstance().loadPlugin(pluginInfos.get(pluginIndex).getLoadInfo().getJarFilePath());
+			var newPluginInfo = loadPluginImpl(pluginInfos.get(pluginIndex));
 
 			pluginInfos.remove(pluginIndex);
 			pluginInfos.add(pluginIndex, newPluginInfo);
@@ -175,16 +193,31 @@ public class PluginsPanel extends JPanel {
 
 		saveAsUserOption();
 	}
+	private PluginInfo loadPluginImpl(PluginInfo pluginInfo) {
+		if(pluginInfo.isFromClasspath()) {
+			return Controller.getInstance().loadPluginFromClasspath();
+		}
+		return Controller.getInstance().loadPlugin(pluginInfo.getLoadInfo().getJarFilePath());
+	}
 
 	private Object[] convertPluginInfoToObjectArray(PluginInfo pluginInfo) {
 		return new Object[] {pluginInfo.getLoadInfo().isLoaded(), pluginInfo.getPluginName(), pluginInfo.getLoadInfo().getJarFilePath()};
 	}
 
 	private void saveAsUserOption() {
-		ConfigLogic.getInstance().savePlugins(pluginInfos.stream().map(PluginInfo::getLoadInfo).collect(Collectors.toList()));
+		if(existPluginInClasspath) {
+			return;
+		}
+		ConfigLogic.getInstance().savePlugins(pluginInfos.stream().filter(pluginInfo -> !pluginInfo.isFromClasspath()).map(PluginInfo::getLoadInfo).collect(Collectors.toList()));
 	}
 
 	public void loadUserOption() {
+		existPluginInClasspath = addPluginFromClasspath();
+		if(existPluginInClasspath) {
+			disableControls();
+			return;
+		}
+
 		var pluginLoadInfos = ConfigLogic.getInstance().getUserOptions().getPlugins();
 		if(pluginLoadInfos == null) {
 			return;
@@ -193,6 +226,12 @@ public class PluginsPanel extends JPanel {
 		pluginLoadInfos.stream().forEach(pluginLoafInfo -> {
 			addPluginImpl(pluginLoafInfo.getJarFilePath(), pluginLoafInfo.isLoaded());
 		});
+	}
+
+	private void disableControls() {
+		jarFilePathTextField.setEnabled(false);
+		jarFileChooseButton.setEnabled(false);
+		addButton.setEnabled(false);
 	}
 
 	public void addPluginTabs(List<IIstePluginTab> pluginTabs) {
