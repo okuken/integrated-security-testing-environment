@@ -6,7 +6,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
 
-version '0.2.0'
+version '0.3.0'
 
 shadowJar{
   archiveName = "iste-${version}.${extension}"
@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     compileOnly 'net.portswigger.burp.extender:burp-extender-api:2.1'
-    testRuntimeOnly files('C:\\Program Files\\BurpSuitePro\\burpsuite_pro.jar') // set your local path to burpsuite jar
+    testRuntimeOnly files(System.getProperty("user.home") + '\\AppData\\Local\\Programs\\BurpSuitePro\\burpsuite_pro.jar') // set your local path to burpsuite jar
 
     implementation files('../iste-plugin-api/build/libs/iste-plugin-api-0.1.0.jar') // https://github.com/okuken/iste-plugin-api
 
