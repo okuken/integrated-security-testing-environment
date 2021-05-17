@@ -11,6 +11,7 @@ import okuken.iste.logic.ConfigLogic;
 import okuken.iste.plugin.api.IIsteContextMenuFactory;
 import okuken.iste.plugin.api.IIsteImportMessage;
 import okuken.iste.plugin.api.IIstePluginCallbacks;
+import okuken.iste.plugin.api.IIstePluginHelpers;
 import okuken.iste.plugin.api.IIstePluginTab;
 import okuken.iste.util.BurpUtil;
 
@@ -69,7 +70,7 @@ class PluginCallbacks implements IIstePluginCallbacks {
 	@Override
 	public void importIsteMessages(List<IIsteImportMessage> importMessages) {
 		Controller.getInstance().addMessages(
-				importMessages.stream().map(PluginHelper::convertIsteImportMessageToMessageDto).collect(Collectors.toList()));
+				importMessages.stream().map(PluginUtil::convertIsteImportMessageToMessageDto).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -83,13 +84,11 @@ class PluginCallbacks implements IIstePluginCallbacks {
 
 	@Override
 	public void saveIstePluginUserOption(String name, String value) {
-		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException("not implemented yet");
 	}
 	@Override
 	public String loadIstePluginUserOption(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("not implemented yet");
 	}
 
 	@Override
@@ -99,6 +98,11 @@ class PluginCallbacks implements IIstePluginCallbacks {
 	@Override
 	public OutputStream getStderr() {
 		return BurpUtil.getCallbacks().getStderr();
+	}
+
+	@Override
+	public IIstePluginHelpers getHelpers() {
+		return PluginHelpers.getInstance();
 	}
 
 }

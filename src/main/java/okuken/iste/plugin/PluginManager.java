@@ -5,15 +5,20 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import okuken.iste.controller.Controller;
 import okuken.iste.plugin.api.IIstePlugin;
+import okuken.iste.plugin.api.IIstePluginTab;
 import okuken.iste.util.BurpUtil;
 
 public class PluginManager {
@@ -100,6 +105,14 @@ public class PluginManager {
 			ret.setIsteRepeaterContextMenuFactories(pluginCallbacks.getIsteRepeaterContextMenuFactories());
 			ret.setPluginTabs(pluginCallbacks.getPluginTabs());
 
+			var validationErrorMessages = validatePlugin(ret);
+			if(!validationErrorMessages.isEmpty()) {
+				BurpUtil.printStderr("Plugin validation error: ");
+				validationErrorMessages.stream().map(msg -> " - " + msg).forEach(BurpUtil::printStderr);
+				closeClassLoader(ret);
+				return ret;
+			}
+
 			Controller.getInstance().addPluginTabs(ret.getPluginTabs());
 			Controller.getInstance().addIsteContextMenuFactories(ret.getIsteContextMenuFactories());
 			Controller.getInstance().addIsteRepeaterContextMenuFactories(ret.getIsteRepeaterContextMenuFactories());
@@ -113,6 +126,34 @@ public class PluginManager {
 			unload(ret);
 			return ret;
 		}
+	}
+	private List<String> validatePlugin(PluginInfo pluginInfo) {
+		List<String> ret = Lists.newArrayList();
+
+		var pluginName = pluginInfo.getPluginName();
+		if(StringUtils.isBlank(pluginName)) {
+			ret.add("require plugin name");
+		} else if(loadedPluginInfos.stream().filter(loaded -> pluginName.equals(loaded.getPluginName())).findAny().isPresent()) {
+			ret.add("duplicated plugin name: " + pluginName);
+		}
+
+		pluginInfo.getPluginTabs().forEach(pluginTab -> {
+			var pluginTabCaption = pluginTab.getTabCaption();
+			if(StringUtils.isBlank(pluginTabCaption)) {
+				ret.add("require plugin tab caption");
+			} else if(loadedPluginInfos.stream().filter(loaded ->
+						loaded.getPluginTabs().stream().filter(loadedTab ->
+							loadedTab.getTabCaption().equals(pluginTabCaption)).findAny().isPresent()).findAny().isPresent()) {
+
+				ret.add("duplicated plugin tab caption: " + pluginTabCaption);
+			}
+		});
+		var tabCaptions = pluginInfo.getPluginTabs().stream().map(IIstePluginTab::getTabCaption).collect(Collectors.toList());
+		if(tabCaptions.size() != new HashSet<>(tabCaptions).size()) {
+			ret.add("duplicated plugin tab caption");
+		}
+
+		return ret;
 	}
 
 	public void invokeProjectChanged() {
@@ -135,10 +176,7 @@ public class PluginManager {
 		}
 		loadedPluginInfos.remove(pluginInfo);
 
-		if(pluginInfo.isFromClasspath()) {
-			return;
-		}
-		closeClassLoader(pluginInfo.getLoadInfo().getJarFilePath());
+		closeClassLoader(pluginInfo);
 	}
 
 	private void unloadImpl(PluginInfo pluginInfo) {
@@ -153,6 +191,13 @@ public class PluginManager {
 		}
 
 		pluginInfo.getPlugin().unloaded();
+	}
+
+	private void closeClassLoader(PluginInfo pluginInfo) {
+		if(pluginInfo.isFromClasspath()) {
+			return;
+		}
+		closeClassLoader(pluginInfo.getLoadInfo().getJarFilePath());
 	}
 
 	private void closeClassLoader(String key) {

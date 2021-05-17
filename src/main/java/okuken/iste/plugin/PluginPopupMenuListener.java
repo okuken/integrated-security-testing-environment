@@ -33,7 +33,7 @@ public class PluginPopupMenuListener implements PopupMenuListener {
 			return;
 		}
 
-		pluginMenuItems = isteContextMenuFactories.stream().flatMap(factory -> PluginHelper.createJMenuItems(factory).stream()).collect(Collectors.toList());
+		pluginMenuItems = isteContextMenuFactories.stream().flatMap(factory -> PluginUtil.createJMenuItems(factory).stream()).collect(Collectors.toList());
 		if(pluginMenuItems.isEmpty()) {
 			pluginMenuItemsStartSeparator.setVisible(false);
 			return;

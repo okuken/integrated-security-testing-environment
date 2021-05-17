@@ -1,6 +1,7 @@
 package okuken.iste.view.plugin;
 
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -18,8 +19,11 @@ import okuken.iste.util.UiUtil;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
 
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
@@ -39,6 +43,7 @@ public class PluginsPanel extends JPanel {
 	private JTextField jarFilePathTextField;
 	private JButton jarFileChooseButton;
 	private JButton addButton;
+	private JPopupMenu popupMenu;
 
 	private JTabbedPane tabbedPane;
 	private JTable table;
@@ -114,6 +119,10 @@ public class PluginsPanel extends JPanel {
 		table.getColumnModel().getColumn(0).setPreferredWidth(50);
 		table.getColumnModel().getColumn(1).setPreferredWidth(100);
 		table.getColumnModel().getColumn(2).setPreferredWidth(300);
+		
+		popupMenu = createPopupMenu();
+		table.setComponentPopupMenu(popupMenu);
+		
 		pluginTableScrollPane.setViewportView(table);
 		
 		UiUtil.setupCtrlCAsCopyCell(table);
@@ -137,6 +146,18 @@ public class PluginsPanel extends JPanel {
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		splitPane.setRightComponent(tabbedPane);
 
+	}
+
+	private JPopupMenu createPopupMenu() {
+		var menu = new JPopupMenu();
+		var menuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_DELETE_ITEM);
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				removeSelectedPlugins();
+			}
+		});
+		menu.add(menuItem);
+		return menu;
 	}
 
 	private void addPlugin(String jarFilePath) {
@@ -174,6 +195,25 @@ public class PluginsPanel extends JPanel {
 		return true;
 	}
 
+	private void removeSelectedPlugins() {
+		var selectedRowIndexs = Arrays.stream(table.getSelectedRows()).mapToObj(Integer::valueOf).collect(Collectors.toList());
+		Collections.reverse(selectedRowIndexs);
+
+		for(var rowIndex: selectedRowIndexs) {
+			if(pluginInfos.get(rowIndex).getLoadInfo().isLoaded()) {
+				loadOrUnloadPlugin(rowIndex, false);
+			}
+			removePluginInfo(rowIndex);
+		}
+
+		saveAsUserOption();
+	}
+
+	private void removePluginInfo(int index) {
+		pluginInfos.remove(index);
+		tableModel.removeRow(index);
+	}
+
 	private void loadOrUnloadPlugin(int pluginIndex, boolean load) {
 		if(load) {
 			var newPluginInfo = loadPluginImpl(pluginInfos.get(pluginIndex));
@@ -201,7 +241,10 @@ public class PluginsPanel extends JPanel {
 	}
 
 	private Object[] convertPluginInfoToObjectArray(PluginInfo pluginInfo) {
-		return new Object[] {pluginInfo.getLoadInfo().isLoaded(), pluginInfo.getPluginName(), pluginInfo.getLoadInfo().getJarFilePath()};
+		return new Object[] {
+				pluginInfo.getLoadInfo().isLoaded(),
+				pluginInfo.getPluginName(),
+				pluginInfo.isFromClasspath() ? Captions.PLUGINS_LOAD_FROM_CLASSPATH : pluginInfo.getLoadInfo().getJarFilePath()};
 	}
 
 	private void saveAsUserOption() {
@@ -232,6 +275,7 @@ public class PluginsPanel extends JPanel {
 		jarFilePathTextField.setEnabled(false);
 		jarFileChooseButton.setEnabled(false);
 		addButton.setEnabled(false);
+		Arrays.stream(popupMenu.getComponents()).forEach(c -> c.setEnabled(false));
 	}
 
 	public void addPluginTabs(List<IIstePluginTab> pluginTabs) {

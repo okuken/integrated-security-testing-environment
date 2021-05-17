@@ -173,6 +173,7 @@ public class Captions {
 	public static final String USER_OPTIONS_DB_FILE_BUTTON_SAVE = "Save & Load";
 
 	public static final String PLUGINS_BUTTON_ADD_PLUGIN = "Add";
+	public static final String PLUGINS_LOAD_FROM_CLASSPATH = "CLASSPATH";
 
 	public static final String SELECT_PROJECT_NEW = "** Create new project **";
 

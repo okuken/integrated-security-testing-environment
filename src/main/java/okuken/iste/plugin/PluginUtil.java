@@ -37,7 +37,7 @@ import okuken.iste.plugin.dto.IsteMessageAnalyzedInfo;
 import okuken.iste.plugin.dto.IsteMessageNotes;
 import okuken.iste.plugin.dto.IsteRepeatInfo;
 
-public class PluginHelper {
+public class PluginUtil {
 
 	public static List<JMenuItem> createJMenuItems(IIsteContextMenuFactory factory) {
 		List<JMenuItem> ret = Lists.newArrayList();
@@ -75,7 +75,7 @@ public class PluginHelper {
 				public void actionPerformed(ActionEvent e) {
 					isteContextMenuItem.invoke(
 							Controller.getInstance().getSelectedMessages().stream()
-								.map(PluginHelper::convertMessageDtoToIsteExportMessage)
+								.map(PluginUtil::convertMessageDtoToIsteExportMessage)
 								.collect(Collectors.toList()));
 				}
 			});
