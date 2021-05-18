@@ -1,5 +1,6 @@
 package okuken.iste.util;
 
+import java.awt.Color;
 import java.awt.Frame;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -11,6 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
 import burp.IBurpExtenderCallbacks;
@@ -64,7 +66,7 @@ public class BurpUtil {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				parentTabbedPane.setBackgroundAt(indexOf(suiteTab, parentTabbedPane), Colors.CHARACTER_NORMAL);
+				parentTabbedPane.setBackgroundAt(indexOf(suiteTab, parentTabbedPane), getDefaultForegroundColor());
 			}
 		}, 5000);
 	}
@@ -75,6 +77,12 @@ public class BurpUtil {
 			}
 		}
 		throw new IllegalStateException();
+	}
+
+	public static Color getDefaultForegroundColor() {
+		var dummyUiComponent = new JLabel("dummy");
+		burpExtenderCallbacks.customizeUiComponent(dummyUiComponent);
+		return dummyUiComponent.getForeground();
 	}
 
 	public static JFrame getBurpSuiteJFrame() {

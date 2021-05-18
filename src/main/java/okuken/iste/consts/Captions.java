@@ -171,6 +171,8 @@ public class Captions {
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";
 	public static final String USER_OPTIONS_DB_FILE_BUTTON_SAVE = "Save & Load";
+	public static final String USER_OPTIONS_THEME = "Theme";
+	public static final String USER_OPTIONS_THEME_EXPLANATION = "* If you have selected the Dark theme in \"User options > Display > User Interface > Theme\", set the Dark theme here as well.";
 
 	public static final String PLUGINS_BUTTON_ADD_PLUGIN = "Add";
 	public static final String PLUGINS_LOAD_FROM_CLASSPATH = "CLASSPATH";

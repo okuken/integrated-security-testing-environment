@@ -25,6 +25,7 @@ public class ConfigLogic {
 
 	private static final String CONFIG_KEY_USER_NAME = "userName";
 	private static final String CONFIG_KEY_DB_FILE_PATH = "dbFilePath";
+	private static final String CONFIG_KEY_DARK_THEME = "darkTheme";
 	private static final String CONFIG_KEY_LAST_SELECTED_PROJECT_NAME = "lastSelectedProjectName";
 	private static final String CONFIG_KEY_PLUGINS = "plugins";
 	private static final String CONFIG_KEY_MESSAGE_MEMO_TEMPLATE = "messageMemoTemplate";
@@ -53,6 +54,7 @@ public class ConfigLogic {
 		ret.setUserName(Optional.ofNullable(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_USER_NAME))
 				.orElse(System.getProperty("user.name")));
 		ret.setDbFilePath(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_DB_FILE_PATH));
+		ret.setDarkTheme(Boolean.valueOf(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_DARK_THEME)));
 		ret.setLastSelectedProjectName(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME));
 
 		PluginLoadInfo[] pluginLoadInfos = loadUserOptionJson(CONFIG_KEY_PLUGINS, PluginLoadInfo[].class);
@@ -89,6 +91,11 @@ public class ConfigLogic {
 	public void saveDbFilePath(String dbFilePath) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_DB_FILE_PATH, dbFilePath);
 		getUserOptions().setDbFilePath(dbFilePath);
+	}
+
+	public void saveDarkTheme(boolean darkTheme) {
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_DARK_THEME, Boolean.toString(darkTheme));
+		getUserOptions().setDarkTheme(darkTheme);
 	}
 
 	public void saveLastSelectedProjectName(String projectName) {

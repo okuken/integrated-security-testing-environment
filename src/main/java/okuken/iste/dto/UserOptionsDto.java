@@ -9,6 +9,7 @@ public class UserOptionsDto {
 
 	private String userName;
 	private String dbFilePath;
+	private boolean darkTheme;
 	private String lastSelectedProjectName;
 	private List<PluginLoadInfo> plugins;
 	private String messageMemoTemplate;
@@ -26,6 +27,12 @@ public class UserOptionsDto {
 	}
 	public void setDbFilePath(String dbFilePath) {
 		this.dbFilePath = dbFilePath;
+	}
+	public boolean isDarkTheme() {
+		return darkTheme;
+	}
+	public void setDarkTheme(boolean darkTheme) {
+		this.darkTheme = darkTheme;
 	}
 	public String getLastSelectedProjectName() {
 		return lastSelectedProjectName;
