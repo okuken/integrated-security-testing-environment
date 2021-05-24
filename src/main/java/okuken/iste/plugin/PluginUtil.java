@@ -36,15 +36,26 @@ import okuken.iste.plugin.dto.IsteMessage;
 import okuken.iste.plugin.dto.IsteMessageAnalyzedInfo;
 import okuken.iste.plugin.dto.IsteMessageNotes;
 import okuken.iste.plugin.dto.IsteRepeatInfo;
+import okuken.iste.util.BurpUtil;
 
 public class PluginUtil {
 
 	public static List<JMenuItem> createJMenuItems(IIsteContextMenuFactory factory) {
 		List<JMenuItem> ret = Lists.newArrayList();
-		factory.createContextMenu().forEach(isteContextMenuNode -> {
-			ret.add(createJMenuItemsImpl(isteContextMenuNode));
-		});
-		return ret;
+		try {
+			var contextMenu = factory.createContextMenu();
+			if(contextMenu == null) {
+				return ret;
+			}
+	
+			contextMenu.forEach(isteContextMenuNode -> {
+				ret.add(createJMenuItemsImpl(isteContextMenuNode));
+			});
+			return ret;
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			return ret;
+		}
 	}
 
 	private static JMenuItem createJMenuItemsImpl(IIsteContextMenuNode node) {
