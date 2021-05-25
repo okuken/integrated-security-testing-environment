@@ -2,20 +2,21 @@ package okuken.iste.plugin;
 
 import java.util.List;
 
-import burp.IContextMenuFactory;
-import burp.IExtensionStateListener;
-import burp.ITab;
+import okuken.iste.plugin.api.IIsteContextMenuFactory;
+import okuken.iste.plugin.api.IIstePlugin;
+import okuken.iste.plugin.api.IIstePluginTab;
 
 public class PluginInfo {
 
 	private PluginLoadInfo loadInfo;
+	private boolean fromClasspath;
+	private IIstePlugin plugin;
 
 	private String pluginName;
-	private List<IContextMenuFactory> pluginContextMenuFactories;
-	private List<ITab> pluginTabs;
-	private IExtensionStateListener pluginStateListener;
+	private List<IIsteContextMenuFactory> isteContextMenuFactories;
+	private List<IIsteContextMenuFactory> isteRepeaterContextMenuFactories;
+	private List<IIstePluginTab> pluginTabs;
 
-	public PluginInfo() {}
 	public PluginInfo(PluginLoadInfo loadInfo) {
 		this.loadInfo = loadInfo;
 	}
@@ -26,29 +27,42 @@ public class PluginInfo {
 	public void setLoadInfo(PluginLoadInfo pluginLoadInfo) {
 		this.loadInfo = pluginLoadInfo;
 	}
+	public boolean isFromClasspath() {
+		return fromClasspath;
+	}
+	public void setFromClasspath(boolean fromClasspath) {
+		this.fromClasspath = fromClasspath;
+	}
+	public IIstePlugin getPlugin() {
+		return plugin;
+	}
+	public void setPlugin(IIstePlugin plugin) {
+		this.plugin = plugin;
+	}
 	public String getPluginName() {
 		return pluginName;
 	}
 	public void setPluginName(String pluginName) {
 		this.pluginName = pluginName;
 	}
-	public List<IContextMenuFactory> getPluginContextMenuFactories() {
-		return pluginContextMenuFactories;
+	public List<IIsteContextMenuFactory> getIsteContextMenuFactories() {
+		return isteContextMenuFactories;
 	}
-	public void setPluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
-		this.pluginContextMenuFactories = pluginContextMenuFactories;
+	public void setIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		this.isteContextMenuFactories = isteContextMenuFactories;
 	}
-	public List<ITab> getPluginTabs() {
+	public List<IIsteContextMenuFactory> getIsteRepeaterContextMenuFactories() {
+		return isteRepeaterContextMenuFactories;
+	}
+	public void setIsteRepeaterContextMenuFactories(
+			List<IIsteContextMenuFactory> isteRepeaterContextMenuFactories) {
+		this.isteRepeaterContextMenuFactories = isteRepeaterContextMenuFactories;
+	}
+	public List<IIstePluginTab> getPluginTabs() {
 		return pluginTabs;
 	}
-	public void setPluginTabs(List<ITab> pluginTabs) {
+	public void setPluginTabs(List<IIstePluginTab> pluginTabs) {
 		this.pluginTabs = pluginTabs;
-	}
-	public IExtensionStateListener getPluginStateListener() {
-		return pluginStateListener;
-	}
-	public void setPluginStateListener(IExtensionStateListener pluginStateListener) {
-		this.pluginStateListener = pluginStateListener;
 	}
 
 }

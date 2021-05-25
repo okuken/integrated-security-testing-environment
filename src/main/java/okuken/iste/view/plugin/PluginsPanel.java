@@ -1,25 +1,29 @@
 package okuken.iste.view.plugin;
 
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
 import javax.swing.JTextField;
 
-import burp.ITab;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.plugin.PluginInfo;
 import okuken.iste.plugin.PluginLoadInfo;
+import okuken.iste.plugin.api.IIstePluginTab;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
 
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
@@ -28,17 +32,26 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 public class PluginsPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private JTextField jarFilePathTextField;
+	private JButton jarFileChooseButton;
+	private JButton addButton;
+	private JPopupMenu popupMenu;
+
 	private JTabbedPane tabbedPane;
 	private JTable table;
 	private DefaultTableModel tableModel;
 
 	private List<PluginInfo> pluginInfos = Lists.newArrayList();
+
+	private boolean existPluginInClasspath;
 
 	@SuppressWarnings("serial")
 	public PluginsPanel() {
@@ -56,20 +69,26 @@ public class PluginsPanel extends JPanel {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		configPanel.add(configHeaderPanel, BorderLayout.NORTH);
 		
-		JTextField jarFilePathTextField = new JTextField();
+		jarFilePathTextField = new JTextField();
 		configHeaderPanel.add(jarFilePathTextField);
 		jarFilePathTextField.setColumns(30);
 		
-		JButton jarFileChooseButton = new JButton(Captions.FILECHOOSER);
+		jarFileChooseButton = new JButton(Captions.FILECHOOSER);
 		configHeaderPanel.add(jarFileChooseButton);
 		
-		JButton addButton = new JButton(Captions.PLUGINS_BUTTON_ADD_PLUGIN);
+		addButton = new JButton(Captions.PLUGINS_BUTTON_ADD_PLUGIN);
 		configHeaderPanel.add(addButton);
 		
 		JScrollPane pluginTableScrollPane = new JScrollPane();
 		configPanel.add(pluginTableScrollPane, BorderLayout.CENTER);
 		
-		table = new JTable();
+		table = new JTable() {
+			@Override
+			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
+				super.changeSelection(row, col, toggle, extend);
+				jarFilePathTextField.setText(pluginInfos.get(row).getLoadInfo().getJarFilePath());
+			}
+		};
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
@@ -100,6 +119,10 @@ public class PluginsPanel extends JPanel {
 		table.getColumnModel().getColumn(0).setPreferredWidth(50);
 		table.getColumnModel().getColumn(1).setPreferredWidth(100);
 		table.getColumnModel().getColumn(2).setPreferredWidth(300);
+		
+		popupMenu = createPopupMenu();
+		table.setComponentPopupMenu(popupMenu);
+		
 		pluginTableScrollPane.setViewportView(table);
 		
 		UiUtil.setupCtrlCAsCopyCell(table);
@@ -113,7 +136,7 @@ public class PluginsPanel extends JPanel {
 		});
 		jarFileChooseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_PLUGIN_FILE);
+				JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_PLUGIN_FILE, jarFilePathTextField.getText());
 				if (fileChooser.showOpenDialog(UiUtil.getParentFrame(jarFileChooseButton)) == JFileChooser.APPROVE_OPTION) {
 					jarFilePathTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
 				}
@@ -125,7 +148,24 @@ public class PluginsPanel extends JPanel {
 
 	}
 
+	private JPopupMenu createPopupMenu() {
+		var menu = new JPopupMenu();
+		var menuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_DELETE_ITEM);
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				removeSelectedPlugins();
+			}
+		});
+		menu.add(menuItem);
+		return menu;
+	}
+
 	private void addPlugin(String jarFilePath) {
+		if(StringUtils.isBlank(jarFilePath) ||
+			pluginInfos.stream().filter(info -> info.getLoadInfo().getJarFilePath().equals(jarFilePath)).findAny().isPresent()) {
+			return;
+		}
+
 		addPluginImpl(jarFilePath, true);
 		saveAsUserOption();
 	}
@@ -137,39 +177,90 @@ public class PluginsPanel extends JPanel {
 		} else {
 			pluginInfo = new PluginInfo(new PluginLoadInfo(jarFilePath, load));
 		}
-		pluginInfos.add(pluginInfo);
-		tableModel.addRow(convertPluginInfoToObjectArray(pluginInfo, load));
+		addPluginInfo(pluginInfo);
 	}
 
-	private void loadOrUnloadPlugin(int pluginIndex, boolean load) {
-		if(load) {
-			var newPluginInfo = Controller.getInstance().loadPlugin(pluginInfos.get(pluginIndex).getLoadInfo().getJarFilePath());
+	private void addPluginInfo(PluginInfo pluginInfo) {
+		pluginInfos.add(pluginInfo);
+		tableModel.addRow(convertPluginInfoToObjectArray(pluginInfo));
+	}
 
-			pluginInfos.remove(pluginIndex);
-			pluginInfos.add(pluginIndex, newPluginInfo);
+	private boolean addPluginFromClasspath() {
+		var pluginInfo = Controller.getInstance().loadPluginFromClasspath();
+		if(pluginInfo == null) {
+			return false;
+		}
 
-			tableModel.removeRow(pluginIndex);
-			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(newPluginInfo, load));
+		addPluginInfo(pluginInfo);
+		return true;
+	}
 
-		} else {
-			Controller.getInstance().unloadPlugin(pluginInfos.get(pluginIndex));
+	private void removeSelectedPlugins() {
+		var selectedRowIndexs = Arrays.stream(table.getSelectedRows()).mapToObj(Integer::valueOf).collect(Collectors.toList());
+		Collections.reverse(selectedRowIndexs);
 
-			tableModel.removeRow(pluginIndex);
-			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(pluginInfos.get(pluginIndex), load));
+		for(var rowIndex: selectedRowIndexs) {
+			if(pluginInfos.get(rowIndex).getLoadInfo().isLoaded()) {
+				loadOrUnloadPlugin(rowIndex, false);
+			}
+			removePluginInfo(rowIndex);
 		}
 
 		saveAsUserOption();
 	}
 
-	private Object[] convertPluginInfoToObjectArray(PluginInfo pluginInfo, boolean load) {
-		return new Object[] {load, pluginInfo.getPluginName(), pluginInfo.getLoadInfo().getJarFilePath()};
+	private void removePluginInfo(int index) {
+		pluginInfos.remove(index);
+		tableModel.removeRow(index);
+	}
+
+	private void loadOrUnloadPlugin(int pluginIndex, boolean load) {
+		if(load) {
+			var newPluginInfo = loadPluginImpl(pluginInfos.get(pluginIndex));
+
+			pluginInfos.remove(pluginIndex);
+			pluginInfos.add(pluginIndex, newPluginInfo);
+
+			tableModel.removeRow(pluginIndex);
+			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(newPluginInfo));
+
+		} else {
+			Controller.getInstance().unloadPlugin(pluginInfos.get(pluginIndex));
+
+			tableModel.removeRow(pluginIndex);
+			tableModel.insertRow(pluginIndex, convertPluginInfoToObjectArray(pluginInfos.get(pluginIndex)));
+		}
+
+		saveAsUserOption();
+	}
+	private PluginInfo loadPluginImpl(PluginInfo pluginInfo) {
+		if(pluginInfo.isFromClasspath()) {
+			return Controller.getInstance().loadPluginFromClasspath();
+		}
+		return Controller.getInstance().loadPlugin(pluginInfo.getLoadInfo().getJarFilePath());
+	}
+
+	private Object[] convertPluginInfoToObjectArray(PluginInfo pluginInfo) {
+		return new Object[] {
+				pluginInfo.getLoadInfo().isLoaded(),
+				pluginInfo.getPluginName(),
+				pluginInfo.isFromClasspath() ? Captions.PLUGINS_LOAD_FROM_CLASSPATH : pluginInfo.getLoadInfo().getJarFilePath()};
 	}
 
 	private void saveAsUserOption() {
-		ConfigLogic.getInstance().savePlugins(pluginInfos.stream().map(PluginInfo::getLoadInfo).collect(Collectors.toList()));
+		if(existPluginInClasspath) {
+			return;
+		}
+		ConfigLogic.getInstance().savePlugins(pluginInfos.stream().filter(pluginInfo -> !pluginInfo.isFromClasspath()).map(PluginInfo::getLoadInfo).collect(Collectors.toList()));
 	}
 
 	public void loadUserOption() {
+		existPluginInClasspath = addPluginFromClasspath();
+		if(existPluginInClasspath) {
+			disableControls();
+			return;
+		}
+
 		var pluginLoadInfos = ConfigLogic.getInstance().getUserOptions().getPlugins();
 		if(pluginLoadInfos == null) {
 			return;
@@ -180,7 +271,14 @@ public class PluginsPanel extends JPanel {
 		});
 	}
 
-	public void addPluginTabs(List<ITab> pluginTabs) {
+	private void disableControls() {
+		jarFilePathTextField.setEnabled(false);
+		jarFileChooseButton.setEnabled(false);
+		addButton.setEnabled(false);
+		Arrays.stream(popupMenu.getComponents()).forEach(c -> c.setEnabled(false));
+	}
+
+	public void addPluginTabs(List<IIstePluginTab> pluginTabs) {
 		pluginTabs.forEach(tab -> {
 			if(tabbedPane.indexOfTab(tab.getTabCaption()) >= 0) {
 				throw new RuntimeException("Duplicated plugin tab name: " + tab.getTabCaption());
@@ -189,7 +287,7 @@ public class PluginsPanel extends JPanel {
 		});
 	}
 
-	public void removePluginTabs(List<ITab> pluginTabs) {
+	public void removePluginTabs(List<IIstePluginTab> pluginTabs) {
 		pluginTabs.forEach(tab -> {
 			var tabIndex = tabbedPane.indexOfTab(tab.getTabCaption());
 			if(tabIndex < 0) {

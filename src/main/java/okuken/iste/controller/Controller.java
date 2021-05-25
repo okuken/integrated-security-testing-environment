@@ -15,9 +15,7 @@ import javax.swing.table.TableColumn;
 
 import com.google.common.collect.Lists;
 
-import burp.IContextMenuFactory;
 import burp.IHttpRequestResponse;
-import burp.ITab;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
@@ -40,6 +38,8 @@ import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.plugin.PluginInfo;
 import okuken.iste.plugin.PluginManager;
+import okuken.iste.plugin.api.IIsteContextMenuFactory;
+import okuken.iste.plugin.api.IIstePluginTab;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.SuitePanel;
@@ -175,9 +175,11 @@ public class Controller {
 
 	public void sendMessagesToSuiteTab(List<IHttpRequestResponse> messages) {
 		BurpUtil.highlightTab(suiteTab);
-		List<MessageDto> messageDtos = messages.stream()
+		addMessages(messages.stream()
 				.map(message -> MessageLogic.getInstance().convertHttpRequestResponseToDto(message))
-				.collect(Collectors.toList());
+				.collect(Collectors.toList()));
+	}
+	public void addMessages(List<MessageDto> messageDtos) {
 		MessageLogic.getInstance().saveMessages(messageDtos);
 		this.messageTableModel.addRows(messageDtos);
 		MessageLogic.getInstance().saveMessageOrder(this.messageTableModel.getRows()); // TODO: join transaction...
@@ -268,6 +270,13 @@ public class Controller {
 
 	public void refreshComponentsDependOnAuthConfig() {
 		repeaterPanel.refreshAuthAccountsComboBox();
+	}
+
+	public List<MessageRepeatDto> getSelectedMessageRepeats() {
+		return repeaterPanel.getSelectedMessageRepeatDtos();
+	}
+	public MessageDto getSelectedMessageRepeatOrg() {
+		return repeaterPanel.getOrgMessageDto();
 	}
 
 	public AuthAccountDto getSelectedAuthAccountOnRepeater() {
@@ -407,23 +416,31 @@ public class Controller {
 	public PluginInfo loadPlugin(String pluginJarFilePath) {
 		return PluginManager.getInstance().load(pluginJarFilePath);
 	}
+	public PluginInfo loadPluginFromClasspath() {
+		return PluginManager.getInstance().loadFromClasspath();
+	}
 	public void unloadPlugin(PluginInfo pluginInfo) {
 		PluginManager.getInstance().unload(pluginInfo);
 	}
 
-	public void addPluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
-		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).addPluginContextMenuFactories(pluginContextMenuFactories);
-		repeatTablePopupMenu.addPluginContextMenuFactories(pluginContextMenuFactories);
+	public void addIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).getPluginPopupMenuListener().addIsteContextMenuFactories(isteContextMenuFactories);
 	}
-	public void removePluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
-		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).removePluginContextMenuFactories(pluginContextMenuFactories);
-		repeatTablePopupMenu.removePluginContextMenuFactories(pluginContextMenuFactories);
+	public void removeIsteContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).getPluginPopupMenuListener().removeIsteContextMenuFactories(isteContextMenuFactories);
 	}
 
-	public void addPluginTabs(List<ITab> pluginTabs) {
+	public void addIsteRepeaterContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		repeatTablePopupMenu.getPluginPopupMenuListener().addIsteContextMenuFactories(isteContextMenuFactories);
+	}
+	public void removeIsteRepeaterContextMenuFactories(List<IIsteContextMenuFactory> isteContextMenuFactories) {
+		repeatTablePopupMenu.getPluginPopupMenuListener().removeIsteContextMenuFactories(isteContextMenuFactories);
+	}
+
+	public void addPluginTabs(List<IIstePluginTab> pluginTabs) {
 		pluginsPanel.addPluginTabs(pluginTabs);
 	}
-	public void removePluginTabs(List<ITab> pluginTabs) {
+	public void removePluginTabs(List<IIstePluginTab> pluginTabs) {
 		pluginsPanel.removePluginTabs(pluginTabs);
 	}
 
@@ -477,6 +494,8 @@ public class Controller {
 		refreshComponentsDependOnProjectName();
 		ConfigLogic.getInstance().resetProjectOptionsDto();
 		reloadDatabase();
+
+		PluginManager.getInstance().invokeProjectChanged();
 	}
 	private void reloadDatabase() {
 		this.messageTableModel.clearRows();

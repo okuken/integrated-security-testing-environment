@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import okuken.iste.dto.AuthConfigDto;
+import okuken.iste.dto.PluginProjectOptionDto;
 import okuken.iste.dto.ProcessOptionsDto;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.dto.ProjectOptionsDto;
@@ -23,6 +25,7 @@ public class ConfigLogic {
 
 	private static final String CONFIG_KEY_USER_NAME = "userName";
 	private static final String CONFIG_KEY_DB_FILE_PATH = "dbFilePath";
+	private static final String CONFIG_KEY_DARK_THEME = "darkTheme";
 	private static final String CONFIG_KEY_LAST_SELECTED_PROJECT_NAME = "lastSelectedProjectName";
 	private static final String CONFIG_KEY_PLUGINS = "plugins";
 	private static final String CONFIG_KEY_MESSAGE_MEMO_TEMPLATE = "messageMemoTemplate";
@@ -51,6 +54,7 @@ public class ConfigLogic {
 		ret.setUserName(Optional.ofNullable(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_USER_NAME))
 				.orElse(System.getProperty("user.name")));
 		ret.setDbFilePath(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_DB_FILE_PATH));
+		ret.setDarkTheme(Boolean.valueOf(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_DARK_THEME)));
 		ret.setLastSelectedProjectName(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME));
 
 		PluginLoadInfo[] pluginLoadInfos = loadUserOptionJson(CONFIG_KEY_PLUGINS, PluginLoadInfo[].class);
@@ -89,6 +93,11 @@ public class ConfigLogic {
 		getUserOptions().setDbFilePath(dbFilePath);
 	}
 
+	public void saveDarkTheme(boolean darkTheme) {
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_DARK_THEME, Boolean.toString(darkTheme));
+		getUserOptions().setDarkTheme(darkTheme);
+	}
+
 	public void saveLastSelectedProjectName(String projectName) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME, projectName);
 		getUserOptions().setLastSelectedProjectName(projectName);
@@ -125,6 +134,7 @@ public class ConfigLogic {
 	private ProjectOptionsDto loadProjectOptions() {
 		var ret = new ProjectOptionsDto();
 		ret.setAuthConfigDto(loadOrInitAuthConfig());
+		ret.setPluginOptions(ProjectOptionLogic.getInstance().loadPluginProjectOptions(getProjectId()));
 		return ret;
 	}
 	private AuthConfigDto loadOrInitAuthConfig() {
@@ -151,6 +161,42 @@ public class ConfigLogic {
 		getProjectOptionsDto().setAuthConfigDto(authConfigDto);
 	}
 
+	public String getPluginProjectOption(String pluginName, String key) {
+		var specificPluginProjectOptions = getSpecificPluginProjectOptions(pluginName);
+		if(specificPluginProjectOptions == null || !specificPluginProjectOptions.containsKey(key)) {
+			return null;
+		}
+		return specificPluginProjectOptions.get(key).getVal();
+	}
+	private Map<String, PluginProjectOptionDto> getSpecificPluginProjectOptions(String pluginName) {
+		if(!getProjectOptionsDto().getPluginOptions().containsKey(pluginName)) {
+			return null;
+		}
+		return getProjectOptionsDto().getPluginOptions().get(pluginName);
+	}
+
+	public void savePluginProjectOption(String pluginName, String key, String value) {
+		var specificPluginProjectOptions = getSpecificPluginProjectOptions(pluginName);
+
+		if(specificPluginProjectOptions == null || !specificPluginProjectOptions.containsKey(key)) {
+			var dto = new PluginProjectOptionDto(key, value);
+			ProjectOptionLogic.getInstance().savePluginProjectOption(getProjectId(), pluginName, dto);
+
+			if(specificPluginProjectOptions == null) {
+				Map<String, PluginProjectOptionDto> newSpecificPluginProjectOptions = Maps.newHashMap();
+				newSpecificPluginProjectOptions.put(key, dto);
+				getProjectOptionsDto().getPluginOptions().put(pluginName, newSpecificPluginProjectOptions);
+				return;
+			}
+
+			specificPluginProjectOptions.put(key, dto);
+			return;
+		}
+
+		var dto = specificPluginProjectOptions.get(key);
+		dto.setVal(value);
+		ProjectOptionLogic.getInstance().updatePluginProjectOption(dto);
+	}
 
 	public ProcessOptionsDto getProcessOptions() {
 		return processOptionsDto;

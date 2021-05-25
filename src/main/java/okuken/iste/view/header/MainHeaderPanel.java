@@ -145,7 +145,7 @@ public class MainHeaderPanel extends JPanel {
 			projectNameLabel.setForeground(Colors.CHARACTER_ALERT);
 			projectNameLabel.setToolTipText(Captions.MAIN_HEADER_ALERT_PROJECT_TT);
 		} else {
-			projectNameLabel.setForeground(Colors.CHARACTER_NORMAL);
+			projectNameLabel.setForeground(BurpUtil.getDefaultForegroundColor());
 			projectNameLabel.setToolTipText(null);
 		}
 	}

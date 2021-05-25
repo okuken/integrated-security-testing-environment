@@ -27,6 +27,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -304,6 +305,10 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 			return null;
 		}
 		return authAccountComboBox.getItemAt(selectedIndex);
+	}
+
+	public List<MessageRepeatDto> getSelectedMessageRepeatDtos() {
+		return repeatTablePanel.getSelectedRows();
 	}
 
 	public MessageDto getOrgMessageDto() {

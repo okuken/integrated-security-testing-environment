@@ -4,18 +4,15 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import com.google.common.collect.Lists;
-
-import burp.IContextMenuFactory;
 import burp.IHttpRequestResponse;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
+import okuken.iste.plugin.PluginPopupMenuListener;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.Optional;
 import java.awt.event.ActionEvent;
 
@@ -23,13 +20,17 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<IContextMenuFactory> pluginContextMenuFactories = Lists.newArrayList();
-
 	private RepeatTablePanel parentRepeatTablePanel;
+
+	private PluginPopupMenuListener pluginPopupMenuListener;
+	private JPopupMenu.Separator pluginMenuItemsStartSeparator;
 
 	public RepeatTablePopupMenu(RepeatTablePanel parentRepeatTablePanel) {
 		this.parentRepeatTablePanel = parentRepeatTablePanel;
 		init();
+
+		pluginPopupMenuListener = new PluginPopupMenuListener(this, pluginMenuItemsStartSeparator);
+		addPopupMenuListener(pluginPopupMenuListener);
 	}
 
 	private void init() {
@@ -110,15 +111,8 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		});
 		add(sendToComparerResponseWithMasterMenuItem);
 
-		//TODO: impl
-//		if(!pluginContextMenuFactories.isEmpty()) {
-//
-//			add(new JPopupMenu.Separator());
-//
-//			pluginContextMenuFactories.forEach(pluginContextMenuFactory -> {
-//				pluginContextMenuFactory.createMenuItems(new PluginContextMenuInvocation()).forEach(this::add);
-//			});
-//		}
+		pluginMenuItemsStartSeparator = new JPopupMenu.Separator();
+		add(pluginMenuItemsStartSeparator);
 
 //		add(new JPopupMenu.Separator());
 //
@@ -137,11 +131,6 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		Controller.getInstance().setRepeatTablePopupMenu(this);
 	}
 
-	private void refresh() {
-		removeAll();
-		init();
-	}
-
 	private IHttpRequestResponse getOrgMessage() {
 		return parentRepeatTablePanel.getParentRepeaterPanel().getOrgMessageDto().getMessage();
 	}
@@ -152,14 +141,8 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		return Optional.ofNullable(bytes).orElse(new byte[] {});
 	}
 
-	public void addPluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
-		this.pluginContextMenuFactories.addAll(pluginContextMenuFactories);
-		refresh();
-	}
-
-	public void removePluginContextMenuFactories(List<IContextMenuFactory> pluginContextMenuFactories) {
-		this.pluginContextMenuFactories.removeAll(pluginContextMenuFactories);
-		refresh();
+	public PluginPopupMenuListener getPluginPopupMenuListener() {
+		return pluginPopupMenuListener;
 	}
 
 }

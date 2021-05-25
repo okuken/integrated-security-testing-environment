@@ -1,5 +1,7 @@
 package okuken.iste;
 
+import java.io.File;
+
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
@@ -53,7 +55,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 
 	private void setupDatabase() {
 		ConfigLogic configLogic = ConfigLogic.getInstance();
-		if(Strings.isNullOrEmpty(configLogic.getUserOptions().getDbFilePath())) {
+		if(judgeNeedChooseDbFilePath(configLogic.getUserOptions().getDbFilePath())) {
 			JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_DB_FILE, configLogic.getDefaultDbFile());
 			switch (fileChooser.showSaveDialog(BurpUtil.getBurpSuiteJFrame())) {
 				case JFileChooser.APPROVE_OPTION:
@@ -66,6 +68,10 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 		}
 
 		DatabaseManager.getInstance().setupDatabase(configLogic.getUserOptions().getDbFilePath());
+	}
+	private boolean judgeNeedChooseDbFilePath(String dbFilePath) {
+		return Strings.isNullOrEmpty(dbFilePath) ||
+				!new File(dbFilePath).exists();
 	}
 
 	@Override

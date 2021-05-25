@@ -6,7 +6,6 @@ public class Colors {
 
 	public static final Color BURP_COLOR = new Color(225, 102, 51);
 
-	public static final Color CHARACTER_NORMAL = Color.BLACK;
 	public static final Color CHARACTER_HIGHLIGHT = BURP_COLOR;
 	public static final Color CHARACTER_ALERT = Color.RED;
 
