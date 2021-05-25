@@ -38,7 +38,7 @@ ISTE puts you in a flow state.
 | :-- | :-- | :-- |
 | Request chain | For each URL in the URL list, the feature to define a request chain, i.e., a sequence of multiple requests and parameter transfer, and issue it repeatedly. | Currently, it is not easy to use. There are many improvements I would like to make, such as making the transfer setting items configurable with combo boxes, semi-automating the settings, allowing step-by-step execution, etc. |
 | Export notes | A feature to export notes in a simple Markdown format. | I haven't been able to take a lot of things into account, but it's the least I can do when I want to share my notes with others. Also, since the search function of the notes is not implemented yet, you can use it to export and search with a text editor. |
-| Plugin | Provides an extension point for ISTE. | The features of ISTE will basically be implemented in ISTE itself, but extremely personal features, such as the ability to link with self-made applications, will be implemented as plug-ins. Currently, I do not provide sample plug-ins because they are quite restrictive, but they barely stand up to my practical use. |
+| Plugin | Provides an extension point for ISTE. | The features of ISTE will basically be implemented in ISTE itself, but extremely personal features, such as the ability to link with self-made applications, will be implemented as plug-ins. see: [ISTE Plugin API](https://github.com/okuken/iste-plugin-api) |
 
 ![iste_demo_02_chain](https://user-images.githubusercontent.com/942241/115988586-6b422680-a5f5-11eb-9031-de10310ed97f.gif)
 
