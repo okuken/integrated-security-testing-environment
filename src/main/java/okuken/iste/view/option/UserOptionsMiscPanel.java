@@ -62,7 +62,6 @@ public class UserOptionsMiscPanel extends JPanel {
 		dbFileTextField.setColumns(20);
 		dbFileTextField.setBounds(110, 25, 300, 30);
 		add(dbFileTextField);
-		dbFileTextField.setText(ConfigLogic.getInstance().getUserOptions().getDbFilePath());
 		
 		JButton dbFileChooseButton = new JButton(Captions.FILECHOOSER);
 		dbFileChooseButton.addActionListener(new ActionListener() {
@@ -112,5 +111,12 @@ public class UserOptionsMiscPanel extends JPanel {
 		themeExplanationLabel.setBounds(200, 75, 700, 30);
 		add(themeExplanationLabel);
 
+		Controller.getInstance().setUserOptionsMiscPanel(this);
+		refresh();
 	}
+
+	public void refresh() {
+		dbFileTextField.setText(ConfigLogic.getInstance().getUserOptions().getDbFilePath());
+	}
+
 }

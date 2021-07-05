@@ -55,6 +55,7 @@ import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.message.table.MessageTablePopupMenu;
 import okuken.iste.view.option.ProjectOptionsPanel;
+import okuken.iste.view.option.UserOptionsMiscPanel;
 import okuken.iste.view.plugin.PluginsPanel;
 import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeatTablePopupMenu;
@@ -91,6 +92,8 @@ public class Controller {
 	private List<MessageSelectorPanel> messageSelectPanels = Lists.newArrayList();
 
 	private ProjectOptionsPanel projectOptionsPanel;
+
+	private UserOptionsMiscPanel userOptionsMiscPanel;
 
 	private PluginsPanel pluginsPanel;
 
@@ -167,6 +170,9 @@ public class Controller {
 	}
 	public void setProjectOptionsPanel(ProjectOptionsPanel projectOptionsPanel) {
 		this.projectOptionsPanel = projectOptionsPanel;
+	}
+	public void setUserOptionsMiscPanel(UserOptionsMiscPanel userOptionsMiscPanel) {
+		this.userOptionsMiscPanel = userOptionsMiscPanel;
 	}
 	public void setPluginsPanel(PluginsPanel pluginsPanel) {
 		this.pluginsPanel = pluginsPanel;
@@ -485,9 +491,15 @@ public class Controller {
 	}
 
 	public void changeDatabase(String dbFilePath) {
+		changeDatabaseOnly(dbFilePath);
+		changeProject(true);
+	}
+	public void changeDatabaseOnly(String dbFilePath) {
 		ConfigLogic.getInstance().saveDbFilePath(dbFilePath);
 		DatabaseManager.getInstance().changeDatabase(dbFilePath);
-		changeProject(true);
+		if(userOptionsMiscPanel != null) {
+			userOptionsMiscPanel.refresh();
+		}
 	}
 	public void changeProject(boolean autoSelect) {
 		ProjectLogic.getInstance().selectProject(autoSelect);

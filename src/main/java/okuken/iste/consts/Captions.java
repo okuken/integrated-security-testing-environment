@@ -23,6 +23,7 @@ public class Captions {
 	public static final String SAVE = "Save";
 	public static final String COPY = "Copy";
 
+	public static final String OK = "OK";
 
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";
 	public static final String CONTEXT_MENU_SEND_TO_HISTORY = "Send to ISTE as history of repeat";
@@ -178,6 +179,7 @@ public class Captions {
 	public static final String PLUGINS_LOAD_FROM_CLASSPATH = "CLASSPATH";
 
 	public static final String SELECT_PROJECT_NEW = "** Create new project **";
+	public static final String CHANGE_DATABASE = "Change DB";
 
 
 	public static final String MESSAGE_EMPTY = "          ";
