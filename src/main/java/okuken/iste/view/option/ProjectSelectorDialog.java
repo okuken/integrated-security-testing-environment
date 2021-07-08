@@ -33,7 +33,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.awt.event.ActionEvent;
 
 public class ProjectSelectorDialog extends JDialog {
@@ -43,6 +42,8 @@ public class ProjectSelectorDialog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JComboBox<ProjectDto> projectsComboBox;
 	private JTextField newProjectNameTextField;
+
+	private String burpProjectName;
 
 	/**
 	 * Create the dialog.
@@ -79,7 +80,7 @@ public class ProjectSelectorDialog extends JDialog {
 			});
 			projectsComboBox.setMaximumRowCount(Sizes.MAX_ROW_COUNT_COMBOBOX);
 
-			var burpProjectName = BurpUtil.getBurpSuiteProjectName();
+			burpProjectName = BurpUtil.getBurpSuiteProjectName();
 			if(burpProjectName != null) {
 				SwingUtilities.invokeLater(() -> {
 					projectsComboBox.setRenderer(new DefaultListCellRenderer() {
@@ -95,7 +96,7 @@ public class ProjectSelectorDialog extends JDialog {
 				});
 			}
 
-			loadProjects();
+			loadProjects(true);
 
 			contentPanel.add(projectsComboBox, BorderLayout.NORTH);
 		}
@@ -139,7 +140,7 @@ public class ProjectSelectorDialog extends JDialog {
 		}
 	}
 
-	private void loadProjects() {
+	private void loadProjects(boolean init) {
 		projectsComboBox.removeAllItems();
 
 		projectsComboBox.addItem(new ProjectDto());
@@ -148,12 +149,18 @@ public class ProjectSelectorDialog extends JDialog {
 		projects.stream().forEach(dto -> projectsComboBox.addItem(dto));
 
 		projectsComboBox.setSelectedIndex(0);
-		String lastSelectedProjectName = ConfigLogic.getInstance().getUserOptions().getLastSelectedProjectName();
-		if(lastSelectedProjectName != null) {
-			Optional<ProjectDto> lastSelectedProject = projects.stream().filter(projectDto -> lastSelectedProjectName.equals(projectDto.getName())).findFirst();
-			if(lastSelectedProject.isPresent()) {
-				projectsComboBox.setSelectedIndex(projects.indexOf(lastSelectedProject.get()) + 1);
-			}
+		selectProjectIfExist(ConfigLogic.getInstance().getUserOptions().getLastSelectedProjectName(), projects);
+		if(!init) {
+			selectProjectIfExist(burpProjectName, projects);
+		}
+	}
+	private void selectProjectIfExist(String selectProjectName, List<ProjectDto> projects) {
+		if(selectProjectName == null) {
+			return;
+		}
+		var selectProject = projects.stream().filter(projectDto -> selectProjectName.equals(projectDto.getName())).findFirst();
+		if(selectProject.isPresent()) {
+			projectsComboBox.setSelectedIndex(projects.indexOf(selectProject.get()) + 1);
 		}
 	}
 
@@ -171,7 +178,7 @@ public class ProjectSelectorDialog extends JDialog {
 		}
 
 		Controller.getInstance().changeDatabaseOnly(newDbFilePath);
-		loadProjects();
+		loadProjects(false);
 	}
 
 	private String createDefaultNewProjectName() {
