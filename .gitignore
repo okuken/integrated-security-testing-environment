@@ -4,6 +4,7 @@
 .gradle
 
 build
+buildModule
 bin
 
 *DynamicSqlSupport.java

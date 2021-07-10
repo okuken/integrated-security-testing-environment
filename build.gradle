@@ -4,12 +4,19 @@ plugins {
     id 'java-library'
     id 'io.freefair.aspectj.post-compile-weaving' version '5.1.0'
     id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id "de.undercouch.download" version "4.1.2"
 }
 
-version '0.3.0'
+version '0.3.1'
+
+def cleanDbVersion = '0.3.1'
 
 shadowJar{
+  mustRunAfter 'generateDao'
   archiveName = "iste-${version}.${extension}"
+  manifest {
+    attributes 'Main-Class': 'okuken.iste.CommandLineInterface'
+  }
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -44,6 +51,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
+    implementation 'args4j:args4j:2.33'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
@@ -52,3 +60,67 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+
+def buildModuleDir = new File(projectDir, 'buildModule')
+def tmpDir = new File(buildDir, 'tmp')
+task createDir {
+    mustRunAfter 'clean'
+    doLast {
+        [buildModuleDir, tmpDir].each {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+    }
+}
+
+def isteCleanDbFile = new File(tmpDir, 'iste_clean.db')
+task makeCleanDb {
+    dependsOn 'createDir'
+
+    def isteJarUrl = "https://github.com/okuken/integrated-security-testing-environment/releases/download/v${cleanDbVersion}/iste-${cleanDbVersion}.jar"
+    def isteJarFile = new File(buildModuleDir, "iste-${cleanDbVersion}.jar")
+
+    doLast {
+        download {
+            src isteJarUrl
+            dest buildModuleDir
+            overwrite false
+        }
+
+        exec {
+            commandLine 'java', '-jar', isteJarFile, '-makeCleanDb', isteCleanDbFile, '-f'
+        }
+    }
+}
+
+task generateDao {
+    dependsOn 'createDir'
+    mustRunAfter 'makeCleanDb'
+
+    def generatorConfig = new File(projectDir, "src/main/resources/generatorConfig.xml")
+
+    def mbgJarUrl = "https://repo1.maven.org/fromsearch?filepath=org/mybatis/generator/mybatis-generator-core/1.4.0/mybatis-generator-core-1.4.0.jar"
+    def mbgJar = new File(buildModuleDir, "mybatis-generator-core-1.4.0.jar")
+    def jdbcJarUrl = "https://repo1.maven.org/fromsearch?filepath=org/xerial/sqlite-jdbc/3.32.3/sqlite-jdbc-3.32.3.jar"
+    def jdbcJar = new File(buildModuleDir, "sqlite-jdbc-3.32.3.jar")
+
+    doLast {
+        download {
+            src([mbgJarUrl, jdbcJarUrl])
+            dest buildModuleDir
+            overwrite false
+        }
+
+//      ant.replace(file: generatorConfig, token: '@@@CLEAN_DB_FILE_PATH@@@', value: "${isteCleanDbFile}")
+
+        exec {
+            commandLine 'java', '-cp', "${jdbcJar};${mbgJar}", 'org.mybatis.generator.api.ShellRunner', '-configfile', generatorConfig, '-overwrite', '-verbose'
+        }
+    }
+}
+
+
+task buildISTE(dependsOn: [clean, createDir, makeCleanDb, generateDao, shadowJar])
+

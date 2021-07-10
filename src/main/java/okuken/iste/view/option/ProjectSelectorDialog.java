@@ -2,23 +2,27 @@ package okuken.iste.view.option;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.Frame;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.commons.lang3.StringUtils;
+
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.consts.Sizes;
+import okuken.iste.controller.Controller;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.FileUtil;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -29,7 +33,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.awt.event.ActionEvent;
 
 public class ProjectSelectorDialog extends JDialog {
@@ -39,6 +42,8 @@ public class ProjectSelectorDialog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JComboBox<ProjectDto> projectsComboBox;
 	private JTextField newProjectNameTextField;
+
+	private String burpProjectName;
 
 	/**
 	 * Create the dialog.
@@ -75,12 +80,7 @@ public class ProjectSelectorDialog extends JDialog {
 			});
 			projectsComboBox.setMaximumRowCount(Sizes.MAX_ROW_COUNT_COMBOBOX);
 
-			projectsComboBox.addItem(new ProjectDto());
-			List<ProjectDto> projects = ProjectLogic.getInstance().loadProjects();
-			Collections.reverse(projects);
-			projects.stream().forEach(dto -> projectsComboBox.addItem(dto));
-
-			var burpProjectName = BurpUtil.getBurpSuiteProjectName();
+			burpProjectName = BurpUtil.getBurpSuiteProjectName();
 			if(burpProjectName != null) {
 				SwingUtilities.invokeLater(() -> {
 					projectsComboBox.setRenderer(new DefaultListCellRenderer() {
@@ -96,39 +96,89 @@ public class ProjectSelectorDialog extends JDialog {
 				});
 			}
 
-			projectsComboBox.setSelectedIndex(0);
-			String lastSelectedProjectName = ConfigLogic.getInstance().getUserOptions().getLastSelectedProjectName();
-			if(lastSelectedProjectName != null) {
-				Optional<ProjectDto> lastSelectedProject = projects.stream().filter(projectDto -> lastSelectedProjectName.equals(projectDto.getName())).findFirst();
-				if(lastSelectedProject.isPresent()) {
-					projectsComboBox.setSelectedIndex(projects.indexOf(lastSelectedProject.get()) + 1);
-				}
-			}
+			loadProjects(true);
 
 			contentPanel.add(projectsComboBox, BorderLayout.NORTH);
 		}
 		{
 			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			buttonPane.setLayout(new BorderLayout(0, 0));
 			{
-				JButton okButton = new JButton("OK");
-				okButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						int selectedIndex = projectsComboBox.getSelectedIndex();
-						if(selectedIndex == 0) { //TODO: validation
-							ProjectDto newDto = projectsComboBox.getItemAt(projectsComboBox.getSelectedIndex());
-							newDto.setName(newProjectNameTextField.getText());
-							newDto.setExplanation("");//TODO
+				JPanel buttonLeftPanel = new JPanel();
+				buttonPane.add(buttonLeftPanel, BorderLayout.WEST);
+				{
+					JButton changeDbButton = new JButton(Captions.CHANGE_DATABASE);
+					changeDbButton.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							changeDatabase();
 						}
-						dispose();
-					}
-				});
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+					});
+					buttonLeftPanel.add(changeDbButton);
+				}
+			}
+			{
+				{
+					JPanel buttonRightPanel = new JPanel();
+					buttonPane.add(buttonRightPanel, BorderLayout.EAST);
+					JButton okButton = new JButton(Captions.OK);
+					buttonRightPanel.add(okButton);
+					okButton.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							int selectedIndex = projectsComboBox.getSelectedIndex();
+							if(selectedIndex == 0) { //TODO: validation
+								ProjectDto newDto = projectsComboBox.getItemAt(projectsComboBox.getSelectedIndex());
+								newDto.setName(newProjectNameTextField.getText());
+								newDto.setExplanation("");//TODO
+							}
+							dispose();
+						}
+					});
+					getRootPane().setDefaultButton(okButton);
+				}
 			}
 		}
+	}
+
+	private void loadProjects(boolean init) {
+		projectsComboBox.removeAllItems();
+
+		projectsComboBox.addItem(new ProjectDto());
+		List<ProjectDto> projects = ProjectLogic.getInstance().loadProjects();
+		Collections.reverse(projects);
+		projects.stream().forEach(dto -> projectsComboBox.addItem(dto));
+
+		projectsComboBox.setSelectedIndex(0);
+		selectProjectIfExist(ConfigLogic.getInstance().getUserOptions().getLastSelectedProjectName(), projects);
+		if(!init) {
+			selectProjectIfExist(burpProjectName, projects);
+		}
+	}
+	private void selectProjectIfExist(String selectProjectName, List<ProjectDto> projects) {
+		if(selectProjectName == null) {
+			return;
+		}
+		var selectProject = projects.stream().filter(projectDto -> selectProjectName.equals(projectDto.getName())).findFirst();
+		if(selectProject.isPresent()) {
+			projectsComboBox.setSelectedIndex(projects.indexOf(selectProject.get()) + 1);
+		}
+	}
+
+	private void changeDatabase() {
+		var currentDbFilePath = ConfigLogic.getInstance().getUserOptions().getDbFilePath();
+
+		JFileChooser fileChooser = FileUtil.createSingleFileChooser(Captions.MESSAGE_CHOOSE_DB_FILE, currentDbFilePath);
+		if (fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+
+		var newDbFilePath = fileChooser.getSelectedFile().getAbsolutePath();
+		if(StringUtils.equals(currentDbFilePath, newDbFilePath)) {
+			return;
+		}
+
+		Controller.getInstance().changeDatabaseOnly(newDbFilePath);
+		loadProjects(false);
 	}
 
 	private String createDefaultNewProjectName() {

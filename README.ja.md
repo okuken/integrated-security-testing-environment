@@ -132,6 +132,21 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 * 作者の直近の困りごと駆動で開発していきます
 * **作者は本ソフトウェアに起因あるいは関連して生じた損害等について、一切の責任を負いません**
 
+## Build ISTE
+
+```
+git clone https://github.com/okuken/iste-plugin-api.git
+cd iste-plugin-api
+git checkout v0.1.0
+gradle jar
+cd ..
+
+git clone https://github.com/okuken/integrated-security-testing-environment.git
+cd integrated-security-testing-environment
+gradle buildISTE
+```
+-> build/libs/iste-x.x.x.jar
+
 ## License
 
 [GPLv3](LICENSE)

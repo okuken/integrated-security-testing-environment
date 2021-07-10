@@ -124,6 +124,21 @@ CAUTION: Please note that this group of features must not be executed without th
 * It does not support simultaneous access from multiple ISTEs to an ISTE project. It can make the data inconsistent.
 * **The author assumes no responsibility for any damage caused by or related to this software.**
 
+## Build ISTE
+
+```
+git clone https://github.com/okuken/iste-plugin-api.git
+cd iste-plugin-api
+git checkout v0.1.0
+gradle jar
+cd ..
+
+git clone https://github.com/okuken/integrated-security-testing-environment.git
+cd integrated-security-testing-environment
+gradle buildISTE
+```
+-> build/libs/iste-x.x.x.jar
+
 ## License
 
 [GPLv3](LICENSE)
