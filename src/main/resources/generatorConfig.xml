@@ -2,9 +2,9 @@
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
   <context id="context1">
-    <jdbcConnection connectionURL="jdbc:sqlite:C:/iste_clean.db" driverClass="org.sqlite.JDBC" />
-    <javaModelGenerator targetPackage="okuken.iste.entity.auto" targetProject="integrated-security-testing-environment/src/main/java/" />
-    <javaClientGenerator targetPackage="okuken.iste.dao.auto" targetProject="integrated-security-testing-environment/src/main/java/" type="XMLMAPPER" />
+    <jdbcConnection connectionURL="jdbc:sqlite:build/tmp/iste_clean.db" driverClass="org.sqlite.JDBC" />
+    <javaModelGenerator targetPackage="okuken.iste.entity.auto" targetProject="src/main/java/" />
+    <javaClientGenerator targetPackage="okuken.iste.dao.auto" targetProject="src/main/java/" type="XMLMAPPER" />
     <table tableName="ISTE_%">
         <generatedKey column="ID" sqlStatement="SELECT LAST_INSERT_ROWID()" identity="true" />
         <domainObjectRenamingRule searchString="^Iste" />

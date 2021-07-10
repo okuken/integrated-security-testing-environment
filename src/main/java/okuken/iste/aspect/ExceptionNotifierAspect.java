@@ -10,7 +10,7 @@ import okuken.iste.util.BurpUtil;
 @Aspect
 public class ExceptionNotifierAspect {
 
-	@Pointcut("execution(* okuken.iste.*.*(..))")
+	@Pointcut("execution(* okuken.iste.IntegratedSecurityTestingEnvironment.*(..))")
 	public void loader() {}
 
 	@Pointcut("execution(* okuken.iste.controller.Controller.*(..))")

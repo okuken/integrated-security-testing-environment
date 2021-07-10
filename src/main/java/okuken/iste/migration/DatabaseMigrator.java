@@ -10,7 +10,6 @@ import org.apache.ibatis.migration.operations.UpOperation;
 import org.apache.ibatis.migration.options.DatabaseOperationOption;
 
 import okuken.iste.consts.Captions;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
 public class DatabaseMigrator {
@@ -26,7 +25,7 @@ public class DatabaseMigrator {
 	public void migrate(ConnectionProvider connectionProvider) {
 		var migrationsLoader = createMigrationsLoader();
 		var databaseOperationOption = createDatabaseOperationOption();
-		var logStream = BurpUtil.getStdoutPrintStream();
+		var logStream = System.out;
 
 		var status = new StatusOperation().operate(connectionProvider, migrationsLoader, databaseOperationOption, new PrintStream(System.out));
 		if(status.getAppliedCount() <= 0) { // case: before initialization
