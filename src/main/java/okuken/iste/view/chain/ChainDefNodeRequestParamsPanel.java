@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.dto.MessageChainNodeReqpDto;
+import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SourceType;
 import okuken.iste.util.RegexUtil;
@@ -22,12 +23,13 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTablePanel<MessageChai
 	private static final long serialVersionUID = 1L;
 
 	private static final Class<?> DTO_CLASS = MessageChainNodeReqpDto.class;
-	private static final int PARAM_TYPE = 0, PARAM_NAME = 1, SOURCE_TYPE = 2, SOURCE_NAME = 3;
+	private static final int PARAM_TYPE = 0, PARAM_NAME = 1, SOURCE_TYPE = 2, SOURCE_NAME = 3, ENCODE = 4;
 	private static final List<ColumnDef> columns = Arrays.asList(
 		new ColumnDef(PARAM_TYPE,  "Type",         100, true, "getParamType",  "setParamType",  RequestParameterType.class, DTO_CLASS),
 		new ColumnDef(PARAM_NAME,  "Name / Regex", 200, true, "getParamName",  "setParamName",  String.class, DTO_CLASS),
 		new ColumnDef(SOURCE_TYPE, "Source type",  100, true, "getSourceType", "setSourceType", SourceType.class, DTO_CLASS),
-		new ColumnDef(SOURCE_NAME, "Source name",  200, true, "getSourceName", "setSourceName", String.class, DTO_CLASS));
+		new ColumnDef(SOURCE_NAME, "Source name",  100, true, "getSourceName", "setSourceName", String.class, DTO_CLASS),
+		new ColumnDef(ENCODE,      "Encode",       100, true, "getEncode",     "setEncode",     EncodeType.class, DTO_CLASS));
 
 	private ChainDefNodePanel parentChainDefNodePanel;
 
@@ -58,6 +60,7 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTablePanel<MessageChai
 	private void afterInit() {
 		setupParamTypeColumn(table);
 		setupSourceTypeColumn(table);
+		setupEncodeColumn(table);
 	}
 
 	@Override
@@ -92,6 +95,7 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTablePanel<MessageChai
 		var dto = new MessageChainNodeReqpDto();
 		dto.setParamType(RequestParameterType.COOKIE);
 		dto.setSourceType(SourceType.VAR);
+		dto.setEncode(EncodeType.NONE);
 		return dto;
 	}
 
@@ -107,6 +111,11 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTablePanel<MessageChai
 			.filter(type -> !type.isAuthOnly() || parentChainDefNodePanel.getParentChainDefPanel().judgeIsAuthChain())
 			.forEach(item -> comboBox.addItem(item));
 		table.getColumnModel().getColumn(SOURCE_TYPE).setCellEditor(new DefaultCellEditor(comboBox));
+	}
+	private void setupEncodeColumn(JTable table) {
+		var comboBox = new JComboBox<EncodeType>();
+		Arrays.stream(EncodeType.values()).forEach(item -> comboBox.addItem(item));
+		table.getColumnModel().getColumn(ENCODE).setCellEditor(new DefaultCellEditor(comboBox));
 	}
 
 }

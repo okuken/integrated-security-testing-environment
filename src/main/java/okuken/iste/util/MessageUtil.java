@@ -16,6 +16,7 @@ import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.dto.MessageCookieDto;
 import okuken.iste.dto.MessageResponseParamDto;
 import okuken.iste.dto.PayloadDto;
+import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.ResponseParameterType;
 
@@ -97,7 +98,7 @@ public class MessageUtil {
 				return request;
 			}
 
-			return applyPayload(request, reqpDto.getParamType(), reqpDto.getParamName(), vars.get(varName));
+			return applyPayload(request, reqpDto.getParamType(), reqpDto.getParamName(), encode(vars.get(varName), reqpDto.getEncode()));
 
 		case AUTH_ACCOUNT_TABLE:
 			if(authAccountDto == null) {
@@ -109,10 +110,18 @@ public class MessageUtil {
 				return request;
 			}
 
-			return applyPayload(request, reqpDto.getParamType(), reqpDto.getParamName(), varValue);
+			return applyPayload(request, reqpDto.getParamType(), reqpDto.getParamName(), encode(varValue, reqpDto.getEncode()));
 
 		default:
 			throw new UnsupportedOperationException(reqpDto.getSourceType().name());
+		}
+	}
+	private static String encode(String value, EncodeType encode) {
+		switch (encode) {
+		case URL:
+			return BurpUtil.getHelpers().urlEncode(value);
+		default:
+			return value;
 		}
 	}
 

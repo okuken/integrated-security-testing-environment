@@ -23,6 +23,7 @@ import okuken.iste.entity.auto.MessageChain;
 import okuken.iste.entity.auto.MessageChainNode;
 import okuken.iste.entity.auto.MessageChainNodeReqp;
 import okuken.iste.entity.auto.MessageChainNodeResp;
+import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.ResponseParameterType;
 import okuken.iste.enums.SourceType;
@@ -89,6 +90,7 @@ public class MessageChainLogic {
 					reqpEntity.setParamName(reqpDto.getParamName());
 					reqpEntity.setSourceType(Byte.toUnsignedInt(reqpDto.getSourceType().getId()));
 					reqpEntity.setSourceName(reqpDto.getSourceName());
+					reqpEntity.setEncode(Integer.toString(reqpDto.getEncode().getId()));
 					reqpEntity.setPrcDate(now);
 					messageChainNodeReqpMapper.insert(reqpEntity);
 					reqpDto.setId(reqpEntity.getId());
@@ -142,6 +144,7 @@ public class MessageChainLogic {
 							reqpDto.setParamName(reqpEntity.getParamName());
 							reqpDto.setSourceType(SourceType.getById((byte)(int)Optional.ofNullable(reqpEntity.getSourceType()).orElse(0)));
 							reqpDto.setSourceName(reqpEntity.getSourceName());
+							reqpDto.setEncode(EncodeType.getById(Integer.parseInt(Optional.ofNullable(reqpEntity.getEncode()).orElse("0"))));
 							return reqpDto;
 						}).collect(Collectors.toList()));
 
