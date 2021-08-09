@@ -385,13 +385,17 @@ public class Controller {
 		return ret;
 	}
 
-	public void saveAuthApplyConfig(AuthApplyConfigDto authApplyConfigDto) {
+	public void saveAuthApplyConfig(AuthApplyConfigDto authApplyConfigDto, boolean keepOldSessionId) {
 		AuthLogic.getInstance().saveAuthApplyConfig(authApplyConfigDto);
-		clearAuthAccountsSession();
+		if(!keepOldSessionId) {
+			clearAuthAccountsSession();
+		}
 	}
-	public void deleteAuthApplyConfigs(List<AuthApplyConfigDto> authApplyConfigDtos) {
+	public void deleteAuthApplyConfigs(List<AuthApplyConfigDto> authApplyConfigDtos, boolean keepOldSessionId) {
 		AuthLogic.getInstance().deleteAuthApplyConfigs(authApplyConfigDtos);
-		clearAuthAccountsSession();
+		if(!keepOldSessionId) {
+			clearAuthAccountsSession();
+		}
 	}
 
 	public AuthAccountDto getSelectedAuthAccountOnAuthConfig() {

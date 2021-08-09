@@ -24,6 +24,7 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -124,6 +125,21 @@ public class UiUtil {
 			}
 		});
 		menu.add(menuItem);
+		return menu;
+	}
+
+	public static final JPopupMenu createCopyPopupMenu(List<String> strs) {
+		var menu = new JPopupMenu();
+		IntStream.range(0, strs.size()).forEach(i -> {
+			var str = strs.get(i);
+			var menuItem = new JMenuItem(String.format("%d: %s", i + 1, str != null ? str : ""));
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					copyToClipboard(str);
+				}
+			});
+			menu.add(menuItem);
+		});
 		return menu;
 	}
 

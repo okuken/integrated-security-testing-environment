@@ -1,6 +1,10 @@
 package okuken.iste.dto;
 
+import org.apache.commons.lang3.StringUtils;
+
+import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
+import okuken.iste.enums.SourceType;
 
 public class AuthApplyConfigDto {
 
@@ -9,7 +13,9 @@ public class AuthApplyConfigDto {
 
 	private RequestParameterType paramType;
 	private String paramName;
-	private String varName;
+	private SourceType sourceType;
+	private String sourceName;
+	private EncodeType encode; 
 
 	public Integer getId() {
 		return id;
@@ -35,11 +41,27 @@ public class AuthApplyConfigDto {
 	public void setParamName(String paramName) {
 		this.paramName = paramName;
 	}
-	public String getVarName() {
-		return varName;
+	public SourceType getSourceType() {
+		return sourceType;
 	}
-	public void setVarName(String varName) {
-		this.varName = varName;
+	public void setSourceType(SourceType sourceType) {
+		this.sourceType = sourceType;
+	}
+	public String getSourceName() {
+		return sourceName;
+	}
+	public void setSourceName(String sourceName) {
+		this.sourceName = sourceName;
+	}
+	public EncodeType getEncode() {
+		return encode;
+	}
+	public void setEncode(EncodeType encode) {
+		this.encode = encode;
+	}
+
+	public boolean isSourceReady() {
+		return sourceType != null && StringUtils.isNotBlank(sourceName);
 	}
 
 }

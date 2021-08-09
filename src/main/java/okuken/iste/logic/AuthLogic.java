@@ -1,6 +1,7 @@
 package okuken.iste.logic;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -19,8 +20,11 @@ import okuken.iste.dto.MessageChainDto;
 import okuken.iste.entity.auto.AuthAccount;
 import okuken.iste.entity.auto.AuthApplyConfig;
 import okuken.iste.entity.auto.AuthConfig;
+import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
+import okuken.iste.enums.SourceType;
 import okuken.iste.util.DbUtil;
+import okuken.iste.util.ReflectionUtil;
 import okuken.iste.util.SqlUtil;
 
 public class AuthLogic {
@@ -39,22 +43,18 @@ public class AuthLogic {
 		DbUtil.withTransaction(session -> {
 			AuthAccountMapper mapper = session.getMapper(AuthAccountMapper.class);
 
-			//TODO: auto convert
 			AuthAccount entity = new AuthAccount();
 			entity.setId(dto.getId());
 			entity.setFkProjectId(ConfigLogic.getInstance().getProjectId());
-			entity.setField01(dto.getField01());
-			entity.setField02(dto.getField02());
-			entity.setField03(dto.getField03());
-			entity.setField04(dto.getField04());
-			entity.setField05(dto.getField05());
+			ReflectionUtil.setNumberedFields(entity, AuthAccountDto.FIELD_SETTER_FORMAT, AuthAccountDto.FIELD_START_NUM, AuthAccountDto.FIELD_END_NUM, String.class, dto, AuthAccountDto.FIELD_GETTER_FORMAT);
 			entity.setRemark(dto.getRemark());
-			entity.setSessionId(dto.getSessionId());
+			ReflectionUtil.setNumberedFields(entity, AuthAccountDto.SESSIONID_SETTER_FORMAT, AuthAccountDto.SESSIONID_START_NUM, AuthAccountDto.SESSIONID_END_NUM, String.class, dto.getSessionIds());
 			entity.setPrcDate(now);
 
 			if(entity.getId() != null) {
 				if(keepOldSessionId) {
-					entity.setSessionId(mapper.selectByPrimaryKey(entity.getId()).get().getSessionId());
+					ReflectionUtil.setNumberedFields(entity, AuthAccountDto.SESSIONID_SETTER_FORMAT, AuthAccountDto.SESSIONID_START_NUM, AuthAccountDto.SESSIONID_END_NUM, String.class,
+							mapper.selectByPrimaryKey(entity.getId()).get(), AuthAccountDto.SESSIONID_GETTER_FORMAT);
 				}
 
 				mapper.updateByPrimaryKey(entity);
@@ -72,7 +72,16 @@ public class AuthLogic {
 			AuthAccountMapper mapper = session.getMapper(AuthAccountMapper.class);
 
 			mapper.update(c -> c
-					.set(AuthAccountDynamicSqlSupport.sessionId).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId01).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId02).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId03).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId04).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId05).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId06).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId07).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId08).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId09).equalToNull()
+					.set(AuthAccountDynamicSqlSupport.sessionId10).equalToNull()
 					.set(AuthAccountDynamicSqlSupport.prcDate).equalTo(now)
 					.where(AuthAccountDynamicSqlSupport.fkProjectId, isEqualTo(ConfigLogic.getInstance().getProjectId())));
 		});
@@ -87,16 +96,12 @@ public class AuthLogic {
 						.orderBy(AuthAccountDynamicSqlSupport.id));
 			});
 
-		return entitys.stream().map(entity -> {//TODO: auto convert
+		return entitys.stream().map(entity -> {
 			AuthAccountDto dto = new AuthAccountDto();
 			dto.setId(entity.getId());
-			dto.setField01(entity.getField01());
-			dto.setField02(entity.getField02());
-			dto.setField03(entity.getField03());
-			dto.setField04(entity.getField04());
-			dto.setField05(entity.getField05());
+			ReflectionUtil.setNumberedFields(dto, AuthAccountDto.FIELD_SETTER_FORMAT, AuthAccountDto.FIELD_START_NUM, AuthAccountDto.FIELD_END_NUM, String.class, entity, AuthAccountDto.FIELD_GETTER_FORMAT);
 			dto.setRemark(entity.getRemark());
-			dto.setSessionId(entity.getSessionId());
+			dto.setSessionIds(ReflectionUtil.getNumberedFieldsAsList(entity, AuthAccountDto.SESSIONID_GETTER_FORMAT, AuthAccountDto.SESSIONID_START_NUM, AuthAccountDto.SESSIONID_END_NUM));
 			return dto;
 		}).collect(Collectors.toList());
 	}
@@ -172,7 +177,9 @@ public class AuthLogic {
 						applyDto.setAuthConfigId(dto.getId());
 						applyDto.setParamType(RequestParameterType.getById((byte)(int)applyEntity.getParamType()));
 						applyDto.setParamName(applyEntity.getParamName());
-						applyDto.setVarName(applyEntity.getVarName());
+						applyDto.setSourceType(SourceType.getById((byte)(int)applyEntity.getSourceType()));
+						applyDto.setSourceName(applyEntity.getSourceName());
+						applyDto.setEncode(EncodeType.getById(Integer.parseInt(Optional.ofNullable(applyEntity.getEncode()).orElse("0"))));
 						return applyDto;
 					}).collect(Collectors.toList()));
 
@@ -203,7 +210,9 @@ public class AuthLogic {
 			entity.setFkAuthConfigId(dto.getAuthConfigId());
 			entity.setParamType((int)dto.getParamType().getId());
 			entity.setParamName(dto.getParamName());
-			entity.setVarName(dto.getVarName());
+			entity.setSourceType((int)dto.getSourceType().getId());
+			entity.setSourceName(dto.getSourceName());
+			entity.setEncode(Integer.toString(dto.getEncode().getId()));
 			entity.setPrcDate(now);
 
 			if(entity.getId() != null) {
@@ -235,14 +244,23 @@ public class AuthLogic {
 				return;
 			}
 
-			//TODO: support multiple authApplyConfigs case
-			var varName = ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().get(0).getVarName();
-			if(messageChainRepeatDto.getVars().containsKey(varName)) {
-				authAccountDto.setSessionId(messageChainRepeatDto.getVars().get(varName));
+			authAccountDto.setSessionIds(
+				ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().stream().map(authApplyConfigDto -> {
+					switch (authApplyConfigDto.getSourceType()) {
+					case VAR:
+						if(!messageChainRepeatDto.getVars().containsKey(authApplyConfigDto.getSourceName())) {
+							return null;
+						}
+						return messageChainRepeatDto.getVars().get(authApplyConfigDto.getSourceName());
+					case AUTH_ACCOUNT_TABLE:
+						return authAccountDto.getField(authApplyConfigDto.getSourceName());
+					default:
+						throw new IllegalArgumentException(authApplyConfigDto.getSourceType().name());
+					}
+				}).collect(Collectors.toList()));
 
-				if(!isTest) {
-					saveAuthAccount(authAccountDto, false);
-				}
+			if(!isTest) {
+				saveAuthAccount(authAccountDto, false);
 			}
 
 			if(callback != null) {
