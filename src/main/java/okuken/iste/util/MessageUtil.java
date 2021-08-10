@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
@@ -31,6 +33,11 @@ public class MessageUtil {
 
 		if(paramType == RequestParameterType.REGEX) {
 			return applyRegexPayload(request, paramName, paramValue);
+		}
+
+		if(!BurpUtil.getHelpers().analyzeRequest(request).getParameters().stream().anyMatch(p -> 
+				p.getType() == paramType.getBurpId() && StringUtils.equals(p.getName(), paramName))) {
+			return request;
 		}
 
 		var parameter = BurpUtil.getHelpers().buildParameter(paramName, paramValue, paramType.getBurpId());
