@@ -205,6 +205,11 @@ public class MessageTablePanel extends JPanel {
 				.collect(Collectors.toList());
 	}
 
+	public MessageTableColumn getSelectedColumnType() {
+		return tableModel.getColumnType(
+				table.convertColumnIndexToModel(table.getSelectedColumn()));
+	}
+
 	public String getSelectedMessagesForCopyToClipboad() {
 		return tableModel.getRowsAsTsv(
 				Arrays.stream(table.getSelectedRows()).map(table::convertRowIndexToModel).toArray(),

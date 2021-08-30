@@ -24,6 +24,7 @@ public class Captions {
 	public static final String COPY = "Copy";
 
 	public static final String OK = "OK";
+	public static final String CANCEL = "Cancel";
 
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";
 	public static final String CONTEXT_MENU_SEND_TO_HISTORY = "Send to ISTE as history of repeat";
@@ -74,12 +75,18 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE = "Send to Comparer (response)";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_ORG = "Send to Comparer (response) with Org";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_MST = "Send to Comparer (response) with Master";
+	public static final String TABLE_CONTEXT_MENU_EDIT_CELL = "Edit cell";
 	public static final String TABLE_CONTEXT_MENU_DELETE_ITEM = "Delete item";
 	public static final String TABLE_CONTEXT_MENU_COPY_NAME = "Copy name";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY = "Copy URL without Query";
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy as table";
 	public static final String TABLE_CONTEXT_MENU_COPY_BY_TEMPLATE_PREFIX = "Copy ";
+
+	public static final String TABLE_CELL_EDITOR_INPUT = "Input";
+	public static final String TABLE_CELL_EDITOR_REPLACE = "Replace(Regex)";
+	public static final String TABLE_CELL_EDITOR_NUMBERING = "Numbering";
+	public static final String TABLE_CELL_EDITOR_NUMBERING_FROM = "from";
 
 	public static final String REPEAT_HISTORY_CAPTION_BY_SEND_TO = "[Send to ISTE]";
 

@@ -247,6 +247,17 @@ public class Controller {
 		return this.messageTablePanel.getSelectedMessagesForCopyToClipboad();
 	}
 
+	public MessageTableColumn getSelectedMessageColumnType() {
+		return messageTablePanel.getSelectedColumnType();
+	}
+
+	public void updateMessage(MessageDto dto) {
+		MessageLogic.getInstance().updateMessage(dto);
+
+		var index = getMessages().indexOf(dto);
+		messageTableModel.fireTableRowsUpdated(index, index);
+	}
+
 	public void refreshMessageTablePopupMenu() {
 		((MessageTablePopupMenu)messageTable.getComponentPopupMenu()).refresh();
 	}
