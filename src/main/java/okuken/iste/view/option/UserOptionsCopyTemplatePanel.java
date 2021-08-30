@@ -4,6 +4,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.apache.commons.lang3.StringUtils;
+
 import okuken.iste.consts.Captions;
 import okuken.iste.util.UiUtil;
 
@@ -11,16 +13,20 @@ import java.awt.FlowLayout;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.stream.IntStream;
 import java.awt.event.ActionEvent;
+import javax.swing.JComboBox;
 
 public class UserOptionsCopyTemplatePanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private JTextField nameTextField;
+	private JComboBox<String> mnemonicComboBox;
 	private JTextArea templateTextArea;
 
-	public UserOptionsCopyTemplatePanel(UserOptionsCopyTemplatesPanel parentPanel, String name, String template) {
+	public UserOptionsCopyTemplatePanel(UserOptionsCopyTemplatesPanel parentPanel, String name, String template, String mnemonic) {
 		var that = this;
 		FlowLayout flowLayout = (FlowLayout) getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
@@ -39,6 +45,16 @@ public class UserOptionsCopyTemplatePanel extends JPanel {
 		UiUtil.addUndoRedoFeature(nameTextField);
 		add(nameTextField);
 		
+		mnemonicComboBox = new JComboBox<String>();
+		mnemonicComboBox.setToolTipText(Captions.USER_OPTIONS_COPY_TEMPLATE_MNEMONIC_TT);
+		mnemonicComboBox.addItem(" ");
+		IntStream.range(KeyEvent.VK_0, KeyEvent.VK_9 + 1).forEach(k -> {mnemonicComboBox.addItem(Character.toString(k));});
+		IntStream.range(KeyEvent.VK_A, KeyEvent.VK_Z + 1).forEach(k -> {mnemonicComboBox.addItem(Character.toString(k));});
+		if(mnemonic != null) {
+			mnemonicComboBox.setSelectedItem(mnemonic);
+		}
+		add(mnemonicComboBox);
+		
 		templateTextArea = new JTextArea(template);
 		templateTextArea.setToolTipText(Captions.USER_OPTIONS_COPY_TEMPLATE_TEMPLATE_TT);
 		templateTextArea.setColumns(50);
@@ -52,6 +68,14 @@ public class UserOptionsCopyTemplatePanel extends JPanel {
 
 	String getTemplateName() {
 		return nameTextField.getText();
+	}
+
+	String getTemplateMnemonic() {
+		var ret = mnemonicComboBox.getItemAt(mnemonicComboBox.getSelectedIndex());
+		if(StringUtils.isBlank(ret)) {
+			return null;
+		}
+		return ret;
 	}
 
 	String getTemplateBody() {

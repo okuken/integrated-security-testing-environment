@@ -31,6 +31,7 @@ public class ConfigLogic {
 	private static final String CONFIG_KEY_MESSAGE_MEMO_TEMPLATE = "messageMemoTemplate";
 	private static final String CONFIG_KEY_PROJECT_MEMO_TEMPLATES = "projectMemoTemplates";
 	private static final String CONFIG_KEY_COPY_TEMPLATES = "copyTemplates";
+	private static final String CONFIG_KEY_COPY_TEMPLATE_MNEMONICS = "copyTemplateMnemonics";
 
 	//cache
 	private UserOptionsDto configDto;
@@ -65,6 +66,7 @@ public class ConfigLogic {
 		ret.setMessageMemoTemplate(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_MESSAGE_MEMO_TEMPLATE));
 		ret.setProjectMemoTemplates(loadUserOptionJson(CONFIG_KEY_PROJECT_MEMO_TEMPLATES, List.class));
 		ret.setCopyTemplates(loadUserOptionJson(CONFIG_KEY_COPY_TEMPLATES, LinkedHashMap.class));
+		ret.setCopyTemplateMnemonics(loadUserOptionJson(CONFIG_KEY_COPY_TEMPLATE_MNEMONICS, LinkedHashMap.class));
 
 		return ret;
 	}
@@ -118,9 +120,11 @@ public class ConfigLogic {
 		getUserOptions().setProjectMemoTemplates(projectMemoTemplates);
 	}
 
-	public void saveCopyTemplates(Map<String, String> copyTemplates) {
+	public void saveCopyTemplates(Map<String, String> copyTemplates, Map<String, String> copyTemplateMnemonics) {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_COPY_TEMPLATES, new Gson().toJson(copyTemplates));
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_COPY_TEMPLATE_MNEMONICS, new Gson().toJson(copyTemplateMnemonics));
 		getUserOptions().setCopyTemplates(copyTemplates);
+		getUserOptions().setCopyTemplateMnemonics(copyTemplateMnemonics);
 	}
 
 

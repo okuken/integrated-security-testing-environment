@@ -15,6 +15,7 @@ public class UserOptionsDto {
 	private String messageMemoTemplate;
 	private List<String> projectMemoTemplates;
 	private Map<String, String> copyTemplates;
+	private Map<String, String> copyTemplateMnemonics;
 
 	public String getUserName() {
 		return userName;
@@ -64,5 +65,10 @@ public class UserOptionsDto {
 	public void setCopyTemplates(Map<String, String> copyTemplates) {
 		this.copyTemplates = copyTemplates;
 	}
-
+	public Map<String, String> getCopyTemplateMnemonics() {
+		return copyTemplateMnemonics;
+	}
+	public void setCopyTemplateMnemonics(Map<String, String> copyTemplateMnemonics) {
+		this.copyTemplateMnemonics = copyTemplateMnemonics;
+	}
 }

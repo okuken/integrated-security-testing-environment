@@ -97,10 +97,10 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 	}
 
 	private void addTemplatePanel() {
-		addTemplatePanel(null, null);
+		addTemplatePanel(null, null, null);
 	}
-	private void addTemplatePanel(String name, String template) {
-		var templatePanel = new UserOptionsCopyTemplatePanel(this, name, template);
+	private void addTemplatePanel(String name, String template, String mnemonic) {
+		var templatePanel = new UserOptionsCopyTemplatePanel(this, name, template, mnemonic);
 		templatePanels.add(templatePanel);
 		mainPanel.add(templatePanel);
 	}
@@ -119,22 +119,32 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 		}
 
 		loadedCopyTemplates.entrySet().forEach(entry -> {
-			addTemplatePanel(entry.getKey(), entry.getValue());
+			addTemplatePanel(entry.getKey(), entry.getValue(), getMnemonic(entry.getKey()));
 		});
 
 		UiUtil.repaint(mainPanel);
 	}
+	private String getMnemonic(String key) {
+		var loadedCopyTemplateMnemonics = ConfigLogic.getInstance().getUserOptions().getCopyTemplateMnemonics();
+		if(loadedCopyTemplateMnemonics == null || !loadedCopyTemplateMnemonics.containsKey(key)) {
+			return null;
+		}
+
+		return loadedCopyTemplateMnemonics.get(key);
+	}
 
 	private void save() {
 		Map<String, String> copyTemplates = Maps.newLinkedHashMap();
+		Map<String, String> copyTemplateMnemonics = Maps.newLinkedHashMap();
 		templatePanels.forEach(templatePanel -> {
 			var name = templatePanel.getTemplateName();
 			if(copyTemplates.containsKey(name)) {
 				throw new IllegalArgumentException("Template name must be unique.");
 			}
 			copyTemplates.put(name, templatePanel.getTemplateBody());
+			copyTemplateMnemonics.put(name, templatePanel.getTemplateMnemonic());
 		});
-		ConfigLogic.getInstance().saveCopyTemplates(copyTemplates);
+		ConfigLogic.getInstance().saveCopyTemplates(copyTemplates, copyTemplateMnemonics);
 		Controller.getInstance().refreshMessageTablePopupMenu();
 	}
 

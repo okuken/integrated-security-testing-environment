@@ -7,6 +7,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.apache.commons.lang3.StringUtils;
+
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
@@ -235,6 +237,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 			add(new JPopupMenu.Separator());
 
+			var loadedCopyTemplateMnemonics = ConfigLogic.getInstance().getUserOptions().getCopyTemplateMnemonics();
 			loadedCopyTemplates.entrySet().forEach(template -> {
 				JMenuItem menuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_BY_TEMPLATE_PREFIX + template.getKey());
 				menuItem.addActionListener(new ActionListener() {
@@ -244,6 +247,10 @@ public class MessageTablePopupMenu extends JPopupMenu {
 								.collect(Collectors.joining(System.lineSeparator())));
 					}
 				});
+				if(loadedCopyTemplateMnemonics != null && loadedCopyTemplateMnemonics.containsKey(template.getKey()) && StringUtils.isNotBlank(loadedCopyTemplateMnemonics.get(template.getKey()))) {
+					menuItem.setMnemonic(
+						(int)loadedCopyTemplateMnemonics.get(template.getKey()).charAt(0));
+				}
 				add(menuItem);
 			});
 		}
