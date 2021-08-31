@@ -21,6 +21,7 @@ import okuken.iste.util.FileUtil;
 import okuken.iste.util.ThreadUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.ContextMenuFactory;
+import okuken.iste.view.KeyStrokeManager;
 import okuken.iste.view.SuiteTab;
 
 public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExtensionStateListener {
@@ -49,6 +50,9 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 
 			SwingUtilities.invokeLater(() -> {
 				controller.initSizeRatioOfParts();
+
+				BurpUtil.extractBurpSuiteProxyHttpHistoryTable();
+				KeyStrokeManager.getInstance().setupKeyStroke();
 			});
 		});
 	}
@@ -80,6 +84,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 		ThreadUtil.shutdownExecutorService();
 		PluginManager.getInstance().unloadAllPlugins();
 		DatabaseManager.getInstance().unloadDatabase();
+		KeyStrokeManager.getInstance().unloadKeyStroke();
 		UiUtil.disposeDockoutFrames();
 		UiUtil.disposePopupFrames();
 	}
