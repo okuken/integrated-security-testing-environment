@@ -277,7 +277,10 @@ public class UiUtil {
 	}
 
 	public static void showMessage(String message, Component triggerComponent) {
-		JOptionPane.showMessageDialog(getParentFrame(triggerComponent), message);
+		JOptionPane.showMessageDialog(getParentFrame(triggerComponent), message, Captions.EXTENSION_NAME_FULL, JOptionPane.ERROR_MESSAGE);
+	}
+	public static void showInfoMessage(String message, Component triggerComponent) {
+		JOptionPane.showMessageDialog(getParentFrame(triggerComponent), message, Captions.EXTENSION_NAME_FULL, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public static boolean getConfirmAnswer(String message) {

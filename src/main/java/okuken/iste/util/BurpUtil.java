@@ -149,8 +149,8 @@ public class BurpUtil {
 		}
 	}
 
-	public static int convertToProxyHistoryIndex(TableModel burpSuiteProxyHttpHistoryTableModel, int tableModelRowIndex) {
-		return ((Integer)burpSuiteProxyHttpHistoryTableModel.getValueAt(tableModelRowIndex, 0)) - 1; // (value of "#" column) - 1
+	public static Integer extractProxyHttpHistoryNumber(TableModel burpSuiteProxyHttpHistoryTableModel, int tableModelRowIndex) {
+		return (Integer)burpSuiteProxyHttpHistoryTableModel.getValueAt(tableModelRowIndex, 0); // value of "#" column
 	}
 
 	private static Boolean professionalEdition;
