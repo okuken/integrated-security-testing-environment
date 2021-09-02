@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -114,6 +115,13 @@ public class UiUtil {
 				copyToClipboard(val != null ? val.toString() : "");
 			}
 		});
+	}
+
+	public static void setupTablePopupMenuItem(JMenuItem menuItem, JTable table, KeyStroke keyStroke, Action action) {
+		menuItem.addActionListener(action);
+		menuItem.setAccelerator(keyStroke);
+		table.getInputMap().put(keyStroke, menuItem);
+		table.getActionMap().put(menuItem, action);
 	}
 
 	public static final JPopupMenu createCopyPopupMenu(Supplier<String> supplier) {
@@ -289,6 +297,12 @@ public class UiUtil {
 	public static boolean getConfirmAnswer(String message, Component triggerComponent) {
 		return JOptionPane.showConfirmDialog(getParentFrame(triggerComponent), 
 				message, String.format("Confirm [%s]", Captions.EXTENSION_NAME_FULL), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
+	}
+
+	public static boolean getConfirmAnswerDefaultCancel(String message, Component triggerComponent) {
+		Object[] options = {Captions.OK, Captions.CANCEL};
+		return JOptionPane.showOptionDialog(getParentFrame(triggerComponent), 
+				message, String.format("Confirm [%s]", Captions.EXTENSION_NAME_FULL), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]) == JOptionPane.OK_OPTION;
 	}
 
 	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
