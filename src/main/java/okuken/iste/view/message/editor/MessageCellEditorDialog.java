@@ -277,9 +277,10 @@ public class MessageCellEditorDialog extends JDialog {
 			int number = Integer.parseInt(numberingFromTextField.getText());
 			for(var message: messages) {
 				columnType.getSetter().invoke(message, makeApplyValue(message, number));
-				Controller.getInstance().updateMessage(message);
+				Controller.getInstance().updateMessage(message, false);
 				number++;
 			};
+			Controller.getInstance().applyMessageFilter();
 			return true;
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);

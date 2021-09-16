@@ -252,10 +252,16 @@ public class Controller {
 	}
 
 	public void updateMessage(MessageDto dto) {
+		updateMessage(dto, true);
+	}
+	public void updateMessage(MessageDto dto, boolean applyMessageFilter) {
 		MessageLogic.getInstance().updateMessage(dto);
 
 		var index = getMessages().indexOf(dto);
 		messageTableModel.fireTableRowsUpdated(index, index);
+		if(applyMessageFilter) {
+			applyMessageFilter();
+		}
 	}
 
 	public void refreshMessageTablePopupMenu() {

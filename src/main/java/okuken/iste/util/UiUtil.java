@@ -59,6 +59,20 @@ public class UiUtil {
 		return SwingUtilities.getWindowAncestor(component);
 	}
 
+	public static final Integer getNextTableModelRow(List<Integer> tableModelRowIndexs, JTable table) {
+		if(tableModelRowIndexs.isEmpty()) {
+			return null;
+		}
+		var tableModelRowIndex = tableModelRowIndexs.get(tableModelRowIndexs.size() - 1);
+
+		var viewIndex = table.convertRowIndexToView(tableModelRowIndex);
+		if(viewIndex + 1 >= table.getRowCount()) {
+			return null;
+		}
+
+		return table.convertRowIndexToModel(viewIndex + 1);
+	}
+
 	public static final void repaint(JComponent component) {
 		component.revalidate();
 		component.repaint();

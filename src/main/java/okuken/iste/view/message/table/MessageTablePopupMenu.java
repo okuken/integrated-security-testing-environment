@@ -204,8 +204,9 @@ public class MessageTablePopupMenu extends JPopupMenu {
 						var progress = progressComboBox.getItemAt(progressComboBox.getSelectedIndex());
 						selectedMessages.forEach(message -> {
 							message.setProgress(progress);
-							Controller.getInstance().updateMessage(message);
+							Controller.getInstance().updateMessage(message, false);
 						});
+						Controller.getInstance().applyMessageFilter();
 					}
 					return;
 				}
