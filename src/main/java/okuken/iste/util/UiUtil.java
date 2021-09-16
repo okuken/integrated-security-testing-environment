@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -40,6 +41,8 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.JTextComponent;
@@ -317,6 +320,26 @@ public class UiUtil {
 		Object[] options = {Captions.OK, Captions.CANCEL};
 		return JOptionPane.showOptionDialog(getParentFrame(triggerComponent), 
 				message, String.format("Confirm [%s]", Captions.EXTENSION_NAME_FULL), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]) == JOptionPane.OK_OPTION;
+	}
+
+	public static int showOptionDialog(Component parentComponent, JComponent component, String title, int optionType, int messageType,
+			Icon icon, Object[] options, Object initialValue) {
+
+		// focus on component
+		component.addAncestorListener(new AncestorListener() {
+			@Override
+			public void ancestorAdded(AncestorEvent event) {
+				var component = event.getComponent();
+				component.requestFocusInWindow();
+				component.removeAncestorListener(this);
+			}
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {}
+			@Override
+			public void ancestorMoved(AncestorEvent event) {}
+		});
+
+		return JOptionPane.showOptionDialog(parentComponent, component, title, optionType, messageType, icon, options, initialValue);
 	}
 
 	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

@@ -19,6 +19,7 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 public class MessageSelectorForSendToHistory {
 
@@ -50,7 +51,7 @@ public class MessageSelectorForSendToHistory {
 			urlComboBox.setSelectedIndex(candidateIndexes.get(0));
 		}
 
-		if(JOptionPane.showOptionDialog(
+		if(UiUtil.showOptionDialog(
 				BurpUtil.getBurpSuiteJFrame(),
 				urlComboBox,
 				Captions.MESSAGE_SELECT_SEND_TO_HISTORY_TARGET,

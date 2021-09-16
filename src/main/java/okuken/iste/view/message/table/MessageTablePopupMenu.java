@@ -194,7 +194,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 					var progressComboBox = new JComboBox<SecurityTestingProgress>();
 					Arrays.stream(SecurityTestingProgress.values()).forEach(progress -> progressComboBox.addItem(progress));
 					progressComboBox.setSelectedItem(selectedMessages.get(0).getProgress());
-					if(JOptionPane.showOptionDialog(
+					if(UiUtil.showOptionDialog(
 							burpFrame,
 							progressComboBox,
 							columnType.getCaption(),
