@@ -32,6 +32,8 @@ public class ConfigLogic {
 	private static final String CONFIG_KEY_PROJECT_MEMO_TEMPLATES = "projectMemoTemplates";
 	private static final String CONFIG_KEY_COPY_TEMPLATES = "copyTemplates";
 	private static final String CONFIG_KEY_COPY_TEMPLATE_MNEMONICS = "copyTemplateMnemonics";
+	private static final String CONFIG_KEY_USE_KEYBOARD_SHORTCUT_Q = "useKeyboardShortcutQ";
+	private static final String CONFIG_KEY_USE_KEYBOARD_SHORTCUT_WITH_CLICK = "useKeyboardShortcutWithClick";
 
 	//cache
 	private UserOptionsDto configDto;
@@ -67,6 +69,9 @@ public class ConfigLogic {
 		ret.setProjectMemoTemplates(loadUserOptionJson(CONFIG_KEY_PROJECT_MEMO_TEMPLATES, List.class));
 		ret.setCopyTemplates(loadUserOptionJson(CONFIG_KEY_COPY_TEMPLATES, LinkedHashMap.class));
 		ret.setCopyTemplateMnemonics(loadUserOptionJson(CONFIG_KEY_COPY_TEMPLATE_MNEMONICS, LinkedHashMap.class));
+
+		ret.setUseKeyboardShortcutQ(Boolean.valueOf(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_USE_KEYBOARD_SHORTCUT_Q)));
+		ret.setUseKeyboardShortcutWithClick(Boolean.valueOf(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_USE_KEYBOARD_SHORTCUT_WITH_CLICK)));
 
 		return ret;
 	}
@@ -125,6 +130,16 @@ public class ConfigLogic {
 		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_COPY_TEMPLATE_MNEMONICS, new Gson().toJson(copyTemplateMnemonics));
 		getUserOptions().setCopyTemplates(copyTemplates);
 		getUserOptions().setCopyTemplateMnemonics(copyTemplateMnemonics);
+	}
+
+	public void saveUseKeyboardShortcutQ(boolean useKeyboardShortcutQ) {
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_USE_KEYBOARD_SHORTCUT_Q, Boolean.toString(useKeyboardShortcutQ));
+		getUserOptions().setUseKeyboardShortcutQ(useKeyboardShortcutQ);
+	}
+
+	public void saveUseKeyboardShortcutWithClick(boolean useKeyboardShortcutWithClick) {
+		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_USE_KEYBOARD_SHORTCUT_WITH_CLICK, Boolean.toString(useKeyboardShortcutWithClick));
+		getUserOptions().setUseKeyboardShortcutWithClick(useKeyboardShortcutWithClick);
 	}
 
 

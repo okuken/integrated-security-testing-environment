@@ -10,6 +10,9 @@ public class UserOptionsDto {
 	private String userName;
 	private String dbFilePath;
 	private boolean darkTheme;
+	private boolean useKeyboardShortcutQ;
+	private boolean useKeyboardShortcutWithClick;
+
 	private String lastSelectedProjectName;
 	private List<PluginLoadInfo> plugins;
 	private String messageMemoTemplate;
@@ -34,6 +37,18 @@ public class UserOptionsDto {
 	}
 	public void setDarkTheme(boolean darkTheme) {
 		this.darkTheme = darkTheme;
+	}
+	public boolean isUseKeyboardShortcutQ() {
+		return useKeyboardShortcutQ;
+	}
+	public void setUseKeyboardShortcutQ(boolean useKeyboardShortcutQ) {
+		this.useKeyboardShortcutQ = useKeyboardShortcutQ;
+	}
+	public boolean isUseKeyboardShortcutWithClick() {
+		return useKeyboardShortcutWithClick;
+	}
+	public void setUseKeyboardShortcutWithClick(boolean useKeyboardShortcutWithClick) {
+		this.useKeyboardShortcutWithClick = useKeyboardShortcutWithClick;
 	}
 	public String getLastSelectedProjectName() {
 		return lastSelectedProjectName;

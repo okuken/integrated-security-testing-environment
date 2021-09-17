@@ -123,6 +123,10 @@ public class BurpUtil {
 		return burpSuiteProxyHttpHistoryTable;
 	}
 	public static void extractBurpSuiteProxyHttpHistoryTable() {
+		if(burpSuiteProxyHttpHistoryTable != null) {
+			return;
+		}
+
 		var ret = new ArrayList<JTable>();
 		extractBurpSuiteProxyHttpHistoryTableImpl(getBurpSuiteJFrame(), ret);
 		if(ret.isEmpty()) {

@@ -51,8 +51,10 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 			SwingUtilities.invokeLater(() -> {
 				controller.initSizeRatioOfParts();
 
-				BurpUtil.extractBurpSuiteProxyHttpHistoryTable();
-				KeyStrokeManager.getInstance().setupKeyStroke();
+				if(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ()) {
+					BurpUtil.extractBurpSuiteProxyHttpHistoryTable();
+					KeyStrokeManager.getInstance().setupKeyStroke();
+				}
 			});
 		});
 	}

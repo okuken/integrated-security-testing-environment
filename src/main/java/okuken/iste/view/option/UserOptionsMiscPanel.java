@@ -6,8 +6,10 @@ import javax.swing.JTextField;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
+import okuken.iste.view.KeyStrokeManager;
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -15,9 +17,9 @@ import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 
 public class UserOptionsMiscPanel extends JPanel {
 
@@ -54,13 +56,12 @@ public class UserOptionsMiscPanel extends JPanel {
 //		add(userNameSaveButton);
 		
 		JLabel dbFileLabel = new JLabel(Captions.USER_OPTIONS_DB_FILE_PATH + ":");
-		dbFileLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 12));
 		dbFileLabel.setBounds(30, 25, 100, 30);
 		add(dbFileLabel);
 		
 		dbFileTextField = new JTextField();
 		dbFileTextField.setColumns(20);
-		dbFileTextField.setBounds(110, 25, 300, 30);
+		dbFileTextField.setBounds(170, 25, 300, 30);
 		add(dbFileTextField);
 		
 		JButton dbFileChooseButton = new JButton(Captions.FILECHOOSER);
@@ -72,7 +73,7 @@ public class UserOptionsMiscPanel extends JPanel {
 				}
 			}
 		});
-		dbFileChooseButton.setBounds(410, 25, 20, 30);
+		dbFileChooseButton.setBounds(470, 25, 20, 30);
 		add(dbFileChooseButton);
 		
 		JButton dbFileSaveButton = new JButton(Captions.USER_OPTIONS_DB_FILE_BUTTON_SAVE);
@@ -83,7 +84,7 @@ public class UserOptionsMiscPanel extends JPanel {
 				UiUtil.showTemporaryMessage(dbFileMessageLabel, Captions.MESSAGE_DONE);
 			}
 		});
-		dbFileSaveButton.setBounds(440, 25, 120, 30);
+		dbFileSaveButton.setBounds(500, 25, 120, 30);
 		add(dbFileSaveButton);
 		
 		dbFileMessageLabel = UiUtil.createTemporaryMessageArea();
@@ -101,15 +102,47 @@ public class UserOptionsMiscPanel extends JPanel {
 			}
 		});
 		themeComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {THEME_LIGHT, THEME_DARK}));
-		themeComboBox.setBounds(110, 75, 80, 30);
+		themeComboBox.setBounds(170, 75, 80, 30);
 		if(ConfigLogic.getInstance().getUserOptions().isDarkTheme()) {
 			themeComboBox.setSelectedItem(THEME_DARK);
 		}
 		add(themeComboBox);
 		
 		JLabel themeExplanationLabel = new JLabel(Captions.USER_OPTIONS_THEME_EXPLANATION);
-		themeExplanationLabel.setBounds(200, 75, 700, 30);
+		themeExplanationLabel.setBounds(260, 75, 700, 30);
 		add(themeExplanationLabel);
+		
+		JLabel useKeyboardShortcutLabel = new JLabel(Captions.USER_OPTIONS_USE_KEYBOARD_SHORTCUT + ":");
+		useKeyboardShortcutLabel.setBounds(30, 130, 135, 13);
+		add(useKeyboardShortcutLabel);
+		
+		JCheckBox useKeyboardShortcutQCheckBox = new JCheckBox(Captions.USER_OPTIONS_USE_KEYBOARD_SHORTCUT_Q);
+		useKeyboardShortcutQCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ());
+		useKeyboardShortcutQCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var useKeyboardShortcutQ = useKeyboardShortcutQCheckBox.isSelected();
+
+				ConfigLogic.getInstance().saveUseKeyboardShortcutQ(useKeyboardShortcutQ);
+				if(useKeyboardShortcutQ) {
+					BurpUtil.extractBurpSuiteProxyHttpHistoryTable();
+					KeyStrokeManager.getInstance().setupKeyStroke();
+				} else {
+					KeyStrokeManager.getInstance().unloadKeyStroke();
+				}
+			}
+		});
+		useKeyboardShortcutQCheckBox.setBounds(170, 126, 600, 21);
+		add(useKeyboardShortcutQCheckBox);
+		
+		JCheckBox useKeyboardShortcutWithClickCheckBox = new JCheckBox(Captions.USER_OPTIONS_USE_KEYBOARD_SHORTCUT_WITH_CLICK);
+		useKeyboardShortcutWithClickCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutWithClick());
+		useKeyboardShortcutWithClickCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ConfigLogic.getInstance().saveUseKeyboardShortcutWithClick(useKeyboardShortcutWithClickCheckBox.isSelected());
+			}
+		});
+		useKeyboardShortcutWithClickCheckBox.setBounds(170, 150, 450, 21);
+		add(useKeyboardShortcutWithClickCheckBox);
 
 		Controller.getInstance().setUserOptionsMiscPanel(this);
 		refresh();

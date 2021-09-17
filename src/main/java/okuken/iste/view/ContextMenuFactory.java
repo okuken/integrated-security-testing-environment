@@ -14,6 +14,7 @@ import burp.IContextMenuInvocation;
 import burp.IHttpRequestResponse;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.view.message.selector.MessageSelectorForSendToHistory;
 
 public class ContextMenuFactory implements IContextMenuFactory {
@@ -33,14 +34,16 @@ public class ContextMenuFactory implements IContextMenuFactory {
 			return null;
 		}
 
-		var modifiersEx = invocation.getInputEvent().getModifiersEx();
-		if((modifiersEx & AUTO_SEND_TO_ISTE_HISTORY_MASK) == AUTO_SEND_TO_ISTE_HISTORY_MASK) {
-			doActionIfNotDuplicate(invocation, selectedMessages, this::sendToHistory);
-			return null;
-		}
-		if((modifiersEx & AUTO_SEND_TO_ISTE_MASK) == AUTO_SEND_TO_ISTE_MASK) {
-			doActionIfNotDuplicate(invocation, selectedMessages, this::sendTo);
-			return null;
+		if(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutWithClick()) {
+			var modifiersEx = invocation.getInputEvent().getModifiersEx();
+			if((modifiersEx & AUTO_SEND_TO_ISTE_HISTORY_MASK) == AUTO_SEND_TO_ISTE_HISTORY_MASK) {
+				doActionIfNotDuplicate(invocation, selectedMessages, this::sendToHistory);
+				return null;
+			}
+			if((modifiersEx & AUTO_SEND_TO_ISTE_MASK) == AUTO_SEND_TO_ISTE_MASK) {
+				doActionIfNotDuplicate(invocation, selectedMessages, this::sendTo);
+				return null;
+			}
 		}
 
 		return Arrays.asList(createSendToMenu(selectedMessages), createSendToHistoryMenu(selectedMessages));
