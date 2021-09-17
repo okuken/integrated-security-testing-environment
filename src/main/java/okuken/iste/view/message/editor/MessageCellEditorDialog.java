@@ -239,9 +239,15 @@ public class MessageCellEditorDialog extends JDialog {
 
 		replaceFromTextField.setEnabled(replaceRadioButton.isSelected());
 		replaceToTextField.setEnabled(replaceRadioButton.isSelected());
+		if(replaceRadioButton.isSelected()) {
+			replaceFromTextField.requestFocusInWindow();
+		}
 
 		numberingFormatTextField.setEnabled(numberingRadioButton.isSelected());
 		numberingFromTextField.setEnabled(numberingRadioButton.isSelected());
+		if(numberingRadioButton.isSelected()) {
+			numberingFormatTextField.requestFocusInWindow();
+		}
 	}
 
 	private boolean validateInputs() {
