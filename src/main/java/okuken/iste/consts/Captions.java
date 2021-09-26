@@ -42,7 +42,7 @@ public class Captions {
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT = "Repeater";
 	public static final String TAB_MAIN_MESSAGE_EDITOR_CHAIN = "Chain";
 
-	public static final String TAB_TOOLS_EXPORT = "Export";
+	public static final String TAB_TOOLS_EXPORT = "Export / Import";
 	public static final String TAB_TOOLS_BSQLI = "BSQLi";
 
 	public static final String TAB_OPTIONS_PROJECT_OPTIONS = "Project options";
@@ -165,9 +165,18 @@ public class Captions {
 
 	public static final String TOOLS_EXPLOIT_BSQLI_POPUP_TITLE_SUFFIX = " - BSQLi";
 
-	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export notes (.md)";
+	public static final String TOOLS_EXPORT_LABEL_MEMO = "Notes";
+	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export (.md)";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER_TT = "Apply filter of List tab to export notes";
+
+	public static final String TOOLS_EXPORT_LABEL_USER_OPTIONS = "User options";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_EXPORT = "Export";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_EXPORT_TT = "Export user options in json format (exclude: environment-dependent options)";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_IMPORT = "Import";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_IMPORT_TT = "Import user options (exclude: environment-dependent options)";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_CLEAR = "Clear";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_CLEAR_TT = "Clear user options and unload ISTE";
 
 	public static final String PROJECT_OPTIONS_PROJECT_NAME = "Project name";
 	public static final String PROJECT_OPTIONS_BUTTON_SAVE = "Save";
@@ -202,7 +211,11 @@ public class Captions {
 	public static final String MESSAGE_SELECT_PROJECT = "Select ISTE project";
 	public static final String MESSAGE_SELECT_SEND_TO_HISTORY_TARGET = "To which history do you want to add the selected item?";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
-	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export notes (.md)";
+	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export";
+	public static final String MESSAGE_CHOOSE_IMPORT_FILE = "Import";
+	public static final String MESSAGE_CLEAR_USEROPTIONS = "Are you sure you want to clear all user options?\n"
+	                                                     + "\n"
+	                                                     + "It includes environment-dependent options, for example, path to the database file. At last, it will unload ISTE.";
 	public static final String MESSAGE_CHOOSE_PLUGIN_FILE = "Choose ISTE plugin jar file";
 
 }

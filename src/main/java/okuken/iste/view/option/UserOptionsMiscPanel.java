@@ -31,6 +31,11 @@ public class UserOptionsMiscPanel extends JPanel {
 	private JTextField dbFileTextField;
 	private JLabel dbFileMessageLabel;
 
+	private JComboBox<String> themeComboBox;
+
+	private JCheckBox useKeyboardShortcutQCheckBox;
+	private JCheckBox useKeyboardShortcutWithClickCheckBox;
+
 	public UserOptionsMiscPanel() {
 		setLayout(null);
 		
@@ -95,7 +100,7 @@ public class UserOptionsMiscPanel extends JPanel {
 		themeLabel.setBounds(30, 75, 45, 30);
 		add(themeLabel);
 		
-		JComboBox<String> themeComboBox = new JComboBox<String>();
+		themeComboBox = new JComboBox<String>();
 		themeComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ConfigLogic.getInstance().saveDarkTheme(themeComboBox.getSelectedItem().equals(THEME_DARK));
@@ -103,9 +108,6 @@ public class UserOptionsMiscPanel extends JPanel {
 		});
 		themeComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {THEME_LIGHT, THEME_DARK}));
 		themeComboBox.setBounds(170, 75, 80, 30);
-		if(ConfigLogic.getInstance().getUserOptions().isDarkTheme()) {
-			themeComboBox.setSelectedItem(THEME_DARK);
-		}
 		add(themeComboBox);
 		
 		JLabel themeExplanationLabel = new JLabel(Captions.USER_OPTIONS_THEME_EXPLANATION);
@@ -116,8 +118,7 @@ public class UserOptionsMiscPanel extends JPanel {
 		useKeyboardShortcutLabel.setBounds(30, 130, 135, 13);
 		add(useKeyboardShortcutLabel);
 		
-		JCheckBox useKeyboardShortcutQCheckBox = new JCheckBox(Captions.USER_OPTIONS_USE_KEYBOARD_SHORTCUT_Q);
-		useKeyboardShortcutQCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ());
+		useKeyboardShortcutQCheckBox = new JCheckBox(Captions.USER_OPTIONS_USE_KEYBOARD_SHORTCUT_Q);
 		useKeyboardShortcutQCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				var useKeyboardShortcutQ = useKeyboardShortcutQCheckBox.isSelected();
@@ -134,8 +135,7 @@ public class UserOptionsMiscPanel extends JPanel {
 		useKeyboardShortcutQCheckBox.setBounds(170, 126, 600, 21);
 		add(useKeyboardShortcutQCheckBox);
 		
-		JCheckBox useKeyboardShortcutWithClickCheckBox = new JCheckBox(Captions.USER_OPTIONS_USE_KEYBOARD_SHORTCUT_WITH_CLICK);
-		useKeyboardShortcutWithClickCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutWithClick());
+		useKeyboardShortcutWithClickCheckBox = new JCheckBox(Captions.USER_OPTIONS_USE_KEYBOARD_SHORTCUT_WITH_CLICK);
 		useKeyboardShortcutWithClickCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ConfigLogic.getInstance().saveUseKeyboardShortcutWithClick(useKeyboardShortcutWithClickCheckBox.isSelected());
@@ -150,6 +150,11 @@ public class UserOptionsMiscPanel extends JPanel {
 
 	public void refresh() {
 		dbFileTextField.setText(ConfigLogic.getInstance().getUserOptions().getDbFilePath());
+
+		themeComboBox.setSelectedItem(ConfigLogic.getInstance().getUserOptions().isDarkTheme() ? THEME_DARK : THEME_LIGHT);
+
+		useKeyboardShortcutQCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ());
+		useKeyboardShortcutWithClickCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutWithClick());
 	}
 
 }

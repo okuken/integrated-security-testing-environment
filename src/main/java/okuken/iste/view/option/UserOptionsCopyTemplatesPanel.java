@@ -94,6 +94,18 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 		
 		
 		load();
+		Controller.getInstance().setUserOptionsCopyTemplatesPanel(this);
+	}
+
+	public void refresh() {
+		for(int i = templatePanels.size() - 1; i >= 0; i--) {
+			var templatePanel = templatePanels.get(i);
+			mainPanel.remove(templatePanel);
+			templatePanels.remove(templatePanel);
+		}
+
+		load();
+		Controller.getInstance().refreshMessageTablePopupMenu();
 	}
 
 	private void addTemplatePanel() {

@@ -55,7 +55,9 @@ import okuken.iste.view.message.table.MessageTableModel;
 import okuken.iste.view.message.table.MessageTablePanel;
 import okuken.iste.view.message.table.MessageTablePopupMenu;
 import okuken.iste.view.option.ProjectOptionsPanel;
+import okuken.iste.view.option.UserOptionsCopyTemplatesPanel;
 import okuken.iste.view.option.UserOptionsMiscPanel;
+import okuken.iste.view.option.UserOptionsTemplatePanel;
 import okuken.iste.view.plugin.PluginsPanel;
 import okuken.iste.view.repeater.RepeatMasterPanel;
 import okuken.iste.view.repeater.RepeatTablePopupMenu;
@@ -92,6 +94,10 @@ public class Controller {
 	private List<MessageSelectorPanel> messageSelectPanels = Lists.newArrayList();
 
 	private ProjectOptionsPanel projectOptionsPanel;
+
+	private UserOptionsTemplatePanel userOptionsTemplatePanel;
+
+	private UserOptionsCopyTemplatesPanel userOptionsCopyTemplatesPanel;
 
 	private UserOptionsMiscPanel userOptionsMiscPanel;
 
@@ -170,6 +176,12 @@ public class Controller {
 	}
 	public void setProjectOptionsPanel(ProjectOptionsPanel projectOptionsPanel) {
 		this.projectOptionsPanel = projectOptionsPanel;
+	}
+	public void setUserOptionsTemplatePanel(UserOptionsTemplatePanel userOptionsTemplatePanel) {
+		this.userOptionsTemplatePanel = userOptionsTemplatePanel;
+	}
+	public void setUserOptionsCopyTemplatesPanel(UserOptionsCopyTemplatesPanel userOptionsCopyTemplatesPanel) {
+		this.userOptionsCopyTemplatesPanel = userOptionsCopyTemplatesPanel;
 	}
 	public void setUserOptionsMiscPanel(UserOptionsMiscPanel userOptionsMiscPanel) {
 		this.userOptionsMiscPanel = userOptionsMiscPanel;
@@ -289,6 +301,12 @@ public class Controller {
 		if(repeaterPanel.getOrgMessageDto() != null && repeaterPanel.getOrgMessageDto().getId().equals(messageDto.getId())) {
 			repeaterPanel.refresh();
 		}
+	}
+
+	public void refreshUserOptionsPanel() {
+		userOptionsTemplatePanel.refresh();
+		userOptionsCopyTemplatesPanel.refresh();
+		userOptionsMiscPanel.refresh();
 	}
 
 	public void refreshComponentsDependOnAuthConfig() {

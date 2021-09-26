@@ -7,9 +7,9 @@ plugins {
     id "de.undercouch.download" version "4.1.2"
 }
 
-version '0.3.1'
+version '0.4.0'
 
-def cleanDbVersion = '0.3.1'
+def cleanDbVersion = '0.4.0'
 
 shadowJar{
   mustRunAfter 'generateDao'
@@ -50,6 +50,7 @@ dependencies {
     implementation 'org.apache.velocity:velocity-engine-core:2.3'
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
     implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
     implementation 'args4j:args4j:2.33'
 
@@ -124,3 +125,4 @@ task generateDao {
 
 task buildISTE(dependsOn: [clean, createDir, makeCleanDb, generateDao, shadowJar])
 
+defaultTasks 'buildISTE'
