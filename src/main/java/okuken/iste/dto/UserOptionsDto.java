@@ -4,6 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import okuken.iste.annotations.Persistent;
 import okuken.iste.plugin.PluginLoadInfo;
 
@@ -32,16 +35,16 @@ public class UserOptionsDto {
 	private List<PluginLoadInfo> plugins;
 
 	@Persistent(key = "messageMemoTemplate")
-	private String messageMemoTemplate;
+	private String messageMemoTemplate = "";
 
 	@Persistent(key = "projectMemoTemplates")
-	private List<String> projectMemoTemplates;
+	private List<String> projectMemoTemplates = Lists.newArrayList();
 
 	@Persistent(key = "copyTemplates")
-	private LinkedHashMap<String, String> copyTemplates;
+	private LinkedHashMap<String, String> copyTemplates = Maps.newLinkedHashMap();
 
 	@Persistent(key = "copyTemplateMnemonics")
-	private Map<String, String> copyTemplateMnemonics;
+	private Map<String, String> copyTemplateMnemonics = Maps.newHashMap();
 
 
 	public String getDbFilePath() {

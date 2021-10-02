@@ -53,6 +53,9 @@ public class ConfigLogic {
 			.filter(field -> field.isAnnotationPresent(Persistent.class))
 			.forEach(field -> {
 				var valueStr = BurpUtil.getCallbacks().loadExtensionSetting(field.getAnnotation(Persistent.class).key());
+				if(valueStr == null) {
+					return;
+				}
 				ReflectionUtil.setPropertyByValueStr(ret, field, valueStr);
 			});
 		return ret;

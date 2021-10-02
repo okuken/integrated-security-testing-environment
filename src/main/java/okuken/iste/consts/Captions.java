@@ -78,6 +78,7 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_EDIT_CELL = "Edit cell";
 	public static final String TABLE_CONTEXT_MENU_DELETE_ITEM = "Delete item";
 	public static final String TABLE_CONTEXT_MENU_COPY_NAME = "Copy name";
+	public static final String TABLE_CONTEXT_MENU_COPY_NAME_WITHOUTNUMBER = "Copy name without number";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY = "Copy URL without Query";
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy as table";

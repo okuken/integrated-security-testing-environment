@@ -124,12 +124,7 @@ public class UserOptionsMiscPanel extends JPanel {
 				var useKeyboardShortcutQ = useKeyboardShortcutQCheckBox.isSelected();
 
 				ConfigLogic.getInstance().saveUseKeyboardShortcutQ(useKeyboardShortcutQ);
-				if(useKeyboardShortcutQ) {
-					BurpUtil.extractBurpSuiteProxyHttpHistoryTable();
-					KeyStrokeManager.getInstance().setupKeyStroke();
-				} else {
-					KeyStrokeManager.getInstance().unloadKeyStroke();
-				}
+				applyUseKeyboardShortcutQ(useKeyboardShortcutQ);
 			}
 		});
 		useKeyboardShortcutQCheckBox.setBounds(170, 126, 600, 21);
@@ -154,7 +149,18 @@ public class UserOptionsMiscPanel extends JPanel {
 		themeComboBox.setSelectedItem(ConfigLogic.getInstance().getUserOptions().isDarkTheme() ? THEME_DARK : THEME_LIGHT);
 
 		useKeyboardShortcutQCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ());
+		applyUseKeyboardShortcutQ(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ());
 		useKeyboardShortcutWithClickCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutWithClick());
+	}
+
+	private void applyUseKeyboardShortcutQ(boolean useKeyboardShortcutQ) {
+		if(!useKeyboardShortcutQ) {
+			KeyStrokeManager.getInstance().unloadKeyStroke();
+			return;
+		}
+
+		BurpUtil.extractBurpSuiteProxyHttpHistoryTable();
+		KeyStrokeManager.getInstance().setupKeyStroke();
 	}
 
 }

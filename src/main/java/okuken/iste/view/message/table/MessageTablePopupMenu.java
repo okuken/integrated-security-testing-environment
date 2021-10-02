@@ -43,6 +43,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 	static final KeyStroke KEYSTROKE_EDIT_CELL = KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK, false);
 	static final KeyStroke KEYSTROKE_DELETE_ITEM = KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK, false);
 	static final KeyStroke KEYSTROKE_COPY_NAME = KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK, false);
+	static final KeyStroke KEYSTROKE_COPY_NAME_WITHOUT_NUMBER = KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK, false);
 	static final KeyStroke KEYSTROKE_COPY_URL = KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK, false);
 	static final KeyStroke KEYSTROKE_COPY_URL_WITHOUT_QUERY = KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK, false);
 
@@ -233,6 +234,11 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		UiUtil.setupTablePopupMenuItem(copyNameMenuItem, table, KEYSTROKE_COPY_NAME,
 			createActionForCopy(messageDto -> messageDto.getName()));
 		add(copyNameMenuItem);
+
+		JMenuItem copyNameWithoutNumberMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_NAME_WITHOUTNUMBER);
+		UiUtil.setupTablePopupMenuItem(copyNameWithoutNumberMenuItem, table, KEYSTROKE_COPY_NAME_WITHOUT_NUMBER,
+			createActionForCopy(messageDto -> messageDto.getNameWithoutNumber()));
+		add(copyNameWithoutNumberMenuItem);
 
 		JMenuItem copyUrlMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_COPY_URL);
 		UiUtil.setupTablePopupMenuItem(copyUrlMenuItem, table, KEYSTROKE_COPY_URL,

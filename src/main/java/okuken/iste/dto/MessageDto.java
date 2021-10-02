@@ -132,6 +132,13 @@ public class MessageDto {
 	public String getName() {
 		return name;
 	}
+	@TemplateReference(key = "NameWithoutNumber")
+	public String getNameWithoutNumber() {
+		if(name == null) {
+			return null;
+		}
+		return name.replaceFirst("^[\\d\\-_]+\\.\\s+", "");
+	}
 	public void setName(String name) {
 		this.name = name;
 	}

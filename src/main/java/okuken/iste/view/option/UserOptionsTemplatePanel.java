@@ -153,7 +153,7 @@ public class UserOptionsTemplatePanel extends JPanel {
 	}
 	private List<String> getProjectMemoTemplates() {
 		var templates = ConfigLogic.getInstance().getUserOptions().getProjectMemoTemplates();
-		if(templates == null) {
+		if(templates == null || templates.isEmpty()) {
 			return IntStream.range(0, ProjectMemoPanel.PROJECT_MEMO_COUNT).mapToObj(i -> "").collect(Collectors.toList());
 		}
 		return templates;
