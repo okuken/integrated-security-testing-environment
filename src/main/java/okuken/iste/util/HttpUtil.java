@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class HttpUtil {
 
 	public static final String HTTP_LINE_SEPARATOR = "\r\n";
@@ -91,7 +93,7 @@ public class HttpUtil {
 		}
 
 		var bodySingleByteStrWithoutHeaderFooter = bodySingleByteStr.substring(boundary.length(), bodySingleByteStr.length() - boundaryEnd.length());
-		var bodyStrWithoutHeaderFooter = Arrays.stream(bodySingleByteStrWithoutHeaderFooter.split(boundary)).map(part -> {
+		var bodyStrWithoutHeaderFooter = Arrays.stream(StringUtils.splitByWholeSeparator(bodySingleByteStrWithoutHeaderFooter, boundary)).map(part -> {
 				var partHeaderEndIndex = part.indexOf(HTTP_HEADER_BODY_SEPARATOR);
 				var partBodyOffset = partHeaderEndIndex + HTTP_HEADER_BODY_SEPARATOR.length();
 				var partHeaders = Arrays.asList(part.substring(0, partHeaderEndIndex).split(HTTP_LINE_SEPARATOR));

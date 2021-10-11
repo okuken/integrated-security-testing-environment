@@ -188,6 +188,28 @@ class HttpUtilTest {
 	}
 
 	@Test
+	void convertMessageBytesToString_multipart_boundary_chars() {
+		var boundary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')(+_,-./:=?"; //see: https://datatracker.ietf.org/doc/html/rfc2046#page-21
+		var data = Lists.newArrayList(
+			new StringWithCharset(StandardCharsets.ISO_8859_1, "POST /example HTTP/1.1"),
+			new StringWithCharset(StandardCharsets.ISO_8859_1, "Host: localhost"),
+			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Type: multipart/form-data; boundary=" + boundary),
+			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Length: 999"),
+			new StringWithCharset(StandardCharsets.ISO_8859_1, ""),
+			new StringWithCharset(StandardCharsets.ISO_8859_1, "--" + boundary),
+			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Type: text/plain; charset=utf-8"),
+			new StringWithCharset(StandardCharsets.ISO_8859_1, ""),
+			new StringWithCharset(StandardCharsets.UTF_8,      "‚ ‚¢‚¤‚¦‚¨"),
+			new StringWithCharset(StandardCharsets.ISO_8859_1, "--" + boundary + "--")
+		);
+
+		var dataBytes = dataToBytes(data);
+		var bodyOffset = new String(dataBytes, StandardCharsets.ISO_8859_1).indexOf("\r\n\r\n") + "\r\n\r\n".length();
+
+		assertEquals(dataToStr(data), HttpUtil.convertMessageBytesToString(dataBytes, dataToHeaders(data), bodyOffset));
+	}
+
+	@Test
 	void createAuthorizationBearerHeader_() {
 		var result = HttpUtil.createAuthorizationBearerHeader("aaa.bbb.ccc");
 		assertEquals("Authorization: Bearer aaa.bbb.ccc", result);
