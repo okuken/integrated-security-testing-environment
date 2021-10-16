@@ -1,15 +1,20 @@
 package okuken.iste.logic;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 import com.google.common.collect.Maps;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import okuken.iste.annotations.Persistent;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.PluginProjectOptionDto;
 import okuken.iste.dto.ProcessOptionsDto;
@@ -18,19 +23,12 @@ import okuken.iste.dto.ProjectOptionsDto;
 import okuken.iste.dto.UserOptionsDto;
 import okuken.iste.plugin.PluginLoadInfo;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.FileUtil;
+import okuken.iste.util.ReflectionUtil;
 
 public class ConfigLogic {
 
 	private static final ConfigLogic instance = new ConfigLogic();
-
-	private static final String CONFIG_KEY_USER_NAME = "userName";
-	private static final String CONFIG_KEY_DB_FILE_PATH = "dbFilePath";
-	private static final String CONFIG_KEY_DARK_THEME = "darkTheme";
-	private static final String CONFIG_KEY_LAST_SELECTED_PROJECT_NAME = "lastSelectedProjectName";
-	private static final String CONFIG_KEY_PLUGINS = "plugins";
-	private static final String CONFIG_KEY_MESSAGE_MEMO_TEMPLATE = "messageMemoTemplate";
-	private static final String CONFIG_KEY_PROJECT_MEMO_TEMPLATES = "projectMemoTemplates";
-	private static final String CONFIG_KEY_COPY_TEMPLATES = "copyTemplates";
 
 	//cache
 	private UserOptionsDto configDto;
@@ -51,35 +49,16 @@ public class ConfigLogic {
 	}
 	private UserOptionsDto loadUserOptions() {
 		UserOptionsDto ret = new UserOptionsDto();
-		ret.setUserName(Optional.ofNullable(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_USER_NAME))
-				.orElse(System.getProperty("user.name")));
-		ret.setDbFilePath(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_DB_FILE_PATH));
-		ret.setDarkTheme(Boolean.valueOf(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_DARK_THEME)));
-		ret.setLastSelectedProjectName(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME));
-
-		PluginLoadInfo[] pluginLoadInfos = loadUserOptionJson(CONFIG_KEY_PLUGINS, PluginLoadInfo[].class);
-		if(pluginLoadInfos != null) {
-			ret.setPlugins(Arrays.asList(pluginLoadInfos));
-		}
-
-		ret.setMessageMemoTemplate(BurpUtil.getCallbacks().loadExtensionSetting(CONFIG_KEY_MESSAGE_MEMO_TEMPLATE));
-		ret.setProjectMemoTemplates(loadUserOptionJson(CONFIG_KEY_PROJECT_MEMO_TEMPLATES, List.class));
-		ret.setCopyTemplates(loadUserOptionJson(CONFIG_KEY_COPY_TEMPLATES, LinkedHashMap.class));
-
+		Arrays.asList(UserOptionsDto.class.getDeclaredFields()).stream()
+			.filter(field -> field.isAnnotationPresent(Persistent.class))
+			.forEach(field -> {
+				var valueStr = BurpUtil.getCallbacks().loadExtensionSetting(field.getAnnotation(Persistent.class).key());
+				if(valueStr == null) {
+					return;
+				}
+				ReflectionUtil.setPropertyByValueStr(ret, field, valueStr);
+			});
 		return ret;
-	}
-	@SuppressWarnings("unchecked")
-	private <T> T loadUserOptionJson(String configKey, Class<?> clazz) {
-		var configVal = BurpUtil.getCallbacks().loadExtensionSetting(configKey);
-		if(configVal == null) {
-			return null;
-		}
-		return (T)new Gson().fromJson(configVal, clazz);
-	}
-
-	public void saveUserName(String userName) {
-		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_USER_NAME, userName);
-		getUserOptions().setUserName(userName);
 	}
 
 	public File getDefaultDbFile() {
@@ -89,38 +68,97 @@ public class ConfigLogic {
 		return getDefaultDbFile().getAbsolutePath();
 	}
 	public void saveDbFilePath(String dbFilePath) {
-		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_DB_FILE_PATH, dbFilePath);
-		getUserOptions().setDbFilePath(dbFilePath);
+		saveUserOption("dbFilePath", dbFilePath);
 	}
 
 	public void saveDarkTheme(boolean darkTheme) {
-		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_DARK_THEME, Boolean.toString(darkTheme));
-		getUserOptions().setDarkTheme(darkTheme);
+		saveUserOption("darkTheme", darkTheme);
 	}
-
 	public void saveLastSelectedProjectName(String projectName) {
-		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_LAST_SELECTED_PROJECT_NAME, projectName);
-		getUserOptions().setLastSelectedProjectName(projectName);
+		saveUserOption("lastSelectedProjectName", projectName);
 	}
-
 	public void savePlugins(List<PluginLoadInfo> pluginLoadInfos) {
-		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_PLUGINS, new Gson().toJson(pluginLoadInfos));
-		getUserOptions().setPlugins(pluginLoadInfos);
+		saveUserOption("plugins", pluginLoadInfos);
 	}
-
 	public void saveMessageMemoTemplate(String messageMemoTemplate) {
-		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_MESSAGE_MEMO_TEMPLATE, messageMemoTemplate);
-		getUserOptions().setMessageMemoTemplate(messageMemoTemplate);
+		saveUserOption("messageMemoTemplate", messageMemoTemplate);
 	}
-
 	public void saveProjectMemoTemplates(List<String> projectMemoTemplates) {
-		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_PROJECT_MEMO_TEMPLATES, new Gson().toJson(projectMemoTemplates));
-		getUserOptions().setProjectMemoTemplates(projectMemoTemplates);
+		saveUserOption("projectMemoTemplates", projectMemoTemplates);
+	}
+	public void saveCopyTemplates(Map<String, String> copyTemplates, Map<String, String> copyTemplateMnemonics) {
+		saveUserOption("copyTemplates", copyTemplates);
+		saveUserOption("copyTemplateMnemonics", copyTemplateMnemonics);
+	}
+	public void saveUseKeyboardShortcutQ(boolean useKeyboardShortcutQ) {
+		saveUserOption("useKeyboardShortcutQ", useKeyboardShortcutQ);
+	}
+	public void saveUseKeyboardShortcutWithClick(boolean useKeyboardShortcutWithClick) {
+		saveUserOption("useKeyboardShortcutWithClick", useKeyboardShortcutWithClick);
 	}
 
-	public void saveCopyTemplates(Map<String, String> copyTemplates) {
-		BurpUtil.getCallbacks().saveExtensionSetting(CONFIG_KEY_COPY_TEMPLATES, new Gson().toJson(copyTemplates));
-		getUserOptions().setCopyTemplates(copyTemplates);
+	private void saveUserOption(String fieldName, String value) {
+		saveUserOption(fieldName, value, value);
+	}
+	private void saveUserOption(String fieldName, boolean value) {
+		saveUserOption(fieldName, value, Boolean.toString(value));
+	}
+	private void saveUserOption(String fieldName, Object value) {
+		if(value == null) {
+			saveUserOption(fieldName, value, null);
+			return;
+		}
+		saveUserOption(fieldName, value, new Gson().toJson(value));
+	}
+	private void saveUserOption(String fieldName, Object value, String valueStr) {
+		try {
+			BurpUtil.getCallbacks().saveExtensionSetting(UserOptionsDto.class.getDeclaredField(fieldName).getAnnotation(Persistent.class).key(), valueStr);
+			BeanUtils.setProperty(getUserOptions(), fieldName, value);
+		} catch (NoSuchFieldException | SecurityException | IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void exportUserOptions(File file) {
+		var gson = new GsonBuilder().addSerializationExclusionStrategy(new ExclusionStrategy() {
+			@Override
+			public boolean shouldSkipField(FieldAttributes f) {
+				var persistent = f.getAnnotation(Persistent.class);
+				return persistent == null || persistent.environmentDependent();
+			}
+			@Override
+			public boolean shouldSkipClass(Class<?> clazz) {
+				return false;
+			}
+		}).setPrettyPrinting().create();
+
+		var userOptionsJson = gson.toJson(getUserOptions());
+		FileUtil.write(file, userOptionsJson);
+	}
+
+	public void importUserOptions(File file) {
+		var userOptionsMap = new Gson().fromJson(FileUtil.read(file), Map.class);
+
+		Arrays.asList(UserOptionsDto.class.getDeclaredFields()).stream()
+			.filter(field -> field.isAnnotationPresent(Persistent.class) && !field.getAnnotation(Persistent.class).environmentDependent())
+			.filter(field -> userOptionsMap.containsKey(field.getName()))
+			.forEach(field -> {
+				var valueStr = convertValueMapToStr(userOptionsMap.get(field.getName()));
+				saveUserOption(field.getName(), ReflectionUtil.convertValueStrToObject(field, valueStr));
+			});
+	}
+	private String convertValueMapToStr(Object valueMap) {
+		if(valueMap.getClass() == String.class) {
+			return (String)valueMap;
+		}
+		return new Gson().toJson(valueMap);
+	}
+
+	public void clearUserOptions() {
+		Arrays.asList(UserOptionsDto.class.getDeclaredFields()).stream()
+			.filter(field -> field.isAnnotationPresent(Persistent.class))
+			.map(field -> field.getAnnotation(Persistent.class).key())
+			.forEach(key -> BurpUtil.getCallbacks().saveExtensionSetting(key, null));
 	}
 
 

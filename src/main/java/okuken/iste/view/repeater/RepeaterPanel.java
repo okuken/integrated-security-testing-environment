@@ -85,9 +85,8 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		authAccountComboBox.setToolTipText(Captions.REPEATER_COMBOBOX_ACCOUNT_TT);
 		authAccountComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int index = authAccountComboBox.getSelectedIndex();
-				authSessionRefreshButton.setEnabled(index > 0);
-				authSessionValueLabel.setText(index > 0 ? authAccountComboBox.getItemAt(index).getSessionIdForDisplay() : null);
+				authSessionRefreshButton.setEnabled(authAccountComboBox.getSelectedIndex() > 0);
+				refreshAuthSessionValueLabelImpl();
 			}
 		});
 		controlLeftPanel.add(authAccountComboBox);
@@ -107,7 +106,6 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		controlLeftPanel.add(authSessionRefreshButton);
 		
 		authSessionValueLabel = new JLabel();
-		authSessionValueLabel.setComponentPopupMenu(UiUtil.createCopyPopupMenu(() -> getSelectedAuthAccountDto().getSessionId()));
 		controlLeftPanel.add(authSessionValueLabel);
 		
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
@@ -225,13 +223,27 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	public void refreshAuthSessionValueLabel() {
 		SwingUtilities.invokeLater(() -> {
-			authSessionValueLabel.setText(authAccountComboBox.getItemAt(authAccountComboBox.getSelectedIndex()).getSessionIdForDisplay());
+			refreshAuthSessionValueLabelImpl();
 		});
+	}
+	private void refreshAuthSessionValueLabelImpl() {
+		var authAccountDto = getSelectedAuthAccountDto();
+		if(authAccountDto == null) {
+			authSessionValueLabel.setText(null);
+			authSessionValueLabel.setComponentPopupMenu(null);
+			return;
+		}
+
+		authSessionValueLabel.setText(authAccountDto.getSessionIdForDisplay());
+		if(!authAccountDto.isSessionIdsEmpty()) {
+			authSessionValueLabel.setComponentPopupMenu(
+				UiUtil.createCopyPopupMenu(authAccountDto.getSessionIds().subList(0, ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().size())));
+		}
 	}
 
 	public void sendRequest(boolean forceAuthSessionRefresh) {
 		AuthAccountDto authAccountDto = getSelectedAuthAccountDto();
-		if(authAccountDto != null && (authAccountDto.getSessionId() == null || forceAuthSessionRefresh)) {
+		if(authAccountDto != null && (forceAuthSessionRefresh || authAccountDto.isSessionIdsEmpty())) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				sendRequestImpl(authAccountDto);
 			});
@@ -283,6 +295,8 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 	}
 
 	public void refreshAuthAccountsComboBox() {
+		var bkSelectedIndex = authAccountComboBox.getSelectedIndex();
+
 		authAccountComboBox.removeAllItems();
 		authAccountComboBox.addItem(new AuthAccountDto()); //dummy
 		authAccountComboBox.setEnabled(false);
@@ -297,6 +311,10 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 			authAccountComboBox.addItem(authAccount);
 		});
 		authAccountComboBox.setEnabled(authAccountComboBox.getItemCount() > 1);
+
+		if(bkSelectedIndex > 0 && bkSelectedIndex < authAccountComboBox.getItemCount()) {
+			authAccountComboBox.setSelectedIndex(bkSelectedIndex);
+		}
 	}
 
 	public AuthAccountDto getSelectedAuthAccountDto() {

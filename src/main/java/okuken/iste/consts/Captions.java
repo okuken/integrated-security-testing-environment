@@ -24,6 +24,7 @@ public class Captions {
 	public static final String COPY = "Copy";
 
 	public static final String OK = "OK";
+	public static final String CANCEL = "Cancel";
 
 	public static final String CONTEXT_MENU_SEND_TO = "Send to ISTE";
 	public static final String CONTEXT_MENU_SEND_TO_HISTORY = "Send to ISTE as history of repeat";
@@ -41,7 +42,7 @@ public class Captions {
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT = "Repeater";
 	public static final String TAB_MAIN_MESSAGE_EDITOR_CHAIN = "Chain";
 
-	public static final String TAB_TOOLS_EXPORT = "Export";
+	public static final String TAB_TOOLS_EXPORT = "Export / Import";
 	public static final String TAB_TOOLS_BSQLI = "BSQLi";
 
 	public static final String TAB_OPTIONS_PROJECT_OPTIONS = "Project options";
@@ -74,12 +75,19 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE = "Send to Comparer (response)";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_ORG = "Send to Comparer (response) with Org";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_MST = "Send to Comparer (response) with Master";
+	public static final String TABLE_CONTEXT_MENU_EDIT_CELL = "Edit cell";
 	public static final String TABLE_CONTEXT_MENU_DELETE_ITEM = "Delete item";
 	public static final String TABLE_CONTEXT_MENU_COPY_NAME = "Copy name";
+	public static final String TABLE_CONTEXT_MENU_COPY_NAME_WITHOUTNUMBER = "Copy name without number";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL = "Copy URL";
 	public static final String TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY = "Copy URL without Query";
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy as table";
 	public static final String TABLE_CONTEXT_MENU_COPY_BY_TEMPLATE_PREFIX = "Copy ";
+
+	public static final String TABLE_CELL_EDITOR_INPUT = "Input";
+	public static final String TABLE_CELL_EDITOR_REPLACE = "Replace(Regex)";
+	public static final String TABLE_CELL_EDITOR_NUMBERING = "Numbering";
+	public static final String TABLE_CELL_EDITOR_NUMBERING_FROM = "from";
 
 	public static final String REPEAT_HISTORY_CAPTION_BY_SEND_TO = "[Send to ISTE]";
 
@@ -158,9 +166,18 @@ public class Captions {
 
 	public static final String TOOLS_EXPLOIT_BSQLI_POPUP_TITLE_SUFFIX = " - BSQLi";
 
-	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export notes (.md)";
+	public static final String TOOLS_EXPORT_LABEL_MEMO = "Notes";
+	public static final String TOOLS_EXPORT_BUTTON_EXPORT_MEMO_TO_TXT_FILE = "Export (.md)";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER = "Filter";
 	public static final String TOOLS_EXPORT_CHECKBOX_FILTER_TT = "Apply filter of List tab to export notes";
+
+	public static final String TOOLS_EXPORT_LABEL_USER_OPTIONS = "User options";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_EXPORT = "Export";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_EXPORT_TT = "Export user options in json format (exclude: environment-dependent options)";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_IMPORT = "Import";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_IMPORT_TT = "Import user options (exclude: environment-dependent options)";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_CLEAR = "Clear";
+	public static final String TOOLS_EXPORT_BUTTON_USER_OPTIONS_CLEAR_TT = "Clear user options and unload ISTE";
 
 	public static final String PROJECT_OPTIONS_PROJECT_NAME = "Project name";
 	public static final String PROJECT_OPTIONS_BUTTON_SAVE = "Save";
@@ -168,12 +185,16 @@ public class Captions {
 	public static final String USER_OPTIONS_TEMPLATE_MEMO_BUTTON_SAVE = "Save";
 	public static final String USER_OPTIONS_COPY_TEMPLATE_EXPLANATION = "\u2139 Templates for copying to clipboad. This setting adds context menu items of \"ISTE > List\". It uses Apache Velocity 2 as the template engine.";
 	public static final String USER_OPTIONS_COPY_TEMPLATE_NAME_TT = "Template name";
+	public static final String USER_OPTIONS_COPY_TEMPLATE_MNEMONIC_TT = "Mnemonic";
 	public static final String USER_OPTIONS_COPY_TEMPLATE_TEMPLATE_TT = "Template";
 	public static final String USER_OPTIONS_USER_NAME = "User name";
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";
 	public static final String USER_OPTIONS_DB_FILE_BUTTON_SAVE = "Save & Load";
 	public static final String USER_OPTIONS_THEME = "Theme";
 	public static final String USER_OPTIONS_THEME_EXPLANATION = "* If you have selected the Dark theme in \"User options > Display > User Interface > Theme\", set the Dark theme here as well.";
+	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT = "Shortcut (Send to ISTE)";
+	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT_Q = "Enable keyboard shortcut \"Ctrl-Q\", \"Ctrl+Shift-Q\" and \"Ctrl+Alt-Q\" on ProxyHttpHistoryTable.";
+	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT_WITH_CLICK = "Enable right-click with \"Ctrl\" or \"Ctrl+Shift\" when ContextMenuCreation.";
 
 	public static final String PLUGINS_BUTTON_ADD_PLUGIN = "Add";
 	public static final String PLUGINS_LOAD_FROM_CLASSPATH = "CLASSPATH";
@@ -191,7 +212,11 @@ public class Captions {
 	public static final String MESSAGE_SELECT_PROJECT = "Select ISTE project";
 	public static final String MESSAGE_SELECT_SEND_TO_HISTORY_TARGET = "To which history do you want to add the selected item?";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
-	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export notes (.md)";
+	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export";
+	public static final String MESSAGE_CHOOSE_IMPORT_FILE = "Import";
+	public static final String MESSAGE_CLEAR_USEROPTIONS = "Are you sure you want to clear all user options?\n"
+	                                                     + "\n"
+	                                                     + "It includes environment-dependent options, for example, path to the database file. At last, it will unload ISTE.";
 	public static final String MESSAGE_CHOOSE_PLUGIN_FILE = "Choose ISTE plugin jar file";
 
 }

@@ -2,7 +2,6 @@ package okuken.iste.view.tool;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 
 import javax.swing.JTabbedPane;
 
@@ -20,12 +19,8 @@ public class ToolsPanel extends JPanel {
 		add(tabbedPane, BorderLayout.CENTER);
 		Controller.getInstance().setToolsTabbedPane(tabbedPane);
 		
-		JPanel exportPanel = new JPanel();
-		exportPanel.setLayout(new GridLayout(5, 1, 0, 0));
+		JPanel exportPanel = new ExportToolsPanel();
 		tabbedPane.addTab(Captions.TAB_TOOLS_EXPORT, null, exportPanel, null);
-		
-		JPanel exportMemoPanel = new ExportToolsPanel();
-		exportPanel.add(exportMemoPanel);
 		
 //		JPanel bsqliPanel = new BlindSqlInjectionPanel();
 //		tabbedPane.addTab(Captions.TAB_TOOLS_BSQLI, null, bsqliPanel, null);

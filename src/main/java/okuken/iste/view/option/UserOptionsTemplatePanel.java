@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Sizes;
+import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.memo.MemoTextArea;
@@ -15,6 +16,7 @@ import okuken.iste.view.memo.ProjectMemoPanel;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
 import java.awt.GridLayout;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -111,7 +113,17 @@ public class UserOptionsTemplatePanel extends JPanel {
 		projectMemoBodyPanel.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		initProjectMemoBodyPanel();
+		
+		Controller.getInstance().setUserOptionsTemplatePanel(this);
+	}
 
+	public void refresh() {
+		initMessageMemoBodyPanel();
+
+		Arrays.stream(projectMemoBodyPanel.getComponents())
+			.filter(component -> component instanceof JScrollPane)
+			.forEach(component -> projectMemoBodyPanel.remove(component));
+		initProjectMemoBodyPanel();
 	}
 
 	private void initMessageMemoBodyPanel() {
@@ -141,7 +153,7 @@ public class UserOptionsTemplatePanel extends JPanel {
 	}
 	private List<String> getProjectMemoTemplates() {
 		var templates = ConfigLogic.getInstance().getUserOptions().getProjectMemoTemplates();
-		if(templates == null) {
+		if(templates == null || templates.isEmpty()) {
 			return IntStream.range(0, ProjectMemoPanel.PROJECT_MEMO_COUNT).mapToObj(i -> "").collect(Collectors.toList());
 		}
 		return templates;

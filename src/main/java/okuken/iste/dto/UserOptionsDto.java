@@ -1,27 +1,52 @@
 package okuken.iste.dto;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import okuken.iste.annotations.Persistent;
 import okuken.iste.plugin.PluginLoadInfo;
 
+/**
+ * [CAUTION] export/import as JSON
+ */
 public class UserOptionsDto {
 
-	private String userName;
+	@Persistent(key = "dbFilePath", environmentDependent = true)
 	private String dbFilePath;
-	private boolean darkTheme;
-	private String lastSelectedProjectName;
-	private List<PluginLoadInfo> plugins;
-	private String messageMemoTemplate;
-	private List<String> projectMemoTemplates;
-	private Map<String, String> copyTemplates;
 
-	public String getUserName() {
-		return userName;
-	}
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+	@Persistent(key = "darkTheme")
+	private boolean darkTheme;
+
+	@Persistent(key = "useKeyboardShortcutQ")
+	private boolean useKeyboardShortcutQ;
+
+	@Persistent(key = "useKeyboardShortcutWithClick")
+	private boolean useKeyboardShortcutWithClick;
+
+
+	@Persistent(key = "lastSelectedProjectName", environmentDependent = true)
+	private String lastSelectedProjectName;
+
+	@Persistent(key = "plugins", environmentDependent = true)
+	private List<PluginLoadInfo> plugins;
+
+	@Persistent(key = "messageMemoTemplate")
+	private String messageMemoTemplate = "";
+
+	@Persistent(key = "projectMemoTemplates")
+	private List<String> projectMemoTemplates = Lists.newArrayList();
+
+	@Persistent(key = "copyTemplates")
+	private LinkedHashMap<String, String> copyTemplates = Maps.newLinkedHashMap();
+
+	@Persistent(key = "copyTemplateMnemonics")
+	private Map<String, String> copyTemplateMnemonics = Maps.newHashMap();
+
+
 	public String getDbFilePath() {
 		return dbFilePath;
 	}
@@ -33,6 +58,18 @@ public class UserOptionsDto {
 	}
 	public void setDarkTheme(boolean darkTheme) {
 		this.darkTheme = darkTheme;
+	}
+	public boolean isUseKeyboardShortcutQ() {
+		return useKeyboardShortcutQ;
+	}
+	public void setUseKeyboardShortcutQ(boolean useKeyboardShortcutQ) {
+		this.useKeyboardShortcutQ = useKeyboardShortcutQ;
+	}
+	public boolean isUseKeyboardShortcutWithClick() {
+		return useKeyboardShortcutWithClick;
+	}
+	public void setUseKeyboardShortcutWithClick(boolean useKeyboardShortcutWithClick) {
+		this.useKeyboardShortcutWithClick = useKeyboardShortcutWithClick;
 	}
 	public String getLastSelectedProjectName() {
 		return lastSelectedProjectName;
@@ -58,11 +95,16 @@ public class UserOptionsDto {
 	public void setProjectMemoTemplates(List<String> projectMemoTemplates) {
 		this.projectMemoTemplates = projectMemoTemplates;
 	}
-	public Map<String, String> getCopyTemplates() {
+	public LinkedHashMap<String, String> getCopyTemplates() {
 		return copyTemplates;
 	}
-	public void setCopyTemplates(Map<String, String> copyTemplates) {
+	public void setCopyTemplates(LinkedHashMap<String, String> copyTemplates) {
 		this.copyTemplates = copyTemplates;
 	}
-
+	public Map<String, String> getCopyTemplateMnemonics() {
+		return copyTemplateMnemonics;
+	}
+	public void setCopyTemplateMnemonics(Map<String, String> copyTemplateMnemonics) {
+		this.copyTemplateMnemonics = copyTemplateMnemonics;
+	}
 }

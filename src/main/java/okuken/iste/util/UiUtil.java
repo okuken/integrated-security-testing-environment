@@ -24,8 +24,11 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,6 +41,8 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.JTextComponent;
@@ -55,6 +60,20 @@ public class UiUtil {
 			return BurpUtil.getBurpSuiteJFrame();
 		}
 		return SwingUtilities.getWindowAncestor(component);
+	}
+
+	public static final Integer getNextTableModelRow(List<Integer> tableModelRowIndexs, JTable table) {
+		if(tableModelRowIndexs.isEmpty()) {
+			return null;
+		}
+		var tableModelRowIndex = tableModelRowIndexs.get(tableModelRowIndexs.size() - 1);
+
+		var viewIndex = table.convertRowIndexToView(tableModelRowIndex);
+		if(viewIndex + 1 >= table.getRowCount()) {
+			return null;
+		}
+
+		return table.convertRowIndexToModel(viewIndex + 1);
 	}
 
 	public static final void repaint(JComponent component) {
@@ -115,6 +134,13 @@ public class UiUtil {
 		});
 	}
 
+	public static void setupTablePopupMenuItem(JMenuItem menuItem, JTable table, KeyStroke keyStroke, Action action) {
+		menuItem.addActionListener(action);
+		menuItem.setAccelerator(keyStroke);
+		table.getInputMap().put(keyStroke, menuItem);
+		table.getActionMap().put(menuItem, action);
+	}
+
 	public static final JPopupMenu createCopyPopupMenu(Supplier<String> supplier) {
 		var menu = new JPopupMenu();
 		var menuItem = new JMenuItem(Captions.COPY);
@@ -124,6 +150,21 @@ public class UiUtil {
 			}
 		});
 		menu.add(menuItem);
+		return menu;
+	}
+
+	public static final JPopupMenu createCopyPopupMenu(List<String> strs) {
+		var menu = new JPopupMenu();
+		IntStream.range(0, strs.size()).forEach(i -> {
+			var str = strs.get(i);
+			var menuItem = new JMenuItem(String.format("%d: %s", i + 1, str != null ? str : ""));
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					copyToClipboard(str);
+				}
+			});
+			menu.add(menuItem);
+		});
 		return menu;
 	}
 
@@ -261,7 +302,10 @@ public class UiUtil {
 	}
 
 	public static void showMessage(String message, Component triggerComponent) {
-		JOptionPane.showMessageDialog(getParentFrame(triggerComponent), message);
+		JOptionPane.showMessageDialog(getParentFrame(triggerComponent), message, Captions.EXTENSION_NAME_FULL, JOptionPane.ERROR_MESSAGE);
+	}
+	public static void showInfoMessage(String message, Component triggerComponent) {
+		JOptionPane.showMessageDialog(getParentFrame(triggerComponent), message, Captions.EXTENSION_NAME_FULL, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public static boolean getConfirmAnswer(String message) {
@@ -270,6 +314,32 @@ public class UiUtil {
 	public static boolean getConfirmAnswer(String message, Component triggerComponent) {
 		return JOptionPane.showConfirmDialog(getParentFrame(triggerComponent), 
 				message, String.format("Confirm [%s]", Captions.EXTENSION_NAME_FULL), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
+	}
+
+	public static boolean getConfirmAnswerDefaultCancel(String message, Component triggerComponent) {
+		Object[] options = {Captions.OK, Captions.CANCEL};
+		return JOptionPane.showOptionDialog(getParentFrame(triggerComponent), 
+				message, String.format("Confirm [%s]", Captions.EXTENSION_NAME_FULL), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]) == JOptionPane.OK_OPTION;
+	}
+
+	public static int showOptionDialog(Component parentComponent, JComponent component, String title, int optionType, int messageType,
+			Icon icon, Object[] options, Object initialValue) {
+
+		// focus on component
+		component.addAncestorListener(new AncestorListener() {
+			@Override
+			public void ancestorAdded(AncestorEvent event) {
+				var component = event.getComponent();
+				component.requestFocusInWindow();
+				component.removeAncestorListener(this);
+			}
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {}
+			@Override
+			public void ancestorMoved(AncestorEvent event) {}
+		});
+
+		return JOptionPane.showOptionDialog(parentComponent, component, title, optionType, messageType, icon, options, initialValue);
 	}
 
 	private static final DateFormat timestampFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

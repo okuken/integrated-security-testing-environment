@@ -55,7 +55,7 @@ public class MessageLogic {
 		dto.setMessage(message);
 		dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(message));
 
-		dto.setName(message.getComment());
+		dto.setName(convertCommentToName(message.getComment()));
 		dto.setProgress(SecurityTestingProgress.NOT_YET);
 		dto.setMethod(dto.getRequestInfo().getMethod());
 		dto.setUrl(dto.getRequestInfo().getUrl());
@@ -82,6 +82,17 @@ public class MessageLogic {
 
 		return dto;
 	}
+
+	private String convertCommentToName(String comment) {
+		if(comment == null) {
+			return null;
+		}
+
+		return Arrays.asList(comment.split("\t")).stream() //consider paste from spread sheet
+				.map(str -> str.stripTrailing())
+				.collect(Collectors.joining(". "));
+	}
+
 	private IHttpRequestResponse convertOriginalToMock(IHttpRequestResponse httpRequestResponse) {
 		IHttpService httpService = httpRequestResponse.getHttpService();
 		IHttpRequestResponse ret = new HttpRequestResponseMock(

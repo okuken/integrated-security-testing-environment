@@ -1,5 +1,6 @@
 package okuken.iste.dto;
 
+import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SourceType;
 
@@ -11,6 +12,7 @@ public class MessageChainNodeReqpDto {
 	private String paramName;
 	private SourceType sourceType;
 	private String sourceName;
+	private EncodeType encode;
 
 	public Integer getId() {
 		return id;
@@ -41,6 +43,12 @@ public class MessageChainNodeReqpDto {
 	}
 	public void setSourceName(String sourceName) {
 		this.sourceName = sourceName;
+	}
+	public EncodeType getEncode() {
+		return encode;
+	}
+	public void setEncode(EncodeType encode) {
+		this.encode = encode;
 	}
 
 }

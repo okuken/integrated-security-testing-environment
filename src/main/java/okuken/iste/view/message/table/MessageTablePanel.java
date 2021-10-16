@@ -2,8 +2,6 @@ package okuken.iste.view.message.table;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -55,6 +53,9 @@ public class MessageTablePanel extends JPanel {
 			@Override
 			public void changeSelection(int row, int col, boolean toggle, boolean extend) {
 				super.changeSelection(row, col, toggle, extend);
+				if(row < 0) {
+					return;
+				}
 
 				var modelRowIndex = table.convertRowIndexToModel(row);
 				var modelColumnIndex = table.convertColumnIndexToModel(col);
@@ -70,7 +71,7 @@ public class MessageTablePanel extends JPanel {
 				}
 			}
 		};
-		table.setComponentPopupMenu(new MessageTablePopupMenu(this));
+		table.setComponentPopupMenu(new MessageTablePopupMenu(this, table));
 		setupTable();
 		Controller.getInstance().setMessageTable(table);	
 
@@ -115,12 +116,6 @@ public class MessageTablePanel extends JPanel {
 
 		JComboBox<SecurityTestingProgress> progressComboBox = new JComboBox<SecurityTestingProgress>();
 		Arrays.stream(SecurityTestingProgress.values()).forEach(progress -> progressComboBox.addItem(progress));
-		progressComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Controller.getInstance().applyMessageFilter();
-			}
-		});
 		progressColumn.setCellEditor(new DefaultCellEditor(progressComboBox));
 	}
 
@@ -165,7 +160,10 @@ public class MessageTablePanel extends JPanel {
 		if(messageFilterDto.getProgresses() == null) {
 			return table.getRowCount();
 		}
-		var selectedRowIndexs = getSelectedRowIndexs(); // memorize selection
+		// memorize selection
+		var selectedRowModelIndexs = getSelectedRowIndexs();
+		var nextRowModelIndex = UiUtil.getNextTableModelRow(selectedRowModelIndexs, table);
+		var selectedColumn = table.getSelectedColumn();
 
 		var tableRowSorter = new TableRowSorter<MessageTableModel>(tableModel);
 		tableRowSorter.setRowFilter(new RowFilter<MessageTableModel, Integer>() {
@@ -182,9 +180,22 @@ public class MessageTablePanel extends JPanel {
 
 		table.setRowSorter(tableRowSorter);
 
-		selectedRowIndexs.stream()
-			.map(table::convertRowIndexToView)
-			.forEach(row -> {table.getSelectionModel().addSelectionInterval(row, row);}); // apply selection
+		// apply selection
+		var selectedRowMax = selectedRowModelIndexs.stream()
+				.map(table::convertRowIndexToView)
+				.filter(row -> row > -1)
+				.max(Integer::compareTo);
+		if(selectedRowMax.isPresent()) {
+			table.changeSelection(selectedRowMax.get(), selectedColumn, false, false);
+		} else if(nextRowModelIndex != null) {
+			var nextRowIndex = table.convertRowIndexToView(nextRowModelIndex);
+			if(nextRowIndex > -1) {
+				table.changeSelection(nextRowIndex, selectedColumn, false, false);
+				SwingUtilities.invokeLater(() -> {
+					table.changeSelection(nextRowIndex, selectedColumn, false, false);
+				});
+			}
+		}
 
 		return table.getRowCount();
 	}
@@ -203,6 +214,11 @@ public class MessageTablePanel extends JPanel {
 		return getSelectedRowIndexs().stream()
 				.map(tableModel::getRow)
 				.collect(Collectors.toList());
+	}
+
+	public MessageTableColumn getSelectedColumnType() {
+		return tableModel.getColumnType(
+				table.convertColumnIndexToModel(table.getSelectedColumn()));
 	}
 
 	public String getSelectedMessagesForCopyToClipboad() {

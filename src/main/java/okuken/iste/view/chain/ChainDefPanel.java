@@ -200,7 +200,7 @@ public class ChainDefPanel extends JPanel {
 		}
 
 		var authAccountDto = Controller.getInstance().getSelectedAuthAccountOnRepeater();
-		if(authAccountDto != null && authAccountDto.getSessionId() == null) {
+		if(authAccountDto != null && authAccountDto.isSessionIdsEmpty()) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				runImpl(chainDefNodePanels, chainDto, authAccountDto, times);
 			});

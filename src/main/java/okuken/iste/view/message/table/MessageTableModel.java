@@ -10,8 +10,8 @@ import javax.swing.table.AbstractTableModel;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
-import okuken.iste.logic.MessageLogic;
 
 public class MessageTableModel extends AbstractTableModel {
 
@@ -142,7 +142,7 @@ public class MessageTableModel extends AbstractTableModel {
 			}
 
 			column.getSetter().invoke(dto, val);
-			MessageLogic.getInstance().updateMessage(dto);
+			Controller.getInstance().updateMessage(dto);
 
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new RuntimeException(e);

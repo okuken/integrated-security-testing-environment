@@ -37,6 +37,7 @@ import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.entity.MessageRepeat;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
+import okuken.iste.util.EncodeUtil;
 import okuken.iste.util.HttpUtil;
 import okuken.iste.util.MessageUtil;
 import okuken.iste.util.SqlUtil;
@@ -73,8 +74,8 @@ public class RepeaterLogic {
 		repeatDto.setMessage(new HttpRequestResponseMock(request, null, orgMessageDto.getMessage().getHttpService()));
 		repeatDto.setSendDate(Calendar.getInstance().getTime());
 		repeatDto.setDifference("");//TODO: impl
-		if(!forAuth && authAccountDto != null && authAccountDto.getSessionId() != null) {
-			repeatDto.setUserId(authAccountDto.getField01());
+		if(judgeIsNeedApplyAuthAccount(forAuth, authAccountDto)) {
+			repeatDto.setUserId(authAccountDto.getUserId());
 		}
 		repeatDto.setChainFlag(isChainNode);
 
@@ -114,8 +115,11 @@ public class RepeaterLogic {
 
 		return repeatDto;
 	}
+	private boolean judgeIsNeedApplyAuthAccount(boolean forAuth, AuthAccountDto authAccountDto) {
+		return !forAuth && authAccountDto != null && !authAccountDto.isSessionIdsEmpty();
+	}
 	private byte[] buildRequest(byte[] request, boolean forAuth, AuthAccountDto authAccountDto) {
-		if(!forAuth && authAccountDto != null && authAccountDto.getSessionId() != null) {
+		if(judgeIsNeedApplyAuthAccount(forAuth, authAccountDto)) {
 			return applyAuthAccount(request, authAccountDto);
 		}
 		return MessageUtil.updateContentLength(request);
@@ -125,9 +129,13 @@ public class RepeaterLogic {
 			throw new IllegalStateException("Sessionid was set but AuthApplyConfig has not registered.");
 		}
 
-		//TODO: support multiple sessionId
-		var authApplyConfig = ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().get(0);
-		return MessageUtil.applyPayload(request, authApplyConfig.getParamType(), authApplyConfig.getParamName(), authAccountDto.getSessionId());
+		var ret = request;
+		var authApplyConfigs = ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos();
+		for(int i = 0; i < authApplyConfigs.size(); i++) {
+			var authApplyConfig = authApplyConfigs.get(i);
+			ret = MessageUtil.applyPayload(ret, authApplyConfig.getParamType(), authApplyConfig.getParamName(), EncodeUtil.encode(authAccountDto.getSessionIds().get(i), authApplyConfig.getEncode()));
+		}
+		return ret;
 	}
 
 	public void saveAsRepeatHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages) {

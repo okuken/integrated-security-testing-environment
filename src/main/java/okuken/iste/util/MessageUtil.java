@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
@@ -25,8 +27,17 @@ public class MessageUtil {
 		if(!paramType.isAppliable()) {
 			throw new IllegalArgumentException("The parameter type is not appliable: " + paramType);
 		}
+		if(paramValue == null) {
+			return request;
+		}
+
 		if(paramType == RequestParameterType.REGEX) {
 			return applyRegexPayload(request, paramName, paramValue);
+		}
+
+		if(!BurpUtil.getHelpers().analyzeRequest(request).getParameters().stream().anyMatch(p -> 
+				p.getType() == paramType.getBurpId() && StringUtils.equals(p.getName(), paramName))) {
+			return request;
 		}
 
 		var parameter = BurpUtil.getHelpers().buildParameter(paramName, paramValue, paramType.getBurpId());
@@ -97,7 +108,7 @@ public class MessageUtil {
 				return request;
 			}
 
-			return applyPayload(request, reqpDto.getParamType(), reqpDto.getParamName(), vars.get(varName));
+			return applyPayload(request, reqpDto.getParamType(), reqpDto.getParamName(), EncodeUtil.encode(vars.get(varName), reqpDto.getEncode()));
 
 		case AUTH_ACCOUNT_TABLE:
 			if(authAccountDto == null) {
@@ -109,13 +120,12 @@ public class MessageUtil {
 				return request;
 			}
 
-			return applyPayload(request, reqpDto.getParamType(), reqpDto.getParamName(), varValue);
+			return applyPayload(request, reqpDto.getParamType(), reqpDto.getParamName(), EncodeUtil.encode(varValue, reqpDto.getEncode()));
 
 		default:
 			throw new UnsupportedOperationException(reqpDto.getSourceType().name());
 		}
 	}
-
 
 	public static byte[] updateContentLength(byte[] request) {
 		var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);

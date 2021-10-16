@@ -49,7 +49,7 @@ public class AuthConfigDto {
 	public boolean isReady() {
 		return CollectionUtils.isNotEmpty(getAuthApplyConfigDtos()) &&
 				StringUtils.isNotEmpty(getAuthApplyConfigDtos().get(0).getParamName()) &&
-				StringUtils.isNotEmpty(getAuthApplyConfigDtos().get(0).getVarName()) &&
+				StringUtils.isNotEmpty(getAuthApplyConfigDtos().get(0).getSourceName()) &&
 				getAuthMessageChainDto() != null &&
 				CollectionUtils.isNotEmpty(getAuthMessageChainDto().getNodes());
 	}
