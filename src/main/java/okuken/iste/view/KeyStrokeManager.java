@@ -152,6 +152,9 @@ public class KeyStrokeManager {
 	}
 
 	public void unloadKeyStroke() {
+		if(!BurpUtil.isBurpSuiteProxyHttpHistoryTableExtracted()) {
+			return;
+		}
 		var proxyHistoryTable = BurpUtil.getBurpSuiteProxyHttpHistoryTable();
 
 		proxyHistoryTable.getInputMap().remove(KEYSTROKE_SEND_TO_ISTE);

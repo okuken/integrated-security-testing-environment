@@ -7,7 +7,7 @@ plugins {
     id "de.undercouch.download" version "4.1.2"
 }
 
-version '0.4.0'
+version '0.4.1'
 
 def cleanDbVersion = '0.4.0'
 
