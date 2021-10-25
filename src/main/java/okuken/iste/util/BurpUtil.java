@@ -116,14 +116,17 @@ public class BurpUtil {
 	}
 
 	private static JTable burpSuiteProxyHttpHistoryTable;
+	public static boolean isBurpSuiteProxyHttpHistoryTableExtracted() {
+		return burpSuiteProxyHttpHistoryTable != null;
+	}
 	public static JTable getBurpSuiteProxyHttpHistoryTable() {
-		if(burpSuiteProxyHttpHistoryTable == null) {
+		if(!isBurpSuiteProxyHttpHistoryTableExtracted()) {
 			throw new IllegalStateException("burpSuiteProxyHttpHistoryTable has not been extracted yet.");
 		}
 		return burpSuiteProxyHttpHistoryTable;
 	}
 	public static void extractBurpSuiteProxyHttpHistoryTable() {
-		if(burpSuiteProxyHttpHistoryTable != null) {
+		if(isBurpSuiteProxyHttpHistoryTableExtracted()) {
 			return;
 		}
 
