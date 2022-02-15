@@ -3,6 +3,7 @@ package okuken.iste.plugin;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.JMenu;
@@ -17,6 +18,7 @@ import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.enums.SecurityTestingProgress;
+import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.plugin.api.IIsteContextMenuFactory;
 import okuken.iste.plugin.api.IIsteContextMenuGroup;
@@ -198,7 +200,8 @@ public class PluginUtil {
 		messageDto.setPriority(isteMessageNotes.getPriority());
 		messageDto.setProgress(SecurityTestingProgress.getById(isteMessageNotes.getProgress()));
 		messageDto.setProgressMemo(isteMessageNotes.getProgressNotes());
-		messageDto.setMemo(isteMessageNotes.getNotes());
+		messageDto.setMemo(Optional.ofNullable(isteMessageNotes.getNotes()).orElse(
+				Optional.ofNullable(ConfigLogic.getInstance().getUserOptions().getMessageMemoTemplate()).orElse("")));
 	}
 
 }
