@@ -52,14 +52,18 @@ public class BurpUtil {
 	}
 
 	public static void printEventLog(String msg) {
+		System.err.println(msg);
 		burpExtenderCallbacks.issueAlert(msg);
 	}
 
 	public static void printStderr(Exception e) {
+		e.printStackTrace();
 		e.printStackTrace(new PrintWriter(burpExtenderCallbacks.getStderr(), true));
 	}
 	public static void printStderr(String msg) {
-		burpExtenderCallbacks.printError(msg);
+		var errMsg = "[ISTE]ERROR: " + msg;
+		System.err.println(errMsg);
+		burpExtenderCallbacks.printError(errMsg);
 	}
 
 	public static PrintStream getStdoutPrintStream() {
@@ -89,6 +93,10 @@ public class BurpUtil {
 		var dummyUiComponent = new JLabel("dummy");
 		burpExtenderCallbacks.customizeUiComponent(dummyUiComponent);
 		return dummyUiComponent.getForeground();
+	}
+
+	public static String getBurpSuiteVersion() {
+		return Arrays.stream(burpExtenderCallbacks.getBurpVersion()).collect(Collectors.joining(" "));
 	}
 
 	public static JFrame getBurpSuiteJFrame() {
@@ -121,7 +129,7 @@ public class BurpUtil {
 	}
 	public static JTable getBurpSuiteProxyHttpHistoryTable() {
 		if(!isBurpSuiteProxyHttpHistoryTableExtracted()) {
-			throw new IllegalStateException("burpSuiteProxyHttpHistoryTable has not been extracted yet.");
+			extractBurpSuiteProxyHttpHistoryTable();
 		}
 		return burpSuiteProxyHttpHistoryTable;
 	}
@@ -133,7 +141,8 @@ public class BurpUtil {
 		var ret = new ArrayList<JTable>();
 		extractBurpSuiteProxyHttpHistoryTableImpl(getBurpSuiteJFrame(), ret);
 		if(ret.isEmpty()) {
-			throw new IllegalStateException("extract burpSuiteProxyHttpHistoryTable was failed.");
+			printStderr("extractBurpSuiteProxyHttpHistoryTable failed. Burp version: " + getBurpSuiteVersion());
+			return;
 		}
 		burpSuiteProxyHttpHistoryTable = ret.get(0);
 	}

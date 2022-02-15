@@ -6,7 +6,6 @@ import javax.swing.JTextField;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.KeyStrokeManager;
@@ -140,16 +139,22 @@ public class UserOptionsMiscPanel extends JPanel {
 		add(useKeyboardShortcutWithClickCheckBox);
 
 		Controller.getInstance().setUserOptionsMiscPanel(this);
-		refresh();
+		refresh(true);
 	}
 
 	public void refresh() {
+		refresh(false);
+	}
+	private void refresh(boolean isInit) {
 		dbFileTextField.setText(ConfigLogic.getInstance().getUserOptions().getDbFilePath());
 
 		themeComboBox.setSelectedItem(ConfigLogic.getInstance().getUserOptions().isDarkTheme() ? THEME_DARK : THEME_LIGHT);
 
 		useKeyboardShortcutQCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ());
-		applyUseKeyboardShortcutQ(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ());
+		if(!isInit) { // if init, registerExtenderCallbacks method will do it.
+			applyUseKeyboardShortcutQ(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ());
+		}
+
 		useKeyboardShortcutWithClickCheckBox.setSelected(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutWithClick());
 	}
 
@@ -159,7 +164,6 @@ public class UserOptionsMiscPanel extends JPanel {
 			return;
 		}
 
-		BurpUtil.extractBurpSuiteProxyHttpHistoryTable();
 		KeyStrokeManager.getInstance().setupKeyStroke();
 	}
 

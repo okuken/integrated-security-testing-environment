@@ -26,7 +26,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -52,8 +51,19 @@ import com.google.common.collect.Lists;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
+import okuken.iste.view.AbstractAction;
 
 public class UiUtil {
+
+	public static final void invokeLater(Runnable doRun) {
+		SwingUtilities.invokeLater(() -> {
+			try {
+				doRun.run();
+			} catch (Exception e) {
+				BurpUtil.printStderr(e);
+			}
+		});
+	}
 
 	public static final Window getParentFrame(Component component) {
 		if(component == null) {
@@ -127,7 +137,11 @@ public class UiUtil {
 		table.getInputMap().put(keyStrokeCtrlC, actionMapKeyCopyCell);
 		table.getActionMap().put(actionMapKeyCopyCell, new AbstractAction() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
+				if(table.getSelectedRow() < 0) {
+					return;
+				}
+
 				var val = table.getModel().getValueAt(table.convertRowIndexToModel(table.getSelectedRow()), columnIndexTranslator.apply(table.getSelectedColumn()));
 				copyToClipboard(val != null ? val.toString() : "");
 			}
