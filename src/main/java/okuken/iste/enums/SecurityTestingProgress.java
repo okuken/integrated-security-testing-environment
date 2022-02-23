@@ -52,6 +52,10 @@ public enum SecurityTestingProgress {
 		Arrays.stream(values()).forEach(progress -> idToEnumMap.put(progress.id, progress));
 	}
 	public static SecurityTestingProgress getById(Integer id) {
+		if(id == null) {
+			return NOT_YET;
+		}
+
 		return idToEnumMap.get(id);
 	}
 

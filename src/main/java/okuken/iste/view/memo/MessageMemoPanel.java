@@ -3,7 +3,6 @@ package okuken.iste.view.memo;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
@@ -49,9 +48,6 @@ public class MessageMemoPanel extends JPanel {
 		nameTextField = new JTextField();
 		nameTextField.setEditable(false);
 		headerPanel.add(nameTextField, BorderLayout.CENTER);
-		SwingUtilities.invokeLater(() -> {
-			nameTextField.setFont(new Font(nameTextField.getFont().getName(), nameTextField.getFont().getStyle(), 10));
-		});
 		
 		textArea = new JTextArea();
 		textArea.getDocument().addDocumentListener(new DocumentListener() {

@@ -13,7 +13,9 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Font;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class ProjectOptionsPanel extends JPanel {
 
@@ -22,16 +24,10 @@ public class ProjectOptionsPanel extends JPanel {
 	private JLabel projectNameMessageLabel;
 
 	public ProjectOptionsPanel() {
-		setLayout(null);
 		
 		JLabel projectNameLabel = new JLabel(Captions.PROJECT_OPTIONS_PROJECT_NAME + ":");
-		projectNameLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 12));
-		projectNameLabel.setBounds(30, 10, 100, 30);
-		add(projectNameLabel);
 		
 		projectNameTextField = new JTextField();
-		projectNameTextField.setBounds(140, 10, 210, 30);
-		add(projectNameTextField);
 		projectNameTextField.setColumns(20);
 		refreshProjectName();
 		
@@ -43,12 +39,34 @@ public class ProjectOptionsPanel extends JPanel {
 				UiUtil.showTemporaryMessage(projectNameMessageLabel, Captions.MESSAGE_SAVED);
 			}
 		});
-		projectNameSaveButton.setBounds(400, 10, 120, 30);
-		add(projectNameSaveButton);
 		
 		projectNameMessageLabel = UiUtil.createTemporaryMessageArea();
-		projectNameMessageLabel.setBounds(530, 10, 200, 30);
-		add(projectNameMessageLabel);
+		
+		GroupLayout groupLayout = new GroupLayout(this);
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(projectNameLabel)
+					.addGap(30)
+					.addComponent(projectNameTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(projectNameSaveButton)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(projectNameMessageLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(projectNameLabel)
+						.addComponent(projectNameTextField)
+						.addComponent(projectNameSaveButton)
+						.addComponent(projectNameMessageLabel)))
+		);
+		setLayout(groupLayout);
 
 	}
 

@@ -1,6 +1,5 @@
 package okuken.iste.view.message.table;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.JMenu;
@@ -23,6 +22,7 @@ import okuken.iste.logic.TemplateLogic;
 import okuken.iste.plugin.PluginPopupMenuListener;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
+import okuken.iste.view.AbstractAction;
 import okuken.iste.view.message.editor.MessageCellEditorDialog;
 
 import java.awt.event.ActionListener;
@@ -128,7 +128,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 		JMenuItem sendToIntruderMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_TO_INTRUDER);
 		UiUtil.setupTablePopupMenuItem(sendToIntruderMenuItem, table, KEYSTROKE_SENDTO_INTRUDER, new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream().forEach(messageDto -> 
 					BurpUtil.getCallbacks().sendToIntruder(
 							messageDto.getMessage().getHttpService().getHost(),
@@ -141,7 +141,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 		JMenuItem sendToRepeaterMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_TO_REPEATER);
 		UiUtil.setupTablePopupMenuItem(sendToRepeaterMenuItem, table, KEYSTROKE_SENDTO_REPEATER, new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream().forEach(messageDto -> 
 					BurpUtil.getCallbacks().sendToRepeater(
 							messageDto.getMessage().getHttpService().getHost(),
@@ -178,7 +178,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 		JMenuItem editCellMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_EDIT_CELL);
 		UiUtil.setupTablePopupMenuItem(editCellMenuItem, table, KEYSTROKE_EDIT_CELL, new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
 				var selectedMessages = Controller.getInstance().getSelectedMessages();
 				if(selectedMessages.isEmpty()) {
 					return;
@@ -222,7 +222,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 		JMenuItem deleteItemMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_DELETE_ITEM);
 		UiUtil.setupTablePopupMenuItem(deleteItemMenuItem, table, KEYSTROKE_DELETE_ITEM, new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
 				if(UiUtil.getConfirmAnswerDefaultCancel(Captions.MESSAGE_DELETE_ITEM, deleteItemMenuItem)) {
 					Controller.getInstance().deleteMessages();
 				}
@@ -291,7 +291,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 	@SuppressWarnings("serial")
 	private Action createActionForCopy(Function<MessageDto, String> mapper) {
 		return new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
 				UiUtil.copyToClipboard(Controller.getInstance().getSelectedMessages().stream()
 						.map(messageDto -> Optional.ofNullable(mapper.apply(messageDto)).orElse(""))
 						.collect(Collectors.joining(System.lineSeparator())));

@@ -104,11 +104,7 @@ public class ConfigLogic {
 		saveUserOption(fieldName, value, Boolean.toString(value));
 	}
 	private void saveUserOption(String fieldName, Object value) {
-		if(value == null) {
-			saveUserOption(fieldName, value, null);
-			return;
-		}
-		saveUserOption(fieldName, value, new Gson().toJson(value));
+		saveUserOption(fieldName, value, convertValueMapToStr(value));
 	}
 	private void saveUserOption(String fieldName, Object value, String valueStr) {
 		try {
@@ -147,7 +143,11 @@ public class ConfigLogic {
 				saveUserOption(field.getName(), ReflectionUtil.convertValueStrToObject(field, valueStr));
 			});
 	}
+
 	private String convertValueMapToStr(Object valueMap) {
+		if(valueMap == null) {
+			return null;
+		}
 		if(valueMap.getClass() == String.class) {
 			return (String)valueMap;
 		}

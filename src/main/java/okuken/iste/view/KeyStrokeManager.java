@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 import com.google.common.collect.Lists;
 
@@ -40,17 +38,21 @@ public class KeyStrokeManager {
 	@SuppressWarnings("serial")
 	public void setupKeyStroke() {
 		var proxyHttpHistoryTable = BurpUtil.getBurpSuiteProxyHttpHistoryTable();
+		if(proxyHttpHistoryTable == null) {
+			BurpUtil.printStderr("setupKeyStroke failed.");
+			return;
+		}
 
 		proxyHttpHistoryTable.getInputMap().put(KEYSTROKE_SEND_TO_ISTE, ACTIONKEY_SEND_TO_ISTE);
 		proxyHttpHistoryTable.getActionMap().put(ACTIONKEY_SEND_TO_ISTE, new AbstractAction() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
 				if(!judgeIsReadyToGetSelectedProxyHistoryIndexes()) {
 					return;
 				}
 
 				var selectedIndexes = getSelectedProxyHistoryIndexes();
-				SwingUtilities.invokeLater(() -> {
+				UiUtil.invokeLater(() -> {
 					Controller.getInstance().sendMessagesToSuiteTab(getProxyHistory(selectedIndexes));
 				});
 			}
@@ -59,13 +61,13 @@ public class KeyStrokeManager {
 		proxyHttpHistoryTable.getInputMap().put(KEYSTROKE_SEND_TO_ISTE_HISTORY, ACTIONKEY_SEND_TO_ISTE_HISTORY);
 		proxyHttpHistoryTable.getActionMap().put(ACTIONKEY_SEND_TO_ISTE_HISTORY, new AbstractAction() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
 				if(!judgeIsReadyToGetSelectedProxyHistoryIndexes()) {
 					return;
 				}
 
 				var selectedIndexes = getSelectedProxyHistoryIndexes();
-				SwingUtilities.invokeLater(() -> {
+				UiUtil.invokeLater(() -> {
 					var selectedMessages = getProxyHistory(selectedIndexes);
 					var targetMessageDto = MessageSelectorForSendToHistory.showDialog(selectedMessages.toArray(new IHttpRequestResponse[0]));
 					if(targetMessageDto == null) {
@@ -80,7 +82,7 @@ public class KeyStrokeManager {
 		proxyHttpHistoryTable.getInputMap().put(KEYSTROKE_CALC_DELETED_HISTORY, ACTIONKEY_CALC_DELETED_HISTORY);
 		proxyHttpHistoryTable.getActionMap().put(ACTIONKEY_CALC_DELETED_HISTORY, new AbstractAction() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformedSafe(ActionEvent e) {
 				if(!judgeIsReadyToCalculateDeletedProxyHttpHistoryNumbers()) {
 					return;
 				}

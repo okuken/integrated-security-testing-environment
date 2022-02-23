@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mybatis.dynamic.sql.SqlBuilder;
 
 import com.google.common.collect.Lists;
@@ -281,7 +282,13 @@ public class MessageLogic {
 			if(messageOrd.isEmpty()) {
 				return Lists.newArrayList();
 			}
-			return Arrays.stream(messageOrd.get().getOrd().split(","))
+
+			var ord = messageOrd.get().getOrd();
+			if(StringUtils.isBlank(ord)) {
+				return Lists.newArrayList();
+			}
+
+			return Arrays.stream(ord.split(","))
 					.map(Integer::valueOf)
 					.collect(Collectors.toList());
 		});
