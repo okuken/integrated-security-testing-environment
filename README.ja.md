@@ -5,6 +5,11 @@
 Webアプリケーションの脆弱性診断をトータルサポートする Burp extension（Burp Suiteの拡張機能）です。  
 診断員を煩雑な作業から解放し、全集中へと導きます。
 
+>**お知らせ**  
+>ISTEの情報交換や告知を目的としたSlackワークスペースを用意しました。  
+>下記の招待リンクからどなたでもご参加いただけますので、ISTEに興味をお持ちの方は是非ご参加ください。  
+>招待リンク：https://join.slack.com/t/burp-iste/shared_invite/zt-13xm9liet-BPI1ByEEklmTKZcSbQepAA
+
 ![iste_demo_01_repeat_as](https://user-images.githubusercontent.com/942241/115988566-51a0df00-a5f5-11eb-98f4-ba5e52b6a379.gif)
 \* I used [OWASP Mutillidae II](https://github.com/webpwnized/mutillidae) in my demonstration.
 
