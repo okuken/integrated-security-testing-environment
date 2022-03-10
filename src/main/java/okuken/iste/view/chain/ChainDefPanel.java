@@ -40,17 +40,28 @@ public class ChainDefPanel extends JPanel {
 	private MessageDto messageDto;
 	private Integer messageChainId;
 
+	private MessageChainDto loadedMessageChainDto;
+
 	private JSpinner timesSpinner;
 	private JLabel timesCountdownLabel;
 
 	private JFrame popupFrame;
 	private JPanel nodesPanel;
+	private ChainDefPresetVarsPanel presetVarsPanel;
 
 	public ChainDefPanel(MessageDto messageDto, Integer messageChainId) {
 		this.messageDto = messageDto;
 		this.messageChainId = messageChainId;
 		
 		setLayout(new BorderLayout(0, 0));
+		
+		JPanel configPanel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) configPanel.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		add(configPanel, BorderLayout.NORTH);
+		
+		presetVarsPanel = new ChainDefPresetVarsPanel(this);
+		configPanel.add(presetVarsPanel);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
@@ -125,10 +136,16 @@ public class ChainDefPanel extends JPanel {
 			return;
 		}
 
-		var messageChainDto = Controller.getInstance().loadMessageChain(messageChainId);
-		messageChainDto.getNodes().stream().forEach(nodeDto -> {
+		loadedMessageChainDto = Controller.getInstance().loadMessageChain(messageChainId);
+		loadedMessageChainDto.getNodes().stream().forEach(nodeDto -> {
 			addNodeTail(nodeDto);
 		});
+
+		presetVarsPanel.refreshPanel();
+	}
+
+	MessageChainDto getLoadedMessageChainDto() {
+		return loadedMessageChainDto;
 	}
 
 	private JPanel createAddButtonPanel() {
@@ -176,6 +193,7 @@ public class ChainDefPanel extends JPanel {
 				.filter(component -> component instanceof ChainDefNodePanel)
 				.map(nodePanel -> ((ChainDefNodePanel)nodePanel).makeNodeDto())
 				.collect(Collectors.toList()));
+		chainDto.setPresetVars(presetVarsPanel.getRows());
 		chainDto.setMessageId(messageDto != null ? messageDto.getId() : null);
 
 		return chainDto;

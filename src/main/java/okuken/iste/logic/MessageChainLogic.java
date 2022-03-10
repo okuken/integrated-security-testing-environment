@@ -13,16 +13,20 @@ import okuken.iste.dao.auto.MessageChainNodeReqpMapper;
 import okuken.iste.dao.auto.MessageChainNodeMapper;
 import okuken.iste.dao.auto.MessageChainNodeRespDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageChainNodeRespMapper;
+import okuken.iste.dao.auto.MessageChainPreVarDynamicSqlSupport;
+import okuken.iste.dao.auto.MessageChainPreVarMapper;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.dto.MessageChainNodeRespDto;
+import okuken.iste.dto.MessageChainPresetVarDto;
 import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.entity.auto.MessageChain;
 import okuken.iste.entity.auto.MessageChainNode;
 import okuken.iste.entity.auto.MessageChainNodeReqp;
 import okuken.iste.entity.auto.MessageChainNodeResp;
+import okuken.iste.entity.auto.MessageChainPreVar;
 import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.ResponseParameterType;
@@ -49,6 +53,7 @@ public class MessageChainLogic {
 			var messageChainNodeMapper = session.getMapper(MessageChainNodeMapper.class);
 			var messageChainNodeReqpMapper = session.getMapper(MessageChainNodeReqpMapper.class);
 			var messageChainNodeRespMapper = session.getMapper(MessageChainNodeRespMapper.class);
+			var messageChainPreVarMapper = session.getMapper(MessageChainPreVarMapper.class);
 
 			//TODO: auto convert
 			var chain = new MessageChain();
@@ -71,6 +76,7 @@ public class MessageChainLogic {
 						messageChainNodeRespMapper.delete(c -> c.where(MessageChainNodeRespDynamicSqlSupport.fkMessageChainNodeId, isEqualTo(node.getId())));
 				});
 				messageChainNodeMapper.delete(c -> c.where(MessageChainNodeDynamicSqlSupport.fkMessageChainId, isEqualTo(chain.getId())));
+				messageChainPreVarMapper.delete(c -> c.where(MessageChainPreVarDynamicSqlSupport.fkMessageChainId, isEqualTo(chain.getId())));
 			}
 
 			// INSERT
@@ -107,6 +113,16 @@ public class MessageChainLogic {
 					respDto.setId(respEntity.getId());
 				});
 			});
+
+			chainDto.getPresetVars().forEach(presetVarDto -> {
+				var presetVarEntity = new MessageChainPreVar();
+				presetVarEntity.setFkMessageChainId(chainDto.getId());
+				presetVarEntity.setName(presetVarDto.getName());
+				presetVarEntity.setValue(presetVarDto.getValue());
+				presetVarEntity.setPrcDate(now);
+				messageChainPreVarMapper.insert(presetVarEntity);
+				presetVarDto.setId(presetVarEntity.getId());
+			});
 		});
 	}
 
@@ -117,6 +133,7 @@ public class MessageChainLogic {
 			var messageChainNodeMapper = session.getMapper(MessageChainNodeMapper.class);
 			var messageChainNodeReqpMapper = session.getMapper(MessageChainNodeReqpMapper.class);
 			var messageChainNodeRespMapper = session.getMapper(MessageChainNodeRespMapper.class);
+			var messageChainPreVarMapper = session.getMapper(MessageChainPreVarMapper.class);
 
 			var chain = messageChainMapper.selectByPrimaryKey(chainId).get();
 			var ret = new MessageChainDto();
@@ -165,6 +182,19 @@ public class MessageChainLogic {
 			}).collect(Collectors.toList());
 
 			ret.setNodes(nodeDtos);
+
+			ret.setPresetVars(
+				messageChainPreVarMapper.select(c -> c
+					.where(MessageChainPreVarDynamicSqlSupport.fkMessageChainId, isEqualTo(chain.getId()))
+					.orderBy(MessageChainPreVarDynamicSqlSupport.id))
+					.stream().map(entity -> {
+						var dto = new MessageChainPresetVarDto();
+						dto.setId(entity.getId());
+						dto.setName(entity.getName());
+						dto.setValue(entity.getValue());
+						return dto;
+					}).collect(Collectors.toList()));
+
 			return ret;
 		});
 	}

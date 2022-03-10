@@ -116,6 +116,7 @@ public class Captions {
 	public static final String CHAIN_DEF_NODE_BUTTON_DELETE = "\u2716"; //x
 	public static final String CHAIN_DEF_NODE_BUTTON_DELETE_TT = "Remove this request from chain";
 
+	public static final String CHAIN_DEF_TABLE_TITLE_PRESET_VARS = "Preset vars";
 	public static final String CHAIN_DEF_TABLE_TITLE_REQUEST_MANIPULATION = "Request manipulation";
 	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
 

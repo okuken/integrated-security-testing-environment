@@ -11,6 +11,7 @@ public class MessageChainDto {
 	private Integer messageId; //base message
 
 	private List<MessageChainNodeDto> nodes = Lists.newArrayList();
+	private List<MessageChainPresetVarDto> presetVars = Lists.newArrayList();
 
 
 	public Integer getId() {
@@ -30,6 +31,12 @@ public class MessageChainDto {
 	}
 	public void setNodes(List<MessageChainNodeDto> nodes) {
 		this.nodes = nodes;
+	}
+	public List<MessageChainPresetVarDto> getPresetVars() {
+		return presetVars;
+	}
+	public void setPresetVars(List<MessageChainPresetVarDto> presetVars) {
+		this.presetVars = presetVars;
 	}
 
 	public Optional<MessageChainNodeDto> getMainNode() {

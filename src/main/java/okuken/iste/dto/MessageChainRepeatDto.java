@@ -17,6 +17,7 @@ public class MessageChainRepeatDto {
 	public MessageChainRepeatDto(MessageChainDto messageChainDto) {
 		super();
 		this.messageChainDto = messageChainDto;
+		messageChainDto.getPresetVars().forEach(dto -> {vars.put(dto.getName(), dto.getValue());});
 	}
 
 	public boolean hasNext() {
