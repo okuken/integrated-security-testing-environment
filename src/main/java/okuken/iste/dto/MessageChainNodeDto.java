@@ -15,6 +15,8 @@ public class MessageChainNodeDto {
 
 	private boolean main;
 
+	private boolean breakpoint;
+
 	private byte[] editedRequest;
 
 	public Integer getId() {
@@ -52,6 +54,12 @@ public class MessageChainNodeDto {
 	}
 	public void setMain(boolean main) {
 		this.main = main;
+	}
+	public boolean isBreakpoint() {
+		return breakpoint;
+	}
+	public void setBreakpoint(boolean breakpoint) {
+		this.breakpoint = breakpoint;
 	}
 
 	public byte[] getRequest() {

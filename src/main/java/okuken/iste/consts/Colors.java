@@ -14,6 +14,8 @@ public class Colors {
 
 	public static final Color COMBOBOX_FOREGROUND_HIGHLIGHT = BURP_COLOR;
 
+	public static final Color BLOCK_BACKGROUND_HIGHLIGHT = BURP_COLOR;
+
 	public static final Color TABLE_BORDER = Color.LIGHT_GRAY;
 
 	public static final Color TABLE_ROW_SELECTED_BORDER = BURP_COLOR;

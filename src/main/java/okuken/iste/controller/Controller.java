@@ -324,8 +324,8 @@ public class Controller {
 		return repeaterPanel.getSelectedAuthAccountDto();
 	}
 
-	public void sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
-		MessageChainLogic.getInstance().sendMessageChain(messageChainDto, authAccountDto, callback, forAuth, needSaveHistory);
+	public MessageChainRepeatDto sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory, MessageChainRepeatDto breakingMessageChainRepeatDto) {
+		return MessageChainLogic.getInstance().sendMessageChain(messageChainDto, authAccountDto, callback, forAuth, needSaveHistory, breakingMessageChainRepeatDto);
 	}
 
 	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback) {
@@ -450,7 +450,7 @@ public class Controller {
 	}
 
 	public void saveMessageChain(MessageChainDto messageChainDto, boolean isAuthChain) {
-		MessageChainLogic.getInstance().saveMessageChain(messageChainDto);
+		MessageChainLogic.getInstance().saveMessageChain(messageChainDto, isAuthChain);
 
 		if(isAuthChain) {
 			ConfigLogic.getInstance().getAuthConfig().setAuthMessageChainDto(messageChainDto);

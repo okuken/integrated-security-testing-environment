@@ -116,11 +116,13 @@ public class Captions {
 	public static final String CHAIN_DEF_NODE_BUTTON_DELETE = "\u2716"; //x
 	public static final String CHAIN_DEF_NODE_BUTTON_DELETE_TT = "Remove this request from chain";
 
+	public static final String CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT = "Breakpoint";
+
 	public static final String CHAIN_DEF_TABLE_TITLE_PRESET_VARS = "Preset vars";
 	public static final String CHAIN_DEF_TABLE_TITLE_REQUEST_MANIPULATION = "Request manipulation";
 	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
 
-	public static final String CHAIN_DEF_RUN = "Run";
+	public static final String CHAIN_DEF_RUN = " \u25b6 ";
 	public static final String CHAIN_DEF_RUN_TT = "Run request chain for specified number of times";
 	public static final String CHAIN_DEF_RUN_DONE = "Done.";
 

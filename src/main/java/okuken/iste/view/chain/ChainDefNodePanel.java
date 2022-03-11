@@ -21,11 +21,13 @@ import javax.swing.border.LineBorder;
 import burp.IHttpRequestResponse;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
 
 public class ChainDefNodePanel extends JPanel {
 
@@ -40,6 +42,9 @@ public class ChainDefNodePanel extends JPanel {
 	private JComboBox<MessageDto> urlComboBox;
 	private ChainDefNodeRequestParamsPanel requestParamsPanel;
 	private ChainDefNodeResponseParamsPanel responseParamsPanel;
+
+	private JPanel messageControlPanel;
+	private JCheckBox breakpointCheckBox;
 
 	private MessageEditorPanel messageEditorPanel;
 
@@ -88,9 +93,20 @@ public class ChainDefNodePanel extends JPanel {
 		flowLayout_2.setAlignment(FlowLayout.LEFT);
 		mainPanel.add(responseParamsPanel);
 		
+		JPanel messagePanel = new JPanel(new BorderLayout(0, 0));
+		centerPanel.add(messagePanel, BorderLayout.CENTER);
+		
 		messageEditorPanel = new MessageEditorPanel(null, !parentChainDefPanel.judgeIsAuthChain(), false, true);
-		centerPanel.add(messageEditorPanel, BorderLayout.CENTER);
+		messagePanel.add(messageEditorPanel, BorderLayout.CENTER);
 		messageEditorPanel.setPreferredSize(MESSAGE_EDITOR_PREFERRED_SIZE);
+		
+		messageControlPanel = new JPanel();
+		FlowLayout flowLayout_3 = (FlowLayout) messageControlPanel.getLayout();
+		flowLayout_3.setAlignment(FlowLayout.LEFT);
+		messagePanel.add(messageControlPanel, BorderLayout.NORTH);
+		
+		breakpointCheckBox = new JCheckBox(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT);
+		messageControlPanel.add(breakpointCheckBox);
 		
 		JPanel leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);
@@ -137,6 +153,8 @@ public class ChainDefNodePanel extends JPanel {
 				responseParamsPanel.addRow(respDto);
 			});
 
+			breakpointCheckBox.setSelected(nodeDto.isBreakpoint());
+
 		} finally {
 			refreshingFlag = refreshingFlagBk;
 		}
@@ -157,6 +175,7 @@ public class ChainDefNodePanel extends JPanel {
 		nodeDto.setMessageDto(urlComboBox.getItemAt(urlComboBox.getSelectedIndex()));
 		nodeDto.setReqps(requestParamsPanel.getRows());
 		nodeDto.setResps(responseParamsPanel.getRows());
+		nodeDto.setBreakpoint(breakpointCheckBox.isSelected());
 		nodeDto.setEditedRequest(messageEditorPanel.getRequest());
 		return nodeDto;
 	}
@@ -166,6 +185,19 @@ public class ChainDefNodePanel extends JPanel {
 	}
 	public void setMessage(IHttpRequestResponse message) {
 		messageEditorPanel.setMessage(message);
+	}
+
+	private Color messageControlPanelDefaultBackgroundColor;
+	public void setIsCurrentNode() {
+		if(messageControlPanelDefaultBackgroundColor == null) {
+			messageControlPanelDefaultBackgroundColor = messageControlPanel.getBackground();
+		}
+		messageControlPanel.setBackground(Colors.BLOCK_BACKGROUND_HIGHLIGHT);
+	}
+	public void clearIsCurrentNode() {
+		if(messageControlPanelDefaultBackgroundColor != null) {
+			messageControlPanel.setBackground(messageControlPanelDefaultBackgroundColor);
+		}
 	}
 
 	public ChainDefPanel getParentChainDefPanel() {

@@ -118,7 +118,7 @@ public class AuthLogic {
 
 	public AuthConfigDto initAuthConfig() {
 		var messageChainDto = new MessageChainDto();
-		MessageChainLogic.getInstance().saveMessageChain(messageChainDto);
+		MessageChainLogic.getInstance().saveMessageChain(messageChainDto, true);
 
 		var authConfigDto = new AuthConfigDto();
 		authConfigDto.setAuthMessageChainDto(messageChainDto);
@@ -267,7 +267,7 @@ public class AuthLogic {
 				callback.accept(authAccountDto);
 			}
 
-		}, true, false);
+		}, true, false, null);
 	}
 
 }

@@ -46,7 +46,12 @@ public class MessageChainLogic {
 	/**
 	 * insert or update.
 	 */
-	public void saveMessageChain(MessageChainDto chainDto) {
+	public void saveMessageChain(MessageChainDto chainDto, boolean isAuthChain) {
+
+		if(isAuthChain) {
+			chainDto.getNodes().forEach(node -> node.setBreakpoint(false));
+		}
+
 		String now = SqlUtil.now();
 		DbUtil.withTransaction(session -> {
 			var messageChainMapper = session.getMapper(MessageChainMapper.class);
@@ -85,6 +90,7 @@ public class MessageChainLogic {
 				node.setFkMessageChainId(chainDto.getId());
 				node.setFkMessageId(nodeDto.getMessageDto().getId());
 				node.setMainFlg(nodeDto.isMain());
+				node.setBreakpoint(nodeDto.isBreakpoint());
 				node.setPrcDate(now);
 				messageChainNodeMapper.insert(node);
 				nodeDto.setId(node.getId());
@@ -149,6 +155,7 @@ public class MessageChainLogic {
 				nodeDto.setId(node.getId());
 				nodeDto.setMessageDto(MessageLogic.getInstance().loadMessage(node.getFkMessageId()));
 				nodeDto.setMain(node.getMainFlg());
+				nodeDto.setBreakpoint(node.getBreakpoint());
 
 				nodeDto.setReqps(
 					messageChainNodeReqpMapper.select(c -> c
@@ -213,25 +220,37 @@ public class MessageChainLogic {
 		});
 	}
 
-	public void sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
-		var messageChainRepeatDto = new MessageChainRepeatDto(messageChainDto);
+	public MessageChainRepeatDto sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory, MessageChainRepeatDto breakingMessageChainRepeatDto) {
+		var messageChainRepeatDto = new MessageChainRepeatDto(messageChainDto, authAccountDto);
 		if(messageChainDto.getNodes().isEmpty()) {
 			if(callback != null) {
 				callback.accept(messageChainRepeatDto , -1);
 			}
-			return;
+			return messageChainRepeatDto;
 		}
 
-		sendMessageChainImpl(messageChainRepeatDto, authAccountDto, callback, forAuth, needSaveHistory);
+		if(breakingMessageChainRepeatDto != null) {
+			messageChainRepeatDto.applyBreakingInfo(breakingMessageChainRepeatDto);
+		}
+		if(breakingMessageChainRepeatDto == null && messageChainRepeatDto.getCurrentNodeDto().isBreakpoint()) {
+			messageChainRepeatDto.before();
+			if(callback != null) {
+				callback.accept(messageChainRepeatDto , -1);
+			}
+			return messageChainRepeatDto;
+		}
+
+		sendMessageChainImpl(messageChainRepeatDto, callback, forAuth, needSaveHistory);
+		return messageChainRepeatDto;
 	}
-	private void sendMessageChainImpl(MessageChainRepeatDto messageChainRepeatDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
+	private void sendMessageChainImpl(MessageChainRepeatDto messageChainRepeatDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
 		var node = messageChainRepeatDto.getCurrentNodeDto();
 
-		var request = MessageUtil.applyPayloads(node.getRequest(), node.getReqps(), messageChainRepeatDto.getVars(), authAccountDto);
+		var request = MessageUtil.applyPayloads(node.getRequest(), node.getReqps(), messageChainRepeatDto.getVars(), messageChainRepeatDto.getAuthAccountDto());
 
 		RepeaterLogic.getInstance().sendRequest(
 				request,
-				authAccountDto,
+				messageChainRepeatDto.getAuthAccountDto(),
 				node.getMessageDto(),
 				(messageRepeatDto) -> {
 					messageChainRepeatDto.getMessageRepeatDtos().add(messageRepeatDto);
@@ -241,9 +260,9 @@ public class MessageChainLogic {
 						callback.accept(messageChainRepeatDto, messageChainRepeatDto.getCurrentIndex());
 					}
 
-					if(messageChainRepeatDto.hasNext()) {
+					if(messageChainRepeatDto.canNext()) {
 						messageChainRepeatDto.next();
-						sendMessageChainImpl(messageChainRepeatDto, authAccountDto, callback, forAuth, needSaveHistory);
+						sendMessageChainImpl(messageChainRepeatDto, callback, forAuth, needSaveHistory);
 					}
 				}, forAuth, needSaveHistory && node.isMain(), true);
 	}
