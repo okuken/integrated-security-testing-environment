@@ -232,8 +232,9 @@ public class MessageChainLogic {
 		if(breakingMessageChainRepeatDto != null) {
 			messageChainRepeatDto.applyBreakingInfo(breakingMessageChainRepeatDto);
 		}
-		if(breakingMessageChainRepeatDto == null && messageChainRepeatDto.getCurrentNodeDto().isBreakpoint()) {
+		if(breakingMessageChainRepeatDto == null && messageChainRepeatDto.getCurrentNodeDto().isBreakpoint()) { //case: initial node has breakpoint
 			messageChainRepeatDto.before();
+			messageChainRepeatDto.setNextAppliedRequestForView(applyPayload(messageChainRepeatDto.getNextNodeDto(), messageChainRepeatDto));
 			if(callback != null) {
 				callback.accept(messageChainRepeatDto , -1);
 			}
@@ -246,7 +247,7 @@ public class MessageChainLogic {
 	private void sendMessageChainImpl(MessageChainRepeatDto messageChainRepeatDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
 		var node = messageChainRepeatDto.getCurrentNodeDto();
 
-		var request = MessageUtil.applyPayloads(node.getRequest(), node.getReqps(), messageChainRepeatDto.getVars(), messageChainRepeatDto.getAuthAccountDto());
+		var request = calcAppliedRequest(node, messageChainRepeatDto);
 
 		RepeaterLogic.getInstance().sendRequest(
 				request,
@@ -255,6 +256,10 @@ public class MessageChainLogic {
 				(messageRepeatDto) -> {
 					messageChainRepeatDto.getMessageRepeatDtos().add(messageRepeatDto);
 					updateVars(messageChainRepeatDto);
+
+					if(!messageChainRepeatDto.canNext() && messageChainRepeatDto.hasNext()) {
+						messageChainRepeatDto.setNextAppliedRequestForView(applyPayload(messageChainRepeatDto.getNextNodeDto(), messageChainRepeatDto));
+					}
 
 					if(callback != null) {
 						callback.accept(messageChainRepeatDto, messageChainRepeatDto.getCurrentIndex());
@@ -265,6 +270,17 @@ public class MessageChainLogic {
 						sendMessageChainImpl(messageChainRepeatDto, callback, forAuth, needSaveHistory);
 					}
 				}, forAuth, needSaveHistory && node.isMain(), true);
+	}
+
+	private byte[] calcAppliedRequest(MessageChainNodeDto node, MessageChainRepeatDto messageChainRepeatDto) {
+		if(messageChainRepeatDto.getNextAppliedRequestForView() != null) {
+			messageChainRepeatDto.setNextAppliedRequestForView(null);
+			return node.getRequest();
+		}
+		return applyPayload(node, messageChainRepeatDto);
+	}
+	private byte[] applyPayload(MessageChainNodeDto node, MessageChainRepeatDto messageChainRepeatDto) {
+		return MessageUtil.applyPayloads(node.getRequest(), node.getReqps(), messageChainRepeatDto.getVars(), messageChainRepeatDto.getAuthAccountDto());
 	}
 
 	private void updateVars(MessageChainRepeatDto messageChainRepeatDto) {

@@ -13,6 +13,7 @@ import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.UiUtil;
 
@@ -261,6 +262,13 @@ public class ChainDefPanel extends JPanel {
 
 		var needSaveHistory = !judgeIsAuthChain();
 		breakingMessageChainRepeatDto = Controller.getInstance().sendMessageChain(messageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
+			if(messageChainRepeatDto.getNextAppliedRequestForView() != null) {
+				var nextAppliedRequestForView = messageChainRepeatDto.getNextAppliedRequestForView();
+				var nextNodeDto = messageChainRepeatDto.getNextNodeDto();
+				SwingUtilities.invokeLater(() -> {
+					chainDefNodePanels.get(index + 1).setMessage(new HttpRequestResponseMock(nextAppliedRequestForView, null, nextNodeDto.getMessageDto().getMessage().getHttpService()));
+				});
+			}
 			if(index < 0) {
 				setIsCurrentNode(chainDefNodePanels, 0);
 				return;

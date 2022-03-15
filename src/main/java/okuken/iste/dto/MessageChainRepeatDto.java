@@ -11,6 +11,8 @@ public class MessageChainRepeatDto {
 	private int currentIndex = 0;
 	private final MessageChainDto messageChainDto;
 
+	private byte[] nextAppliedRequestForView;
+
 	private AuthAccountDto authAccountDto;
 
 	private final List<MessageRepeatDto> messageRepeatDtos = Lists.newArrayList();
@@ -26,6 +28,7 @@ public class MessageChainRepeatDto {
 	public void applyBreakingInfo(MessageChainRepeatDto breakingMessageChainRepeatDto) {
 		authAccountDto = breakingMessageChainRepeatDto.getAuthAccountDto();
 		currentIndex = breakingMessageChainRepeatDto.getCurrentIndex() + 1;
+		nextAppliedRequestForView = breakingMessageChainRepeatDto.getNextAppliedRequestForView();
 		messageRepeatDtos.addAll(breakingMessageChainRepeatDto.getMessageRepeatDtos());
 		vars.putAll(breakingMessageChainRepeatDto.getVars());
 	}
@@ -49,6 +52,9 @@ public class MessageChainRepeatDto {
 	public MessageChainNodeDto getCurrentNodeDto() {
 		return messageChainDto.getNodes().get(currentIndex);
 	}
+	public MessageChainNodeDto getNextNodeDto() {
+		return messageChainDto.getNodes().get(currentIndex + 1);
+	}
 
 	public int getCurrentIndex() {
 		return currentIndex;
@@ -64,6 +70,13 @@ public class MessageChainRepeatDto {
 	}
 	public Map<String, String> getVars() {
 		return vars;
+	}
+
+	public byte[] getNextAppliedRequestForView() {
+		return nextAppliedRequestForView;
+	}
+	public void setNextAppliedRequestForView(byte[] nextAppliedRequestForView) {
+		this.nextAppliedRequestForView = nextAppliedRequestForView;
 	}
 
 }
