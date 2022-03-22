@@ -126,7 +126,7 @@ public class Captions {
 	public static final String CHAIN_DEF_RUN_TT = "Start or resume request chain";
 	public static final String CHAIN_DEF_TERMINATE = " \u23f9 ";
 	public static final String CHAIN_DEF_TERMINATE_TT = "Terminate request chain";
-	public static final String CHAIN_DEF_STEP = " \u21a9 ";
+	public static final String CHAIN_DEF_STEP = " \u2935 ";
 	public static final String CHAIN_DEF_STEP_TT = "Step request chain";
 	public static final String CHAIN_DEF_RUN_DONE = "Done.";
 	public static final String CHAIN_DEF_RUN_TERMINATE_FORCE = "Forced termination.";

@@ -48,6 +48,7 @@ public class ChainDefPanel extends JPanel {
 
 	private JButton startButton;
 	private JButton terminateButton;
+	private JButton stepButton;
 
 	private JSpinner timesSpinner;
 	private JLabel timesCountdownLabel;
@@ -78,12 +79,7 @@ public class ChainDefPanel extends JPanel {
 		controlCenterPanel.add(startButton);
 		startButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				startButton.setEnabled(false); //prevent double-click
-				if(breakingMessageChainRepeatDto != null) {
-					resume();
-					return;
-				}
-				run();
+				start(false);
 			}
 		});
 		
@@ -93,6 +89,15 @@ public class ChainDefPanel extends JPanel {
 		terminateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				terminate();
+			}
+		});
+		
+		stepButton = new JButton(Captions.CHAIN_DEF_STEP);
+		stepButton.setToolTipText(Captions.CHAIN_DEF_STEP_TT);
+		controlCenterPanel.add(stepButton);
+		stepButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				start(true);
 			}
 		});
 		
@@ -168,10 +173,11 @@ public class ChainDefPanel extends JPanel {
 
 	private void refreshControlsState() {
 		var isRunningOrBreaking = (breakingMessageChainRepeatDto != null);
-		var isBreaking = isRunningOrBreaking && breakingMessageChainRepeatDto.getNextAppliedRequestForView() != null;
+		var isBreaking = isRunningOrBreaking && breakingMessageChainRepeatDto.isBreaking();
 		var isRunning = (isRunningOrBreaking && !isBreaking);
 
 		startButton.setEnabled(!isRunning);
+		stepButton.setEnabled(!isRunning);
 		terminateButton.setEnabled(isRunningOrBreaking);
 	}
 
@@ -216,12 +222,10 @@ public class ChainDefPanel extends JPanel {
 	}
 
 	private void setIsCurrentNode(List<ChainDefNodePanel> chainDefNodePanels, Integer index) {
-		SwingUtilities.invokeLater(() -> {
-			chainDefNodePanels.forEach(e -> e.clearIsCurrentNode());
-			if(index != null) {
-				chainDefNodePanels.get(index).setIsCurrentNode();
-			}
-		});
+		chainDefNodePanels.forEach(e -> e.clearIsCurrentNode());
+		if(index != null) {
+			chainDefNodePanels.get(index).setIsCurrentNode();
+		}
 	}
 
 	private List<ChainDefNodePanel> getChainDefNodePanels() {
@@ -246,7 +250,19 @@ public class ChainDefPanel extends JPanel {
 		return chainDto;
 	}
 
-	private void run() {
+	private void start(boolean isStep) {
+		startButton.setEnabled(false); //prevent double-click
+		stepButton.setEnabled(false);
+
+		if(breakingMessageChainRepeatDto != null) {
+			resume(isStep);
+		} else {
+			run(isStep);
+		}
+		refreshControlsState();
+	}
+
+	private void run(boolean isStep) {
 		var chainDefNodePanels = getChainDefNodePanels();
 		if(chainDefNodePanels.isEmpty()) {
 			return;
@@ -256,85 +272,86 @@ public class ChainDefPanel extends JPanel {
 		var times = getTimes();
 
 		if(judgeIsAuthChain()) {
-			runImpl(chainDefNodePanels, chainDto, Controller.getInstance().getSelectedAuthAccountOnAuthConfig(), times);
+			runImpl(chainDefNodePanels, chainDto, Controller.getInstance().getSelectedAuthAccountOnAuthConfig(), times, isStep);
 			return;
 		}
 
 		var authAccountDto = Controller.getInstance().getSelectedAuthAccountOnRepeater();
 		if(authAccountDto != null && authAccountDto.isSessionIdsEmpty()) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
-				runImpl(chainDefNodePanels, chainDto, authAccountDto, times);
+				runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
 			});
 			return;
 		}
-		runImpl(chainDefNodePanels, chainDto, authAccountDto, times);
+		runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
 	}
 
-	private void resume() {
+	private void resume(boolean isStep) {
 		var chainDefNodePanels = getChainDefNodePanels();
 		var chainDto = makeChainDto();
 		var times = Integer.parseInt(timesCountdownLabel.getText());
 
-		runImpl(chainDefNodePanels, chainDto, null, times);
+		runImpl(chainDefNodePanels, chainDto, null, times, isStep);
 	}
 
-	private void runImpl(List<ChainDefNodePanel> chainDefNodePanels, MessageChainDto messageChainDto, AuthAccountDto authAccountDto, int times) {
+	private void runImpl(List<ChainDefNodePanel> chainDefNodePanels, MessageChainDto messageChainDto, AuthAccountDto authAccountDto, int times, boolean isStep) {
 		SwingUtilities.invokeLater(() -> {
 			timesCountdownLabel.setText(Integer.toString(times));
 		});
+
+		if(isStep) {
+			if(breakingMessageChainRepeatDto != null) {
+				var nextIndex = breakingMessageChainRepeatDto.getCurrentIndex() + 1;
+				if(nextIndex < messageChainDto.getNodes().size()) {
+					messageChainDto.getNodes().get(nextIndex).setBreakpoint(true);
+				}
+			} else {
+				messageChainDto.getNodes().get(0).setBreakpoint(true);
+			}
+		}
 
 		var needSaveHistory = !judgeIsAuthChain();
 		breakingMessageChainRepeatDto = Controller.getInstance().sendMessageChain(messageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
 			if(messageChainRepeatDto.isForceTerminate()) {
 				SwingUtilities.invokeLater(() -> {
-					refreshControlsState();
 					timesCountdownLabel.setText(Captions.CHAIN_DEF_RUN_TERMINATE_FORCE + " (" + times + ")");
-				});
-				return;
-			}
-			if(messageChainRepeatDto.getNextAppliedRequestForView() != null) {
-				var nextAppliedRequestForView = messageChainRepeatDto.getNextAppliedRequestForView();
-				var nextNodeDto = messageChainRepeatDto.getNextNodeDto();
-				SwingUtilities.invokeLater(() -> {
-					chainDefNodePanels.get(index + 1).setMessage(new HttpRequestResponseMock(nextAppliedRequestForView, null, nextNodeDto.getMessageDto().getMessage().getHttpService()));
 					refreshControlsState();
 				});
-			}
-			if(index < 0) {
-				setIsCurrentNode(chainDefNodePanels, 0);
 				return;
 			}
+			if(messageChainRepeatDto.isBreaking()) {
+				var breakingAppliedRequestForView = messageChainRepeatDto.getBreakingAppliedRequestForView();
+				SwingUtilities.invokeLater(() -> {
+					chainDefNodePanels.get(index).setMessage(new HttpRequestResponseMock(breakingAppliedRequestForView, null, messageChainRepeatDto.getMessageChainDto().getNodes().get(index).getMessageDto().getMessage().getHttpService()));
+					setIsCurrentNode(chainDefNodePanels, index);
+					refreshControlsState();
+				});
+				return;
+			}
+
 			SwingUtilities.invokeLater(() -> {
 				chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage());
-			});
+				setIsCurrentNode(chainDefNodePanels, null);
 
-			if(messageChainRepeatDto.getCurrentNodeDto().isMain() && needSaveHistory) {
-				SwingUtilities.invokeLater(() -> {
+				if(messageChainRepeatDto.getCurrentNodeDto().isMain() && needSaveHistory) {
 					Controller.getInstance().refreshRepeatTablePanel(messageChainDto.getMainNode().get().getMessageDto().getId()); //TODO:improve...
-				});
-			}
+				}
+			});
 
 			var nextIndex = index + 1;
 			if(nextIndex >= chainDefNodePanels.size()) { //case: last node
 				breakingMessageChainRepeatDto = null;
-				setIsCurrentNode(chainDefNodePanels, null);
 				if(times - 1 > 0) {
-					runImpl(chainDefNodePanels, messageChainDto, authAccountDto, times - 1); //recursive
+					runImpl(chainDefNodePanels, messageChainDto, authAccountDto, times - 1, isStep); //recursive
 				} else {
 					SwingUtilities.invokeLater(() -> {
 						refreshControlsState();
 						timesCountdownLabel.setText(Captions.CHAIN_DEF_RUN_DONE);
 					});
 				}
-			} else {
-				setIsCurrentNode(chainDefNodePanels, messageChainDto.getNodes().get(nextIndex).isBreakpoint() ? nextIndex : null);
 			}
 
 		}, judgeIsAuthChain(), needSaveHistory, breakingMessageChainRepeatDto);
-
-		SwingUtilities.invokeLater(() -> {
-			refreshControlsState();
-		});
 	}
 
 	private void terminate() {

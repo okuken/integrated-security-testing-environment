@@ -232,14 +232,6 @@ public class MessageChainLogic {
 		if(breakingMessageChainRepeatDto != null) {
 			messageChainRepeatDto.applyBreakingInfo(breakingMessageChainRepeatDto);
 		}
-		if(breakingMessageChainRepeatDto == null && messageChainRepeatDto.getCurrentNodeDto().isBreakpoint()) { //case: initial node has breakpoint
-			messageChainRepeatDto.before();
-			messageChainRepeatDto.setNextAppliedRequestForView(applyPayload(messageChainRepeatDto.getNextNodeDto(), messageChainRepeatDto));
-			if(callback != null) {
-				callback.accept(messageChainRepeatDto , -1);
-			}
-			return messageChainRepeatDto;
-		}
 
 		sendMessageChainImpl(messageChainRepeatDto, callback, forAuth, needSaveHistory);
 		return messageChainRepeatDto;
@@ -254,7 +246,20 @@ public class MessageChainLogic {
 
 		var node = messageChainRepeatDto.getCurrentNodeDto();
 
-		var request = calcAppliedRequest(node, messageChainRepeatDto);
+		byte[] request = null;
+		if(messageChainRepeatDto.isBreaking()) {
+			messageChainRepeatDto.setBreaking(false);
+			request = node.getRequest();
+		} else if(node.isBreakpoint()) {
+			messageChainRepeatDto.setBreaking(true);
+			messageChainRepeatDto.setBreakingAppliedRequestForView(applyPayload(node, messageChainRepeatDto));
+			if(callback != null) {
+				callback.accept(messageChainRepeatDto, messageChainRepeatDto.getCurrentIndex());
+			}
+			return;
+		} else {
+			request = applyPayload(node, messageChainRepeatDto);
+		}
 
 		RepeaterLogic.getInstance().sendRequest(
 				request,
@@ -264,28 +269,17 @@ public class MessageChainLogic {
 					messageChainRepeatDto.getMessageRepeatDtos().add(messageRepeatDto);
 					updateVars(messageChainRepeatDto);
 
-					if(!messageChainRepeatDto.canNext() && messageChainRepeatDto.hasNext()) {
-						messageChainRepeatDto.setNextAppliedRequestForView(applyPayload(messageChainRepeatDto.getNextNodeDto(), messageChainRepeatDto));
-					}
-
 					if(callback != null) {
 						callback.accept(messageChainRepeatDto, messageChainRepeatDto.getCurrentIndex());
 					}
 
-					if(messageChainRepeatDto.canNext()) {
+					if(messageChainRepeatDto.hasNext()) {
 						messageChainRepeatDto.next();
 						sendMessageChainImpl(messageChainRepeatDto, callback, forAuth, needSaveHistory);
 					}
 				}, forAuth, needSaveHistory && node.isMain(), true);
 	}
 
-	private byte[] calcAppliedRequest(MessageChainNodeDto node, MessageChainRepeatDto messageChainRepeatDto) {
-		if(messageChainRepeatDto.getNextAppliedRequestForView() != null) {
-			messageChainRepeatDto.setNextAppliedRequestForView(null);
-			return node.getRequest();
-		}
-		return applyPayload(node, messageChainRepeatDto);
-	}
 	private byte[] applyPayload(MessageChainNodeDto node, MessageChainRepeatDto messageChainRepeatDto) {
 		return MessageUtil.applyPayloads(node.getRequest(), node.getReqps(), messageChainRepeatDto.getVars(), messageChainRepeatDto.getAuthAccountDto());
 	}

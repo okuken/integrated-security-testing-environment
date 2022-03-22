@@ -11,7 +11,8 @@ public class MessageChainRepeatDto {
 	private int currentIndex = 0;
 	private final MessageChainDto messageChainDto;
 
-	private byte[] nextAppliedRequestForView;
+	private boolean breaking;
+	private byte[] breakingAppliedRequestForView;
 	private volatile boolean forceTerminate;
 
 	private AuthAccountDto authAccountDto;
@@ -27,20 +28,13 @@ public class MessageChainRepeatDto {
 	}
 
 	public void applyBreakingInfo(MessageChainRepeatDto breakingMessageChainRepeatDto) {
+		breaking = breakingMessageChainRepeatDto.isBreaking();
 		authAccountDto = breakingMessageChainRepeatDto.getAuthAccountDto();
-		currentIndex = breakingMessageChainRepeatDto.getCurrentIndex() + 1;
-		nextAppliedRequestForView = breakingMessageChainRepeatDto.getNextAppliedRequestForView();
+		currentIndex = breakingMessageChainRepeatDto.getCurrentIndex();
 		messageRepeatDtos.addAll(breakingMessageChainRepeatDto.getMessageRepeatDtos());
 		vars.putAll(breakingMessageChainRepeatDto.getVars());
 	}
 
-	public boolean canNext() {
-		var nextIndex = currentIndex + 1;
-		if(nextIndex < messageChainDto.getNodes().size()) {
-			return !messageChainDto.getNodes().get(nextIndex).isBreakpoint();
-		};
-		return false;
-	}
 	public boolean hasNext() {
 		return currentIndex + 1 < messageChainDto.getNodes().size();
 	}
@@ -73,11 +67,18 @@ public class MessageChainRepeatDto {
 		return vars;
 	}
 
-	public byte[] getNextAppliedRequestForView() {
-		return nextAppliedRequestForView;
+
+	public boolean isBreaking() {
+		return breaking;
 	}
-	public void setNextAppliedRequestForView(byte[] nextAppliedRequestForView) {
-		this.nextAppliedRequestForView = nextAppliedRequestForView;
+	public void setBreaking(boolean breaking) {
+		this.breaking = breaking;
+	}
+	public byte[] getBreakingAppliedRequestForView() {
+		return breakingAppliedRequestForView;
+	}
+	public void setBreakingAppliedRequestForView(byte[] breakingAppliedRequestForView) {
+		this.breakingAppliedRequestForView = breakingAppliedRequestForView;
 	}
 	public boolean isForceTerminate() {
 		return forceTerminate;
