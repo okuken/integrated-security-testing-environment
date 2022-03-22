@@ -46,6 +46,9 @@ public class ChainDefPanel extends JPanel {
 
 	private MessageChainRepeatDto breakingMessageChainRepeatDto;
 
+	private JButton startButton;
+	private JButton terminateButton;
+
 	private JSpinner timesSpinner;
 	private JLabel timesCountdownLabel;
 
@@ -66,6 +69,43 @@ public class ChainDefPanel extends JPanel {
 		
 		presetVarsPanel = new ChainDefPresetVarsPanel(this);
 		configPanel.add(presetVarsPanel);
+		
+		JPanel controlCenterPanel = new JPanel();
+		configPanel.add(controlCenterPanel, BorderLayout.CENTER);
+		
+		startButton = new JButton(Captions.CHAIN_DEF_RUN);
+		startButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
+		controlCenterPanel.add(startButton);
+		startButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				startButton.setEnabled(false); //prevent double-click
+				if(breakingMessageChainRepeatDto != null) {
+					resume();
+					return;
+				}
+				run();
+			}
+		});
+		
+		terminateButton = new JButton(Captions.CHAIN_DEF_TERMINATE);
+		terminateButton.setToolTipText(Captions.CHAIN_DEF_TERMINATE_TT);
+		controlCenterPanel.add(terminateButton);
+		terminateButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				terminate();
+			}
+		});
+		
+		JLabel timesLabel = new JLabel(" x ");
+		controlCenterPanel.add(timesLabel);
+		
+		timesSpinner = new JSpinner();
+		timesSpinner.setModel(new SpinnerNumberModel(TIMES_DEFAULT, 1, 999, 1));
+		controlCenterPanel.add(timesSpinner);
+		
+		timesCountdownLabel = new JLabel("");
+		timesCountdownLabel.setForeground(Colors.CHARACTER_HIGHLIGHT);
+		controlCenterPanel.add(timesCountdownLabel);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
@@ -88,33 +128,6 @@ public class ChainDefPanel extends JPanel {
 				cancel();
 			}
 		});
-		
-		JPanel controlCenterPanel = new JPanel();
-		controlPanel.add(controlCenterPanel, BorderLayout.CENTER);
-		
-		JButton runButton = new JButton(Captions.CHAIN_DEF_RUN);
-		runButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
-		controlCenterPanel.add(runButton);
-		runButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(breakingMessageChainRepeatDto != null) {
-					resume();
-					return;
-				}
-				run();
-			}
-		});
-		
-		JLabel timesLabel = new JLabel(" x ");
-		controlCenterPanel.add(timesLabel);
-		
-		timesSpinner = new JSpinner();
-		timesSpinner.setModel(new SpinnerNumberModel(TIMES_DEFAULT, 1, 999, 1));
-		controlCenterPanel.add(timesSpinner);
-		
-		timesCountdownLabel = new JLabel("");
-		timesCountdownLabel.setForeground(Colors.CHARACTER_HIGHLIGHT);
-		controlCenterPanel.add(timesCountdownLabel);
 		
 		JPanel controlRightPanel = new JPanel();
 		controlPanel.add(controlRightPanel, BorderLayout.EAST);
@@ -150,6 +163,16 @@ public class ChainDefPanel extends JPanel {
 		});
 
 		presetVarsPanel.refreshPanel();
+		refreshControlsState();
+	}
+
+	private void refreshControlsState() {
+		var isRunningOrBreaking = (breakingMessageChainRepeatDto != null);
+		var isBreaking = isRunningOrBreaking && breakingMessageChainRepeatDto.getNextAppliedRequestForView() != null;
+		var isRunning = (isRunningOrBreaking && !isBreaking);
+
+		startButton.setEnabled(!isRunning);
+		terminateButton.setEnabled(isRunningOrBreaking);
 	}
 
 	MessageChainDto getLoadedMessageChainDto() {
@@ -262,11 +285,19 @@ public class ChainDefPanel extends JPanel {
 
 		var needSaveHistory = !judgeIsAuthChain();
 		breakingMessageChainRepeatDto = Controller.getInstance().sendMessageChain(messageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
+			if(messageChainRepeatDto.isForceTerminate()) {
+				SwingUtilities.invokeLater(() -> {
+					refreshControlsState();
+					timesCountdownLabel.setText(Captions.CHAIN_DEF_RUN_TERMINATE_FORCE + " (" + times + ")");
+				});
+				return;
+			}
 			if(messageChainRepeatDto.getNextAppliedRequestForView() != null) {
 				var nextAppliedRequestForView = messageChainRepeatDto.getNextAppliedRequestForView();
 				var nextNodeDto = messageChainRepeatDto.getNextNodeDto();
 				SwingUtilities.invokeLater(() -> {
 					chainDefNodePanels.get(index + 1).setMessage(new HttpRequestResponseMock(nextAppliedRequestForView, null, nextNodeDto.getMessageDto().getMessage().getHttpService()));
+					refreshControlsState();
 				});
 			}
 			if(index < 0) {
@@ -291,6 +322,7 @@ public class ChainDefPanel extends JPanel {
 					runImpl(chainDefNodePanels, messageChainDto, authAccountDto, times - 1); //recursive
 				} else {
 					SwingUtilities.invokeLater(() -> {
+						refreshControlsState();
 						timesCountdownLabel.setText(Captions.CHAIN_DEF_RUN_DONE);
 					});
 				}
@@ -299,6 +331,20 @@ public class ChainDefPanel extends JPanel {
 			}
 
 		}, judgeIsAuthChain(), needSaveHistory, breakingMessageChainRepeatDto);
+
+		SwingUtilities.invokeLater(() -> {
+			refreshControlsState();
+		});
+	}
+
+	private void terminate() {
+		if(breakingMessageChainRepeatDto != null) {
+			breakingMessageChainRepeatDto.setForceTerminate(true);
+			breakingMessageChainRepeatDto = null;
+		}
+		setIsCurrentNode(getChainDefNodePanels(), null);
+		refreshControlsState();
+		timesCountdownLabel.setText("");
 	}
 
 	private int getTimes() {

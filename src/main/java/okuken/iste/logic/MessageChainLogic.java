@@ -245,6 +245,13 @@ public class MessageChainLogic {
 		return messageChainRepeatDto;
 	}
 	private void sendMessageChainImpl(MessageChainRepeatDto messageChainRepeatDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
+		if(messageChainRepeatDto.isForceTerminate()) {
+			if(callback != null) {
+				callback.accept(messageChainRepeatDto, messageChainRepeatDto.getCurrentIndex());
+			}
+			return;
+		}
+
 		var node = messageChainRepeatDto.getCurrentNodeDto();
 
 		var request = calcAppliedRequest(node, messageChainRepeatDto);

@@ -12,6 +12,7 @@ public class MessageChainRepeatDto {
 	private final MessageChainDto messageChainDto;
 
 	private byte[] nextAppliedRequestForView;
+	private volatile boolean forceTerminate;
 
 	private AuthAccountDto authAccountDto;
 
@@ -77,6 +78,12 @@ public class MessageChainRepeatDto {
 	}
 	public void setNextAppliedRequestForView(byte[] nextAppliedRequestForView) {
 		this.nextAppliedRequestForView = nextAppliedRequestForView;
+	}
+	public boolean isForceTerminate() {
+		return forceTerminate;
+	}
+	public void setForceTerminate(boolean forceTerminate) {
+		this.forceTerminate = forceTerminate;
 	}
 
 }
