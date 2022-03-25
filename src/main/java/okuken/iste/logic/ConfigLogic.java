@@ -5,9 +5,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.commons.beanutils.BeanUtils;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -15,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import okuken.iste.annotations.Persistent;
+import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.PluginProjectOptionDto;
 import okuken.iste.dto.ProcessOptionsDto;
@@ -34,6 +37,10 @@ public class ConfigLogic {
 	private UserOptionsDto configDto;
 	private ProjectOptionsDto projectOptionsDto;
 	private ProcessOptionsDto processOptionsDto = new ProcessOptionsDto();
+
+	//listener
+	private List<Consumer<List<AuthAccountDto>>> authAccountChangeListeners = Lists.newArrayList();
+	private List<Consumer<AuthAccountDto>> authAccountSessionChangeListeners = Lists.newArrayList();
 
 	private ConfigLogic() {}
 	public static ConfigLogic getInstance() {
@@ -166,12 +173,14 @@ public class ConfigLogic {
 		if(projectOptionsDto == null) {
 			//TODO: synchronize
 			projectOptionsDto = loadProjectOptions();
+			authAccountChangeListeners.forEach(l -> l.accept(projectOptionsDto.getAuthAccountDtos()));
 		}
 		return projectOptionsDto;
 	}
 	private ProjectOptionsDto loadProjectOptions() {
 		var ret = new ProjectOptionsDto();
 		ret.setAuthConfigDto(loadOrInitAuthConfig());
+		ret.setAuthAccountDtos(AuthLogic.getInstance().loadAuthAccounts());
 		ret.setPluginOptions(ProjectOptionLogic.getInstance().loadPluginProjectOptions(getProjectId()));
 		return ret;
 	}
@@ -187,6 +196,31 @@ public class ConfigLogic {
 		projectOptionsDto = null;
 	}
 
+	public void reloadAuthAccountDtos() {
+		getProjectOptionsDto().setAuthAccountDtos(AuthLogic.getInstance().loadAuthAccounts());
+		authAccountChangeListeners.forEach(l -> l.accept(projectOptionsDto.getAuthAccountDtos()));
+	}
+	public void addAuthAccountChangeListener(Consumer<List<AuthAccountDto>> listener) {
+		authAccountChangeListeners.add(listener);
+	}
+	public void removeAuthAccountChangeListener(Consumer<List<AuthAccountDto>> listener) {
+		authAccountChangeListeners.remove(listener);
+	}
+
+	public void setAuthAccountSessionIds(AuthAccountDto authAccountDto) {
+		var optional = getAuthAccountDtos().stream().filter(dto -> dto.getId().equals(authAccountDto.getId())).findFirst();
+		if(optional.isPresent()) {
+			optional.get().setSessionIds(authAccountDto.getSessionIds());
+			authAccountSessionChangeListeners.forEach(l -> l.accept(authAccountDto));
+		}
+	}
+	public void addAuthAccountSessionChangeListener(Consumer<AuthAccountDto> listener) {
+		authAccountSessionChangeListeners.add(listener);
+	}
+	public void removeAuthAccountSessionChangeListener(Consumer<AuthAccountDto> listener) {
+		authAccountSessionChangeListeners.remove(listener);
+	}
+
 	public AuthConfigDto getAuthConfig() {
 		return getProjectOptionsDto().getAuthConfigDto();
 	}
@@ -195,8 +229,8 @@ public class ConfigLogic {
 		return authConfig != null && authConfig.isReady();
 	}
 
-	public void setAuthConfig(AuthConfigDto authConfigDto) {
-		getProjectOptionsDto().setAuthConfigDto(authConfigDto);
+	public List<AuthAccountDto> getAuthAccountDtos() {
+		return getProjectOptionsDto().getAuthAccountDtos();
 	}
 
 	public String getPluginProjectOption(String pluginName, String key) {

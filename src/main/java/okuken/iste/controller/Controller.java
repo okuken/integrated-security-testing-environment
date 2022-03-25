@@ -19,7 +19,6 @@ import burp.IHttpRequestResponse;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
-import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.dto.MessageDto;
@@ -309,10 +308,6 @@ public class Controller {
 		userOptionsMiscPanel.refresh();
 	}
 
-	public void refreshComponentsDependOnAuthConfig() {
-		repeaterPanel.refreshAuthAccountsComboBox();
-	}
-
 	public List<MessageRepeatDto> getSelectedMessageRepeats() {
 		return repeaterPanel.getSelectedMessageRepeatDtos();
 	}
@@ -391,20 +386,20 @@ public class Controller {
 	}
 
 	public List<AuthAccountDto> getAuthAccounts() {
-		return AuthLogic.getInstance().loadAuthAccounts();
+		return ConfigLogic.getInstance().getAuthAccountDtos();
 	}
 	public void saveAuthAccount(AuthAccountDto authAccountDto, boolean keepOldSessionId) {
 		AuthLogic.getInstance().saveAuthAccount(authAccountDto, keepOldSessionId);
-		refreshComponentsDependOnAuthConfig();
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
 	}
 	public void deleteAuthAccounts(List<AuthAccountDto> authAccountDtos) {
 		AuthLogic.getInstance().deleteAuthAccounts(authAccountDtos);
-		refreshComponentsDependOnAuthConfig();
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
 	}
 
 	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<AuthAccountDto> callback) {
 		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, x -> {
-			repeaterPanel.refreshAuthSessionValueLabel();
+			ConfigLogic.getInstance().setAuthAccountSessionIds(x);
 			if(callback != null) {
 				callback.accept(x);
 			}
@@ -413,14 +408,7 @@ public class Controller {
 
 	private void clearAuthAccountsSession() {
 		AuthLogic.getInstance().clearAuthAccountsSession();
-		refreshComponentsDependOnAuthConfig();
-	}
-
-	public AuthConfigDto getAuthConfig() {
-		var ret = AuthLogic.getInstance().loadAuthConfig();
-		var messageChainDto = MessageChainLogic.getInstance().loadMessageChain(ret.getAuthMessageChainId());
-		ret.setAuthMessageChainDto(messageChainDto);
-		return ret;
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
 	}
 
 	public void saveAuthApplyConfig(AuthApplyConfigDto authApplyConfigDto, boolean keepOldSessionId) {
@@ -499,7 +487,6 @@ public class Controller {
 		applyMessageFilter();
 		this.projectMemoPanel.refreshPanel();
 		this.authPanel.refreshPanel(messageDtos);
-		refreshComponentsDependOnAuthConfig();
 		refreshComponentsDependentOnMessages(messageDtos);
 	}
 
