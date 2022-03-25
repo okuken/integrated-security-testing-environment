@@ -261,7 +261,7 @@ public class ChainDefNodePanel extends JPanel {
 
 
 	private void sendRequest(boolean forceAuthSessionRefresh) {
-		AuthAccountDto authAccountDto = Controller.getInstance().getSelectedAuthAccountOnRepeater();
+		AuthAccountDto authAccountDto = parentChainDefPanel.getSelectedAuthAccountDto();
 		if(authAccountDto != null && (forceAuthSessionRefresh || authAccountDto.isSessionIdsEmpty())) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				sendRequestImpl(authAccountDto);

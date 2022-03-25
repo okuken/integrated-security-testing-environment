@@ -16,11 +16,11 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
-import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 import okuken.iste.view.chain.ChainDefPanel;
+import okuken.iste.view.common.AuthAccountSelectorPanel;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 
 import javax.swing.AbstractButton;
@@ -28,9 +28,7 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import java.util.stream.IntStream;
 import java.awt.event.ActionEvent;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 public class RepeaterPanel extends AbstractDockoutableTabPanel {
@@ -41,9 +39,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 	private RepeatTablePanel repeatTablePanel;
 	private MessageEditorPanel messageEditorPanel;
 
-	private JComboBox<AuthAccountDto> authAccountComboBox;
-	private JButton authSessionRefreshButton;
-	private JLabel authSessionValueLabel;
+	private AuthAccountSelectorPanel authAccountSelectorPanel;
 
 	private JButton followRedirectButton;
 
@@ -82,38 +78,8 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		sendButton.setMnemonic(KeyEvent.VK_S);
 		controlLeftPanel.add(sendButton);
 		
-		authAccountComboBox = new JComboBox<AuthAccountDto>();
-		authAccountComboBox.setToolTipText(Captions.REPEATER_COMBOBOX_ACCOUNT_TT);
-		authAccountComboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				authSessionRefreshButton.setEnabled(authAccountComboBox.getSelectedIndex() > 0);
-				refreshAuthSessionValueLabelImpl();
-			}
-		});
-		ConfigLogic.getInstance().addAuthAccountChangeListener(accounts -> {
-			refreshAuthAccountsComboBox();
-		});
-		controlLeftPanel.add(authAccountComboBox);
-		
-		authSessionRefreshButton = new JButton(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH);
-		authSessionRefreshButton.setToolTipText(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH_TT);
-		authSessionRefreshButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int selectedIndex = authAccountComboBox.getSelectedIndex();
-				if(selectedIndex < 1) { //dummy
-					return;
-				}
-
-				Controller.getInstance().fetchNewAuthSession(authAccountComboBox.getItemAt(selectedIndex), null);
-			}
-		});
-		controlLeftPanel.add(authSessionRefreshButton);
-		
-		authSessionValueLabel = new JLabel();
-		ConfigLogic.getInstance().addAuthAccountSessionChangeListener(account -> {
-			refreshAuthSessionValueLabel();
-		});
-		controlLeftPanel.add(authSessionValueLabel);
+		authAccountSelectorPanel = new AuthAccountSelectorPanel(false);
+		controlLeftPanel.add(authAccountSelectorPanel);
 		
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
 		copyOrgButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_ORG_TT);
@@ -228,28 +194,8 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		refreshFollowRedirectButton(BurpUtil.getHelpers().analyzeResponse(message.getResponse()).getStatusCode());
 	}
 
-	private void refreshAuthSessionValueLabel() {
-		SwingUtilities.invokeLater(() -> {
-			refreshAuthSessionValueLabelImpl();
-		});
-	}
-	private void refreshAuthSessionValueLabelImpl() {
-		var authAccountDto = getSelectedAuthAccountDto();
-		if(authAccountDto == null) {
-			authSessionValueLabel.setText(null);
-			authSessionValueLabel.setComponentPopupMenu(null);
-			return;
-		}
-
-		authSessionValueLabel.setText(authAccountDto.getSessionIdForDisplay());
-		if(!authAccountDto.isSessionIdsEmpty()) {
-			authSessionValueLabel.setComponentPopupMenu(
-				UiUtil.createCopyPopupMenu(authAccountDto.getSessionIds().subList(0, ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().size())));
-		}
-	}
-
 	public void sendRequest(boolean forceAuthSessionRefresh) {
-		AuthAccountDto authAccountDto = getSelectedAuthAccountDto();
+		AuthAccountDto authAccountDto = authAccountSelectorPanel.getSelectedAuthAccountDto();
 		if(authAccountDto != null && (forceAuthSessionRefresh || authAccountDto.isSessionIdsEmpty())) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				sendRequestImpl(authAccountDto);
@@ -299,48 +245,6 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 			return;
 		}
 		followRedirectButton.setEnabled(statusCode / 100 == 3);
-	}
-
-	private void refreshAuthAccountsComboBox() {
-		var bkSelectedId = getSelectedAuthAccountDtoId();
-
-		authAccountComboBox.removeAllItems();
-		authAccountComboBox.addItem(new AuthAccountDto()); //dummy
-		authAccountComboBox.setEnabled(false);
-		authSessionRefreshButton.setEnabled(false);
-		authSessionValueLabel.setText(null);
-
-		if(!ConfigLogic.getInstance().isAuthConfigReady()) {
-			return;
-		}
-
-		Controller.getInstance().getAuthAccounts().forEach(authAccount -> {
-			authAccountComboBox.addItem(authAccount);
-		});
-		authAccountComboBox.setEnabled(authAccountComboBox.getItemCount() > 1);
-
-		if(bkSelectedId != null) {
-			var indexOptional = IntStream.range(0, authAccountComboBox.getItemCount())
-									.filter(i -> bkSelectedId.equals(authAccountComboBox.getItemAt(i).getId())).findFirst();
-			if(indexOptional.isPresent()) {
-				authAccountComboBox.setSelectedIndex(indexOptional.getAsInt());
-			}
-		}
-	}
-
-	public AuthAccountDto getSelectedAuthAccountDto() {
-		var selectedIndex = authAccountComboBox.getSelectedIndex();
-		if(selectedIndex < 1) { //dummy
-			return null;
-		}
-		return authAccountComboBox.getItemAt(selectedIndex);
-	}
-	private Integer getSelectedAuthAccountDtoId() {
-		var dto = getSelectedAuthAccountDto();
-		if(dto == null) {
-			return null;
-		}
-		return dto.getId();
 	}
 
 	public List<MessageRepeatDto> getSelectedMessageRepeatDtos() {

@@ -315,10 +315,6 @@ public class Controller {
 		return repeaterPanel.getOrgMessageDto();
 	}
 
-	public AuthAccountDto getSelectedAuthAccountOnRepeater() {
-		return repeaterPanel.getSelectedAuthAccountDto();
-	}
-
 	public MessageChainRepeatDto sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory, MessageChainRepeatDto breakingMessageChainRepeatDto) {
 		return MessageChainLogic.getInstance().sendMessageChain(messageChainDto, authAccountDto, callback, forAuth, needSaveHistory, breakingMessageChainRepeatDto);
 	}
@@ -422,14 +418,6 @@ public class Controller {
 		if(!keepOldSessionId) {
 			clearAuthAccountsSession();
 		}
-	}
-
-	public AuthAccountDto getSelectedAuthAccountOnAuthConfig() {
-		var selectedAuthAccounts = authPanel.getSelectedAuthAccounts();
-		if(selectedAuthAccounts.isEmpty()) {
-			return null;
-		}
-		return selectedAuthAccounts.get(0);
 	}
 
 	public Integer getMessageChainIdByBaseMessageId(Integer messageId) {

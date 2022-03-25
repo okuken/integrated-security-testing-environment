@@ -4,7 +4,6 @@ import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 
 import okuken.iste.consts.Captions;
-import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 
@@ -50,10 +49,6 @@ public class AuthPanel extends AbstractDockoutableTabPanel {
 	public void refreshPanel(List<MessageDto> messageDtos) {
 		authAccountTablePanel.refreshPanel();
 		authConfigPanel.refreshPanel();
-	}
-
-	public List<AuthAccountDto> getSelectedAuthAccounts() {
-		return authAccountTablePanel.getSelectedRows();
 	}
 
 	@Override

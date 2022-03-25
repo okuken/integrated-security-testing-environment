@@ -16,6 +16,7 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.UiUtil;
+import okuken.iste.view.common.AuthAccountSelectorPanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -46,6 +47,8 @@ public class ChainDefPanel extends JPanel {
 
 	private MessageChainRepeatDto breakingMessageChainRepeatDto;
 
+	private AuthAccountSelectorPanel authAccountSelectorPanel;
+
 	private JButton startButton;
 	private JButton terminateButton;
 	private JButton stepButton;
@@ -70,6 +73,10 @@ public class ChainDefPanel extends JPanel {
 		
 		presetVarsPanel = new ChainDefPresetVarsPanel(this);
 		configPanel.add(presetVarsPanel);
+		
+		authAccountSelectorPanel = new AuthAccountSelectorPanel(judgeIsAuthChain());
+		authAccountSelectorPanel.refreshComboBox();
+		configPanel.add(authAccountSelectorPanel);
 		
 		JPanel controlCenterPanel = new JPanel();
 		configPanel.add(controlCenterPanel, BorderLayout.CENTER);
@@ -228,6 +235,10 @@ public class ChainDefPanel extends JPanel {
 		}
 	}
 
+	AuthAccountDto getSelectedAuthAccountDto() {
+		return authAccountSelectorPanel.getSelectedAuthAccountDto();
+	}
+
 	private List<ChainDefNodePanel> getChainDefNodePanels() {
 		return Arrays.asList(nodesPanel.getComponents()).stream()
 				.filter(component -> component instanceof ChainDefNodePanel)
@@ -271,12 +282,12 @@ public class ChainDefPanel extends JPanel {
 		var chainDto = makeChainDto();
 		var times = getTimes();
 
+		var authAccountDto = authAccountSelectorPanel.getSelectedAuthAccountDto();
 		if(judgeIsAuthChain()) {
-			runImpl(chainDefNodePanels, chainDto, Controller.getInstance().getSelectedAuthAccountOnAuthConfig(), times, isStep);
+			runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
 			return;
 		}
 
-		var authAccountDto = Controller.getInstance().getSelectedAuthAccountOnRepeater();
 		if(authAccountDto != null && authAccountDto.isSessionIdsEmpty()) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
@@ -389,6 +400,7 @@ public class ChainDefPanel extends JPanel {
 	}
 
 	public void cancel() {
+		authAccountSelectorPanel.unloaded();
 		UiUtil.closePopup(popupFrame);
 	}
 

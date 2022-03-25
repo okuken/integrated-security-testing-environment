@@ -286,6 +286,10 @@ public class MessageChainLogic {
 
 	private void updateVars(MessageChainRepeatDto messageChainRepeatDto) {
 		var response = messageChainRepeatDto.getMessageRepeatDtos().get(messageChainRepeatDto.getCurrentIndex()).getMessage().getResponse();
+		if(response == null) {
+			return;
+		}
+
 		messageChainRepeatDto.getCurrentNodeDto().getResps().forEach(resp -> {
 			var paramValue = MessageUtil.extractResponseParam(response, resp.getParamType(), resp.getParamName());
 			if(paramValue != null) {
