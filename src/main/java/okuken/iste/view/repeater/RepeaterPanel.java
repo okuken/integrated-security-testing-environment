@@ -334,10 +334,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 	}
 
 	public IHttpRequestResponse getMasterMessage() {
-		if(orgMessageDto.getRepeatMasterMessage() == null) {
-			return orgMessageDto.getMessage();
-		}
-		return orgMessageDto.getRepeatMasterMessage();
+		return orgMessageDto.getMasterMessage();
 	}
 
 	public void clear() {

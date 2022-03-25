@@ -108,6 +108,10 @@ public class UiUtil {
 		}, 1000);
 	}
 
+	public static final JLabel createSpacer() {
+		return new JLabel("Å@");
+	}
+
 	/**
 	 * CAUTION: support ASCII only
 	 */

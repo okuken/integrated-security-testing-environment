@@ -117,6 +117,8 @@ public class Captions {
 	public static final String CHAIN_DEF_NODE_BUTTON_DELETE_TT = "Remove this request from chain";
 
 	public static final String CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT = "Break";
+	public static final String CHAIN_DEF_NODE_MESSAGE_BUTTON_SEND = "Send";
+	public static final String CHAIN_DEF_NODE_MESSAGE_BUTTON_SEND_TT = "Issue SINGLE request as selected account {Shift: with refresh session}";
 
 	public static final String CHAIN_DEF_TABLE_TITLE_PRESET_VARS = "Preset vars";
 	public static final String CHAIN_DEF_TABLE_TITLE_REQUEST_MANIPULATION = "Request manipulation";

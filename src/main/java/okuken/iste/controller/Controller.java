@@ -329,7 +329,10 @@ public class Controller {
 	}
 
 	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback) {
-		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, false, true);
+		return sendRepeaterRequest(request, authAccountDto, orgMessageDto, callback, true);
+	}
+	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean needSaveHistory) {
+		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, false, needSaveHistory);
 	}
 
 	public void sendRepeaterRequest(boolean forceAuthSessionRefresh) {

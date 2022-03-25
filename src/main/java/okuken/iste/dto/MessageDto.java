@@ -401,6 +401,9 @@ public class MessageDto {
 		}
 		return repeatMasterMessage;
 	}
+	public IHttpRequestResponse getMasterMessage() {
+		return Optional.ofNullable(getRepeatMasterMessage()).orElse(getMessage());
+	}
 	public void setRepeatMasterMessage(IHttpRequestResponse repeatMasterMessage) {
 		this.repeatMasterMessage = repeatMasterMessage;
 	}

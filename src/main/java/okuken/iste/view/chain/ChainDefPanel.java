@@ -333,7 +333,7 @@ public class ChainDefPanel extends JPanel {
 				chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage());
 				setIsCurrentNode(chainDefNodePanels, null);
 
-				if(messageChainRepeatDto.getCurrentNodeDto().isMain() && needSaveHistory) {
+				if(messageChainRepeatDto.getMessageChainDto().getNodes().get(index).isMain() && needSaveHistory) {
 					Controller.getInstance().refreshRepeatTablePanel(messageChainDto.getMainNode().get().getMessageDto().getId()); //TODO:improve...
 				}
 			});

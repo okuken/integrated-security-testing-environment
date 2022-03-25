@@ -1,13 +1,17 @@
 package okuken.iste.view.chain;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.burp.HttpRequestResponseMock;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 
 import java.awt.event.ItemEvent;
@@ -16,6 +20,7 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.border.LineBorder;
 
 import burp.IHttpRequestResponse;
@@ -108,6 +113,56 @@ public class ChainDefNodePanel extends JPanel {
 		breakpointCheckBox = new JCheckBox(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT);
 		messageControlPanel.add(breakpointCheckBox);
 		
+		messageControlPanel.add(UiUtil.createSpacer());
+		
+		JButton btnSend = new JButton(Captions.CHAIN_DEF_NODE_MESSAGE_BUTTON_SEND);
+		btnSend.setToolTipText(Captions.CHAIN_DEF_NODE_MESSAGE_BUTTON_SEND_TT);
+		btnSend.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sendRequest(UiUtil.judgeIsForceRefresh(e));
+			}
+		});
+		messageControlPanel.add(btnSend);
+		
+		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
+		copyOrgButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_ORG_TT);
+		copyOrgButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				messageEditorPanel.clearMessage();
+				messageEditorPanel.setMessage(getSelectedMessageDto());
+			}
+		});
+		messageControlPanel.add(copyOrgButton);
+		
+		JButton copyMasterButton = new JButton(Captions.REPEATER_BUTTON_COPY_MASTER);
+		copyMasterButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_MASTER_TT);
+		copyMasterButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				messageEditorPanel.clearMessage();
+				messageEditorPanel.setMessage(getSelectedMessageDto().getMasterMessage());
+			}
+		});
+		messageControlPanel.add(copyMasterButton);
+		
+		messageControlPanel.add(UiUtil.createSpacer());
+		
+		JLabel saveAsMasterMessageLabel = UiUtil.createTemporaryMessageArea();
+		JButton saveAsMasterButton = new JButton(Captions.REPEATER_BUTTON_SAVE_AS_MASTER);
+		saveAsMasterButton.setToolTipText(Captions.REPEATER_BUTTON_SAVE_AS_MASTER_TT);
+		saveAsMasterButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var orgMessageDto = getSelectedMessageDto();
+				orgMessageDto.setRepeatMasterMessage(new HttpRequestResponseMock(
+						messageEditorPanel.getRequest(),
+						messageEditorPanel.getResponse(),
+						orgMessageDto.getMessage().getHttpService()));
+				Controller.getInstance().saveRepeatMaster(orgMessageDto);
+				UiUtil.showTemporaryMessage(saveAsMasterMessageLabel, Captions.MESSAGE_SAVED);
+			}
+		});
+		messageControlPanel.add(saveAsMasterButton);
+		messageControlPanel.add(saveAsMasterMessageLabel);
+		
 		JPanel leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);
 		
@@ -161,7 +216,7 @@ public class ChainDefNodePanel extends JPanel {
 	}
 
 	private void refreshMessageEditorPanel() {
-		messageEditorPanel.setMessage(urlComboBox.getItemAt(urlComboBox.getSelectedIndex()));
+		messageEditorPanel.setMessage(getSelectedMessageDto());
 	}
 
 	private void removeNode() {
@@ -172,12 +227,16 @@ public class ChainDefNodePanel extends JPanel {
 		//TODO: validation
 		var nodeDto = new MessageChainNodeDto();
 		nodeDto.setMain(isMainNode);
-		nodeDto.setMessageDto(urlComboBox.getItemAt(urlComboBox.getSelectedIndex()));
+		nodeDto.setMessageDto(getSelectedMessageDto());
 		nodeDto.setReqps(requestParamsPanel.getRows());
 		nodeDto.setResps(responseParamsPanel.getRows());
 		nodeDto.setBreakpoint(breakpointCheckBox.isSelected());
 		nodeDto.setEditedRequest(messageEditorPanel.getRequest());
 		return nodeDto;
+	}
+
+	private MessageDto getSelectedMessageDto() {
+		return urlComboBox.getItemAt(urlComboBox.getSelectedIndex());
 	}
 
 	public void clearMessage() {
@@ -199,6 +258,31 @@ public class ChainDefNodePanel extends JPanel {
 			messageControlPanel.setBackground(messageControlPanelDefaultBackgroundColor);
 		}
 	}
+
+
+	private void sendRequest(boolean forceAuthSessionRefresh) {
+		AuthAccountDto authAccountDto = Controller.getInstance().getSelectedAuthAccountOnRepeater();
+		if(authAccountDto != null && (forceAuthSessionRefresh || authAccountDto.isSessionIdsEmpty())) {
+			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
+				sendRequestImpl(authAccountDto);
+			});
+			return;
+		}
+
+		sendRequestImpl(authAccountDto);
+	}
+	private void sendRequestImpl(AuthAccountDto authAccountDto) {
+		var orgMessageDto = getSelectedMessageDto();
+		Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, orgMessageDto, repeatedDto -> {
+			SwingUtilities.invokeLater(() -> {
+				messageEditorPanel.setResponse(repeatedDto.getMessage().getResponse());
+				if(isMainNode) {
+					Controller.getInstance().refreshRepeatTablePanel(orgMessageDto.getId());
+				}
+			});
+		}, isMainNode);
+	}
+
 
 	public ChainDefPanel getParentChainDefPanel() {
 		return parentChainDefPanel;
