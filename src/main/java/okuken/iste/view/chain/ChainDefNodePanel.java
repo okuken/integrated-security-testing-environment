@@ -60,7 +60,7 @@ public class ChainDefNodePanel extends JPanel {
 		this.isMainNode = nodeDto != null && nodeDto.isMain();
 		
 		setLayout(new BorderLayout(0, 0));
-		setBorder(new LineBorder(Colors.BLOCK_BORDER));
+		setBorder(new LineBorder(isMainNode ? Colors.BLOCK_BORDER_HIGHLIGHT : Colors.BLOCK_BORDER));
 		
 		JPanel centerPanel = new JPanel(new BorderLayout(0, 0));
 		add(centerPanel, BorderLayout.CENTER);
@@ -244,6 +244,14 @@ public class ChainDefNodePanel extends JPanel {
 		messageEditorPanel.setMessage(message, true);
 	}
 
+	public void focusMessageEditor() {
+		messageEditorPanel.focusRequest();
+	}
+
+	public void focusMessageSelector() {
+		UiUtil.focus(urlComboBox);
+	}
+
 	private Color messageControlPanelDefaultBackgroundColor;
 	public void setIsCurrentNode() {
 		if(messageControlPanelDefaultBackgroundColor == null) {
@@ -257,6 +265,9 @@ public class ChainDefNodePanel extends JPanel {
 		}
 	}
 
+	public boolean isMainNode() {
+		return isMainNode;
+	}
 
 	private void sendRequest(boolean forceAuthSessionRefresh) {
 		AuthAccountDto authAccountDto = parentChainDefPanel.getSelectedAuthAccountDto();

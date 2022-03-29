@@ -21,5 +21,6 @@ public class Colors {
 	public static final Color TABLE_ROW_SELECTED_BORDER = BURP_COLOR;
 
 	public static final Color BLOCK_BORDER = Color.LIGHT_GRAY;
+	public static final Color BLOCK_BORDER_HIGHLIGHT = BURP_COLOR;
 
 }

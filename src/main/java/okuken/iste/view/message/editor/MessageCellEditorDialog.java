@@ -24,6 +24,7 @@ import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.message.table.MessageTableColumn;
 import javax.swing.JRadioButton;
 import java.awt.GridBagLayout;
@@ -240,13 +241,13 @@ public class MessageCellEditorDialog extends JDialog {
 		replaceFromTextField.setEnabled(replaceRadioButton.isSelected());
 		replaceToTextField.setEnabled(replaceRadioButton.isSelected());
 		if(replaceRadioButton.isSelected()) {
-			replaceFromTextField.requestFocusInWindow();
+			UiUtil.focus(replaceFromTextField);
 		}
 
 		numberingFormatTextField.setEnabled(numberingRadioButton.isSelected());
 		numberingFromTextField.setEnabled(numberingRadioButton.isSelected());
 		if(numberingRadioButton.isSelected()) {
-			numberingFormatTextField.requestFocusInWindow();
+			UiUtil.focus(numberingFormatTextField);
 		}
 	}
 

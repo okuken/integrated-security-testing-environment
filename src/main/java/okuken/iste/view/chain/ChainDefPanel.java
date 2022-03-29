@@ -29,6 +29,7 @@ import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
@@ -58,6 +59,7 @@ public class ChainDefPanel extends JPanel {
 	private JLabel timesCountdownLabel;
 
 	private JFrame popupFrame;
+	private JScrollPane nodesScrollPane;
 	private JPanel nodesPanel;
 	private ChainDefPresetVarsPanel presetVarsPanel;
 
@@ -123,11 +125,11 @@ public class ChainDefPanel extends JPanel {
 		timesCountdownLabel.setForeground(Colors.CHARACTER_HIGHLIGHT);
 		controlCenterPanel.add(timesCountdownLabel);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		add(scrollPane, BorderLayout.CENTER);
+		nodesScrollPane = new JScrollPane();
+		add(nodesScrollPane, BorderLayout.CENTER);
 		
 		nodesPanel = new JPanel();
-		scrollPane.setViewportView(nodesPanel);
+		nodesScrollPane.setViewportView(nodesPanel);
 		nodesPanel.setLayout(new BoxLayout(nodesPanel, BoxLayout.PAGE_AXIS));
 		
 		JPanel controlPanel = new JPanel();
@@ -180,6 +182,13 @@ public class ChainDefPanel extends JPanel {
 
 		presetVarsPanel.refreshPanel();
 		refreshControlsState();
+
+		var mainNodePanel = getMainChainDefNodePanel();
+		if(mainNodePanel.isPresent()) {
+			SwingUtilities.invokeLater(() -> {
+				focusNode(mainNodePanel.get(), true);
+			});
+		}
 	}
 
 	private void refreshControlsState() {
@@ -205,24 +214,29 @@ public class ChainDefPanel extends JPanel {
 		buttonPanel.add(addButton);
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addNode(buttonPanel);
+				var nodePanel = addNode(buttonPanel);
+				SwingUtilities.invokeLater(() -> {
+					focusNode(nodePanel, false);
+				});
 			}
 		});
 
 		return buttonPanel;
 	}
 
-	private void addNode(JPanel clickedButtonPanel) {
+	private ChainDefNodePanel addNode(JPanel clickedButtonPanel) {
 		var index = Arrays.asList(nodesPanel.getComponents()).indexOf(clickedButtonPanel);
-		addNode(null, index);
+		return addNode(null, index);
 	}
 	private void addNodeTail(MessageChainNodeDto nodeDto) {
 		addNode(nodeDto, nodesPanel.getComponents().length - 1);
 	}
-	private void addNode(MessageChainNodeDto nodeDto, int baseIndex) {
-		nodesPanel.add(new ChainDefNodePanel(nodeDto, this), baseIndex + 1);
+	private ChainDefNodePanel addNode(MessageChainNodeDto nodeDto, int baseIndex) {
+		var nodePanel = new ChainDefNodePanel(nodeDto, this);
+		nodesPanel.add(nodePanel, baseIndex + 1);
 		nodesPanel.add(createAddButtonPanel(), baseIndex + 2);
 		UiUtil.repaint(this);
+		return nodePanel;
 	}
 
 	void removeNode(JPanel clickedNodePanel) {
@@ -239,6 +253,15 @@ public class ChainDefPanel extends JPanel {
 		}
 	}
 
+	private void focusNode(ChainDefNodePanel chainDefNodePanel, boolean focusMessageEditor) {
+		if(focusMessageEditor) {
+			chainDefNodePanel.focusMessageEditor();
+		} else {
+			chainDefNodePanel.focusMessageSelector();
+		}
+		UiUtil.scrollFor(chainDefNodePanel, nodesScrollPane);
+	}
+
 	AuthAccountDto getSelectedAuthAccountDto() {
 		return authAccountSelectorPanel.getSelectedAuthAccountDto();
 	}
@@ -248,6 +271,10 @@ public class ChainDefPanel extends JPanel {
 				.filter(component -> component instanceof ChainDefNodePanel)
 				.map(chainDefNodePanel -> (ChainDefNodePanel)chainDefNodePanel)
 				.collect(Collectors.toList());
+	}
+
+	private Optional<ChainDefNodePanel> getMainChainDefNodePanel() {
+		return getChainDefNodePanels().stream().filter(ChainDefNodePanel::isMainNode).findFirst();
 	}
 
 	private MessageChainDto makeChainDto() {
@@ -337,8 +364,10 @@ public class ChainDefPanel extends JPanel {
 			if(messageChainRepeatDto.isBreaking()) {
 				var breakingAppliedRequestForView = messageChainRepeatDto.getBreakingAppliedRequestForView();
 				SwingUtilities.invokeLater(() -> {
-					chainDefNodePanels.get(index).setMessage(new HttpRequestResponseMock(breakingAppliedRequestForView, null, messageChainRepeatDto.getMessageChainDto().getNodes().get(index).getMessageDto().getMessage().getHttpService()));
+					var chainDefNodePanel = chainDefNodePanels.get(index);
+					chainDefNodePanel.setMessage(new HttpRequestResponseMock(breakingAppliedRequestForView, null, messageChainRepeatDto.getMessageChainDto().getNodes().get(index).getMessageDto().getMessage().getHttpService()));
 					setIsCurrentNode(chainDefNodePanels, index);
+					focusNode(chainDefNodePanel, true);
 					refreshControlsState();
 				});
 				return;

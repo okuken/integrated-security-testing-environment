@@ -82,4 +82,8 @@ public class UserOptionsCopyTemplatePanel extends JPanel {
 		return templateTextArea.getText();
 	}
 
+	void focus() {
+		UiUtil.focus(templateTextArea);
+	}
+
 }

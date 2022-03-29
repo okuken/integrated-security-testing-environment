@@ -149,4 +149,11 @@ public class MessageEditorPanel extends JPanel {
 		setResponse(new byte[] {});
 	}
 
+	public void focusRequest() {
+		var component = getRequestTextComponent();
+		if(component != null) {
+			UiUtil.focus(component);
+		}
+	}
+
 }

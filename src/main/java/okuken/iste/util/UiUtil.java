@@ -112,11 +112,19 @@ public class UiUtil {
 			}
 
 			if(hasFocus) {
-				textComponent.requestFocusInWindow();
+				focus(textComponent);
 			}
 		} catch (Exception e) {
 			BurpUtil.printStderr(e);
 		}
+	}
+
+	public static final void focus(JComponent component) {
+		component.requestFocusInWindow();
+	}
+
+	public static final void scrollFor(Component component, JScrollPane scrollPane) {
+		scrollPane.getViewport().setViewPosition(component.getLocation());
 	}
 
 	public static final JLabel createTemporaryMessageArea() {
@@ -376,7 +384,7 @@ public class UiUtil {
 			@Override
 			public void ancestorAdded(AncestorEvent event) {
 				var component = event.getComponent();
-				component.requestFocusInWindow();
+				focus(component);
 				component.removeAncestorListener(this);
 			}
 			@Override
