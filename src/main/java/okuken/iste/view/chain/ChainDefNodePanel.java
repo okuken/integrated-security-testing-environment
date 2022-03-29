@@ -128,8 +128,7 @@ public class ChainDefNodePanel extends JPanel {
 		copyOrgButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_ORG_TT);
 		copyOrgButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				messageEditorPanel.clearMessage();
-				messageEditorPanel.setMessage(getSelectedMessageDto());
+				messageEditorPanel.setMessage(getSelectedMessageDto(), true);
 			}
 		});
 		messageControlPanel.add(copyOrgButton);
@@ -138,8 +137,7 @@ public class ChainDefNodePanel extends JPanel {
 		copyMasterButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_MASTER_TT);
 		copyMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				messageEditorPanel.clearMessage();
-				messageEditorPanel.setMessage(getSelectedMessageDto().getMasterMessage());
+				messageEditorPanel.setMessage(getSelectedMessageDto().getMasterMessage(), true);
 			}
 		});
 		messageControlPanel.add(copyMasterButton);
@@ -183,7 +181,7 @@ public class ChainDefNodePanel extends JPanel {
 		refreshPanel(nodeDto, Controller.getInstance().getMessages());
 	}
 
-	public void refreshPanel(MessageChainNodeDto nodeDto, List<MessageDto> messageDtos) {
+	private void refreshPanel(MessageChainNodeDto nodeDto, List<MessageDto> messageDtos) {
 		var refreshingFlagBk = refreshingFlag;
 		refreshingFlag = true;
 		try {
@@ -243,7 +241,7 @@ public class ChainDefNodePanel extends JPanel {
 		messageEditorPanel.clearMessage();
 	}
 	public void setMessage(IHttpRequestResponse message) {
-		messageEditorPanel.setMessage(message);
+		messageEditorPanel.setMessage(message, true);
 	}
 
 	private Color messageControlPanelDefaultBackgroundColor;
@@ -273,7 +271,7 @@ public class ChainDefNodePanel extends JPanel {
 	}
 	private void sendRequestImpl(AuthAccountDto authAccountDto) {
 		var orgMessageDto = getSelectedMessageDto();
-		Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, orgMessageDto, repeatedDto -> {
+		var repeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, orgMessageDto, repeatedDto -> {
 			SwingUtilities.invokeLater(() -> {
 				messageEditorPanel.setResponse(repeatedDto.getMessage().getResponse());
 				if(isMainNode) {
@@ -281,6 +279,7 @@ public class ChainDefNodePanel extends JPanel {
 				}
 			});
 		}, isMainNode);
+		messageEditorPanel.setMessage(repeatDto.getMessage(), true);
 	}
 
 

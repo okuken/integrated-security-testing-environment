@@ -2,6 +2,7 @@ package okuken.iste.view.common;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
@@ -53,6 +54,7 @@ public class AuthAccountSelectorPanel extends JPanel {
 		
 		authSessionRefreshButton = new JButton(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH);
 		authSessionRefreshButton.setToolTipText(Captions.REPEATER_BUTTON_AUTH_SESSION_REFRESH_TT);
+		authSessionRefreshButton.setMnemonic(KeyEvent.VK_R);
 		authSessionRefreshButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int selectedIndex = authAccountComboBox.getSelectedIndex();

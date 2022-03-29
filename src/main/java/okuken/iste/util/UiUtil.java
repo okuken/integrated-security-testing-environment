@@ -91,6 +91,34 @@ public class UiUtil {
 		component.repaint();
 	}
 
+	public static void withKeepCaretPosition(JTextComponent textComponent, Runnable procedure) {
+		if(textComponent == null) {
+			procedure.run();
+			return;
+		}
+
+		var hasFocus = textComponent.hasFocus();
+		var caretPosition = textComponent.getCaretPosition();
+
+		procedure.run();
+
+		try {
+			var textLength = textComponent.getText().length();
+
+			if(caretPosition < textLength) {
+				textComponent.setCaretPosition(caretPosition);
+			} else {
+				textComponent.setCaretPosition(textLength);
+			}
+
+			if(hasFocus) {
+				textComponent.requestFocusInWindow();
+			}
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+		}
+	}
+
 	public static final JLabel createTemporaryMessageArea() {
 		var ret = new JLabel(Captions.MESSAGE_EMPTY);
 		ret.setForeground(Colors.CHARACTER_HIGHLIGHT);
@@ -109,7 +137,7 @@ public class UiUtil {
 	}
 
 	public static final JLabel createSpacer() {
-		return new JLabel("@");
+		return new JLabel("  ");
 	}
 
 	/**

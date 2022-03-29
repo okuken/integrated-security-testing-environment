@@ -70,12 +70,12 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		
 		JButton sendButton = new JButton(Captions.REPEATER_BUTTON_SEND);
 		sendButton.setToolTipText(Captions.REPEATER_BUTTON_SEND_TT);
+		sendButton.setMnemonic(KeyEvent.VK_S);
 		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				sendRequest(UiUtil.judgeIsForceRefresh(e));
 			}
 		});
-		sendButton.setMnemonic(KeyEvent.VK_S);
 		controlLeftPanel.add(sendButton);
 		
 		authAccountSelectorPanel = new AuthAccountSelectorPanel(false);
@@ -83,20 +83,20 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		
 		JButton copyOrgButton = new JButton(Captions.REPEATER_BUTTON_COPY_ORG);
 		copyOrgButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_ORG_TT);
+		copyOrgButton.setMnemonic(KeyEvent.VK_O);
 		copyOrgButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				messageEditorPanel.clearMessage();
-				setMessage(orgMessageDto);
+				setMessage(orgMessageDto, true);
 			}
 		});
 		controlLeftPanel.add(copyOrgButton);
 		
 		JButton copyMasterButton = new JButton(Captions.REPEATER_BUTTON_COPY_MASTER);
 		copyMasterButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_MASTER_TT);
+		copyMasterButton.setMnemonic(KeyEvent.VK_M);
 		copyMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				messageEditorPanel.clearMessage();
-				setMessage(getMasterMessage());
+				setMessage(getMasterMessage(), true);
 			}
 		});
 		controlLeftPanel.add(copyMasterButton);
@@ -163,7 +163,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 		Integer lastRowIndex = repeatTablePanel.selectLastRow();
 		if(lastRowIndex == null) {
-			setMessage(orgMessageDto);
+			setMessage(orgMessageDto, false);
 			return;
 		}
 		setMessage(lastRowIndex);
@@ -171,10 +171,10 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 	public void setMessage(int rowIndex) {
 		MessageRepeatDto messageRepeatDto = repeatTablePanel.getRow(rowIndex);
-		setMessage(messageRepeatDto);
+		setMessage(messageRepeatDto, false);
 	}
-	private void setMessage(MessageRepeatDto messageRepeatDto) {
-		messageEditorPanel.setMessage(messageRepeatDto.getMessage());
+	private void setMessage(MessageRepeatDto messageRepeatDto, boolean keepCaretPosition) {
+		messageEditorPanel.setMessage(messageRepeatDto.getMessage(), keepCaretPosition);
 		refreshFollowRedirectButton(messageRepeatDto.getStatus());
 	}
 	private void setResponse(MessageRepeatDto messageRepeatDto) {
@@ -185,13 +185,13 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		messageEditorPanel.setMessage(messageRepeatRedirectDto.getMessage());
 		refreshFollowRedirectButton(messageRepeatRedirectDto.getStatus());
 	}
-	private void setMessage(MessageDto messageDto) {
-		messageEditorPanel.setMessage(messageDto);
+	private void setMessage(MessageDto messageDto, boolean keepCaretPosition) {
+		messageEditorPanel.setMessage(messageDto, keepCaretPosition);
 		refreshFollowRedirectButton(messageDto.getStatus());
 	}
-	private void setMessage(IHttpRequestResponse message) {
-		messageEditorPanel.setMessage(message);
-		refreshFollowRedirectButton(BurpUtil.getHelpers().analyzeResponse(message.getResponse()).getStatusCode());
+	private void setMessage(IHttpRequestResponse message, boolean keepCaretPosition) {
+		messageEditorPanel.setMessage(message, keepCaretPosition);
+		refreshFollowRedirectButton(message.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(message.getResponse()).getStatusCode() : null);
 	}
 
 	public void sendRequest(boolean forceAuthSessionRefresh) {
@@ -221,7 +221,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 
 		repeatTablePanel.addRow(messageRepeatDto);
 		repeatTablePanel.selectLastRow();
-		setResponse(messageRepeatDto); //not set request to prevent focus out of messageEditor
+		setMessage(messageRepeatDto, true);
 	}
 
 	private void followRedirect() {

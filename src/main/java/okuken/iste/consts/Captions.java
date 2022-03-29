@@ -95,7 +95,7 @@ public class Captions {
 	public static final String REPEATER_BUTTON_SEND_TT = "Issue request in message editor as selected account {Shift: with refresh session}";
 	public static final String REPEATER_COMBOBOX_ACCOUNT_TT = "Select account";
 	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH = "\uD83D\uDD04";
-	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH_TT = "Refresh session of selected account";
+	public static final String REPEATER_BUTTON_AUTH_SESSION_REFRESH_TT = "Refresh session of selected account [Alt+R]";
 	public static final String REPEATER_BUTTON_COPY_ORG = "Org";
 	public static final String REPEATER_BUTTON_COPY_ORG_TT = "Set original message to message editor";
 	public static final String REPEATER_BUTTON_COPY_MASTER = "Master";
@@ -125,11 +125,11 @@ public class Captions {
 	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
 
 	public static final String CHAIN_DEF_RUN = " \u25b6 ";
-	public static final String CHAIN_DEF_RUN_TT = "Start or resume request chain";
+	public static final String CHAIN_DEF_RUN_TT = "Start or resume request chain [Alt+S]";
 	public static final String CHAIN_DEF_TERMINATE = " \u23f9 ";
-	public static final String CHAIN_DEF_TERMINATE_TT = "Terminate request chain";
+	public static final String CHAIN_DEF_TERMINATE_TT = "Terminate request chain [Alt+T]";
 	public static final String CHAIN_DEF_STEP = " \u2935 ";
-	public static final String CHAIN_DEF_STEP_TT = "Step request chain";
+	public static final String CHAIN_DEF_STEP_TT = "Step request chain [Alt+X]";
 	public static final String CHAIN_DEF_RUN_DONE = "Done.";
 	public static final String CHAIN_DEF_RUN_TERMINATE_FORCE = "Forced termination.";
 

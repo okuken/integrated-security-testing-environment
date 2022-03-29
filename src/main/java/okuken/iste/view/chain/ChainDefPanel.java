@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -83,6 +84,7 @@ public class ChainDefPanel extends JPanel {
 		
 		startButton = new JButton(Captions.CHAIN_DEF_RUN);
 		startButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
+		startButton.setMnemonic(KeyEvent.VK_S);
 		controlCenterPanel.add(startButton);
 		startButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -92,6 +94,7 @@ public class ChainDefPanel extends JPanel {
 		
 		terminateButton = new JButton(Captions.CHAIN_DEF_TERMINATE);
 		terminateButton.setToolTipText(Captions.CHAIN_DEF_TERMINATE_TT);
+		terminateButton.setMnemonic(KeyEvent.VK_T);
 		controlCenterPanel.add(terminateButton);
 		terminateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -101,6 +104,7 @@ public class ChainDefPanel extends JPanel {
 		
 		stepButton = new JButton(Captions.CHAIN_DEF_STEP);
 		stepButton.setToolTipText(Captions.CHAIN_DEF_STEP_TT);
+		stepButton.setMnemonic(KeyEvent.VK_X);
 		controlCenterPanel.add(stepButton);
 		stepButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

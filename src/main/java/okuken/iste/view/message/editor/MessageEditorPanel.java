@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.text.JTextComponent;
 
 import burp.IHttpRequestResponse;
 import burp.IHttpService;
@@ -14,12 +15,15 @@ import burp.IMessageEditorController;
 import okuken.iste.consts.Captions;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 public class MessageEditorPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private IMessageEditor requestMessageEditor;
+	private JTextComponent requestMessageEditorTextComponent;
+
 	private IMessageEditor responseMessageEditor;
 
 	private IHttpService httpService;
@@ -86,6 +90,13 @@ public class MessageEditorPanel extends JPanel {
 		return requestMessageEditor.getSelectionBounds();
 	}
 
+	private JTextComponent getRequestTextComponent() {
+		if(requestMessageEditorTextComponent == null) {
+			requestMessageEditorTextComponent = BurpUtil.extractMessageEditorTextComponent(requestMessageEditor);
+		}
+		return requestMessageEditorTextComponent;
+	}
+
 	public byte[] getResponse() {
 		return responseMessageEditor.getMessage();
 	}
@@ -95,6 +106,16 @@ public class MessageEditorPanel extends JPanel {
 	}
 
 	public void setRequest(byte[] request) {
+		setRequest(request, false);
+	}
+	public void setRequest(byte[] request, boolean keepCaretPosition) {
+		if(keepCaretPosition) {
+			UiUtil.withKeepCaretPosition(getRequestTextComponent(), () -> {
+				requestMessageEditor.setMessage(request, true);
+			});
+			return;
+		}
+
 		requestMessageEditor.setMessage(request, true);
 	}
 
@@ -103,11 +124,17 @@ public class MessageEditorPanel extends JPanel {
 	}
 
 	public void setMessage(MessageDto dto) {
-		setMessage(dto.getMessage());
+		setMessage(dto, false);
+	}
+	public void setMessage(MessageDto dto, boolean keepCaretPosition) {
+		setMessage(dto.getMessage(), keepCaretPosition);
 	}
 
 	public void setMessage(IHttpRequestResponse message) {
-		setRequest(message.getRequest());
+		setMessage(message, false);
+	}
+	public void setMessage(IHttpRequestResponse message, boolean keepCaretPosition) {
+		setRequest(message.getRequest(), keepCaretPosition);
 		setResponse(message.getResponse());
 		httpService = message.getHttpService();
 	}
