@@ -53,6 +53,9 @@ public class ChainDefNodePanel extends JPanel {
 	private ChainDefNodeRequestParamsPanel requestParamsPanel;
 	private ChainDefNodeResponseParamsPanel responseParamsPanel;
 
+	private JPanel messageInfoPanel;
+	private JLabel messageNameLabel;
+
 	private JPanel messageControlPanel;
 	private JCheckBox breakpointCheckBox;
 
@@ -71,7 +74,6 @@ public class ChainDefNodePanel extends JPanel {
 		add(centerPanel, BorderLayout.CENTER);
 		
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		splitPane.setOneTouchExpandable(true);
 		centerPanel.add(splitPane, BorderLayout.CENTER);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -118,10 +120,24 @@ public class ChainDefNodePanel extends JPanel {
 		messagePanel.add(messageEditorPanel, BorderLayout.CENTER);
 		messageEditorPanel.setPreferredSize(MESSAGE_EDITOR_PREFERRED_SIZE);
 		
+		JPanel messageHeaderPanel = new JPanel();
+		messagePanel.add(messageHeaderPanel, BorderLayout.NORTH);
+		messageHeaderPanel.setLayout(new BorderLayout(0, 0));
+		
+		messageInfoPanel = new JPanel();
+		FlowLayout flowLayout_4 = (FlowLayout) messageInfoPanel.getLayout();
+		flowLayout_4.setVgap(2);
+		flowLayout_4.setAlignment(FlowLayout.LEFT);
+		messageHeaderPanel.add(messageInfoPanel, BorderLayout.NORTH);
+		
+		messageNameLabel = new JLabel();
+		messageInfoPanel.add(messageNameLabel);
+		
 		messageControlPanel = new JPanel();
 		FlowLayout flowLayout_3 = (FlowLayout) messageControlPanel.getLayout();
+		flowLayout_3.setVgap(2);
 		flowLayout_3.setAlignment(FlowLayout.LEFT);
-		messagePanel.add(messageControlPanel, BorderLayout.NORTH);
+		messageHeaderPanel.add(messageControlPanel, BorderLayout.CENTER);
 		
 		breakpointCheckBox = new JCheckBox(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT);
 		messageControlPanel.add(breakpointCheckBox);
@@ -227,7 +243,9 @@ public class ChainDefNodePanel extends JPanel {
 	}
 
 	private void refreshMessageEditorPanel() {
-		messageEditorPanel.setMessage(getSelectedMessageDto());
+		var messageDto = getSelectedMessageDto();
+		messageNameLabel.setText(messageDto.toString());
+		messageEditorPanel.setMessage(messageDto);
 	}
 
 	public void changeMessageEditorsLayout(MessageEditorsLayoutType type) {
@@ -276,16 +294,18 @@ public class ChainDefNodePanel extends JPanel {
 		UiUtil.focus(urlComboBox);
 	}
 
-	private Color messageControlPanelDefaultBackgroundColor;
+	private Color panelDefaultBackgroundColor;
 	public void setIsCurrentNode() {
-		if(messageControlPanelDefaultBackgroundColor == null) {
-			messageControlPanelDefaultBackgroundColor = messageControlPanel.getBackground();
+		if(panelDefaultBackgroundColor == null) {
+			panelDefaultBackgroundColor = messageControlPanel.getBackground();
 		}
 		messageControlPanel.setBackground(Colors.BLOCK_BACKGROUND_HIGHLIGHT);
+		messageInfoPanel.setBackground(Colors.BLOCK_BACKGROUND_HIGHLIGHT);
 	}
 	public void clearIsCurrentNode() {
-		if(messageControlPanelDefaultBackgroundColor != null) {
-			messageControlPanel.setBackground(messageControlPanelDefaultBackgroundColor);
+		if(panelDefaultBackgroundColor != null) {
+			messageControlPanel.setBackground(panelDefaultBackgroundColor);
+			messageInfoPanel.setBackground(panelDefaultBackgroundColor);
 		}
 	}
 
