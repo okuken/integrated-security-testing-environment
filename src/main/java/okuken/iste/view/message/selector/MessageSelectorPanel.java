@@ -15,6 +15,7 @@ import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.view.message.editor.MessageEditorPanel;
+import okuken.iste.view.message.editor.MessageEditorsLayoutType;
 
 public class MessageSelectorPanel extends JPanel {
 
@@ -46,7 +47,7 @@ public class MessageSelectorPanel extends JPanel {
 		});
 		urlPanel.add(urlComboBox);
 		
-		messageEditorPanel = new MessageEditorPanel(null, true, false, true);
+		messageEditorPanel = new MessageEditorPanel(null, true, false, MessageEditorsLayoutType.TAB);
 		add(messageEditorPanel, BorderLayout.CENTER);
 		
 		if(!popup) {

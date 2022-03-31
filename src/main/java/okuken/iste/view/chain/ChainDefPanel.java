@@ -17,6 +17,8 @@ import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.common.AuthAccountSelectorPanel;
+import okuken.iste.view.message.editor.MessageEditorsLayoutType;
+import okuken.iste.view.message.editor.MessageEditorsLayoutTypeSelectorPanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -35,6 +37,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import java.awt.GridLayout;
 
 public class ChainDefPanel extends JPanel {
 
@@ -62,6 +65,7 @@ public class ChainDefPanel extends JPanel {
 	private JScrollPane nodesScrollPane;
 	private JPanel nodesPanel;
 	private ChainDefPresetVarsPanel presetVarsPanel;
+	private MessageEditorsLayoutTypeSelectorPanel messageEditorsLayoutTypeSelectorPanel;
 
 	public ChainDefPanel(MessageDto messageDto, Integer messageChainId) {
 		this.messageDto = messageDto;
@@ -69,25 +73,41 @@ public class ChainDefPanel extends JPanel {
 		
 		setLayout(new BorderLayout(0, 0));
 		
-		JPanel configPanel = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) configPanel.getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
-		add(configPanel, BorderLayout.NORTH);
+		JPanel headerPanel = new JPanel();
+		add(headerPanel, BorderLayout.NORTH);
+		headerPanel.setLayout(new BorderLayout(0, 0));
 		
 		presetVarsPanel = new ChainDefPresetVarsPanel(this);
-		configPanel.add(presetVarsPanel);
+		headerPanel.add(presetVarsPanel, BorderLayout.WEST);
+		
+		JScrollPane operationScrollPane = new JScrollPane();
+		operationScrollPane.setBorder(null);
+		headerPanel.add(operationScrollPane, BorderLayout.CENTER);
+		
+		JPanel operationPanel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) operationPanel.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		operationScrollPane.setViewportView(operationPanel);
+		
+		JPanel operationMainPanel = new JPanel();
+		operationMainPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		operationPanel.add(operationMainPanel);
 		
 		authAccountSelectorPanel = new AuthAccountSelectorPanel(judgeIsAuthChain());
+		FlowLayout flowLayout_1 = (FlowLayout) authAccountSelectorPanel.getLayout();
+		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		authAccountSelectorPanel.refreshComboBox();
-		configPanel.add(authAccountSelectorPanel);
+		operationMainPanel.add(authAccountSelectorPanel);
 		
-		JPanel controlCenterPanel = new JPanel();
-		configPanel.add(controlCenterPanel, BorderLayout.CENTER);
+		JPanel operationCenterPanel = new JPanel();
+		FlowLayout flowLayout_2 = (FlowLayout) operationCenterPanel.getLayout();
+		flowLayout_2.setAlignment(FlowLayout.LEFT);
+		operationMainPanel.add(operationCenterPanel);
 		
 		startButton = new JButton(Captions.CHAIN_DEF_RUN);
 		startButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
 		startButton.setMnemonic(KeyEvent.VK_S);
-		controlCenterPanel.add(startButton);
+		operationCenterPanel.add(startButton);
 		startButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				start(false);
@@ -97,7 +117,7 @@ public class ChainDefPanel extends JPanel {
 		terminateButton = new JButton(Captions.CHAIN_DEF_TERMINATE);
 		terminateButton.setToolTipText(Captions.CHAIN_DEF_TERMINATE_TT);
 		terminateButton.setMnemonic(KeyEvent.VK_T);
-		controlCenterPanel.add(terminateButton);
+		operationCenterPanel.add(terminateButton);
 		terminateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				terminate();
@@ -107,7 +127,7 @@ public class ChainDefPanel extends JPanel {
 		stepButton = new JButton(Captions.CHAIN_DEF_STEP);
 		stepButton.setToolTipText(Captions.CHAIN_DEF_STEP_TT);
 		stepButton.setMnemonic(KeyEvent.VK_X);
-		controlCenterPanel.add(stepButton);
+		operationCenterPanel.add(stepButton);
 		stepButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				start(true);
@@ -115,15 +135,48 @@ public class ChainDefPanel extends JPanel {
 		});
 		
 		JLabel timesLabel = new JLabel(" x ");
-		controlCenterPanel.add(timesLabel);
+		operationCenterPanel.add(timesLabel);
 		
 		timesSpinner = new JSpinner();
 		timesSpinner.setModel(new SpinnerNumberModel(TIMES_DEFAULT, 1, 999, 1));
-		controlCenterPanel.add(timesSpinner);
+		operationCenterPanel.add(timesSpinner);
 		
 		timesCountdownLabel = new JLabel("");
 		timesCountdownLabel.setForeground(Colors.CHARACTER_HIGHLIGHT);
-		controlCenterPanel.add(timesCountdownLabel);
+		operationCenterPanel.add(timesCountdownLabel);
+		
+		JPanel configPanel = new JPanel();
+		headerPanel.add(configPanel, BorderLayout.EAST);
+		
+		JPanel configMainPanel = new JPanel();
+		configPanel.add(configMainPanel);
+		configMainPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		messageEditorsLayoutTypeSelectorPanel = new MessageEditorsLayoutTypeSelectorPanel(type -> {
+			getChainDefNodePanels().stream().forEach(nodePanel -> nodePanel.changeMessageEditorsLayout(type));
+		});
+		configMainPanel.add(messageEditorsLayoutTypeSelectorPanel);
+		
+		JPanel splitDividerControlPanel = new JPanel();
+		configMainPanel.add(splitDividerControlPanel);
+		
+		JButton collapseButton = new JButton(Captions.CHAIN_DEF_SPLIT_COLLAPSE);
+		collapseButton.setToolTipText(Captions.CHAIN_DEF_SPLIT_COLLAPSE_TT);
+		collapseButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				getChainDefNodePanels().stream().forEach(ChainDefNodePanel::collapseSettingPanel);
+			}
+		});
+		splitDividerControlPanel.add(collapseButton);
+		
+		JButton expandButton = new JButton(Captions.CHAIN_DEF_SPLIT_EXPAND);
+		expandButton.setToolTipText(Captions.CHAIN_DEF_SPLIT_EXPAND_TT);
+		expandButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				getChainDefNodePanels().stream().forEach(ChainDefNodePanel::expandSettingPanel);
+			}
+		});
+		splitDividerControlPanel.add(expandButton);
 		
 		nodesScrollPane = new JScrollPane();
 		add(nodesScrollPane, BorderLayout.CENTER);
@@ -264,6 +317,10 @@ public class ChainDefPanel extends JPanel {
 
 	AuthAccountDto getSelectedAuthAccountDto() {
 		return authAccountSelectorPanel.getSelectedAuthAccountDto();
+	}
+
+	MessageEditorsLayoutType getSelectedMessageEditorsLayoutType() {
+		return messageEditorsLayoutTypeSelectorPanel.getSelectedMessageEditorsLayoutType();
 	}
 
 	private List<ChainDefNodePanel> getChainDefNodePanels() {

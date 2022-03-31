@@ -1,6 +1,8 @@
 package okuken.iste.view.chain;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 import okuken.iste.consts.Captions;
@@ -13,6 +15,7 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.message.editor.MessageEditorPanel;
+import okuken.iste.view.message.editor.MessageEditorsLayoutType;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -44,6 +47,8 @@ public class ChainDefNodePanel extends JPanel {
 
 	private boolean isMainNode;
 
+	private JSplitPane splitPane;
+
 	private JComboBox<MessageDto> urlComboBox;
 	private ChainDefNodeRequestParamsPanel requestParamsPanel;
 	private ChainDefNodeResponseParamsPanel responseParamsPanel;
@@ -65,8 +70,16 @@ public class ChainDefNodePanel extends JPanel {
 		JPanel centerPanel = new JPanel(new BorderLayout(0, 0));
 		add(centerPanel, BorderLayout.CENTER);
 		
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane.setOneTouchExpandable(true);
+		centerPanel.add(splitPane, BorderLayout.CENTER);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBorder(null);
+		splitPane.setLeftComponent(scrollPane);
+		
 		JPanel panel = new JPanel(new BorderLayout(0, 0));
-		centerPanel.add(panel, BorderLayout.WEST);
+		scrollPane.setViewportView(panel);
 		
 		JPanel mainPanel = new JPanel();
 		panel.add(mainPanel, BorderLayout.NORTH);
@@ -99,9 +112,9 @@ public class ChainDefNodePanel extends JPanel {
 		mainPanel.add(responseParamsPanel);
 		
 		JPanel messagePanel = new JPanel(new BorderLayout(0, 0));
-		centerPanel.add(messagePanel, BorderLayout.CENTER);
+		splitPane.setRightComponent(messagePanel);
 		
-		messageEditorPanel = new MessageEditorPanel(null, !parentChainDefPanel.judgeIsAuthChain(), false, true);
+		messageEditorPanel = new MessageEditorPanel(null, !parentChainDefPanel.judgeIsAuthChain(), false, parentChainDefPanel.getSelectedMessageEditorsLayoutType());
 		messagePanel.add(messageEditorPanel, BorderLayout.CENTER);
 		messageEditorPanel.setPreferredSize(MESSAGE_EDITOR_PREFERRED_SIZE);
 		
@@ -215,6 +228,17 @@ public class ChainDefNodePanel extends JPanel {
 
 	private void refreshMessageEditorPanel() {
 		messageEditorPanel.setMessage(getSelectedMessageDto());
+	}
+
+	public void changeMessageEditorsLayout(MessageEditorsLayoutType type) {
+		messageEditorPanel.setupMessageEditorsLayout(type);
+	}
+
+	public void collapseSettingPanel() {
+		splitPane.setDividerLocation(0);
+	}
+	public void expandSettingPanel() {
+		splitPane.setDividerLocation(0.4);
 	}
 
 	private void removeNode() {

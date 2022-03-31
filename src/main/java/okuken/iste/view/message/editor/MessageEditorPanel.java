@@ -1,6 +1,7 @@
 package okuken.iste.view.message.editor;
 
 import java.awt.BorderLayout;
+import java.util.Arrays;
 import java.util.Optional;
 
 import javax.swing.JPanel;
@@ -28,6 +29,9 @@ public class MessageEditorPanel extends JPanel {
 
 	private IHttpService httpService;
 
+	private JSplitPane splitPane;
+	private JTabbedPane tabbedPane;
+
 	public MessageEditorPanel() {
 		this(null, false, false);
 	}
@@ -35,9 +39,9 @@ public class MessageEditorPanel extends JPanel {
 		this(null, requestEditable, responseEditable);
 	}
 	public MessageEditorPanel(IMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable) {
-		this(aMessageEditorController, requestEditable, responseEditable, false);
+		this(aMessageEditorController, requestEditable, responseEditable, MessageEditorsLayoutType.HORIZONTAL_SPLIT);
 	}
-	public MessageEditorPanel(IMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable, boolean tabMode) {
+	public MessageEditorPanel(IMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable, MessageEditorsLayoutType type) {
 		setLayout(new BorderLayout(0, 0));
 
 		var messageEditorController = aMessageEditorController;
@@ -48,21 +52,36 @@ public class MessageEditorPanel extends JPanel {
 		requestMessageEditor = BurpUtil.getCallbacks().createMessageEditor(messageEditorController, requestEditable);
 		responseMessageEditor = BurpUtil.getCallbacks().createMessageEditor(messageEditorController, responseEditable);
 
-		if(tabMode) {
-			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		setupMessageEditorsLayout(type);
+	}
+
+	public void setupMessageEditorsLayout(MessageEditorsLayoutType type) {
+
+		Arrays.stream(getComponents()).filter(c -> c == splitPane || c == tabbedPane).forEach(c -> remove(c));
+		splitPane = null;
+		tabbedPane = null;
+
+		switch (type) {
+		case HORIZONTAL_SPLIT:
+		case VERTICAL_SPLIT:
+			splitPane = new JSplitPane(type.getOrientation(),
+					requestMessageEditor.getComponent(),
+					responseMessageEditor.getComponent()
+				);
+			splitPane.setResizeWeight(0.5);
+			add(splitPane);
+			break;
+		case TAB:
+			tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 			tabbedPane.addTab(Captions.TAB_MESSAGE_EDITOR_REQUEST, null, requestMessageEditor.getComponent(), null);
 			tabbedPane.addTab(Captions.TAB_MESSAGE_EDITOR_RESPONSE, null, responseMessageEditor.getComponent(), null);
 			add(tabbedPane);
-			return;
+			break;
+		default:
+			break;
 		}
 
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-				requestMessageEditor.getComponent(),
-				responseMessageEditor.getComponent()
-			);
-		splitPane.setResizeWeight(0.5);
-
-		add(splitPane);
+		UiUtil.repaint(this);
 	}
 
 	private IMessageEditorController createDefaultMessageEditorController() {
