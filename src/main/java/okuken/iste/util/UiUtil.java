@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
@@ -272,6 +274,15 @@ public class UiUtil {
 		verticalScrollBar.setValue(verticalScrollBar.getMinimum());
 		var horizontalScrollBar = scrollPane.getHorizontalScrollBar();
 		horizontalScrollBar.setValue(horizontalScrollBar.getMinimum());
+	}
+
+	public static void setupScrollPaneMouseWheelDispatch(JScrollPane scrollPane, JScrollPane parentScrollPane) {
+		scrollPane.setWheelScrollingEnabled(false);
+		scrollPane.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				parentScrollPane.dispatchEvent(e);
+			}
+		});
 	}
 
 

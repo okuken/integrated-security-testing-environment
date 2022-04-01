@@ -78,6 +78,7 @@ public class ChainDefNodePanel extends JPanel {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBorder(null);
+		UiUtil.setupScrollPaneMouseWheelDispatch(scrollPane, parentChainDefPanel.getNodesScrollPane());
 		splitPane.setLeftComponent(scrollPane);
 		
 		JPanel panel = new JPanel(new BorderLayout(0, 0));

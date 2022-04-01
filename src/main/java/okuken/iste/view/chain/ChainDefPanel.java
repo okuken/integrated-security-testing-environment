@@ -323,6 +323,10 @@ public class ChainDefPanel extends JPanel {
 		return messageEditorsLayoutTypeSelectorPanel.getSelectedMessageEditorsLayoutType();
 	}
 
+	JScrollPane getNodesScrollPane() {
+		return nodesScrollPane;
+	}
+
 	private List<ChainDefNodePanel> getChainDefNodePanels() {
 		return Arrays.asList(nodesPanel.getComponents()).stream()
 				.filter(component -> component instanceof ChainDefNodePanel)
