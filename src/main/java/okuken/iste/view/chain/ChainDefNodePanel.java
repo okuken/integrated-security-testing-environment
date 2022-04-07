@@ -280,9 +280,6 @@ public class ChainDefNodePanel extends JPanel {
 		return urlComboBox.getItemAt(urlComboBox.getSelectedIndex());
 	}
 
-	public void clearMessage() {
-		messageEditorPanel.clearMessage();
-	}
 	public void setMessage(IHttpRequestResponse message) {
 		messageEditorPanel.setMessage(message, true);
 	}

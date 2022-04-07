@@ -140,6 +140,8 @@ public class Captions {
 	public static final String CHAIN_DEF_SPLIT_COLLAPSE_TT = "Collapse manipulation setting panels";
 	public static final String CHAIN_DEF_SPLIT_EXPAND = ">";
 	public static final String CHAIN_DEF_SPLIT_EXPAND_TT = "Expand manipulation setting panels";
+	public static final String CHAIN_DEF_AUTO_SCROLL = "Auto scroll";
+	public static final String CHAIN_DEF_AUTO_SCROLL_TT = "Auto scroll to breaking node";
 
 	public static final String MESSAGE_EDITORS_LAYOUT_TYPE_COMBOBOX_TT = "Select layout of message editors";
 

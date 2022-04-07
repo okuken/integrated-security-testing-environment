@@ -38,6 +38,7 @@ import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import java.awt.GridLayout;
+import javax.swing.JCheckBox;
 
 public class ChainDefPanel extends JPanel {
 
@@ -60,6 +61,8 @@ public class ChainDefPanel extends JPanel {
 
 	private JSpinner timesSpinner;
 	private JLabel timesCountdownLabel;
+
+	private boolean autoScrollWhenBreaking = true;
 
 	private JFrame popupFrame;
 	private JScrollPane nodesScrollPane;
@@ -152,13 +155,10 @@ public class ChainDefPanel extends JPanel {
 		configPanel.add(configMainPanel);
 		configMainPanel.setLayout(new GridLayout(0, 1, 0, 0));
 		
-		messageEditorsLayoutTypeSelectorPanel = new MessageEditorsLayoutTypeSelectorPanel(type -> {
-			getChainDefNodePanels().stream().forEach(nodePanel -> nodePanel.changeMessageEditorsLayout(type));
-		});
-		configMainPanel.add(messageEditorsLayoutTypeSelectorPanel);
-		
-		JPanel splitDividerControlPanel = new JPanel();
-		configMainPanel.add(splitDividerControlPanel);
+		JPanel layoutControlPanel = new JPanel();
+		FlowLayout flowLayout_4 = (FlowLayout) layoutControlPanel.getLayout();
+		flowLayout_4.setVgap(0);
+		configMainPanel.add(layoutControlPanel);
 		
 		JButton collapseButton = new JButton(Captions.CHAIN_DEF_SPLIT_COLLAPSE);
 		collapseButton.setToolTipText(Captions.CHAIN_DEF_SPLIT_COLLAPSE_TT);
@@ -167,7 +167,7 @@ public class ChainDefPanel extends JPanel {
 				getChainDefNodePanels().stream().forEach(ChainDefNodePanel::collapseSettingPanel);
 			}
 		});
-		splitDividerControlPanel.add(collapseButton);
+		layoutControlPanel.add(collapseButton);
 		
 		JButton expandButton = new JButton(Captions.CHAIN_DEF_SPLIT_EXPAND);
 		expandButton.setToolTipText(Captions.CHAIN_DEF_SPLIT_EXPAND_TT);
@@ -176,7 +176,31 @@ public class ChainDefPanel extends JPanel {
 				getChainDefNodePanels().stream().forEach(ChainDefNodePanel::expandSettingPanel);
 			}
 		});
-		splitDividerControlPanel.add(expandButton);
+		layoutControlPanel.add(expandButton);
+		
+		layoutControlPanel.add(UiUtil.createSpacer());
+		
+		messageEditorsLayoutTypeSelectorPanel = new MessageEditorsLayoutTypeSelectorPanel(type -> {
+			getChainDefNodePanels().stream().forEach(nodePanel -> nodePanel.changeMessageEditorsLayout(type));
+		});
+		FlowLayout flowLayout_5 = (FlowLayout) messageEditorsLayoutTypeSelectorPanel.getLayout();
+		flowLayout_5.setHgap(0);
+		layoutControlPanel.add(messageEditorsLayoutTypeSelectorPanel);
+		
+		JPanel scrollControlPanel = new JPanel();
+		FlowLayout flowLayout_3 = (FlowLayout) scrollControlPanel.getLayout();
+		flowLayout_3.setAlignment(FlowLayout.RIGHT);
+		configMainPanel.add(scrollControlPanel);
+		
+		JCheckBox autoScrollCheckBox = new JCheckBox(Captions.CHAIN_DEF_AUTO_SCROLL);
+		autoScrollCheckBox.setToolTipText(Captions.CHAIN_DEF_AUTO_SCROLL_TT);
+		autoScrollCheckBox.setSelected(autoScrollWhenBreaking);
+		autoScrollCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				autoScrollWhenBreaking = autoScrollCheckBox.isSelected();
+			}
+		});
+		scrollControlPanel.add(autoScrollCheckBox);
 		
 		nodesScrollPane = new JScrollPane();
 		add(nodesScrollPane, BorderLayout.CENTER);
@@ -307,12 +331,18 @@ public class ChainDefPanel extends JPanel {
 	}
 
 	private void focusNode(ChainDefNodePanel chainDefNodePanel, boolean focusMessageEditor) {
+		focusNode(chainDefNodePanel, focusMessageEditor, false);
+	}
+	private void focusNode(ChainDefNodePanel chainDefNodePanel, boolean focusMessageEditor, boolean forBreaking) {
 		if(focusMessageEditor) {
 			chainDefNodePanel.focusMessageEditor();
 		} else {
 			chainDefNodePanel.focusMessageSelector();
 		}
-		UiUtil.scrollFor(chainDefNodePanel, nodesScrollPane);
+
+		if(!forBreaking || autoScrollWhenBreaking) {
+			UiUtil.scrollFor(chainDefNodePanel, nodesScrollPane);
+		}
 	}
 
 	AuthAccountDto getSelectedAuthAccountDto() {
@@ -428,7 +458,7 @@ public class ChainDefPanel extends JPanel {
 					var chainDefNodePanel = chainDefNodePanels.get(index);
 					chainDefNodePanel.setMessage(new HttpRequestResponseMock(breakingAppliedRequestForView, null, messageChainRepeatDto.getMessageChainDto().getNodes().get(index).getMessageDto().getMessage().getHttpService()));
 					setIsCurrentNode(chainDefNodePanels, index);
-					focusNode(chainDefNodePanel, true);
+					focusNode(chainDefNodePanel, true, true);
 					refreshControlsState();
 				});
 				return;
