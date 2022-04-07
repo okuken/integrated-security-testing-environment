@@ -32,6 +32,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -194,6 +196,29 @@ public class ChainDefNodePanel extends JPanel {
 		JPanel leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);
 		
+		JPanel nodeControlPanel = new JPanel(new GridLayout(0, 1, 0, 0));
+		leftPanel.add(nodeControlPanel);
+		
+		JButton btnUp = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_UP);
+		btnUp.setToolTipText(Captions.CHAIN_DEF_NODE_BUTTON_UP_TT);
+		btnUp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				upNode();
+			}
+		});
+		nodeControlPanel.add(btnUp);
+
+		JButton btnDown = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_DOWN);
+		btnDown.setToolTipText(Captions.CHAIN_DEF_NODE_BUTTON_DOWN_TT);
+		btnDown.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				downNode();
+			}
+		});
+		nodeControlPanel.add(btnDown);
+		
+		nodeControlPanel.add(UiUtil.createSpacer());
+		
 		JButton btnDelete = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_DELETE);
 		btnDelete.setToolTipText(Captions.CHAIN_DEF_NODE_BUTTON_DELETE_TT);
 		btnDelete.addActionListener(new ActionListener() {
@@ -202,7 +227,7 @@ public class ChainDefNodePanel extends JPanel {
 			}
 		});
 		btnDelete.setEnabled(!isMainNode);
-		leftPanel.add(btnDelete);
+		nodeControlPanel.add(btnDelete);
 		
 		initPanel(nodeDto);
 	}
@@ -258,6 +283,14 @@ public class ChainDefNodePanel extends JPanel {
 	}
 	public void expandSettingPanel() {
 		splitPane.setDividerLocation(0.4);
+	}
+
+	private void upNode() {
+		parentChainDefPanel.upNode(this);
+	}
+
+	private void downNode() {
+		parentChainDefPanel.downNode(this);
 	}
 
 	private void removeNode() {

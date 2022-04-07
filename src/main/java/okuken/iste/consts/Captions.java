@@ -115,6 +115,10 @@ public class Captions {
 	public static final String CHAIN_DEF_NODE_BUTTON_ADD_TT = "Add request here";
 	public static final String CHAIN_DEF_NODE_BUTTON_DELETE = "\u2716"; //x
 	public static final String CHAIN_DEF_NODE_BUTTON_DELETE_TT = "Remove this request from chain";
+	public static final String CHAIN_DEF_NODE_BUTTON_UP = "\u2b06";
+	public static final String CHAIN_DEF_NODE_BUTTON_UP_TT = "Move up this request";
+	public static final String CHAIN_DEF_NODE_BUTTON_DOWN = "\u2b07";
+	public static final String CHAIN_DEF_NODE_BUTTON_DOWN_TT = "Move down this request";
 
 	public static final String CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT = "Break";
 	public static final String CHAIN_DEF_NODE_MESSAGE_BUTTON_SEND = "Send";
@@ -141,7 +145,7 @@ public class Captions {
 	public static final String CHAIN_DEF_SPLIT_EXPAND = ">";
 	public static final String CHAIN_DEF_SPLIT_EXPAND_TT = "Expand manipulation setting panels";
 	public static final String CHAIN_DEF_AUTO_SCROLL = "Auto scroll";
-	public static final String CHAIN_DEF_AUTO_SCROLL_TT = "Auto scroll to breaking node";
+	public static final String CHAIN_DEF_AUTO_SCROLL_TT = "Auto scroll to breaking request";
 
 	public static final String MESSAGE_EDITORS_LAYOUT_TYPE_COMBOBOX_TT = "Select layout of message editors";
 

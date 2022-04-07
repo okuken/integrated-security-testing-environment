@@ -316,11 +316,43 @@ public class ChainDefPanel extends JPanel {
 		return nodePanel;
 	}
 
+	void upNode(ChainDefNodePanel clickedNodePanel) {
+		var index = indexOfNodePanel(clickedNodePanel);
+		changeOrderOfNodes(index - 2, index);
+	}
+	void downNode(ChainDefNodePanel clickedNodePanel) {
+		var index = indexOfNodePanel(clickedNodePanel);
+		changeOrderOfNodes(index, index + 2);
+	}
+	private void changeOrderOfNodes(int index1, int index2) {
+		if(index1 > index2) { //force index1 <= index2
+			var tmp = index1;
+			index1 = index2;
+			index2 = tmp;
+		}
+		if(index1 < 0 || index2 >= nodesPanel.getComponentCount()) {
+			return;
+		}
+
+		var nodePanel1 = nodesPanel.getComponent(index1);
+		var nodePanel2 = nodesPanel.getComponent(index2);
+		nodesPanel.remove(index2);
+		nodesPanel.remove(index1);
+		nodesPanel.add(nodePanel2, index1);
+		nodesPanel.add(nodePanel1, index2);
+
+		UiUtil.repaint(this);
+	}
+
 	void removeNode(JPanel clickedNodePanel) {
-		var index = Arrays.asList(nodesPanel.getComponents()).indexOf(clickedNodePanel);
+		var index = indexOfNodePanel(clickedNodePanel);
 		nodesPanel.remove(index); // nodePanel
 		nodesPanel.remove(index); // addButtonPanel
 		UiUtil.repaint(this);
+	}
+
+	private int indexOfNodePanel(JPanel clickedNodePanel) {
+		return Arrays.asList(nodesPanel.getComponents()).indexOf(clickedNodePanel);
 	}
 
 	private void setIsCurrentNode(List<ChainDefNodePanel> chainDefNodePanels, Integer index) {
