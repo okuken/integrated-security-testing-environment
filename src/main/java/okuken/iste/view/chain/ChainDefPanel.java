@@ -5,6 +5,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import com.google.common.collect.Lists;
+
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
@@ -71,6 +73,9 @@ public class ChainDefPanel extends JPanel {
 	private MessageEditorsLayoutTypeSelectorPanel messageEditorsLayoutTypeSelectorPanel;
 
 	public ChainDefPanel(MessageDto messageDto, Integer messageChainId) {
+		this(messageDto, messageChainId, Lists.newArrayList(messageDto), false);
+	}
+	public ChainDefPanel(MessageDto messageDto, Integer messageChainId, List<MessageDto> elementMessageDtos, boolean clean) {
 		this.messageDto = messageDto;
 		this.messageChainId = messageChainId;
 		
@@ -239,16 +244,18 @@ public class ChainDefPanel extends JPanel {
 			}
 		});
 		
-		init();
+		init(elementMessageDtos, clean);
 	}
 
-	private void init() {
+	private void init(List<MessageDto> elementMessageDtos, boolean clean) {
 		nodesPanel.add(createAddButtonPanel());
-		if(messageChainId == null) {
-			var nodeDto = new MessageChainNodeDto();
-			nodeDto.setMessageDto(messageDto);
-			nodeDto.setMain(true);
-			addNodeTail(nodeDto);
+		if(messageChainId == null || clean) {
+			elementMessageDtos.forEach(elementMessageDto -> {
+				var nodeDto = new MessageChainNodeDto();
+				nodeDto.setMessageDto(elementMessageDto);
+				nodeDto.setMain(elementMessageDto.getId().equals(messageDto.getId()));
+				addNodeTail(nodeDto);
+			});
 			return;
 		}
 

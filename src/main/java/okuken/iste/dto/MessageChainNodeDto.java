@@ -69,4 +69,8 @@ public class MessageChainNodeDto {
 		return messageDto.getMessage().getRequest();
 	}
 
+	public boolean hasSettings() {
+		return !reqps.isEmpty() || !resps.isEmpty() || breakpoint;
+	}
+
 }

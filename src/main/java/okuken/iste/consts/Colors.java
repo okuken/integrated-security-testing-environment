@@ -13,6 +13,7 @@ public class Colors {
 	public static final Color BUTTON_FOREGROUND_HIGHLIGHT = Color.WHITE;
 
 	public static final Color COMBOBOX_FOREGROUND_HIGHLIGHT = BURP_COLOR;
+	public static final Color COMBOBOX_FOREGROUND_GRAYOUT = Color.GRAY;
 
 	public static final Color BLOCK_BACKGROUND_HIGHLIGHT = BURP_COLOR;
 

@@ -75,6 +75,8 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE = "Send to Comparer (response)";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_ORG = "Send to Comparer (response) with Org";
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_MST = "Send to Comparer (response) with Master";
+	public static final String TABLE_CONTEXT_MENU_OPEN_CHAIN = "Open chain";
+	public static final String TABLE_CONTEXT_MENU_CREATE_CHAIN = "Create chain";
 	public static final String TABLE_CONTEXT_MENU_EDIT_CELL = "Edit cell";
 	public static final String TABLE_CONTEXT_MENU_DELETE_ITEM = "Delete item";
 	public static final String TABLE_CONTEXT_MENU_COPY_NAME = "Copy name";
@@ -234,6 +236,8 @@ public class Captions {
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";
 	public static final String MESSAGE_SELECT_PROJECT = "Select ISTE project";
 	public static final String MESSAGE_SELECT_SEND_TO_HISTORY_TARGET = "To which history do you want to add the selected item?";
+	public static final String MESSAGE_SELECT_CREATE_CHAIN_TARGET = "To which message create a request chain?";
+	public static final String MESSAGE_SELECT_CREATE_CHAIN_TARGET_EXIST = "Selected message has chain. Override it?";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
 	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export";
 	public static final String MESSAGE_CHOOSE_IMPORT_FILE = "Import";

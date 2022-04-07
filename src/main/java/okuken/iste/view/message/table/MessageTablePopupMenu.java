@@ -23,7 +23,9 @@ import okuken.iste.plugin.PluginPopupMenuListener;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractAction;
+import okuken.iste.view.chain.ChainDefPanel;
 import okuken.iste.view.message.editor.MessageCellEditorDialog;
+import okuken.iste.view.message.selector.MessageSelectorForCreateChain;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -173,6 +175,41 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 		pluginMenuItemsStartSeparator = new JPopupMenu.Separator();
 		add(pluginMenuItemsStartSeparator);
+
+		add(new JPopupMenu.Separator());
+
+		JMenuItem openChainMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_OPEN_CHAIN);
+		openChainMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Controller.getInstance().getSelectedMessages().forEach(orgMessageDto -> {
+					var chainDefPanel = new ChainDefPanel(orgMessageDto, Controller.getInstance().getMessageChainIdByBaseMessageId(orgMessageDto.getId()));
+					chainDefPanel.setPopupFrame(UiUtil.popup(orgMessageDto.getName() + Captions.REPEATER_POPUP_TITLE_SUFFIX_CHAIN, chainDefPanel, table, we -> {chainDefPanel.cancel();}));
+				});
+			}
+		});
+		add(openChainMenuItem);
+
+		JMenuItem createChainMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_CREATE_CHAIN);
+		createChainMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var selectedMessages = Controller.getInstance().getSelectedMessages();
+				var targetMessage = MessageSelectorForCreateChain.showDialog(selectedMessages);
+				if(targetMessage == null) {
+					return;
+				}
+
+				var chain = Controller.getInstance().getMessageChainByBaseMessageId(targetMessage.getId());
+				if(chain != null && chain.isEditedByUser()) {
+					if(!UiUtil.getConfirmAnswer(Captions.MESSAGE_SELECT_CREATE_CHAIN_TARGET_EXIST, table)) {
+						return;
+					}
+				}
+
+				var chainDefPanel = new ChainDefPanel(targetMessage, chain != null ? chain.getId() : null, selectedMessages, true);
+				chainDefPanel.setPopupFrame(UiUtil.popup(targetMessage.getName() + Captions.REPEATER_POPUP_TITLE_SUFFIX_CHAIN, chainDefPanel, table, we -> {chainDefPanel.cancel();}));
+			}
+		});
+		add(createChainMenuItem);
 
 		add(new JPopupMenu.Separator());
 

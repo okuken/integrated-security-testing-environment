@@ -42,4 +42,9 @@ public class MessageChainDto {
 	public Optional<MessageChainNodeDto> getMainNode() {
 		return nodes.stream().filter(MessageChainNodeDto::isMain).findFirst();
 	}
+
+	public boolean isEditedByUser() {
+		return !presetVars.isEmpty() || nodes.size() > 1 || nodes.get(0).hasSettings();
+	}
+
 }

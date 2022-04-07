@@ -420,6 +420,14 @@ public class Controller {
 		}
 	}
 
+	public MessageChainDto getMessageChainByBaseMessageId(Integer messageId) {
+		var chainId = getMessageChainIdByBaseMessageId(messageId);
+		if(chainId == null) {
+			return null;
+		}
+		return loadMessageChain(chainId);
+	}
+
 	public Integer getMessageChainIdByBaseMessageId(Integer messageId) {
 		return MessageChainLogic.getInstance().getMessageChainIdByBaseMessageId(messageId);
 	}
