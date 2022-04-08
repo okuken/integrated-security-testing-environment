@@ -142,6 +142,10 @@ public class Captions {
 	public static final String CHAIN_DEF_SAVE = "Save";
 	public static final String CHAIN_DEF_CANCEL = "Cancel";
 
+	public static final String CHAIN_DEF_SEMIAUTO_SETTING = "Semi-auto setting";
+	public static final String CHAIN_DEF_SEMIAUTO_SETTING_COOKIE = "Cookie";
+	public static final String CHAIN_DEF_SEMIAUTO_SETTING_COOKIE_TT = "Add cookie transfer settings semi-automatically";
+
 	public static final String CHAIN_DEF_SPLIT_COLLAPSE = "<";
 	public static final String CHAIN_DEF_SPLIT_COLLAPSE_TT = "Collapse manipulation setting panels";
 	public static final String CHAIN_DEF_SPLIT_EXPAND = ">";
@@ -238,6 +242,8 @@ public class Captions {
 	public static final String MESSAGE_SELECT_SEND_TO_HISTORY_TARGET = "To which history do you want to add the selected item?";
 	public static final String MESSAGE_SELECT_CREATE_CHAIN_TARGET = "To which message create a request chain?";
 	public static final String MESSAGE_SELECT_CREATE_CHAIN_TARGET_EXIST = "Selected message has chain. Override it?";
+	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE = "Select transfer target cookies";
+	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE_EMPTY = "No Cookies.";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
 	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export";
 	public static final String MESSAGE_CHOOSE_IMPORT_FILE = "Import";

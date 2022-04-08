@@ -4,21 +4,30 @@ import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
 
 import com.google.common.collect.Lists;
 
+import burp.ICookie;
+import burp.IParameter;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
+import okuken.iste.dto.MessageChainNodeReqpDto;
+import okuken.iste.dto.MessageChainNodeRespDto;
 import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
+import okuken.iste.enums.RequestParameterType;
+import okuken.iste.enums.ResponseParameterType;
+import okuken.iste.enums.SourceType;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.common.AuthAccountSelectorPanel;
+import okuken.iste.view.common.MultipleSelectorPanel;
 import okuken.iste.view.message.editor.MessageEditorsLayoutType;
 import okuken.iste.view.message.editor.MessageEditorsLayoutTypeSelectorPanel;
 
@@ -35,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
@@ -155,6 +165,30 @@ public class ChainDefPanel extends JPanel {
 		
 		JPanel configPanel = new JPanel();
 		headerPanel.add(configPanel, BorderLayout.EAST);
+		
+		JPanel semiAutoSettingPanel = new JPanel(new BorderLayout(0, 0));
+		semiAutoSettingPanel.setBorder(new LineBorder(Colors.BLOCK_BORDER));
+		configPanel.add(semiAutoSettingPanel);
+		
+		JPanel semiAutoSettingHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		semiAutoSettingPanel.add(semiAutoSettingHeaderPanel, BorderLayout.NORTH);
+		
+		JLabel semiAutoSettingLabel = new JLabel(Captions.CHAIN_DEF_SEMIAUTO_SETTING);
+		semiAutoSettingHeaderPanel.add(semiAutoSettingLabel);
+		
+		JPanel semiAutoSettingMainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		semiAutoSettingPanel.add(semiAutoSettingMainPanel, BorderLayout.CENTER);
+		
+		JButton semiAutoCookieSettingButton = new JButton(Captions.CHAIN_DEF_SEMIAUTO_SETTING_COOKIE);
+		semiAutoCookieSettingButton.setToolTipText(Captions.CHAIN_DEF_SEMIAUTO_SETTING_COOKIE_TT);
+		semiAutoCookieSettingButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				semiAutoAddCookieTransferSettings();
+			}
+		});
+		semiAutoSettingMainPanel.add(semiAutoCookieSettingButton);
+		
+		configPanel.add(UiUtil.createSpacerM());
 		
 		JPanel configMainPanel = new JPanel();
 		configPanel.add(configMainPanel);
@@ -360,6 +394,65 @@ public class ChainDefPanel extends JPanel {
 
 	private int indexOfNodePanel(JPanel clickedNodePanel) {
 		return Arrays.asList(nodesPanel.getComponents()).indexOf(clickedNodePanel);
+	}
+
+	private void semiAutoAddCookieTransferSettings() {
+		var messageChainDto = makeChainDto();
+
+		var cookies = messageChainDto.getNodes().stream()
+				.filter(node -> node.getMessageDto().getResponseInfo() != null)
+				.flatMap(node -> node.getMessageDto().getResponseInfo().getCookies().stream().map(cookie -> cookie.getName()))
+				.distinct()
+				.collect(Collectors.toList());
+
+		if(cookies.isEmpty()) {
+			UiUtil.showMessage(Captions.MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE_EMPTY, this);
+			return;
+		}
+
+		var selectedCookies = new MultipleSelectorPanel<String>(cookies).showDialog(Captions.MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE, this);
+		if(selectedCookies == null || selectedCookies.isEmpty()) {
+			return;
+		}
+
+		var nodeDtos = messageChainDto.getNodes();
+		var nodePanels = getChainDefNodePanels();
+
+		IntStream.range(0, nodeDtos.size()).forEach(i -> {
+			var nodeDto = nodeDtos.get(i);
+			var nodePanel = nodePanels.get(i);
+
+			//reqp
+			nodeDto.getMessageDto().getRequestInfo().getParameters().stream()
+					.filter(p -> p.getType() == RequestParameterType.COOKIE.getBurpId())
+					.map(IParameter::getName)
+					.filter(selectedCookies::contains)
+					.filter(cookie -> !nodeDto.getReqps().stream() //unique
+										.filter(reqp -> reqp.getParamType() == RequestParameterType.COOKIE)
+										.anyMatch(reqp -> cookie.equals(reqp.getParamName())))
+					.filter(cookie -> IntStream.range(0, i) //check exist memorized var
+										.anyMatch(j -> nodeDtos.get(j).getResps().stream()
+														.anyMatch(resp -> cookie.equals(resp.getVarName()))))
+					.forEach(cookie -> {
+						var reqpDto = new MessageChainNodeReqpDto(RequestParameterType.COOKIE, cookie, SourceType.VAR, cookie);
+						nodePanel.addReqp(reqpDto);
+					});
+
+			//resp
+			var responseInfo = nodeDto.getMessageDto().getResponseInfo();
+			if(responseInfo != null) {
+				responseInfo.getCookies().stream()
+					.map(ICookie::getName)
+					.filter(selectedCookies::contains)
+					.filter(cookie -> !nodeDto.getResps().stream() //unique
+										.filter(resp -> resp.getParamType() == ResponseParameterType.COOKIE)
+										.anyMatch(resp -> cookie.equals(resp.getParamName())))
+					.forEach(cookie -> {
+						var respDto = new MessageChainNodeRespDto(ResponseParameterType.COOKIE, cookie, cookie);
+						nodePanel.addResp(respDto);
+					});
+			}
+		});
 	}
 
 	private void setIsCurrentNode(List<ChainDefNodePanel> chainDefNodePanels, Integer index) {

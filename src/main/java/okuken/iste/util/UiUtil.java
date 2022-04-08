@@ -26,6 +26,7 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.swing.Action;
@@ -147,7 +148,14 @@ public class UiUtil {
 	}
 
 	public static final JLabel createSpacer() {
-		return new JLabel("  ");
+		return createSpacer(1);
+	}
+	public static final JLabel createSpacerM() {
+		return createSpacer(2);
+	}
+	private static final JLabel createSpacer(int size) {
+		var spaceStr = IntStream.range(0, size).mapToObj(i -> "  ").collect(Collectors.joining());
+		return new JLabel(spaceStr);
 	}
 
 	/**

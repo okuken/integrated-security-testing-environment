@@ -12,7 +12,15 @@ public class MessageChainNodeReqpDto {
 	private String paramName;
 	private SourceType sourceType;
 	private String sourceName;
-	private EncodeType encode;
+	private EncodeType encode = EncodeType.NONE;
+
+	public MessageChainNodeReqpDto() {}
+	public MessageChainNodeReqpDto(RequestParameterType paramType, String paramName, SourceType sourceType, String sourceName) {
+		this.paramType = paramType;
+		this.paramName = paramName;
+		this.sourceType = sourceType;
+		this.sourceName = sourceName;
+	}
 
 	public Integer getId() {
 		return id;

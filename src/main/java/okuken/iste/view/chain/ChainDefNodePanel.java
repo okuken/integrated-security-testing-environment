@@ -11,6 +11,8 @@ import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainNodeDto;
+import okuken.iste.dto.MessageChainNodeReqpDto;
+import okuken.iste.dto.MessageChainNodeRespDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.util.UiUtil;
@@ -315,6 +317,14 @@ public class ChainDefNodePanel extends JPanel {
 
 	public void setMessage(IHttpRequestResponse message) {
 		messageEditorPanel.setMessage(message, true);
+	}
+
+	void addReqp(MessageChainNodeReqpDto reqpDto) {
+		requestParamsPanel.addRow(reqpDto);
+	}
+
+	void addResp(MessageChainNodeRespDto respDto) {
+		responseParamsPanel.addRow(respDto);
 	}
 
 	public void focusMessageEditor() {

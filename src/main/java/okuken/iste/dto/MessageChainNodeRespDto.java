@@ -10,6 +10,13 @@ public class MessageChainNodeRespDto {
 	private String paramName;
 	private String varName;
 
+	public MessageChainNodeRespDto() {}
+	public MessageChainNodeRespDto(ResponseParameterType paramType, String paramName, String varName) {
+		this.paramType = paramType;
+		this.paramName = paramName;
+		this.varName = varName;
+	}
+
 	public Integer getId() {
 		return id;
 	}
