@@ -19,6 +19,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
@@ -291,6 +292,20 @@ public class UiUtil {
 				parentScrollPane.dispatchEvent(e);
 			}
 		});
+	}
+
+	public static void setOpaqueChildComponents(Container container, boolean opaque) {
+		Arrays.stream(container.getComponents()).forEach(c -> setOpaqueChildComponentsImpl(c, opaque));
+	}
+	private static void setOpaqueChildComponentsImpl(Component component, boolean opaque) {
+		if(component instanceof JComponent) {
+			((JComponent)component).setOpaque(opaque);
+		}
+		if(component instanceof Container) {
+			Arrays.stream(((Container)component).getComponents()).forEach(child -> {
+				setOpaqueChildComponentsImpl(child, opaque); //recursive
+			});
+		}
 	}
 
 

@@ -57,15 +57,21 @@ public class ChainDefNodePanel extends JPanel {
 	private ChainDefNodeRequestParamsPanel requestParamsPanel;
 	private ChainDefNodeResponseParamsPanel responseParamsPanel;
 
+	private JPanel messageHeaderPanel;
+
 	private JPanel messageInfoPanel;
 	private JLabel messageNameLabel;
 
 	private JPanel messageControlPanel;
 	private JCheckBox breakpointCheckBox;
+	private JCheckBox skipCheckBox;
 
 	private MessageEditorPanel messageEditorPanel;
 
 	private boolean refreshingFlag = false;
+
+	private boolean currentNode;
+	private Color panelDefaultBackgroundColor;
 
 	public ChainDefNodePanel(MessageChainNodeDto nodeDto, ChainDefPanel parentChainDefPanel) {
 		this.parentChainDefPanel = parentChainDefPanel;
@@ -125,7 +131,7 @@ public class ChainDefNodePanel extends JPanel {
 		messagePanel.add(messageEditorPanel, BorderLayout.CENTER);
 		messageEditorPanel.setPreferredSize(MESSAGE_EDITOR_PREFERRED_SIZE);
 		
-		JPanel messageHeaderPanel = new JPanel();
+		messageHeaderPanel = new JPanel();
 		messagePanel.add(messageHeaderPanel, BorderLayout.NORTH);
 		messageHeaderPanel.setLayout(new BorderLayout(0, 0));
 		
@@ -145,7 +151,17 @@ public class ChainDefNodePanel extends JPanel {
 		messageHeaderPanel.add(messageControlPanel, BorderLayout.CENTER);
 		
 		breakpointCheckBox = new JCheckBox(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT);
+		breakpointCheckBox.setToolTipText(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT_TT);
 		messageControlPanel.add(breakpointCheckBox);
+		
+		skipCheckBox = new JCheckBox(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_SKIP);
+		skipCheckBox.setToolTipText(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_SKIP_TT);
+		skipCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshBackgroundColor();
+			}
+		});
+		messageControlPanel.add(skipCheckBox);
 		
 		messageControlPanel.add(UiUtil.createSpacer());
 		
@@ -236,6 +252,12 @@ public class ChainDefNodePanel extends JPanel {
 
 	private void initPanel(MessageChainNodeDto nodeDto) {
 		refreshPanel(nodeDto, Controller.getInstance().getMessages());
+
+		SwingUtilities.invokeLater(() -> {
+			UiUtil.setOpaqueChildComponents(this, false);
+			panelDefaultBackgroundColor = getBackground();
+			refreshBackgroundColor();
+		});
 	}
 
 	private void refreshPanel(MessageChainNodeDto nodeDto, List<MessageDto> messageDtos) {
@@ -264,6 +286,7 @@ public class ChainDefNodePanel extends JPanel {
 			});
 
 			breakpointCheckBox.setSelected(nodeDto.isBreakpoint());
+			skipCheckBox.setSelected(nodeDto.isSkip());
 
 		} finally {
 			refreshingFlag = refreshingFlagBk;
@@ -307,6 +330,7 @@ public class ChainDefNodePanel extends JPanel {
 		nodeDto.setReqps(requestParamsPanel.getRows());
 		nodeDto.setResps(responseParamsPanel.getRows());
 		nodeDto.setBreakpoint(breakpointCheckBox.isSelected());
+		nodeDto.setSkip(skipCheckBox.isSelected());
 		nodeDto.setEditedRequest(messageEditorPanel.getRequest());
 		return nodeDto;
 	}
@@ -335,19 +359,30 @@ public class ChainDefNodePanel extends JPanel {
 		UiUtil.focus(urlComboBox);
 	}
 
-	private Color panelDefaultBackgroundColor;
 	public void setIsCurrentNode() {
-		if(panelDefaultBackgroundColor == null) {
-			panelDefaultBackgroundColor = messageControlPanel.getBackground();
-		}
-		messageControlPanel.setBackground(Colors.BLOCK_BACKGROUND_HIGHLIGHT);
-		messageInfoPanel.setBackground(Colors.BLOCK_BACKGROUND_HIGHLIGHT);
+		currentNode = true;
+		refreshBackgroundColor();
 	}
 	public void clearIsCurrentNode() {
-		if(panelDefaultBackgroundColor != null) {
-			messageControlPanel.setBackground(panelDefaultBackgroundColor);
-			messageInfoPanel.setBackground(panelDefaultBackgroundColor);
+		currentNode = false;
+		refreshBackgroundColor();
+	}
+
+	private void refreshBackgroundColor() {
+		if(skipCheckBox.isSelected()) {
+			messageHeaderPanel.setOpaque(false);
+			setBackground(Colors.BLOCK_BACKGROUND_GRAYOUT);
+			return;
+		} else if(currentNode) {
+			messageHeaderPanel.setOpaque(true);
+			messageHeaderPanel.setBackground(Colors.BLOCK_BACKGROUND_HIGHLIGHT);
+			return;
+		} else {
+			messageHeaderPanel.setOpaque(false);
+			setBackground(panelDefaultBackgroundColor);
 		}
+
+		UiUtil.repaint(this);
 	}
 
 	public boolean isMainNode() {

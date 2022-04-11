@@ -25,6 +25,7 @@ import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.ResponseParameterType;
 import okuken.iste.enums.SourceType;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.common.AuthAccountSelectorPanel;
 import okuken.iste.view.common.MultipleSelectorPanel;
@@ -43,6 +44,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.awt.event.ActionEvent;
@@ -132,6 +134,16 @@ public class ChainDefPanel extends JPanel {
 			}
 		});
 		
+		stepButton = new JButton(Captions.CHAIN_DEF_STEP);
+		stepButton.setToolTipText(Captions.CHAIN_DEF_STEP_TT);
+		stepButton.setMnemonic(KeyEvent.VK_X);
+		operationCenterPanel.add(stepButton);
+		stepButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				start(true);
+			}
+		});
+		
 		terminateButton = new JButton(Captions.CHAIN_DEF_TERMINATE);
 		terminateButton.setToolTipText(Captions.CHAIN_DEF_TERMINATE_TT);
 		terminateButton.setMnemonic(KeyEvent.VK_T);
@@ -142,15 +154,7 @@ public class ChainDefPanel extends JPanel {
 			}
 		});
 		
-		stepButton = new JButton(Captions.CHAIN_DEF_STEP);
-		stepButton.setToolTipText(Captions.CHAIN_DEF_STEP_TT);
-		stepButton.setMnemonic(KeyEvent.VK_X);
-		operationCenterPanel.add(stepButton);
-		stepButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				start(true);
-			}
-		});
+		operationCenterPanel.add(UiUtil.createSpacer());
 		
 		JLabel timesLabel = new JLabel(" x ");
 		operationCenterPanel.add(timesLabel);
@@ -333,6 +337,7 @@ public class ChainDefPanel extends JPanel {
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				var nodePanel = addNode(buttonPanel);
+				BurpUtil.getCallbacks().customizeUiComponent(nodePanel);
 				SwingUtilities.invokeLater(() -> {
 					focusNode(nodePanel, false);
 				});
@@ -565,13 +570,15 @@ public class ChainDefPanel extends JPanel {
 		});
 
 		if(isStep) {
+			OptionalInt nextNotSkipIndex;
 			if(breakingMessageChainRepeatDto != null) {
-				var nextIndex = breakingMessageChainRepeatDto.getCurrentIndex() + 1;
-				if(nextIndex < messageChainDto.getNodes().size()) {
-					messageChainDto.getNodes().get(nextIndex).setBreakpoint(true);
-				}
+				nextNotSkipIndex = getFirstNotSkipIndex(messageChainDto, breakingMessageChainRepeatDto.getCurrentIndex() + 1, messageChainDto.getNodes().size());
 			} else {
-				messageChainDto.getNodes().get(0).setBreakpoint(true);
+				nextNotSkipIndex = getFirstNotSkipIndex(messageChainDto, 0, messageChainDto.getNodes().size());
+			}
+
+			if(nextNotSkipIndex.isPresent()) {
+				messageChainDto.getNodes().get(nextNotSkipIndex.getAsInt()).setBreakpoint(true);
 			}
 		}
 
@@ -596,14 +603,16 @@ public class ChainDefPanel extends JPanel {
 				return;
 			}
 
-			SwingUtilities.invokeLater(() -> {
-				chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage());
-				setIsCurrentNode(chainDefNodePanels, null);
-
-				if(messageChainRepeatDto.getMessageChainDto().getNodes().get(index).isMain() && needSaveHistory) {
-					Controller.getInstance().refreshRepeatTablePanel(messageChainDto.getMainNode().get().getMessageDto().getId()); //TODO:improve...
-				}
-			});
+			if(!messageChainRepeatDto.getCurrentNodeDto().isSkip()) {
+				SwingUtilities.invokeLater(() -> {
+					chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage());
+					setIsCurrentNode(chainDefNodePanels, null);
+	
+					if(messageChainRepeatDto.getMessageChainDto().getNodes().get(index).isMain() && needSaveHistory) {
+						Controller.getInstance().refreshRepeatTablePanel(messageChainDto.getMainNode().get().getMessageDto().getId()); //TODO:improve...
+					}
+				});
+			}
 
 			var nextIndex = index + 1;
 			if(nextIndex >= chainDefNodePanels.size()) { //case: last node
@@ -612,6 +621,7 @@ public class ChainDefPanel extends JPanel {
 					runImpl(chainDefNodePanels, messageChainDto, authAccountDto, times - 1, isStep); //recursive
 				} else {
 					SwingUtilities.invokeLater(() -> {
+						breakingMessageChainRepeatDto = null;
 						refreshControlsState();
 						timesCountdownLabel.setText(Captions.CHAIN_DEF_RUN_DONE);
 					});
@@ -619,6 +629,12 @@ public class ChainDefPanel extends JPanel {
 			}
 
 		}, judgeIsAuthChain(), needSaveHistory, breakingMessageChainRepeatDto);
+	}
+
+	private OptionalInt getFirstNotSkipIndex(MessageChainDto messageChainDto, int startIndex, int endIndex) {
+		return IntStream.range(startIndex, endIndex)
+				.filter(i -> !messageChainDto.getNodes().get(i).isSkip())
+				.findFirst();
 	}
 
 	private void terminate() {

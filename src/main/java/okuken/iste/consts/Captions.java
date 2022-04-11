@@ -123,6 +123,9 @@ public class Captions {
 	public static final String CHAIN_DEF_NODE_BUTTON_DOWN_TT = "Move down this request";
 
 	public static final String CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT = "Break";
+	public static final String CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT_TT = "Breakpoint";
+	public static final String CHAIN_DEF_NODE_MESSAGE_CHECKBOX_SKIP = "Skip";
+	public static final String CHAIN_DEF_NODE_MESSAGE_CHECKBOX_SKIP_TT = "Skip this request";
 	public static final String CHAIN_DEF_NODE_MESSAGE_BUTTON_SEND = "Send";
 	public static final String CHAIN_DEF_NODE_MESSAGE_BUTTON_SEND_TT = "Issue SINGLE request as selected account {Shift: with refresh session}";
 
@@ -134,7 +137,7 @@ public class Captions {
 	public static final String CHAIN_DEF_RUN_TT = "Start or resume request chain [Alt+S]";
 	public static final String CHAIN_DEF_TERMINATE = " \u23f9 ";
 	public static final String CHAIN_DEF_TERMINATE_TT = "Terminate request chain [Alt+T]";
-	public static final String CHAIN_DEF_STEP = " \u2935 ";
+	public static final String CHAIN_DEF_STEP = " \u2b07 ";
 	public static final String CHAIN_DEF_STEP_TT = "Step request chain [Alt+X]";
 	public static final String CHAIN_DEF_RUN_DONE = "Done.";
 	public static final String CHAIN_DEF_RUN_TERMINATE_FORCE = "Forced termination.";

@@ -16,6 +16,7 @@ public class MessageChainNodeDto {
 	private boolean main;
 
 	private boolean breakpoint;
+	private boolean skip;
 
 	private byte[] editedRequest;
 
@@ -61,6 +62,12 @@ public class MessageChainNodeDto {
 	public void setBreakpoint(boolean breakpoint) {
 		this.breakpoint = breakpoint;
 	}
+	public boolean isSkip() {
+		return skip;
+	}
+	public void setSkip(boolean skip) {
+		this.skip = skip;
+	}
 
 	public byte[] getRequest() {
 		if(editedRequest != null) {
@@ -70,7 +77,7 @@ public class MessageChainNodeDto {
 	}
 
 	public boolean hasSettings() {
-		return !reqps.isEmpty() || !resps.isEmpty() || breakpoint;
+		return !reqps.isEmpty() || !resps.isEmpty() || breakpoint || skip;
 	}
 
 }
