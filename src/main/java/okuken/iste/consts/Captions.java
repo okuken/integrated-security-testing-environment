@@ -239,6 +239,8 @@ public class Captions {
 	public static final String MESSAGE_SAVED = "Saved.";
 	public static final String MESSAGE_DONE = "Done.";
 
+	public static final String MESSAGE_REGEX_ERROR = "**ERROR**";
+
 	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose SQLite database file for ISTE";
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";
 	public static final String MESSAGE_SELECT_PROJECT = "Select ISTE project";

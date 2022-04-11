@@ -140,7 +140,7 @@ public class MessageUtil {
 			throw new IllegalArgumentException("The parameter type is not extractable: " + paramType);
 		}
 		if(paramType == ResponseParameterType.REGEX) {
-			return RegexUtil.extractOneGroup(new String(response, ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET), paramName);
+			return RegexUtil.extractOneGroup(response, paramName);
 		}
 
 		var paramOptional = extractResponseCandidateParams(response, paramType).stream()

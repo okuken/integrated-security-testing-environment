@@ -31,6 +31,9 @@ public class RegexUtil {
 			.toString();
 	}
 
+	public static String extractOneGroup(byte[] bytes, String regex) {
+		return extractOneGroup(convertToStringForRegex(bytes), regex);
+	}
 	public static String extractOneGroup(String str, String regex) {
 		return extractOneGroup(str, Pattern.compile(regex));
 	}
@@ -40,6 +43,10 @@ public class RegexUtil {
 			return null;
 		}
 		return matcher.group(1);
+	}
+
+	public static String convertToStringForRegex(byte[] bytes) {
+		return new String(bytes, ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET);
 	}
 
 }

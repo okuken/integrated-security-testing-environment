@@ -119,7 +119,7 @@ public class ChainDefNodePanel extends JPanel {
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		mainPanel.add(requestParamsPanel);
 		
-		responseParamsPanel = new ChainDefNodeResponseParamsPanel();
+		responseParamsPanel = new ChainDefNodeResponseParamsPanel(this);
 		FlowLayout flowLayout_2 = (FlowLayout) responseParamsPanel.getLayout();
 		flowLayout_2.setAlignment(FlowLayout.LEFT);
 		mainPanel.add(responseParamsPanel);
@@ -337,6 +337,14 @@ public class ChainDefNodePanel extends JPanel {
 
 	private MessageDto getSelectedMessageDto() {
 		return urlComboBox.getItemAt(urlComboBox.getSelectedIndex());
+	}
+
+	public byte[] getRequest() {
+		return messageEditorPanel.getRequest();
+	}
+
+	public byte[] getResponse() {
+		return messageEditorPanel.getResponse();
 	}
 
 	public void setMessage(IHttpRequestResponse message) {

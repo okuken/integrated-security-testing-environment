@@ -72,11 +72,12 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 				var dto = dtos.get(rowIndex);
 
 				try {
-					if(val.equals(column.getGetter().invoke(dto))) { //case: no change
-						return;
+					if(column.getGetter() != null && column.getSetter() != null) {
+						if(val.equals(column.getGetter().invoke(dto))) { //case: no change
+							return;
+						}
+						column.getSetter().invoke(dto, val);
 					}
-					column.getSetter().invoke(dto, val);
-
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new RuntimeException(e);
 				}
@@ -164,6 +165,9 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 	private Object[] convertDtoToObjectArray(T dto) {
 		return columns.stream().map(column -> {
 			try {
+				if(column.getGetter() == null) {
+					return "";
+				}
 				return column.getGetter().invoke(dto);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();
@@ -208,6 +212,10 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 	public void refreshPanel() {
 		clearRows();
 		loadRows();
+	}
+
+	public void setValueAt(Object value, int row, int col) {
+		tableModel.setValueAt(value, row, col);
 	}
 
 	public List<T> getRows() {
