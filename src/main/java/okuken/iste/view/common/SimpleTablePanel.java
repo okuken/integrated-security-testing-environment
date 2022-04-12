@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -118,18 +119,38 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		flowLayout_1.setAlignment(FlowLayout.RIGHT);
 		headerPanel.add(headerRightPanel, BorderLayout.EAST);
 		
+		JButton upRowButton = new JButton(Captions.TABLE_CONTROL_BUTTON_UP);
+		upRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_UP_TT);
+		upRowButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				upRows(getSelectedRowIndexsReversed());
+			}
+		});
+		headerRightPanel.add(upRowButton);
+		
+		JButton downRowButton = new JButton(Captions.TABLE_CONTROL_BUTTON_DOWN);
+		downRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_DOWN_TT);
+		downRowButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				downRows(getSelectedRowIndexsReversed());
+			}
+		});
+		headerRightPanel.add(downRowButton);
+		
+		headerRightPanel.add(UiUtil.createSpacer());
+		
 		JButton deleteRowButton = new JButton(Captions.TABLE_CONTROL_BUTTON_DELETE);
+		deleteRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_DELETE_TT);
 		deleteRowButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				List<Integer> selectedRows = getSelectedRowIndexs();
-				Collections.reverse(selectedRows);
-				removeRows(selectedRows);
+				removeRows(getSelectedRowIndexsReversed());
 			}
 		});
 		
 		headerRightPanel.add(deleteRowButton);
 		
 		JButton addRowButton = new JButton(Captions.TABLE_CONTROL_BUTTON_ADD);
+		addRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_ADD_TT);
 		addRowButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addRow();
@@ -140,6 +161,11 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		afterInit(table, tableModel);
 	}
 
+	private List<Integer> getSelectedRowIndexsReversed() {
+		List<Integer> selectedRows = getSelectedRowIndexs();
+		Collections.reverse(selectedRows);
+		return selectedRows;
+	}
 	private List<Integer> getSelectedRowIndexs() {
 		return Arrays.stream(table.getSelectedRows())
 				.mapToObj(Integer::valueOf)
@@ -176,15 +202,67 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		}).toArray();
 	}
 
-	private void removeRows(List<Integer> selectedRowsReversed) {
+	private void upRows(List<Integer> selectedRowsReversed) {
+		if(selectedRowsReversed.isEmpty()) {
+			return;
+		}
+
+		var top = selectedRowsReversed.get(selectedRowsReversed.size() - 1);
+		var target = top - 1 >= 0 ? top - 1 : top;
+
+		var movedDtos = moveRows(target, selectedRowsReversed);
+
+		afterUpRows(movedDtos);
+	}
+
+	private void downRows(List<Integer> selectedRowsReversed) {
+		if(selectedRowsReversed.isEmpty()) {
+			return;
+		}
+
+		var bottom = selectedRowsReversed.get(0);
+		var finalTarget = bottom + 1 < dtos.size() ? bottom + 1 : bottom;
+		var target = finalTarget - selectedRowsReversed.size() + 1;
+
+		var movedDtos = moveRows(target, selectedRowsReversed);
+
+		afterDownRows(movedDtos);
+	}
+
+	private List<T> moveRows(int to, List<Integer> selectedRowsReversed) {
+		var movingDtos = new ArrayList<T>();
 		selectedRowsReversed.forEach(selectedRow -> {
 			var dto = dtos.get(selectedRow);
 
+			movingDtos.add(dto);
+			dtos.remove(dto);
+			tableModel.removeRow(selectedRow);
+		});
+
+		movingDtos.forEach(movingDto -> {
+			dtos.add(to, movingDto);
+			tableModel.insertRow(to, convertDtoToObjectArray(movingDto));
+		});
+
+		table.getSelectionModel().addSelectionInterval(to, to + selectedRowsReversed.size() - 1);
+
+		return movingDtos;
+	}
+
+	private void removeRows(List<Integer> selectedRowsReversed) {
+		List<T> removedRows = Lists.newArrayList();
+
+		selectedRowsReversed.forEach(selectedRow -> {
+			var dto = dtos.get(selectedRow);
+
+			removedRows.add(dto);
 			dtos.remove(dto);
 			tableModel.removeRow(selectedRow);
 
 			afterRemoveRow(dto);
 		});
+
+		afterRemoveRows(removedRows);
 	}
 
 	/**
@@ -225,6 +303,10 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 	protected int getMaxRowSize() {
 		return Integer.MAX_VALUE;
 	}
+
+	protected void afterUpRows(List<T> dtos) {}
+	protected void afterDownRows(List<T> dtos) {}
+	protected void afterRemoveRows(List<T> dtos) {}
 
 	abstract protected List<ColumnDef> getColumnDefs();
 	abstract protected String getTableCaption();

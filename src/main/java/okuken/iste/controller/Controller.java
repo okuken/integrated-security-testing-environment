@@ -26,6 +26,7 @@ import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.ProjectMemoDto;
+import okuken.iste.enums.OrderType;
 import okuken.iste.logic.AuthLogic;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
@@ -33,6 +34,7 @@ import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageChainLogic;
 import okuken.iste.logic.MessageFilterLogic;
 import okuken.iste.logic.MessageLogic;
+import okuken.iste.logic.OrderLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.plugin.PluginInfo;
@@ -384,13 +386,26 @@ public class Controller {
 	public List<AuthAccountDto> getAuthAccounts() {
 		return ConfigLogic.getInstance().getAuthAccountDtos();
 	}
+	public void saveNewAuthAccount(AuthAccountDto newAuthAccountDto, boolean keepOldSessionId, List<AuthAccountDto> allAuthAccountDtos) {
+		AuthLogic.getInstance().saveAuthAccount(newAuthAccountDto, keepOldSessionId);
+		saveAuthAccountsOrderImpl(allAuthAccountDtos);
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
+	}
 	public void saveAuthAccount(AuthAccountDto authAccountDto, boolean keepOldSessionId) {
 		AuthLogic.getInstance().saveAuthAccount(authAccountDto, keepOldSessionId);
 		ConfigLogic.getInstance().reloadAuthAccountDtos();
 	}
-	public void deleteAuthAccounts(List<AuthAccountDto> authAccountDtos) {
-		AuthLogic.getInstance().deleteAuthAccounts(authAccountDtos);
+	public void deleteAuthAccounts(List<AuthAccountDto> deleteAuthAccountDtos, List<AuthAccountDto> restAuthAccountDtos) {
+		AuthLogic.getInstance().deleteAuthAccounts(deleteAuthAccountDtos);
+		saveAuthAccountsOrderImpl(restAuthAccountDtos);
 		ConfigLogic.getInstance().reloadAuthAccountDtos();
+	}
+	public void saveAuthAccountsOrder(List<AuthAccountDto> authAccountDtos) {
+		saveAuthAccountsOrderImpl(authAccountDtos);
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
+	}
+	private void saveAuthAccountsOrderImpl(List<AuthAccountDto> authAccountDtos) {
+		OrderLogic.getInstance().saveOrder(authAccountDtos, OrderType.AUTH_ACCOUNT);
 	}
 
 	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<AuthAccountDto> callback) {
@@ -407,17 +422,31 @@ public class Controller {
 		ConfigLogic.getInstance().reloadAuthAccountDtos();
 	}
 
+	public void saveNewAuthApplyConfig(AuthApplyConfigDto authApplyConfigDto, boolean keepOldSessionId, List<AuthApplyConfigDto> allAuthApplyConfigDtos) {
+		AuthLogic.getInstance().saveAuthApplyConfig(authApplyConfigDto);
+		saveAuthApplyConfigsOrderImpl(allAuthApplyConfigDtos);
+		if(!keepOldSessionId) {
+			clearAuthAccountsSession();
+		}
+	}
 	public void saveAuthApplyConfig(AuthApplyConfigDto authApplyConfigDto, boolean keepOldSessionId) {
 		AuthLogic.getInstance().saveAuthApplyConfig(authApplyConfigDto);
 		if(!keepOldSessionId) {
 			clearAuthAccountsSession();
 		}
 	}
-	public void deleteAuthApplyConfigs(List<AuthApplyConfigDto> authApplyConfigDtos, boolean keepOldSessionId) {
+	public void deleteAuthApplyConfigs(List<AuthApplyConfigDto> authApplyConfigDtos, boolean keepOldSessionId, List<AuthApplyConfigDto> restAuthApplyConfigDtos) {
 		AuthLogic.getInstance().deleteAuthApplyConfigs(authApplyConfigDtos);
+		saveAuthApplyConfigsOrderImpl(restAuthApplyConfigDtos);
 		if(!keepOldSessionId) {
 			clearAuthAccountsSession();
 		}
+	}
+	public void saveAuthApplyConfigsOrder(List<AuthApplyConfigDto> authApplyConfigDtos) {
+		saveAuthApplyConfigsOrderImpl(authApplyConfigDtos);
+	}
+	private void saveAuthApplyConfigsOrderImpl(List<AuthApplyConfigDto> authApplyConfigDtos) {
+		OrderLogic.getInstance().saveOrder(authApplyConfigDtos, OrderType.AUTH_APPLY_CONFIG);
 	}
 
 	public MessageChainDto getMessageChainByBaseMessageId(Integer messageId) {

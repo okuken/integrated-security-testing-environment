@@ -21,6 +21,7 @@ import okuken.iste.entity.auto.AuthAccount;
 import okuken.iste.entity.auto.AuthApplyConfig;
 import okuken.iste.entity.auto.AuthConfig;
 import okuken.iste.enums.EncodeType;
+import okuken.iste.enums.OrderType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SourceType;
 import okuken.iste.util.DbUtil;
@@ -96,7 +97,7 @@ public class AuthLogic {
 						.orderBy(AuthAccountDynamicSqlSupport.id));
 			});
 
-		return entitys.stream().map(entity -> {
+		var authAccountDtos = entitys.stream().map(entity -> {
 			AuthAccountDto dto = new AuthAccountDto();
 			dto.setId(entity.getId());
 			ReflectionUtil.setNumberedFields(dto, AuthAccountDto.FIELD_SETTER_FORMAT, AuthAccountDto.FIELD_START_NUM, AuthAccountDto.FIELD_END_NUM, String.class, entity, AuthAccountDto.FIELD_GETTER_FORMAT);
@@ -104,6 +105,8 @@ public class AuthLogic {
 			dto.setSessionIds(ReflectionUtil.getNumberedFieldsAsList(entity, AuthAccountDto.SESSIONID_GETTER_FORMAT, AuthAccountDto.SESSIONID_START_NUM, AuthAccountDto.SESSIONID_END_NUM));
 			return dto;
 		}).collect(Collectors.toList());
+
+		return OrderLogic.getInstance().sortByOrder(authAccountDtos, OrderType.AUTH_ACCOUNT);
 	}
 
 	public void deleteAuthAccounts(List<AuthAccountDto> dtos) {
@@ -167,8 +170,7 @@ public class AuthLogic {
 			dto.setId(entity.getId());
 			dto.setAuthMessageChainId(entity.getFkMessageChainId());
 
-			dto.setAuthApplyConfigDtos(
-				authApplyConfigMapper.select(c -> c
+			var authApplyConfigDtos = authApplyConfigMapper.select(c -> c
 					.where(AuthApplyConfigDynamicSqlSupport.fkAuthConfigId, isEqualTo(dto.getId()))
 					.orderBy(AuthApplyConfigDynamicSqlSupport.id))
 					.stream().map(applyEntity -> {
@@ -181,7 +183,8 @@ public class AuthLogic {
 						applyDto.setSourceName(applyEntity.getSourceName());
 						applyDto.setEncode(EncodeType.getById(Integer.parseInt(Optional.ofNullable(applyEntity.getEncode()).orElse("0"))));
 						return applyDto;
-					}).collect(Collectors.toList()));
+					}).collect(Collectors.toList());
+			dto.setAuthApplyConfigDtos(OrderLogic.getInstance().sortByOrder(authApplyConfigDtos, OrderType.AUTH_APPLY_CONFIG));
 
 			return dto;
 		});

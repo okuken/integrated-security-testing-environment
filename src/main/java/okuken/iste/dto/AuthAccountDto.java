@@ -7,10 +7,11 @@ import java.util.Optional;
 import com.google.common.base.Predicates;
 
 import okuken.iste.consts.Sizes;
+import okuken.iste.interfaces.Orderable;
 import okuken.iste.util.ReflectionUtil;
 import okuken.iste.util.UiUtil;
 
-public class AuthAccountDto {
+public class AuthAccountDto implements Orderable {
 
 	public static final String FIELD_GETTER_FORMAT = "getField%02d";
 	public static final String FIELD_SETTER_FORMAT = "setField%02d";

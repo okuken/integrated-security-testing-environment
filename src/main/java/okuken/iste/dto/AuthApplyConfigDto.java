@@ -5,8 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SourceType;
+import okuken.iste.interfaces.Orderable;
 
-public class AuthApplyConfigDto {
+public class AuthApplyConfigDto implements Orderable {
 
 	private Integer id;
 	private Integer authConfigId;

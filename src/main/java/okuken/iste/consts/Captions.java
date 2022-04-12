@@ -18,7 +18,13 @@ public class Captions {
 	public static final String ADD = "\u2795"; //+
 	public static final String DELETE = "\u2716"; //x
 	public static final String TABLE_CONTROL_BUTTON_ADD = "+";
+	public static final String TABLE_CONTROL_BUTTON_ADD_TT = "Add row";
 	public static final String TABLE_CONTROL_BUTTON_DELETE = "-";
+	public static final String TABLE_CONTROL_BUTTON_DELETE_TT = "Delete selected rows";
+	public static final String TABLE_CONTROL_BUTTON_UP = "↑";
+	public static final String TABLE_CONTROL_BUTTON_UP_TT = "Up selected rows";
+	public static final String TABLE_CONTROL_BUTTON_DOWN = "↓";
+	public static final String TABLE_CONTROL_BUTTON_DOWN_TT = "Down selected rows";
 
 	public static final String SAVE = "Save";
 	public static final String COPY = "Copy";
