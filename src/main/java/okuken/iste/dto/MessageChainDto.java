@@ -44,7 +44,7 @@ public class MessageChainDto {
 	}
 
 	public boolean isEditedByUser() {
-		return !presetVars.isEmpty() || nodes.size() > 1 || nodes.get(0).hasSettings();
+		return !presetVars.isEmpty() || !nodes.isEmpty();
 	}
 
 }

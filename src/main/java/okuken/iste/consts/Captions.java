@@ -83,6 +83,7 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_MST = "Send to Comparer (response) with Master";
 	public static final String TABLE_CONTEXT_MENU_OPEN_CHAIN = "Open chain";
 	public static final String TABLE_CONTEXT_MENU_CREATE_CHAIN = "Create chain";
+	public static final String TABLE_CONTEXT_MENU_CREATE_AUTH_CHAIN = "Create auth chain";
 	public static final String TABLE_CONTEXT_MENU_EDIT_CELL = "Edit cell";
 	public static final String TABLE_CONTEXT_MENU_DELETE_ITEM = "Delete item";
 	public static final String TABLE_CONTEXT_MENU_COPY_NAME = "Copy name";
@@ -253,6 +254,7 @@ public class Captions {
 	public static final String MESSAGE_SELECT_SEND_TO_HISTORY_TARGET = "To which history do you want to add the selected item?";
 	public static final String MESSAGE_SELECT_CREATE_CHAIN_TARGET = "To which message create a request chain?";
 	public static final String MESSAGE_SELECT_CREATE_CHAIN_TARGET_EXIST = "Selected message has chain. Override it?";
+	public static final String MESSAGE_AUTH_CHAIN_EXIST = "Auth chain already exists. Override it?";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE = "Select transfer target cookies";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE_EMPTY = "No Cookies.";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";

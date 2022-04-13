@@ -193,7 +193,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		createChainMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				var selectedMessages = Controller.getInstance().getSelectedMessages();
-				var targetMessage = MessageSelectorForCreateChain.showDialog(selectedMessages);
+				var targetMessage = selectedMessages.size() == 1 ? selectedMessages.get(0) : MessageSelectorForCreateChain.showDialog(selectedMessages);
 				if(targetMessage == null) {
 					return;
 				}
@@ -210,6 +210,24 @@ public class MessageTablePopupMenu extends JPopupMenu {
 			}
 		});
 		add(createChainMenuItem);
+
+		JMenuItem createAuthChainMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_CREATE_AUTH_CHAIN);
+		createAuthChainMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var selectedMessages = Controller.getInstance().getSelectedMessages();
+
+				var chain = ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto();
+				if(chain.isEditedByUser()) {
+					if(!UiUtil.getConfirmAnswer(Captions.MESSAGE_AUTH_CHAIN_EXIST, table)) {
+						return;
+					}
+				}
+
+				var chainDefPanel = new ChainDefPanel(null, chain.getId(), selectedMessages, true);
+				chainDefPanel.setPopupFrame(UiUtil.popup(Captions.AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN, chainDefPanel, table, we -> {chainDefPanel.cancel();}));
+			}
+		});
+		add(createAuthChainMenuItem);
 
 		add(new JPopupMenu.Separator());
 

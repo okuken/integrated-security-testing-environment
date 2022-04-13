@@ -291,7 +291,9 @@ public class ChainDefPanel extends JPanel {
 			elementMessageDtos.forEach(elementMessageDto -> {
 				var nodeDto = new MessageChainNodeDto();
 				nodeDto.setMessageDto(elementMessageDto);
-				nodeDto.setMain(elementMessageDto.getId().equals(messageDto.getId()));
+				if(messageDto != null) {
+					nodeDto.setMain(elementMessageDto.getId().equals(messageDto.getId()));
+				}
 				addNodeTail(nodeDto);
 			});
 			return;
