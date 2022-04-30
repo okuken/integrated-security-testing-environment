@@ -275,6 +275,9 @@ public class UiUtil {
 	}
 
 	public static boolean judgeIsForceRefresh(ActionEvent e) {
+		return judgeIsShiftDown(e);
+	}
+	public static boolean judgeIsShiftDown(ActionEvent e) {
 		return (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
 	}
 

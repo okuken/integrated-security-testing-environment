@@ -43,7 +43,7 @@ public abstract class SimpleTableRegexPanel<T> extends SimpleTablePanel<T> {
 
 	@Override
 	protected void afterAddRow(T dto) {
-		refreshRegexResult(dto, getRows().size() - 1);
+		refreshRegexResult(dto, dtos.indexOf(dto));
 	}
 
 	@Override

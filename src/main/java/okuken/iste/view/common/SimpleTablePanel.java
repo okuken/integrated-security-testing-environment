@@ -153,7 +153,7 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		addRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_ADD_TT);
 		addRowButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addRow();
+				addRow(UiUtil.judgeIsShiftDown(e));
 			}
 		});
 		headerRightPanel.add(addRowButton);
@@ -177,15 +177,27 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 				.collect(Collectors.toList());
 	}
 
-	private void addRow() {
+	private void addRow(boolean insert) {
 		if(dtos.size() >= getMaxRowSize()) {
 			return; //TODO: show error message
 		}
-		addRow(createRowDto());
+
+		var insertIndex = dtos.size();
+		if(insert) {
+			var selectedIndexes = getSelectedRowIndexs();
+			if(!selectedIndexes.isEmpty()) {
+				insertIndex = selectedIndexes.get(0);
+			}
+		}
+
+		addRow(createRowDto(), insertIndex);
 	}
 	public void addRow(T dto) {
-		dtos.add(dto);
-		tableModel.addRow(convertDtoToObjectArray(dto));
+		addRow(dto, dtos.size());
+	}
+	public void addRow(T dto, int index) {
+		dtos.add(index, dto);
+		tableModel.insertRow(index, convertDtoToObjectArray(dto));
 		afterAddRow(dto);
 	}
 	private Object[] convertDtoToObjectArray(T dto) {
