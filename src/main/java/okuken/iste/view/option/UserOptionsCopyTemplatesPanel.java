@@ -131,6 +131,31 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 		UiUtil.repaint(mainPanel);
 	}
 
+	void upTemplatePanel(UserOptionsCopyTemplatePanel templatePanel) {
+		var currentIndex = templatePanels.indexOf(templatePanel);
+		changeOrder(currentIndex - 1, currentIndex);
+	}
+
+	void downTemplatePanel(UserOptionsCopyTemplatePanel templatePanel) {
+		var currentIndex = templatePanels.indexOf(templatePanel);
+		changeOrder(currentIndex, currentIndex + 1);
+	}
+
+	private void changeOrder(int index1, int index2) {
+		if(index1 < 0 || index2 >= templatePanels.size()) {
+			return;
+		}
+
+		var target = templatePanels.get(index2);
+		mainPanel.remove(target);
+		templatePanels.remove(target);
+
+		mainPanel.add(target, index1);
+		templatePanels.add(index1, target);
+
+		UiUtil.repaint(mainPanel);
+	}
+
 	private void load() {
 		var loadedCopyTemplates = ConfigLogic.getInstance().getUserOptions().getCopyTemplates();
 		if(loadedCopyTemplates == null) {

@@ -17,6 +17,8 @@ public class Captions {
 
 	public static final String ADD = "\u2795"; //+
 	public static final String DELETE = "\u2716"; //x
+	public static final String UP = "↑";
+	public static final String DOWN = "↓";
 	public static final String TABLE_CONTROL_BUTTON_ADD = "+";
 	public static final String TABLE_CONTROL_BUTTON_ADD_TT = "Add row {Shift: insert}";
 	public static final String TABLE_CONTROL_BUTTON_DELETE = "-";

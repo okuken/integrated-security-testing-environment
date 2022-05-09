@@ -17,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.util.stream.IntStream;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
+import java.awt.GridLayout;
 
 public class UserOptionsCopyTemplatePanel extends JPanel {
 
@@ -25,6 +26,8 @@ public class UserOptionsCopyTemplatePanel extends JPanel {
 	private JTextField nameTextField;
 	private JComboBox<String> mnemonicComboBox;
 	private JTextArea templateTextArea;
+	private JButton upButton;
+	private JButton downButton;
 
 	public UserOptionsCopyTemplatePanel(UserOptionsCopyTemplatesPanel parentPanel, String name, String template, String mnemonic) {
 		var that = this;
@@ -63,6 +66,26 @@ public class UserOptionsCopyTemplatePanel extends JPanel {
 		
 		JScrollPane templateScrollPane = new JScrollPane(templateTextArea);
 		add(templateScrollPane);
+		
+		JPanel sortPanel = new JPanel();
+		add(sortPanel);
+		sortPanel.setLayout(new GridLayout(2, 1, 0, 0));
+		
+		upButton = new JButton(Captions.UP);
+		upButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				parentPanel.upTemplatePanel(that);
+			}
+		});
+		sortPanel.add(upButton);
+		
+		downButton = new JButton(Captions.DOWN);
+		downButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				parentPanel.downTemplatePanel(that);
+			}
+		});
+		sortPanel.add(downButton);
 		
 	}
 
