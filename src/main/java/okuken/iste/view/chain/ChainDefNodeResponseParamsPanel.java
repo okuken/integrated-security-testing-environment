@@ -57,7 +57,7 @@ public class ChainDefNodeResponseParamsPanel extends SimpleTableRegexPanel<Messa
 	@Override
 	protected MessageChainNodeRespDto createRowDto() {
 		var dto = new MessageChainNodeRespDto();
-		dto.setParamType(ResponseParameterType.COOKIE);
+		dto.setParamType(ResponseParameterType.REGEX);
 		return dto;
 	}
 

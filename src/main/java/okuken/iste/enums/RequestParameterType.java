@@ -8,8 +8,8 @@ import com.google.common.collect.Maps;
 import burp.IParameter;
 
 public enum RequestParameterType {
-	URL				((byte) 0, true,  IParameter.PARAM_URL,            "URL"),
-	BODY			((byte) 1, true,  IParameter.PARAM_BODY,           "Body"),
+	URL				((byte) 0, true,  IParameter.PARAM_URL,            "URL param"),
+	BODY			((byte) 1, true,  IParameter.PARAM_BODY,           "Body param"),
 	MULTIPART_ATTR	((byte) 5, false, IParameter.PARAM_MULTIPART_ATTR, "Body(Multipart(Attr))"),
 	JSON			((byte) 6, false, IParameter.PARAM_JSON,           "Body(JSON)"),
 	XML				((byte) 3, false, IParameter.PARAM_XML,            "Body(XML)"),

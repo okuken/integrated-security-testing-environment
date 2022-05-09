@@ -28,8 +28,8 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTableRegexPanel<Messag
 		new ColumnDef(PARAM_TYPE,  "Type",            75, true, "getParamType",  "setParamType",  RequestParameterType.class, DTO_CLASS),
 		new ColumnDef(PARAM_NAME,  "Name / Regex",   200, true, "getParamName",  "setParamName",  String.class, DTO_CLASS),
 		new ColumnDef(SOURCE_TYPE, "Source type",     75, true, "getSourceType", "setSourceType", SourceType.class, DTO_CLASS),
-		new ColumnDef(SOURCE_NAME, "Source name",     75, true, "getSourceName", "setSourceName", String.class, DTO_CLASS),
-		new ColumnDef(ENCODE,      "Encode",          75, true, "getEncode",     "setEncode",     EncodeType.class, DTO_CLASS),
+		new ColumnDef(SOURCE_NAME, "Source name",    105, true, "getSourceName", "setSourceName", String.class, DTO_CLASS),
+		new ColumnDef(ENCODE,      "Encode",          45, true, "getEncode",     "setEncode",     EncodeType.class, DTO_CLASS),
 		new ColumnDef(REGEX_RESULT,"(Regex result)", 100));
 
 	private static final List<Integer> REGEX_LISTENER_COLUMNS = Lists.newArrayList(PARAM_TYPE, PARAM_NAME);
@@ -61,10 +61,20 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTableRegexPanel<Messag
 	@Override
 	protected MessageChainNodeReqpDto createRowDto() {
 		var dto = new MessageChainNodeReqpDto();
-		dto.setParamType(RequestParameterType.COOKIE);
+		dto.setParamType(getInitialParamType());
 		dto.setSourceType(SourceType.VAR);
 		dto.setEncode(EncodeType.NONE);
 		return dto;
+	}
+	private RequestParameterType getInitialParamType() {
+		var parameters = parentChainDefNodePanel.getSelectedMessageDto().getRequestInfo().getParameters();
+		if(parameters.stream().anyMatch(p -> p.getType() == RequestParameterType.URL.getBurpId())) {
+			return RequestParameterType.URL;
+		}
+		if(parameters.stream().anyMatch(p -> p.getType() == RequestParameterType.BODY.getBurpId())) {
+			return RequestParameterType.BODY;
+		}
+		return RequestParameterType.REGEX;
 	}
 
 

@@ -1,6 +1,7 @@
 package okuken.iste.view.common;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -48,6 +49,12 @@ public abstract class SimpleTableRegexPanel<T> extends SimpleTablePanel<T> {
 
 	@Override
 	protected void afterRemoveRow(T dto) {
+	}
+
+	public void refreshAllRegexResult() {
+		IntStream.range(0, dtos.size()).forEach(i -> {
+			refreshRegexResult(dtos.get(i), i);
+		});
 	}
 
 	private void refreshRegexResult(T dto, int row) {

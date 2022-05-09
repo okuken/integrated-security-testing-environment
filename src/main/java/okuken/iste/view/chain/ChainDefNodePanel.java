@@ -178,7 +178,7 @@ public class ChainDefNodePanel extends JPanel {
 		copyOrgButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_ORG_TT);
 		copyOrgButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				messageEditorPanel.setMessage(getSelectedMessageDto(), true);
+				setMessage(getSelectedMessageDto(), true);
 			}
 		});
 		messageControlPanel.add(copyOrgButton);
@@ -187,7 +187,7 @@ public class ChainDefNodePanel extends JPanel {
 		copyMasterButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_MASTER_TT);
 		copyMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				messageEditorPanel.setMessage(getSelectedMessageDto().getMasterMessage(), true);
+				setMessage(getSelectedMessageDto().getMasterMessage());
 			}
 		});
 		messageControlPanel.add(copyMasterButton);
@@ -296,7 +296,7 @@ public class ChainDefNodePanel extends JPanel {
 	private void refreshMessageEditorPanel() {
 		var messageDto = getSelectedMessageDto();
 		messageNameLabel.setText(messageDto.toString());
-		messageEditorPanel.setMessage(messageDto);
+		setMessage(messageDto, false);
 	}
 
 	public void changeMessageEditorsLayout(MessageEditorsLayoutType type) {
@@ -335,7 +335,7 @@ public class ChainDefNodePanel extends JPanel {
 		return nodeDto;
 	}
 
-	private MessageDto getSelectedMessageDto() {
+	public MessageDto getSelectedMessageDto() {
 		return urlComboBox.getItemAt(urlComboBox.getSelectedIndex());
 	}
 
@@ -349,6 +349,19 @@ public class ChainDefNodePanel extends JPanel {
 
 	public void setMessage(IHttpRequestResponse message) {
 		messageEditorPanel.setMessage(message, true);
+		requestParamsPanel.refreshAllRegexResult();
+		responseParamsPanel.refreshAllRegexResult();
+	}
+
+	private void setMessage(MessageDto messageDto, boolean keepCaretPosition) {
+		messageEditorPanel.setMessage(messageDto, keepCaretPosition);
+		requestParamsPanel.refreshAllRegexResult();
+		responseParamsPanel.refreshAllRegexResult();
+	}
+
+	private void setResponse(byte[] response) {
+		messageEditorPanel.setResponse(response);
+		responseParamsPanel.refreshAllRegexResult();
 	}
 
 	void addReqp(MessageChainNodeReqpDto reqpDto) {
@@ -412,13 +425,13 @@ public class ChainDefNodePanel extends JPanel {
 		var orgMessageDto = getSelectedMessageDto();
 		var repeatDto = Controller.getInstance().sendRepeaterRequest(messageEditorPanel.getRequest(), authAccountDto, orgMessageDto, repeatedDto -> {
 			SwingUtilities.invokeLater(() -> {
-				messageEditorPanel.setResponse(repeatedDto.getMessage().getResponse());
+				setResponse(repeatedDto.getMessage().getResponse());
 				if(isMainNode) {
 					Controller.getInstance().refreshRepeatTablePanel(orgMessageDto.getId());
 				}
 			});
 		}, isMainNode);
-		messageEditorPanel.setMessage(repeatDto.getMessage(), true);
+		setMessage(repeatDto.getMessage());
 	}
 
 
