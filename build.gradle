@@ -4,7 +4,7 @@ plugins {
     id 'java-library'
     id 'io.freefair.aspectj.post-compile-weaving' version '5.1.0'
     id 'com.github.johnrengelman.shadow' version '6.0.0'
-    id "de.undercouch.download" version "4.1.2"
+    id 'de.undercouch.download' version '4.1.2'
 }
 
 version '0.4.2'
@@ -30,10 +30,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'net.portswigger.burp.extender:burp-extender-api:2.1'
-    testRuntimeOnly files(System.getProperty("user.home") + '\\AppData\\Local\\Programs\\BurpSuitePro\\burpsuite_pro.jar') // set your local path to burpsuite jar
+    compileOnly 'net.portswigger.burp.extender:burp-extender-api:2.3'
+//    testRuntimeOnly files(System.getProperty("user.home") + '\\AppData\\Local\\Programs\\BurpSuitePro\\burpsuite_pro.jar') // set your local path to burpsuite jar
+    testRuntimeOnly files(System.getProperty("user.home") + '\\AppData\\Local\\Programs\\BurpSuiteCommunity\\burpsuite_community.jar')
 
-    implementation files('../iste-plugin-api/build/libs/iste-plugin-api-0.1.0.jar') // https://github.com/okuken/iste-plugin-api
+    implementation files('../iste-plugin-api/build/libs/iste-plugin-api-0.1.1.jar') // https://github.com/okuken/iste-plugin-api
 
     implementation 'org.mybatis:mybatis:3.5.5'
     implementation 'org.mybatis.dynamic-sql:mybatis-dynamic-sql:1.1.4'
@@ -122,7 +123,14 @@ task generateDao {
     }
 }
 
+task generateInfo {
+    def infoFile = new File(projectDir, "src/main/resources/iste.properties")
 
-task buildISTE(dependsOn: [clean, createDir, makeCleanDb, generateDao, shadowJar])
+    doLast {
+        infoFile.write "version=v${version}"
+    }
+}
+
+task buildISTE(dependsOn: [clean, createDir, makeCleanDb, generateDao, generateInfo, shadowJar])
 
 defaultTasks 'buildISTE'

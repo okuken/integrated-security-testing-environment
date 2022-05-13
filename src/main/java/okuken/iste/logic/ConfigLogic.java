@@ -103,6 +103,9 @@ public class ConfigLogic {
 	public void saveUseKeyboardShortcutWithClick(boolean useKeyboardShortcutWithClick) {
 		saveUserOption("useKeyboardShortcutWithClick", useKeyboardShortcutWithClick);
 	}
+	public void saveUseAutoCheckUpdate(boolean useAutoCheckUpdate) {
+		saveUserOption("useAutoCheckUpdate", useAutoCheckUpdate);
+	}
 
 	private void saveUserOption(String fieldName, String value) {
 		saveUserOption(fieldName, value, value);

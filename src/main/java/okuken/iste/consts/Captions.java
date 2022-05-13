@@ -44,6 +44,7 @@ public class Captions {
 	public static final String TAB_TOOLS = "Tools";
 	public static final String TAB_OPTIONS = "Options";
 	public static final String TAB_PLUGINS = "Plugins";
+	public static final String TAB_ABOUT = "About";
 
 	public static final String TAB_MAIN_MESSAGE_EDITOR_ORIGINAL = "Org";
 	public static final String TAB_MAIN_MESSAGE_EDITOR_REPEAT_MASTER = "Master";
@@ -240,6 +241,10 @@ public class Captions {
 	public static final String PLUGINS_BUTTON_ADD_PLUGIN = "Add";
 	public static final String PLUGINS_LOAD_FROM_CLASSPATH = "CLASSPATH";
 
+	public static final String ABOUT_BUTTON_CHECK_UPDATE = "Check for updates";
+	public static final String ABOUT_CHECKBOX_AUTO_CHECK = "Auto check";
+	public static final String ABOUT_CHECKBOX_AUTO_CHECK_TT = "Automatically check for updates on load ISTE";
+
 	public static final String SELECT_PROJECT_NEW = "** Create new project **";
 	public static final String CHANGE_DATABASE = "Change DB";
 
@@ -249,6 +254,8 @@ public class Captions {
 	public static final String MESSAGE_DONE = "Done.";
 
 	public static final String MESSAGE_REGEX_ERROR = "**ERROR**";
+	public static final String MESSAGE_VERSION_LATEST = "ISTE is up to date.";
+	public static final String MESSAGE_VERSION_NOT_LATEST = "%s has been released. Please download and try it!";
 
 	public static final String MESSAGE_CHOOSE_DB_FILE = "Choose SQLite database file for ISTE";
 	public static final String MESSAGE_MIGRATION = "Are you sure you want to perform database migration now?";

@@ -17,6 +17,7 @@ import okuken.iste.consts.Captions;
 import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
 import okuken.iste.util.UiUtil;
+import okuken.iste.view.about.AboutPanel;
 import okuken.iste.view.auth.AuthPanel;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
@@ -141,6 +142,9 @@ public class SuitePanel extends JPanel {
 		PluginsPanel pluginsPanel = new PluginsPanel();
 		mainTabbedPane.addTab(Captions.TAB_PLUGINS, null, pluginsPanel, null);
 		Controller.getInstance().setPluginsPanel(pluginsPanel);
+		
+		JPanel aboutPanel = new AboutPanel();
+		mainTabbedPane.addTab(Captions.TAB_ABOUT, null, aboutPanel, null);
 		
 		mainTabbedPane.addTab(Captions.DOCKOUT, null);
 		mainTabbedPane.setToolTipTextAt(getDockoutTabIndex(), Captions.DOCKOUT_TT);

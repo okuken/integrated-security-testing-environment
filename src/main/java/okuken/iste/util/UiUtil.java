@@ -2,6 +2,7 @@ package okuken.iste.util;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.StringSelection;
@@ -16,6 +17,7 @@ import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +35,7 @@ import java.util.stream.IntStream;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -44,8 +47,11 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.JTextComponent;
@@ -131,6 +137,11 @@ public class UiUtil {
 		scrollPane.getViewport().setViewPosition(component.getLocation());
 	}
 
+	public static void highlightTab(Component tabComponent) {
+		JTabbedPane parentTabbedPane = (JTabbedPane)tabComponent.getParent();
+		parentTabbedPane.setForegroundAt(parentTabbedPane.indexOfComponent(tabComponent), Colors.CHARACTER_HIGHLIGHT);
+	}
+
 	public static final JLabel createTemporaryMessageArea() {
 		var ret = new JLabel(Captions.MESSAGE_EMPTY);
 		ret.setForeground(Colors.CHARACTER_HIGHLIGHT);
@@ -157,6 +168,28 @@ public class UiUtil {
 	private static final JLabel createSpacer(int size) {
 		var spaceStr = IntStream.range(0, size).mapToObj(i -> "  ").collect(Collectors.joining());
 		return new JLabel(spaceStr);
+	}
+
+	public static final JEditorPane createLinkLabel(String url) {
+		return createLinkLabel(url, url);
+	}
+	public static final JEditorPane createLinkLabel(String caption, String url) {
+		JEditorPane ret = new JEditorPane("text/html", String.format("<a href=\"%s\">%s</a>", url, caption));
+		ret.setEditable(false);
+		ret.setBorder(new EmptyBorder(0, 0, 0, 0));
+		ret.addHyperlinkListener(new HyperlinkListener() {
+			public void hyperlinkUpdate(HyperlinkEvent e) {
+				if(!HyperlinkEvent.EventType.ACTIVATED.equals(e.getEventType())) {
+					return;
+				}
+				try {
+					Desktop.getDesktop().browse(URI.create(url));
+				} catch (Exception ex) {
+					BurpUtil.printStderr(ex);
+				}
+			}
+		});
+		return ret;
 	}
 
 	/**
