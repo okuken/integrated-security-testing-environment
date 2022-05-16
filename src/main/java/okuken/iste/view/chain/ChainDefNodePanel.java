@@ -372,6 +372,11 @@ public class ChainDefNodePanel extends JPanel {
 		responseParamsPanel.addRow(respDto);
 	}
 
+	void stopEditing() {
+		requestParamsPanel.stopEditing();
+		responseParamsPanel.stopEditing();
+	}
+
 	public void focusMessageEditor() {
 		messageEditorPanel.focusRequest();
 	}

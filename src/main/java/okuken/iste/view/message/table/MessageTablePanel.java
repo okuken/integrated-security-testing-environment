@@ -72,6 +72,7 @@ public class MessageTablePanel extends JPanel {
 			}
 		};
 		table.setComponentPopupMenu(new MessageTablePopupMenu(this, table));
+		UiUtil.setupStopEditingOnFocusLost(table);
 		setupTable();
 		Controller.getInstance().setMessageTable(table);	
 
@@ -157,6 +158,7 @@ public class MessageTablePanel extends JPanel {
 	}
 
 	public int applyFilter(MessageFilterDto messageFilterDto) {
+		UiUtil.stopEditing(table);
 		if(messageFilterDto.getProgresses() == null) {
 			return table.getRowCount();
 		}

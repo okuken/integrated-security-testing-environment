@@ -508,6 +508,7 @@ public class ChainDefPanel extends JPanel {
 	}
 
 	private MessageChainDto makeChainDto() {
+		stopEditing();
 		var chainDto = new MessageChainDto();
 
 		chainDto.setId(messageChainId);
@@ -665,6 +666,11 @@ public class ChainDefPanel extends JPanel {
 			isAuthChain = ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId().equals(messageChainId);
 		}
 		return isAuthChain;
+	}
+
+	private void stopEditing() {
+		presetVarsPanel.stopEditing();
+		getChainDefNodePanels().forEach(ChainDefNodePanel::stopEditing);
 	}
 
 	private void save() {

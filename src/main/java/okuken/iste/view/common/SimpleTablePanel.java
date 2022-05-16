@@ -93,6 +93,7 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		tablePanel.add(table.getTableHeader(), BorderLayout.NORTH);
 		tablePanel.add(table);
 		
+		UiUtil.setupStopEditingOnFocusLost(table);
 		UiUtil.setupCtrlCAsCopyCell(table);
 		SwingUtilities.invokeLater(() -> {
 			table.setBorder(new LineBorder(Colors.TABLE_BORDER));
@@ -306,6 +307,10 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 
 	public void setValueAt(Object value, int row, int col) {
 		tableModel.setValueAt(value, row, col);
+	}
+
+	public void stopEditing() {
+		UiUtil.stopEditing(table);
 	}
 
 	public List<T> getRows() {

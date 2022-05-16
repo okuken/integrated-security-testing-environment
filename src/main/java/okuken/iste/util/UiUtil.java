@@ -8,6 +8,8 @@ import java.awt.Window;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -230,6 +233,20 @@ public class UiUtil {
 				copyToClipboard(val != null ? val.toString() : "");
 			}
 		});
+	}
+
+	public static void setupStopEditingOnFocusLost(JTable table) {
+		((DefaultCellEditor)table.getDefaultEditor(Object.class)).getComponent().addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				stopEditing(table);
+			}
+		});
+	}
+	public static void stopEditing(JTable table) {
+		if(table.isEditing()) {
+			table.getCellEditor().stopCellEditing();
+		}
 	}
 
 	public static void setupTablePopupMenuItem(JMenuItem menuItem, JTable table, KeyStroke keyStroke, Action action) {
