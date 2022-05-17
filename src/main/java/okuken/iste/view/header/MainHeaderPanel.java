@@ -11,6 +11,7 @@ import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.UiUtil;
 
 import java.awt.FlowLayout;
 
@@ -130,6 +131,11 @@ public class MainHeaderPanel extends JPanel {
 
 	public MessageFilterDto getMessageFilterDto() {
 		return createMessageFilterDto();
+	}
+
+	public void focusOnSearch() {
+		UiUtil.focus(searchTextField);
+		searchTextField.selectAll();
 	}
 
 	private void setRowCount(int rowCount) {

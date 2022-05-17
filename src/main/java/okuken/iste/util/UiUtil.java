@@ -236,6 +236,7 @@ public class UiUtil {
 	}
 
 	public static void setupStopEditingOnFocusLost(JTable table) {
+		table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 		((DefaultCellEditor)table.getDefaultEditor(Object.class)).getComponent().addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -247,6 +248,11 @@ public class UiUtil {
 		if(table.isEditing()) {
 			table.getCellEditor().stopCellEditing();
 		}
+	}
+
+	public static void setupShortcutKey(JComponent component, KeyStroke keyStroke, Action action) {
+		component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(keyStroke, keyStroke);
+		component.getActionMap().put(keyStroke, action);
 	}
 
 	public static void setupTablePopupMenuItem(JMenuItem menuItem, JTable table, KeyStroke keyStroke, Action action) {
