@@ -6,6 +6,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.LineBorder;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -40,9 +41,12 @@ public class AboutPanel extends JPanel {
 
 	public AboutPanel() {
 		FlowLayout flowLayout = (FlowLayout) getLayout();
+		flowLayout.setHgap(Positions.FLOW_GAP);
+		flowLayout.setVgap(Positions.FLOW_GAP);
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		
 		JPanel panel = new JPanel();
+		panel.setBorder(new LineBorder(Colors.BLOCK_BORDER));
 		add(panel);
 		
 		JLabel nameLabel = new JLabel(Captions.EXTENSION_NAME_FULL);
@@ -88,7 +92,7 @@ public class AboutPanel extends JPanel {
 							.addComponent(useAutoCheckUpdateCheckBox, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addComponent(checkUpdateResultMessageLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(checkUpdateResultMessageUrlLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap())
+					.addContainerGap(Positions.CONTAINER_GAP, Positions.CONTAINER_GAP))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -106,7 +110,7 @@ public class AboutPanel extends JPanel {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(checkUpdateResultMessageLabel)
 					.addComponent(checkUpdateResultMessageUrlLabel)
-					.addContainerGap())
+					.addContainerGap(Positions.CONTAINER_GAP, Positions.CONTAINER_GAP))
 		);
 		panel.setLayout(gl_panel);
 		

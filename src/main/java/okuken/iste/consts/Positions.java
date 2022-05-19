@@ -10,6 +10,7 @@ public class Positions {
 	public static final double DIVIDER_LOCATION_MAIN_RIGHT = 0.5;
 
 
-	public static final int CONTAINER_GAP = 30;
+	public static final int FLOW_GAP = 30;
+	public static final int CONTAINER_GAP = 15;
 
 }

@@ -27,6 +27,7 @@ import okuken.iste.enums.SourceType;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
+import okuken.iste.view.AbstractAction;
 import okuken.iste.view.common.AuthAccountSelectorPanel;
 import okuken.iste.view.common.MultipleSelectorPanel;
 import okuken.iste.view.message.editor.MessageEditorsLayoutType;
@@ -38,7 +39,6 @@ import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -87,6 +87,7 @@ public class ChainDefPanel extends JPanel {
 	public ChainDefPanel(MessageDto messageDto, Integer messageChainId) {
 		this(messageDto, messageChainId, Lists.newArrayList(messageDto), false);
 	}
+	@SuppressWarnings("serial")
 	public ChainDefPanel(MessageDto messageDto, Integer messageChainId, List<MessageDto> elementMessageDtos, boolean clean) {
 		this.messageDto = messageDto;
 		this.messageChainId = messageChainId;
@@ -128,8 +129,8 @@ public class ChainDefPanel extends JPanel {
 		startButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
 		startButton.setMnemonic(KeyEvent.VK_S);
 		operationCenterPanel.add(startButton);
-		startButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		startButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				start(false);
 			}
 		});
@@ -138,8 +139,8 @@ public class ChainDefPanel extends JPanel {
 		stepButton.setToolTipText(Captions.CHAIN_DEF_STEP_TT);
 		stepButton.setMnemonic(KeyEvent.VK_X);
 		operationCenterPanel.add(stepButton);
-		stepButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		stepButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				start(true);
 			}
 		});
@@ -148,8 +149,8 @@ public class ChainDefPanel extends JPanel {
 		terminateButton.setToolTipText(Captions.CHAIN_DEF_TERMINATE_TT);
 		terminateButton.setMnemonic(KeyEvent.VK_T);
 		operationCenterPanel.add(terminateButton);
-		terminateButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		terminateButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				terminate();
 			}
 		});
@@ -185,8 +186,8 @@ public class ChainDefPanel extends JPanel {
 		
 		JButton semiAutoCookieSettingButton = new JButton(Captions.CHAIN_DEF_SEMIAUTO_SETTING_COOKIE);
 		semiAutoCookieSettingButton.setToolTipText(Captions.CHAIN_DEF_SEMIAUTO_SETTING_COOKIE_TT);
-		semiAutoCookieSettingButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		semiAutoCookieSettingButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				semiAutoAddCookieTransferSettings();
 			}
 		});
@@ -205,8 +206,8 @@ public class ChainDefPanel extends JPanel {
 		
 		JButton collapseButton = new JButton(Captions.CHAIN_DEF_SPLIT_COLLAPSE);
 		collapseButton.setToolTipText(Captions.CHAIN_DEF_SPLIT_COLLAPSE_TT);
-		collapseButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		collapseButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				getChainDefNodePanels().stream().forEach(ChainDefNodePanel::collapseSettingPanel);
 			}
 		});
@@ -214,8 +215,8 @@ public class ChainDefPanel extends JPanel {
 		
 		JButton expandButton = new JButton(Captions.CHAIN_DEF_SPLIT_EXPAND);
 		expandButton.setToolTipText(Captions.CHAIN_DEF_SPLIT_EXPAND_TT);
-		expandButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		expandButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				getChainDefNodePanels().stream().forEach(ChainDefNodePanel::expandSettingPanel);
 			}
 		});
@@ -238,8 +239,8 @@ public class ChainDefPanel extends JPanel {
 		JCheckBox autoScrollCheckBox = new JCheckBox(Captions.CHAIN_DEF_AUTO_SCROLL);
 		autoScrollCheckBox.setToolTipText(Captions.CHAIN_DEF_AUTO_SCROLL_TT);
 		autoScrollCheckBox.setSelected(autoScrollWhenBreaking);
-		autoScrollCheckBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		autoScrollCheckBox.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				autoScrollWhenBreaking = autoScrollCheckBox.isSelected();
 			}
 		});
@@ -261,8 +262,8 @@ public class ChainDefPanel extends JPanel {
 		
 		JButton cancelButton = new JButton(Captions.CHAIN_DEF_CANCEL);
 		controlLeftPanel.add(cancelButton);
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		cancelButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				cancel();
 			}
 		});
@@ -275,8 +276,8 @@ public class ChainDefPanel extends JPanel {
 		
 		JButton saveButton = new JButton(Captions.CHAIN_DEF_SAVE);
 		controlRightPanel.add(saveButton);
-		saveButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		saveButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				save();
 				UiUtil.showTemporaryMessage(saveMessageLabel, Captions.MESSAGE_SAVED);
 			}
@@ -329,6 +330,7 @@ public class ChainDefPanel extends JPanel {
 		return loadedMessageChainDto;
 	}
 
+	@SuppressWarnings("serial")
 	private JPanel createAddButtonPanel() {
 		var buttonPanel = new JPanel();
 		((FlowLayout) buttonPanel.getLayout()).setAlignment(FlowLayout.LEFT);
@@ -336,8 +338,8 @@ public class ChainDefPanel extends JPanel {
 		var addButton = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_ADD);
 		addButton.setToolTipText(Captions.CHAIN_DEF_NODE_BUTTON_ADD_TT);
 		buttonPanel.add(addButton);
-		addButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		addButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
 				var nodePanel = addNode(buttonPanel);
 				BurpUtil.getCallbacks().customizeUiComponent(nodePanel);
 				SwingUtilities.invokeLater(() -> {
