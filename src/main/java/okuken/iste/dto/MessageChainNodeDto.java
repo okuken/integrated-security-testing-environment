@@ -4,13 +4,17 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import jakarta.validation.Valid;
+
 public class MessageChainNodeDto {
 
 	private Integer id;
 
 	private MessageDto messageDto;
 
+	@Valid
 	private List<MessageChainNodeReqpDto> reqps = Lists.newArrayList();
+	@Valid
 	private List<MessageChainNodeRespDto> resps = Lists.newArrayList();
 
 	private boolean main;

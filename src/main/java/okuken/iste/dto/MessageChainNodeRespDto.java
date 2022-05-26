@@ -1,13 +1,18 @@
 package okuken.iste.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import okuken.iste.enums.ResponseParameterType;
 
 public class MessageChainNodeRespDto {
 
 	private Integer id;
 
+	@NotNull
 	private ResponseParameterType paramType;
+	@NotEmpty
 	private String paramName;
+	@NotEmpty
 	private String varName;
 
 	public MessageChainNodeRespDto() {}

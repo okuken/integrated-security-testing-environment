@@ -1,5 +1,7 @@
 package okuken.iste.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import okuken.iste.enums.EncodeType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SourceType;
@@ -8,9 +10,13 @@ public class MessageChainNodeReqpDto {
 
 	private Integer id;
 
+	@NotNull
 	private RequestParameterType paramType;
+	@NotEmpty
 	private String paramName;
+	@NotNull
 	private SourceType sourceType;
+	@NotEmpty
 	private String sourceName;
 	private EncodeType encode = EncodeType.NONE;
 

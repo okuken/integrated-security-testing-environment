@@ -1,9 +1,12 @@
 package okuken.iste.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+
 public class MessageChainPresetVarDto {
 
 	private Integer id;
 
+	@NotEmpty
 	private String name;
 	private String value;
 

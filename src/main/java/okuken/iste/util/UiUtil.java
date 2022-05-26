@@ -148,6 +148,9 @@ public class UiUtil {
 	public static final JLabel createTemporaryMessageArea() {
 		var ret = new JLabel(Captions.MESSAGE_EMPTY);
 		ret.setForeground(Colors.CHARACTER_HIGHLIGHT);
+		invokeLater(() -> {
+			setupHtmlEnable(ret);
+		});
 		return ret;
 	}
 	public static final void showTemporaryMessage(JLabel messageArea, String message) {
@@ -160,6 +163,10 @@ public class UiUtil {
 				});
 			}
 		}, 1000);
+	}
+
+	public static void setupHtmlEnable(JLabel label) {
+		label.putClientProperty("html.disable", Boolean.FALSE);
 	}
 
 	public static final JLabel createSpacer() {

@@ -27,6 +27,7 @@ import okuken.iste.enums.SourceType;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
+import okuken.iste.util.ValidationUtil;
 import okuken.iste.view.AbstractAction;
 import okuken.iste.view.common.AuthAccountSelectorPanel;
 import okuken.iste.view.common.MultipleSelectorPanel;
@@ -75,6 +76,9 @@ public class ChainDefPanel extends JPanel {
 
 	private JSpinner timesSpinner;
 	private JLabel timesCountdownLabel;
+
+	private JLabel startMessageLabel;
+	private JLabel saveMessageLabel;
 
 	private boolean autoScrollWhenBreaking = true;
 
@@ -167,6 +171,9 @@ public class ChainDefPanel extends JPanel {
 		timesCountdownLabel = new JLabel("");
 		timesCountdownLabel.setForeground(Colors.CHARACTER_HIGHLIGHT);
 		operationCenterPanel.add(timesCountdownLabel);
+		
+		startMessageLabel = UiUtil.createTemporaryMessageArea();
+		operationPanel.add(startMessageLabel);
 		
 		JPanel configPanel = new JPanel();
 		headerPanel.add(configPanel, BorderLayout.EAST);
@@ -271,7 +278,7 @@ public class ChainDefPanel extends JPanel {
 		JPanel controlRightPanel = new JPanel();
 		controlPanel.add(controlRightPanel, BorderLayout.EAST);
 		
-		JLabel saveMessageLabel = UiUtil.createTemporaryMessageArea();
+		saveMessageLabel = UiUtil.createTemporaryMessageArea();
 		controlRightPanel.add(saveMessageLabel);
 		
 		JButton saveButton = new JButton(Captions.CHAIN_DEF_SAVE);
@@ -279,7 +286,6 @@ public class ChainDefPanel extends JPanel {
 		saveButton.addActionListener(new AbstractAction() {
 			@Override public void actionPerformedSafe(ActionEvent e) {
 				save();
-				UiUtil.showTemporaryMessage(saveMessageLabel, Captions.MESSAGE_SAVED);
 			}
 		});
 		
@@ -526,24 +532,31 @@ public class ChainDefPanel extends JPanel {
 	}
 
 	private void start(boolean isStep) {
+		var chainDto = makeChainDto();
+		var error = ValidationUtil.validate(chainDto);
+		if(error.isPresent()) {
+			startMessageLabel.setText(error.get());
+			return;
+		}
+		startMessageLabel.setText(null);
+
 		startButton.setEnabled(false); //prevent double-click
 		stepButton.setEnabled(false);
 
 		if(breakingMessageChainRepeatDto != null) {
-			resume(isStep);
+			resume(chainDto, isStep);
 		} else {
-			run(isStep);
+			run(chainDto, isStep);
 		}
 		refreshControlsState();
 	}
 
-	private void run(boolean isStep) {
+	private void run(MessageChainDto chainDto, boolean isStep) {
 		var chainDefNodePanels = getChainDefNodePanels();
 		if(chainDefNodePanels.isEmpty()) {
 			return;
 		}
 
-		var chainDto = makeChainDto();
 		var times = getTimes();
 
 		var authAccountDto = authAccountSelectorPanel.getSelectedAuthAccountDto();
@@ -561,9 +574,8 @@ public class ChainDefPanel extends JPanel {
 		runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
 	}
 
-	private void resume(boolean isStep) {
+	private void resume(MessageChainDto chainDto, boolean isStep) {
 		var chainDefNodePanels = getChainDefNodePanels();
-		var chainDto = makeChainDto();
 		var times = Integer.parseInt(timesCountdownLabel.getText());
 
 		runImpl(chainDefNodePanels, chainDto, null, times, isStep);
@@ -677,8 +689,16 @@ public class ChainDefPanel extends JPanel {
 
 	private void save() {
 		var messageChainDto = makeChainDto();
+		var error = ValidationUtil.validate(messageChainDto);
+		if(error.isPresent()) {
+			saveMessageLabel.setText(error.get());
+			return;
+		}
+
 		Controller.getInstance().saveMessageChain(messageChainDto, judgeIsAuthChain());
 		messageChainId = messageChainDto.getId();
+
+		UiUtil.showTemporaryMessage(saveMessageLabel, Captions.MESSAGE_SAVED);
 	}
 
 	public void cancel() {

@@ -46,6 +46,9 @@ dependencies {
 
     implementation "org.aspectj:aspectjrt:1.9.5"
 
+    implementation "org.hibernate.validator:hibernate-validator:7.0.4.Final"
+    implementation "org.glassfish:jakarta.el:4.0.2"
+
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.guava:guava:28.1-jre'
     implementation 'org.apache.velocity:velocity-engine-core:2.3'
