@@ -267,6 +267,7 @@ public class Captions {
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE = "Select transfer target cookies";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE_EMPTY = "No Cookies.";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
+	public static final String MESSAGE_EXIT_WITHOUT_SAVE = "Edits are not saved. Discard them?";
 	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export";
 	public static final String MESSAGE_CHOOSE_IMPORT_FILE = "Import";
 	public static final String MESSAGE_CLEAR_USEROPTIONS = "Are you sure you want to clear all user options?\n"

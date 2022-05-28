@@ -52,6 +52,7 @@ public class ChainDefNodePanel extends JPanel {
 
 	private ChainDefPanel parentChainDefPanel;
 
+	private List<Runnable> editListeners = Lists.newArrayList();
 	private List<Consumer<MessageDto>> messageSelectionChangeListeners = Lists.newArrayList();
 	private List<Consumer<IHttpRequestResponse>> chainResponseListeners = Lists.newArrayList();
 	private List<Consumer<Color>> colorChangeListeners = Lists.newArrayList();
@@ -117,6 +118,7 @@ public class ChainDefNodePanel extends JPanel {
 				if(!refreshingFlag && e.getStateChange() == ItemEvent.SELECTED) {
 					refreshMessageEditorPanel();
 					messageSelectionChangeListeners.forEach(listener -> listener.accept(getSelectedMessageDto()));
+					afterEdit();
 				}
 			}
 		});
@@ -126,11 +128,13 @@ public class ChainDefNodePanel extends JPanel {
 		requestParamsPanel = new ChainDefNodeRequestParamsPanel(this);
 		FlowLayout flowLayout_1 = (FlowLayout) requestParamsPanel.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
+		requestParamsPanel.addEditListener(() -> afterEdit());
 		mainPanel.add(requestParamsPanel);
 		
 		responseParamsPanel = new ChainDefNodeResponseParamsPanel(this);
 		FlowLayout flowLayout_2 = (FlowLayout) responseParamsPanel.getLayout();
 		flowLayout_2.setAlignment(FlowLayout.LEFT);
+		responseParamsPanel.addEditListener(() -> afterEdit());
 		mainPanel.add(responseParamsPanel);
 		
 		JPanel messagePanel = new JPanel(new BorderLayout(0, 0));
@@ -161,6 +165,11 @@ public class ChainDefNodePanel extends JPanel {
 		
 		breakpointCheckBox = new JCheckBox(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT);
 		breakpointCheckBox.setToolTipText(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT_TT);
+		breakpointCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				afterEdit();
+			}
+		});
 		messageControlPanel.add(breakpointCheckBox);
 		
 		skipCheckBox = new JCheckBox(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_SKIP);
@@ -168,6 +177,7 @@ public class ChainDefNodePanel extends JPanel {
 		skipCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				refreshBackgroundColor();
+				afterEdit();
 			}
 		});
 		messageControlPanel.add(skipCheckBox);
@@ -321,15 +331,18 @@ public class ChainDefNodePanel extends JPanel {
 
 	private void upNode() {
 		parentChainDefPanel.upNode(this);
+		afterEdit();
 	}
 
 	private void downNode() {
 		parentChainDefPanel.downNode(this);
+		afterEdit();
 	}
 
 	private void removeNode() {
 		parentChainDefPanel.removeNode(this);
 		nodeRemoveListeners.forEach(Runnable::run);
+		afterEdit();
 	}
 
 	public MessageChainNodeDto makeNodeDto() {
@@ -462,6 +475,14 @@ public class ChainDefNodePanel extends JPanel {
 		return parentChainDefPanel;
 	}
 
+
+	private void afterEdit() {
+		editListeners.forEach(Runnable::run);
+	}
+
+	void addEditListener(Runnable listener) {
+		editListeners.add(listener);
+	}
 
 	void addMessageSelectionChangeListener(Consumer<MessageDto> listener) {
 		messageSelectionChangeListeners.add(listener);

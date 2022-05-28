@@ -82,6 +82,8 @@ public class ChainDefPanel extends JPanel {
 	private JLabel startMessageLabel;
 	private JLabel saveMessageLabel;
 
+	private JButton saveButton;
+
 	private boolean autoScrollWhenBreaking = true;
 
 	private JFrame popupFrame;
@@ -106,6 +108,7 @@ public class ChainDefPanel extends JPanel {
 		headerPanel.setLayout(new BorderLayout(0, 0));
 		
 		presetVarsPanel = new ChainDefPresetVarsPanel(this);
+		presetVarsPanel.addEditListener(() -> afterEdit());
 		headerPanel.add(presetVarsPanel, BorderLayout.WEST);
 		
 		JScrollPane operationScrollPane = new JScrollPane();
@@ -294,7 +297,8 @@ public class ChainDefPanel extends JPanel {
 		saveMessageLabel = UiUtil.createTemporaryMessageArea();
 		controlRightPanel.add(saveMessageLabel);
 		
-		JButton saveButton = new JButton(Captions.CHAIN_DEF_SAVE);
+		saveButton = new JButton(Captions.CHAIN_DEF_SAVE);
+		saveButton.setEnabled(clean);
 		controlRightPanel.add(saveButton);
 		saveButton.addActionListener(new AbstractAction() {
 			@Override public void actionPerformedSafe(ActionEvent e) {
@@ -364,6 +368,7 @@ public class ChainDefPanel extends JPanel {
 				SwingUtilities.invokeLater(() -> {
 					focusNode(nodePanel, false);
 				});
+				afterEdit();
 			}
 		});
 
@@ -379,6 +384,7 @@ public class ChainDefPanel extends JPanel {
 	}
 	private ChainDefNodePanel addNode(MessageChainNodeDto nodeDto, int baseIndex) {
 		var nodePanel = new ChainDefNodePanel(nodeDto, this);
+		nodePanel.addEditListener(() -> afterEdit());
 		nodesPanel.add(nodePanel, baseIndex + 1);
 		nodesPanel.add(createAddButtonPanel(), baseIndex + 2);
 
@@ -728,11 +734,20 @@ public class ChainDefPanel extends JPanel {
 		messageChainId = messageChainDto.getId();
 
 		UiUtil.showTemporaryMessage(saveMessageLabel, Captions.MESSAGE_SAVED);
+		saveButton.setEnabled(false);
 	}
 
 	public void cancel() {
+		if(saveButton.isEnabled() && !UiUtil.getConfirmAnswerDefaultCancel(Captions.MESSAGE_EXIT_WITHOUT_SAVE, saveButton)) {
+			return;
+		}
+
 		authAccountSelectorPanel.unloaded();
 		UiUtil.closePopup(popupFrame);
+	}
+
+	private void afterEdit() {
+		saveButton.setEnabled(true);
 	}
 
 

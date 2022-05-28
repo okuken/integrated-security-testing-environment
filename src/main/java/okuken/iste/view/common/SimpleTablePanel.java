@@ -37,6 +37,8 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 	protected JTable table;
 	protected DefaultTableModel tableModel;
 
+	private List<Runnable> editListeners = Lists.newArrayList();
+
 	@SuppressWarnings("serial")
 	public SimpleTablePanel() {
 		
@@ -84,6 +86,9 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 				}
 
 				afterSetValueAt(val, rowIndex, columnIndex, dto);
+				if(column.isEditable()) {
+					afterEdit();
+				}
 				super.setValueAt(val, rowIndex, columnIndex);
 			}
 		});
@@ -200,6 +205,7 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		dtos.add(index, dto);
 		tableModel.insertRow(index, convertDtoToObjectArray(dto));
 		afterAddRow(dto);
+		afterEdit();
 	}
 	private Object[] convertDtoToObjectArray(T dto) {
 		return columns.stream().map(column -> {
@@ -226,6 +232,7 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		var movedDtos = moveRows(target, selectedRowsReversed);
 
 		afterUpRows(movedDtos);
+		afterEdit();
 	}
 
 	private void downRows(List<Integer> selectedRowsReversed) {
@@ -240,6 +247,7 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		var movedDtos = moveRows(target, selectedRowsReversed);
 
 		afterDownRows(movedDtos);
+		afterEdit();
 	}
 
 	private List<T> moveRows(int to, List<Integer> selectedRowsReversed) {
@@ -276,6 +284,7 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		});
 
 		afterRemoveRows(removedRows);
+		afterEdit();
 	}
 
 	/**
@@ -311,6 +320,14 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 
 	public void stopEditing() {
 		UiUtil.stopEditing(table);
+	}
+
+	public void addEditListener(Runnable listener) {
+		editListeners.add(listener);
+	}
+
+	private void afterEdit() {
+		editListeners.forEach(Runnable::run);
 	}
 
 	public List<T> getRows() {
