@@ -41,6 +41,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -85,6 +87,7 @@ public class ChainDefPanel extends JPanel {
 	private JFrame popupFrame;
 	private JScrollPane nodesScrollPane;
 	private JPanel nodesPanel;
+	private JPanel nodeLabelsPanel; 
 	private ChainDefPresetVarsPanel presetVarsPanel;
 	private MessageEditorsLayoutTypeSelectorPanel messageEditorsLayoutTypeSelectorPanel;
 
@@ -109,10 +112,14 @@ public class ChainDefPanel extends JPanel {
 		operationScrollPane.setBorder(null);
 		headerPanel.add(operationScrollPane, BorderLayout.CENTER);
 		
+		JPanel operationBasePanel = new JPanel();
+		operationBasePanel.setLayout(new BorderLayout(0, 0));
+		operationScrollPane.setViewportView(operationBasePanel);
+		
 		JPanel operationPanel = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) operationPanel.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
-		operationScrollPane.setViewportView(operationPanel);
+		operationBasePanel.add(operationPanel, BorderLayout.CENTER);
 		
 		JPanel operationMainPanel = new JPanel();
 		operationMainPanel.setLayout(new GridLayout(0, 1, 0, 0));
@@ -174,6 +181,12 @@ public class ChainDefPanel extends JPanel {
 		
 		startMessageLabel = UiUtil.createTemporaryMessageArea();
 		operationPanel.add(startMessageLabel);
+		
+		nodeLabelsPanel = new JPanel();
+		FlowLayout flowLayout_6 = (FlowLayout) nodeLabelsPanel.getLayout();
+		flowLayout_6.setAlignment(FlowLayout.LEFT);
+		flowLayout_6.setHgap(10);
+		operationBasePanel.add(nodeLabelsPanel, BorderLayout.SOUTH);
 		
 		JPanel configPanel = new JPanel();
 		headerPanel.add(configPanel, BorderLayout.EAST);
@@ -368,6 +381,16 @@ public class ChainDefPanel extends JPanel {
 		var nodePanel = new ChainDefNodePanel(nodeDto, this);
 		nodesPanel.add(nodePanel, baseIndex + 1);
 		nodesPanel.add(createAddButtonPanel(), baseIndex + 2);
+
+		var nodeLabel = new ChainDefNodeLabelPanel(nodePanel);
+		nodeLabel.addLabelMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				UiUtil.scrollFor(nodePanel, nodesScrollPane);
+			}
+		});
+		nodeLabelsPanel.add(nodeLabel, getChainDefNodePanels().indexOf(nodePanel));
+
 		UiUtil.repaint(this);
 		return nodePanel;
 	}
@@ -396,6 +419,11 @@ public class ChainDefPanel extends JPanel {
 		nodesPanel.remove(index1);
 		nodesPanel.add(nodePanel2, index1);
 		nodesPanel.add(nodePanel1, index2);
+
+		var nodeLabel1Index = getChainDefNodePanels().indexOf(nodesPanel.getComponent(index1));
+		var nodeLabel1 = nodeLabelsPanel.getComponent(nodeLabel1Index);
+		nodeLabelsPanel.remove(nodeLabel1Index);
+		nodeLabelsPanel.add(nodeLabel1, nodeLabel1Index + 1);
 
 		UiUtil.repaint(this);
 	}
@@ -556,6 +584,7 @@ public class ChainDefPanel extends JPanel {
 		if(chainDefNodePanels.isEmpty()) {
 			return;
 		}
+		Arrays.stream(nodeLabelsPanel.getComponents()).forEach(nodeLabel -> ((ChainDefNodeLabelPanel)nodeLabel).notifyStartChain());
 
 		var times = getTimes();
 
@@ -612,7 +641,7 @@ public class ChainDefPanel extends JPanel {
 				var breakingAppliedRequestForView = messageChainRepeatDto.getBreakingAppliedRequestForView();
 				SwingUtilities.invokeLater(() -> {
 					var chainDefNodePanel = chainDefNodePanels.get(index);
-					chainDefNodePanel.setMessage(new HttpRequestResponseMock(breakingAppliedRequestForView, null, messageChainRepeatDto.getMessageChainDto().getNodes().get(index).getMessageDto().getMessage().getHttpService()));
+					chainDefNodePanel.setMessage(new HttpRequestResponseMock(breakingAppliedRequestForView, null, messageChainRepeatDto.getMessageChainDto().getNodes().get(index).getMessageDto().getMessage().getHttpService()), false);
 					setIsCurrentNode(chainDefNodePanels, index);
 					focusNode(chainDefNodePanel, true, true);
 					refreshControlsState();
@@ -622,7 +651,7 @@ public class ChainDefPanel extends JPanel {
 
 			if(!messageChainRepeatDto.getCurrentNodeDto().isSkip()) {
 				SwingUtilities.invokeLater(() -> {
-					chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage());
+					chainDefNodePanels.get(index).setMessage(messageChainRepeatDto.getMessageRepeatDtos().get(index).getMessage(), true);
 					setIsCurrentNode(chainDefNodePanels, null);
 	
 					if(messageChainRepeatDto.getMessageChainDto().getNodes().get(index).isMain() && needSaveHistory) {

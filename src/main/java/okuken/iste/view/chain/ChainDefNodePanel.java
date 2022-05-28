@@ -22,11 +22,14 @@ import okuken.iste.view.message.editor.MessageEditorsLayoutType;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.border.LineBorder;
+
+import com.google.common.collect.Lists;
 
 import burp.IHttpRequestResponse;
 
@@ -48,6 +51,11 @@ public class ChainDefNodePanel extends JPanel {
 	private static final Dimension MESSAGE_EDITOR_PREFERRED_SIZE = new Dimension(800, 400);
 
 	private ChainDefPanel parentChainDefPanel;
+
+	private List<Consumer<MessageDto>> messageSelectionChangeListeners = Lists.newArrayList();
+	private List<Consumer<IHttpRequestResponse>> chainResponseListeners = Lists.newArrayList();
+	private List<Consumer<Color>> colorChangeListeners = Lists.newArrayList();
+	private List<Runnable> nodeRemoveListeners = Lists.newArrayList();
 
 	private boolean isMainNode;
 
@@ -108,6 +116,7 @@ public class ChainDefNodePanel extends JPanel {
 			public void itemStateChanged(ItemEvent e) {
 				if(!refreshingFlag && e.getStateChange() == ItemEvent.SELECTED) {
 					refreshMessageEditorPanel();
+					messageSelectionChangeListeners.forEach(listener -> listener.accept(getSelectedMessageDto()));
 				}
 			}
 		});
@@ -187,7 +196,7 @@ public class ChainDefNodePanel extends JPanel {
 		copyMasterButton.setToolTipText(Captions.REPEATER_BUTTON_COPY_MASTER_TT);
 		copyMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setMessage(getSelectedMessageDto().getMasterMessage());
+				setMessage(getSelectedMessageDto().getMasterMessage(), false);
 			}
 		});
 		messageControlPanel.add(copyMasterButton);
@@ -320,6 +329,7 @@ public class ChainDefNodePanel extends JPanel {
 
 	private void removeNode() {
 		parentChainDefPanel.removeNode(this);
+		nodeRemoveListeners.forEach(Runnable::run);
 	}
 
 	public MessageChainNodeDto makeNodeDto() {
@@ -347,10 +357,13 @@ public class ChainDefNodePanel extends JPanel {
 		return messageEditorPanel.getResponse();
 	}
 
-	public void setMessage(IHttpRequestResponse message) {
+	public void setMessage(IHttpRequestResponse message, boolean chainResponse) {
 		messageEditorPanel.setMessage(message, true);
 		requestParamsPanel.refreshAllRegexResult();
 		responseParamsPanel.refreshAllRegexResult();
+		if(chainResponse) {
+			chainResponseListeners.forEach(listener -> listener.accept(message));
+		}
 	}
 
 	private void setMessage(MessageDto messageDto, boolean keepCaretPosition) {
@@ -395,17 +408,22 @@ public class ChainDefNodePanel extends JPanel {
 	}
 
 	private void refreshBackgroundColor() {
+		var color = panelDefaultBackgroundColor;
 		if(skipCheckBox.isSelected()) {
+			color = Colors.BLOCK_BACKGROUND_GRAYOUT;
 			messageHeaderPanel.setOpaque(false);
-			setBackground(Colors.BLOCK_BACKGROUND_GRAYOUT);
-			return;
+			setBackground(color);
 		} else if(currentNode) {
+			color = Colors.BLOCK_BACKGROUND_HIGHLIGHT;
 			messageHeaderPanel.setOpaque(true);
-			messageHeaderPanel.setBackground(Colors.BLOCK_BACKGROUND_HIGHLIGHT);
-			return;
+			messageHeaderPanel.setBackground(color);
 		} else {
 			messageHeaderPanel.setOpaque(false);
-			setBackground(panelDefaultBackgroundColor);
+			setBackground(color);
+		}
+
+		for(var listener: colorChangeListeners) {
+			listener.accept(color);
 		}
 
 		UiUtil.repaint(this);
@@ -436,12 +454,26 @@ public class ChainDefNodePanel extends JPanel {
 				}
 			});
 		}, isMainNode);
-		setMessage(repeatDto.getMessage());
+		setMessage(repeatDto.getMessage(), false);
 	}
 
 
 	public ChainDefPanel getParentChainDefPanel() {
 		return parentChainDefPanel;
+	}
+
+
+	void addMessageSelectionChangeListener(Consumer<MessageDto> listener) {
+		messageSelectionChangeListeners.add(listener);
+	}
+	void addChainResponseListener(Consumer<IHttpRequestResponse> listener) {
+		chainResponseListeners.add(listener);
+	}
+	void addColorChangeListener(Consumer<Color> listener) {
+		colorChangeListeners.add(listener);
+	}
+	void addNodeRemoveListener(Runnable listener) {
+		nodeRemoveListeners.add(listener);
 	}
 
 }

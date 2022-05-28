@@ -8,6 +8,7 @@ public class Colors {
 
 	public static final Color CHARACTER_HIGHLIGHT = BURP_COLOR;
 	public static final Color CHARACTER_ALERT = Color.RED;
+	public static final Color CHARACTER_GRAYOUT = Color.GRAY;
 
 	public static final Color BUTTON_BACKGROUND_HIGHLIGHT = BURP_COLOR;
 	public static final Color BUTTON_FOREGROUND_HIGHLIGHT = Color.WHITE;
