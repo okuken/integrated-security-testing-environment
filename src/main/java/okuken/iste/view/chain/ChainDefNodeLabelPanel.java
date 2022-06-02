@@ -38,7 +38,7 @@ public class ChainDefNodeLabelPanel extends JPanel {
 	private void init(ChainDefNodePanel nodePanel) {
 
 		if(nodePanel.isMainNode()) {
-			setBorder(new LineBorder(Colors.BLOCK_BORDER_HIGHLIGHT));
+			setBorder(new LineBorder(Colors.BLOCK_BORDER_HIGHLIGHT, 2));
 		}
 
 		refreshByMessageSelection(nodePanel.getSelectedMessageDto());

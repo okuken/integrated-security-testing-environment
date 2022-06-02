@@ -18,6 +18,7 @@ public class Colors {
 
 	public static final Color BLOCK_BACKGROUND_HIGHLIGHT = BURP_COLOR;
 	public static final Color BLOCK_BACKGROUND_GRAYOUT = Color.LIGHT_GRAY;
+	public static final Color BLOCK_BACKGROUND_HOLD = new Color(0x83BAD6);
 
 	public static final Color TABLE_BORDER = Color.LIGHT_GRAY;
 

@@ -139,23 +139,23 @@ public class ChainDefPanel extends JPanel {
 		flowLayout_2.setAlignment(FlowLayout.LEFT);
 		operationMainPanel.add(operationCenterPanel);
 		
-		startButton = new JButton(Captions.CHAIN_DEF_RUN);
-		startButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
-		startButton.setMnemonic(KeyEvent.VK_S);
-		operationCenterPanel.add(startButton);
-		startButton.addActionListener(new AbstractAction() {
-			@Override public void actionPerformedSafe(ActionEvent e) {
-				start(false);
-			}
-		});
-		
 		stepButton = new JButton(Captions.CHAIN_DEF_STEP);
 		stepButton.setToolTipText(Captions.CHAIN_DEF_STEP_TT);
-		stepButton.setMnemonic(KeyEvent.VK_X);
+		stepButton.setMnemonic(KeyEvent.VK_S);
 		operationCenterPanel.add(stepButton);
 		stepButton.addActionListener(new AbstractAction() {
 			@Override public void actionPerformedSafe(ActionEvent e) {
 				start(true);
+			}
+		});
+		
+		startButton = new JButton(Captions.CHAIN_DEF_RUN);
+		startButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
+		startButton.setMnemonic(KeyEvent.VK_D);
+		operationCenterPanel.add(startButton);
+		startButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
+				start(false);
 			}
 		});
 		

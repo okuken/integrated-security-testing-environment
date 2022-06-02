@@ -167,6 +167,7 @@ public class ChainDefNodePanel extends JPanel {
 		breakpointCheckBox.setToolTipText(Captions.CHAIN_DEF_NODE_MESSAGE_CHECKBOX_BREAK_POINT_TT);
 		breakpointCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				refreshBackgroundColor();
 				afterEdit();
 			}
 		});
@@ -430,6 +431,10 @@ public class ChainDefNodePanel extends JPanel {
 			color = Colors.BLOCK_BACKGROUND_HIGHLIGHT;
 			messageHeaderPanel.setOpaque(true);
 			messageHeaderPanel.setBackground(color);
+		} else if(breakpointCheckBox.isSelected()) {
+			color = Colors.BLOCK_BACKGROUND_HOLD;
+			messageHeaderPanel.setOpaque(false);
+			setBackground(color);
 		} else {
 			messageHeaderPanel.setOpaque(false);
 			setBackground(color);
