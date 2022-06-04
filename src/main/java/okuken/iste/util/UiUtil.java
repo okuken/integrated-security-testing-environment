@@ -50,6 +50,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -76,6 +77,14 @@ public class UiUtil {
 				BurpUtil.printStderr(e);
 			}
 		});
+	}
+
+	public static final String getLookAndFeelName() {
+		var lookAndFeel = UIManager.getLookAndFeel();
+		if(lookAndFeel == null) {
+			return "";
+		}
+		return lookAndFeel.toString();
 	}
 
 	public static final Window getParentFrame(Component component) {

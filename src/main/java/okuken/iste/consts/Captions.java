@@ -233,7 +233,7 @@ public class Captions {
 	public static final String USER_OPTIONS_DB_FILE_PATH = "Database file";
 	public static final String USER_OPTIONS_DB_FILE_BUTTON_SAVE = "Save & Load";
 	public static final String USER_OPTIONS_THEME = "Theme";
-	public static final String USER_OPTIONS_THEME_EXPLANATION = "* If you have selected the Dark theme in \"User options > Display > User Interface > Theme\", set the Dark theme here as well.";
+	public static final String USER_OPTIONS_THEME_EXPLANATION = "* Automatically follow \"User options > Display > User Interface > Theme\".";
 	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT = "Shortcut (Send to ISTE)";
 	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT_Q = "Enable keyboard shortcut \"Ctrl-Q\", \"Ctrl+Shift-Q\" and \"Ctrl+Alt-Q\" on ProxyHttpHistoryTable.";
 	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT_WITH_CLICK = "Enable right-click with \"Ctrl\" or \"Ctrl+Shift\" when ContextMenuCreation.";

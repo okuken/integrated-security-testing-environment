@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -28,6 +29,7 @@ import okuken.iste.plugin.PluginLoadInfo;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.ReflectionUtil;
+import okuken.iste.util.UiUtil;
 
 public class ConfigLogic {
 
@@ -65,7 +67,24 @@ public class ConfigLogic {
 				}
 				ReflectionUtil.setPropertyByValueStr(ret, field, valueStr);
 			});
+		overrideUserOptions(ret);
 		return ret;
+	}
+	private void overrideUserOptions(UserOptionsDto userOptionsDto) {
+		var isDarkTheme = autoRecognizeIsDarkTheme();
+		if(isDarkTheme.isPresent()) {
+			userOptionsDto.setDarkTheme(isDarkTheme.get());
+		}
+	}
+	private Optional<Boolean> autoRecognizeIsDarkTheme() {
+		var lookAndFeelName = UiUtil.getLookAndFeelName();
+		if(BurpUtil.isDarkTheme(lookAndFeelName)) {
+			return Optional.of(Boolean.TRUE);
+		}
+		if(BurpUtil.isLightTheme(lookAndFeelName)) {
+			return Optional.of(Boolean.FALSE);
+		}
+		return Optional.empty();
 	}
 
 	public File getDefaultDbFile() {
@@ -152,6 +171,8 @@ public class ConfigLogic {
 				var valueStr = convertValueMapToStr(userOptionsMap.get(field.getName()));
 				saveUserOption(field.getName(), ReflectionUtil.convertValueStrToObject(field, valueStr));
 			});
+
+		overrideUserOptions(getUserOptions());
 	}
 
 	private String convertValueMapToStr(Object valueMap) {

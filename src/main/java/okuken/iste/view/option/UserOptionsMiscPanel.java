@@ -2,10 +2,12 @@ package okuken.iste.view.option;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
+import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.KeyStrokeManager;
@@ -15,6 +17,9 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Optional;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -23,13 +28,15 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class UserOptionsMiscPanel extends JPanel {
 
 	private static final String THEME_LIGHT = "Light";
 	private static final String THEME_DARK = "Dark";
 
 	private static final long serialVersionUID = 1L;
-//	private JTextField userNameTextField; //TODO: impl
+
 	private JTextField dbFileTextField;
 	private JLabel dbFileMessageLabel;
 
@@ -75,6 +82,24 @@ public class UserOptionsMiscPanel extends JPanel {
 			}
 		});
 		themeComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {THEME_LIGHT, THEME_DARK}));
+		UIManager.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if(!StringUtils.equals(evt.getPropertyName(), "lookAndFeel")) {
+					return;
+				}
+				var newValueStr = Optional.ofNullable(evt.getNewValue()).orElse("").toString();
+
+				if(BurpUtil.isDarkTheme(newValueStr)) {
+					themeComboBox.setSelectedItem(THEME_DARK);
+					return;
+				}
+				if(BurpUtil.isLightTheme(newValueStr)) {
+					themeComboBox.setSelectedItem(THEME_LIGHT);
+					return;
+				}
+			}
+		});
 		
 		JLabel themeExplanationLabel = new JLabel(Captions.USER_OPTIONS_THEME_EXPLANATION);
 		

@@ -23,6 +23,8 @@ import javax.swing.JTextArea;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 import burp.IBurpExtenderCallbacks;
@@ -126,6 +128,13 @@ public class BurpUtil {
 			return null;
 		}
 		return burpSuiteProjectName;
+	}
+
+	public static final boolean isDarkTheme(String lookAndFeelName) {
+		return StringUtils.contains(StringUtils.upperCase(lookAndFeelName), "DARK");
+	}
+	public static final boolean isLightTheme(String lookAndFeelName) {
+		return StringUtils.contains(StringUtils.upperCase(lookAndFeelName), "LIGHT");
 	}
 
 	private static JTable burpSuiteProxyHttpHistoryTable;
