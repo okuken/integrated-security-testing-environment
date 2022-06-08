@@ -19,7 +19,6 @@ import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Optional;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -88,15 +87,10 @@ public class UserOptionsMiscPanel extends JPanel {
 				if(!StringUtils.equals(evt.getPropertyName(), "lookAndFeel")) {
 					return;
 				}
-				var newValueStr = Optional.ofNullable(evt.getNewValue()).orElse("").toString();
 
-				if(BurpUtil.isDarkTheme(newValueStr)) {
-					themeComboBox.setSelectedItem(THEME_DARK);
-					return;
-				}
-				if(BurpUtil.isLightTheme(newValueStr)) {
-					themeComboBox.setSelectedItem(THEME_LIGHT);
-					return;
+				var isDarkTheme = BurpUtil.isDarkTheme();
+				if(isDarkTheme.isPresent()) {
+					themeComboBox.setSelectedItem(isDarkTheme.get() ? THEME_DARK : THEME_LIGHT);
 				}
 			}
 		});

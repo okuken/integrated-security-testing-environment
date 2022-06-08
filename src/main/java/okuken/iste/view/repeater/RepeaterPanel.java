@@ -134,6 +134,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		
 		JButton chainButton = new JButton(Captions.REPEATER_BUTTON_CHAIN);
 		chainButton.setToolTipText(Captions.REPEATER_BUTTON_CHAIN_TT);
+		chainButton.setMnemonic(KeyEvent.VK_C);
 		chainButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				var chainDefPanel = new ChainDefPanel(orgMessageDto, Controller.getInstance().getMessageChainIdByBaseMessageId(orgMessageDto.getId()));

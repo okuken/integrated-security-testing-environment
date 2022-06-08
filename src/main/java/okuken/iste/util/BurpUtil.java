@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
@@ -130,10 +131,20 @@ public class BurpUtil {
 		return burpSuiteProjectName;
 	}
 
-	public static final boolean isDarkTheme(String lookAndFeelName) {
+	public static final Optional<Boolean> isDarkTheme() {
+		var lookAndFeelName = UiUtil.getLookAndFeelName();
+		if(isDarkThemeImpl(lookAndFeelName)) {
+			return Optional.of(Boolean.TRUE);
+		}
+		if(isLightThemeImpl(lookAndFeelName)) {
+			return Optional.of(Boolean.FALSE);
+		}
+		return Optional.empty();
+	}
+	private static final boolean isDarkThemeImpl(String lookAndFeelName) {
 		return StringUtils.contains(StringUtils.upperCase(lookAndFeelName), "DARK");
 	}
-	public static final boolean isLightTheme(String lookAndFeelName) {
+	private static final boolean isLightThemeImpl(String lookAndFeelName) {
 		return StringUtils.contains(StringUtils.upperCase(lookAndFeelName), "LIGHT");
 	}
 

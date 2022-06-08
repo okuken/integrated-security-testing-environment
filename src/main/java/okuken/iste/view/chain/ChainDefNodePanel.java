@@ -15,6 +15,7 @@ import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.dto.MessageChainNodeRespDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
+import okuken.iste.enums.IsteColor;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.editor.MessageEditorsLayoutType;
@@ -87,7 +88,7 @@ public class ChainDefNodePanel extends JPanel {
 		this.isMainNode = nodeDto != null && nodeDto.isMain();
 		
 		setLayout(new BorderLayout(0, 0));
-		setBorder(new LineBorder(isMainNode ? Colors.BLOCK_BORDER_HIGHLIGHT : Colors.BLOCK_BORDER));
+		setBorder(isMainNode ? new LineBorder(Colors.BLOCK_BORDER_HIGHLIGHT, 2) : new LineBorder(Colors.BLOCK_BORDER));
 		
 		JPanel centerPanel = new JPanel(new BorderLayout(0, 0));
 		add(centerPanel, BorderLayout.CENTER);
@@ -424,15 +425,15 @@ public class ChainDefNodePanel extends JPanel {
 	private void refreshBackgroundColor() {
 		var color = panelDefaultBackgroundColor;
 		if(skipCheckBox.isSelected()) {
-			color = Colors.BLOCK_BACKGROUND_GRAYOUT;
+			color = IsteColor.BLOCK_BACKGROUND_GRAYOUT.get();
 			messageHeaderPanel.setOpaque(false);
 			setBackground(color);
 		} else if(currentNode) {
-			color = Colors.BLOCK_BACKGROUND_HIGHLIGHT;
+			color = IsteColor.BLOCK_BACKGROUND_HIGHLIGHT.get();
 			messageHeaderPanel.setOpaque(true);
 			messageHeaderPanel.setBackground(color);
 		} else if(breakpointCheckBox.isSelected()) {
-			color = Colors.BLOCK_BACKGROUND_HOLD;
+			color = IsteColor.BLOCK_BACKGROUND_HOLD.get();
 			messageHeaderPanel.setOpaque(false);
 			setBackground(color);
 		} else {
