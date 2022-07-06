@@ -6,6 +6,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 import burp.ICookie;
@@ -26,11 +28,13 @@ import okuken.iste.enums.ResponseParameterType;
 import okuken.iste.enums.SourceType;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpUtil;
+import okuken.iste.util.MessageUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.util.ValidationUtil;
 import okuken.iste.view.AbstractAction;
 import okuken.iste.view.common.AuthAccountSelectorPanel;
 import okuken.iste.view.common.MultipleSelectorPanel;
+import okuken.iste.view.common.VerticalFlowPanel;
 import okuken.iste.view.message.editor.MessageEditorsLayoutType;
 import okuken.iste.view.message.editor.MessageEditorsLayoutTypeSelectorPanel;
 
@@ -204,7 +208,7 @@ public class ChainDefPanel extends JPanel {
 		JLabel semiAutoSettingLabel = new JLabel(Captions.CHAIN_DEF_SEMIAUTO_SETTING);
 		semiAutoSettingHeaderPanel.add(semiAutoSettingLabel);
 		
-		JPanel semiAutoSettingMainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		JPanel semiAutoSettingMainPanel = new VerticalFlowPanel();
 		semiAutoSettingPanel.add(semiAutoSettingMainPanel, BorderLayout.CENTER);
 		
 		JButton semiAutoCookieSettingButton = new JButton(Captions.CHAIN_DEF_SEMIAUTO_SETTING_COOKIE);
@@ -215,6 +219,15 @@ public class ChainDefPanel extends JPanel {
 			}
 		});
 		semiAutoSettingMainPanel.add(semiAutoCookieSettingButton);
+		
+		JButton semiAutoTokenSettingButton = new JButton(Captions.CHAIN_DEF_SEMIAUTO_SETTING_TOKEN);
+		semiAutoTokenSettingButton.setToolTipText(Captions.CHAIN_DEF_SEMIAUTO_SETTING_TOKEN_TT);
+		semiAutoTokenSettingButton.addActionListener(new AbstractAction() {
+			@Override public void actionPerformedSafe(ActionEvent e) {
+				semiAutoAddTokenTransferSettings();
+			}
+		});
+		semiAutoSettingMainPanel.add(semiAutoTokenSettingButton);
 		
 		configPanel.add(UiUtil.createSpacerM());
 		
@@ -501,6 +514,58 @@ public class ChainDefPanel extends JPanel {
 						nodePanel.addResp(respDto);
 					});
 			}
+		});
+	}
+
+	private void semiAutoAddTokenTransferSettings() {
+		var messageChainDto = makeChainDto();
+
+		var tokenTransferSettings = new ChainDefTokenTransferSettingsPanel(messageChainDto).showDialog(this);
+		if(tokenTransferSettings == null || tokenTransferSettings.isEmpty()) {
+			return;
+		}
+
+		var nodeDtos = messageChainDto.getNodes();
+		var nodePanels = getChainDefNodePanels();
+
+		//resp
+		for(int i = 0; i < nodeDtos.size(); i++) {
+			var nodeDto = nodeDtos.get(i);
+			var nodePanel = nodePanels.get(i);
+
+			var docOptional = MessageUtil.parseResponseHtml(nodeDto.getMessageDto());
+			if(docOptional.isEmpty()) {
+				continue;
+			}
+			var doc = docOptional.get();
+
+			tokenTransferSettings.stream()
+				.filter(setting -> {
+					var element = doc.selectFirst(setting.getSelector());
+					return element != null && element.hasAttr(setting.getValueAttrName());
+				})
+				.filter(setting -> !nodeDto.getResps().stream() //unique
+									.filter(resp -> resp.getParamType() == ResponseParameterType.HTML_TAG)
+									.anyMatch(resp -> StringUtils.equals(resp.getParamName(), setting.getSettingString())))
+				.forEach(setting -> nodePanel.addResp(new MessageChainNodeRespDto(ResponseParameterType.HTML_TAG, setting.getSettingString(), setting.getVarName())));
+		}
+
+		//reqp
+		IntStream.range(0, nodeDtos.size()).forEach(i -> {
+			var nodeDto = nodeDtos.get(i);
+			var nodePanel = nodePanels.get(i);
+
+			var requestParams = MessageUtil.extractRequestParams(nodeDto.getMessageDto());
+
+			tokenTransferSettings.stream()
+				.filter(setting -> setting.getRequestParam() != null && requestParams.contains(setting.getRequestParam()))
+				.filter(setting -> !nodeDto.getReqps().stream() //unique
+										.anyMatch(reqp -> reqp.getParamType() == setting.getRequestParam().getType() &&
+															StringUtils.equals(reqp.getParamName(), setting.getRequestParam().getName())))
+				.filter(setting -> IntStream.range(0, i) //check exist memorized var
+										.anyMatch(j -> nodeDtos.get(j).getResps().stream()
+														.anyMatch(resp -> StringUtils.equals(resp.getVarName(), setting.getVarName()))))
+				.forEach(setting -> nodePanel.addReqp(new MessageChainNodeReqpDto(setting.getRequestParam().getType(), setting.getRequestParam().getName(), SourceType.VAR, setting.getVarName())));
 		});
 	}
 

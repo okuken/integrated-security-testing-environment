@@ -12,5 +12,6 @@ public class Positions {
 
 	public static final int FLOW_GAP = 30;
 	public static final int CONTAINER_GAP = 15;
+	public static final int INDENT_GAP = 30;
 
 }

@@ -71,8 +71,11 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 			}
 			@Override
 			public void setValueAt(Object val, int rowIndex, int columnIndex) {
-				var column = columns.get(columnIndex);
+				if(rowIndex >= dtos.size()) {
+					return;
+				}
 				var dto = dtos.get(rowIndex);
+				var column = columns.get(columnIndex);
 
 				try {
 					if(column.getGetter() != null && column.getSetter() != null) {

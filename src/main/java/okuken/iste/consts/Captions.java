@@ -159,6 +159,12 @@ public class Captions {
 	public static final String CHAIN_DEF_SEMIAUTO_SETTING_COOKIE = "Cookie";
 	public static final String CHAIN_DEF_SEMIAUTO_SETTING_COOKIE_TT = "Add cookie transfer settings semi-automatically";
 
+	public static final String CHAIN_DEF_SEMIAUTO_SETTING_TOKEN = "Token";
+	public static final String CHAIN_DEF_SEMIAUTO_SETTING_TOKEN_TT = "Add token transfer settings semi-automatically";
+	public static final String CHAIN_DEF_SEMIAUTO_SETTING_TOKEN_ATTR_NAME_KEY = "key attr";
+	public static final String CHAIN_DEF_SEMIAUTO_SETTING_TOKEN_ATTR_NAME_VALUE = "value attr";
+	public static final String CHAIN_DEF_SEMIAUTO_SETTING_TOKEN_REQUEST_PARAM_NAME = "Request parameter";
+
 	public static final String CHAIN_DEF_SPLIT_COLLAPSE = "<";
 	public static final String CHAIN_DEF_SPLIT_COLLAPSE_TT = "Collapse manipulation setting panels";
 	public static final String CHAIN_DEF_SPLIT_EXPAND = ">";
@@ -266,6 +272,8 @@ public class Captions {
 	public static final String MESSAGE_AUTH_CHAIN_EXIST = "Auth chain already exists. Override it?";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE = "Select transfer target cookies";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE_EMPTY = "No Cookies.";
+	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN = "Select transfer target tokens        * hidden(input) and meta tags are listed as candidates";
+	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN_EMPTY = "No Tokens.";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
 	public static final String MESSAGE_EXIT_WITHOUT_SAVE = "Edits are not saved. Discard them?";
 	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export";

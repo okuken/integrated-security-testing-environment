@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -20,6 +21,7 @@ import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.dto.MessageChainTokenTransferSettingDto;
 import okuken.iste.dto.MessageCookieDto;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.MessageRequestParamDto;
 import okuken.iste.dto.MessageResponseParamDto;
 import okuken.iste.dto.PayloadDto;
 import okuken.iste.enums.RequestParameterType;
@@ -148,6 +150,34 @@ public class MessageUtil {
 		var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
 		return BurpUtil.getHelpers().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
 	}
+
+	public static List<MessageRequestParamDto> extractRequestParams(List<MessageDto> messageDtos) {
+		return messageDtos.stream()
+				.flatMap(messageDto -> extractRequestParams(messageDto).stream())
+				.sorted()
+				.distinct()
+				.collect(Collectors.toList());
+	}
+	public static List<MessageRequestParamDto> extractRequestParams(MessageDto messageDto) {
+		var parameters = messageDto.getRequestInfo().getParameters().stream()
+				.filter(MessageUtil::isRequestParameter)
+				.map(param -> new MessageRequestParamDto(RequestParameterType.getByBurpId(param.getType()), param.getName()));
+
+		var headers = messageDto.getRequestInfo().getHeaders().stream()
+				.map(header -> header.split(":"))
+				.filter(headerSplitted -> headerSplitted.length >= 2)
+				.map(headerSplitted -> headerSplitted[0].trim())
+				.filter(headerName -> !StringUtils.equals(headerName, "Cookie"))
+				.map(headerName -> new MessageRequestParamDto(RequestParameterType.HEADER, headerName));
+
+		return Stream.concat(parameters, headers).sorted().distinct().collect(Collectors.toList());
+	}
+	private static boolean isRequestParameter(IParameter param) {
+		var paramType = param.getType();
+		return paramType == RequestParameterType.URL.getBurpId() ||
+				paramType == RequestParameterType.BODY.getBurpId();
+	}
+
 
 	/**
 	 * CAUTION: not support to extract multibyte character
