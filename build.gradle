@@ -49,6 +49,7 @@ dependencies {
     implementation "org.hibernate.validator:hibernate-validator:7.0.4.Final"
     implementation "org.glassfish:jakarta.el:4.0.2"
 
+    implementation 'org.jsoup:jsoup:1.15.1'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.guava:guava:28.1-jre'
     implementation 'org.apache.velocity:velocity-engine-core:2.3'

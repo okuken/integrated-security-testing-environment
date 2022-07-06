@@ -49,7 +49,13 @@ public class HttpUtil {
 		if(charsetStr == null) {
 			return null;
 		}
-		return Charset.forName(charsetStr);
+
+		try {
+			return Charset.forName(charsetStr);
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			return null;
+		}
 	}
 
 	private static String extractHeaderParamValue(List<String> headers, String startsWith, String contains, Pattern paramValueExtractPattern) {
@@ -76,6 +82,20 @@ public class HttpUtil {
 
 	public static byte[] extractMessageBody(byte[] message, int bodyOffset) {
 		return Arrays.copyOfRange(message, bodyOffset, message.length);
+	}
+
+	public static String extractMessageBody(String message) {
+		var separatorIndex = message.indexOf(HTTP_HEADER_BODY_SEPARATOR);
+		if(separatorIndex < 0) {
+			return "";
+		}
+
+		var bodyStartIndex = separatorIndex + HTTP_HEADER_BODY_SEPARATOR.length();
+		if(bodyStartIndex >= message.length()) {
+			return "";
+		}
+
+		return message.substring(bodyStartIndex);
 	}
 
 	public static String convertMessageBytesToString(byte[] message, List<String> headers, int bodyOffset) {

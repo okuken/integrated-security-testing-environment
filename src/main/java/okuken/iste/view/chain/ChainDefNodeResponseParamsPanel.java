@@ -24,10 +24,10 @@ public class ChainDefNodeResponseParamsPanel extends SimpleTableRegexPanel<Messa
 	private static final Class<?> DTO_CLASS = MessageChainNodeRespDto.class;
 	private static final int PARAM_TYPE = 0, PARAM_NAME = 1, SOURCE_NAME = 2, REGEX_RESULT = 3;
 	private static final List<ColumnDef> columns = Arrays.asList(
-		new ColumnDef(PARAM_TYPE,  "Type",            75, true, "getParamType",  "setParamType",  ResponseParameterType.class, DTO_CLASS),
-		new ColumnDef(PARAM_NAME,  "Name / Regex",   200, true, "getParamName",  "setParamName",  String.class, DTO_CLASS),
-		new ColumnDef(SOURCE_NAME, "Var name",       225, true, "getVarName",    "setVarName",    String.class, DTO_CLASS),
-		new ColumnDef(REGEX_RESULT,"(Regex result)", 100));
+		new ColumnDef(PARAM_TYPE,  "Type",                            75, true, "getParamType",  "setParamType",  ResponseParameterType.class, DTO_CLASS),
+		new ColumnDef(PARAM_NAME,  "Name / Regex / Selector;attr",   275, true, "getParamName",  "setParamName",  String.class, DTO_CLASS),
+		new ColumnDef(SOURCE_NAME, "Var name",                       150, true, "getVarName",    "setVarName",    String.class, DTO_CLASS),
+		new ColumnDef(REGEX_RESULT,"(Regex result)",                 100));
 
 	private static final List<Integer> REGEX_LISTENER_COLUMNS = Lists.newArrayList(PARAM_TYPE, PARAM_NAME);
 

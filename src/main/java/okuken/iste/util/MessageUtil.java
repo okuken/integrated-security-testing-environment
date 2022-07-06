@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -15,7 +17,9 @@ import burp.IParameter;
 import burp.IResponseInfo;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainNodeReqpDto;
+import okuken.iste.dto.MessageChainTokenTransferSettingDto;
 import okuken.iste.dto.MessageCookieDto;
+import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageResponseParamDto;
 import okuken.iste.dto.PayloadDto;
 import okuken.iste.enums.RequestParameterType;
@@ -33,6 +37,10 @@ public class MessageUtil {
 
 		if(paramType == RequestParameterType.REGEX) {
 			return applyRegexPayload(request, paramName, paramValue);
+		}
+
+		if(paramType == RequestParameterType.HEADER) {
+			return applyHeaderPayload(request, paramName, paramValue);
 		}
 
 		if(!BurpUtil.getHelpers().analyzeRequest(request).getParameters().stream().anyMatch(p -> 
@@ -62,6 +70,15 @@ public class MessageUtil {
 		var ret = BurpUtil.getHelpers().removeParameter(request, parameter);
 		ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
 		return BurpUtil.getHelpers().addParameter(ret, parameter);
+	}
+
+	private static byte[] applyHeaderPayload(byte[] request, String headerName, String value) {
+		var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
+
+		var headerPrefix = headerName + ": ";
+		var appliedHeaders = requestInfo.getHeaders().stream().map(header -> header.startsWith(headerPrefix) ? headerPrefix + value : header).collect(Collectors.toList());
+		var body = HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset());
+		return BurpUtil.getHelpers().buildHttpMessage(appliedHeaders, body);
 	}
 
 //	private static byte[] applyHeaderPayload(byte[] request, IParameter parameter) {
@@ -142,6 +159,9 @@ public class MessageUtil {
 		if(paramType == ResponseParameterType.REGEX) {
 			return RegexUtil.extractOneGroup(response, paramName);
 		}
+		if(paramType == ResponseParameterType.HTML_TAG) {
+			return extractResponseHtmlTagValue(response, paramName);
+		}
 
 		var paramOptional = extractResponseCandidateParams(response, paramType).stream()
 				.filter(sessionIdParam -> sessionIdParam.getName().equals(paramName))
@@ -164,6 +184,29 @@ public class MessageUtil {
 			default:
 				return Lists.newArrayList();
 		}
+	}
+
+	public static String extractResponseHtmlTagValue(byte[] response, String settingString) {
+		var docOptional = parseResponseHtml(response);
+		if(docOptional.isEmpty()) {
+			return null;
+		}
+		var doc = docOptional.get();
+
+		var separaterIndex = settingString.lastIndexOf(MessageChainTokenTransferSettingDto.SETTING_SEPARATER);
+		if(separaterIndex < 0 || separaterIndex >= settingString.length() - 1) {
+			return null;
+		}
+		var selector = settingString.substring(0, separaterIndex);
+		var valueAttrName = settingString.substring(separaterIndex + 1);
+
+		var element = doc.selectFirst(selector);
+		if(element == null) {
+			return null;
+		}
+
+		var ret = element.attr(valueAttrName);
+		return StringUtils.isNotEmpty(ret) ? ret : null;
 	}
 
 	public static short extractResponseStatus(byte[] response) {
@@ -198,6 +241,27 @@ public class MessageUtil {
 			dto.setType(ResponseParameterType.JSON);
 			return dto;
 		}).collect(Collectors.toList());
+	}
+
+	public static Optional<Document> parseResponseHtml(byte[] response) {
+		var responseInfo = BurpUtil.getHelpers().analyzeResponse(response);
+		if(!isHtml(responseInfo.getStatedMimeType())) {
+			return Optional.empty();
+		}
+		var responseStr = HttpUtil.convertMessageBytesToString(response, responseInfo.getHeaders(), responseInfo.getBodyOffset());
+		return parseResponseHtml(responseStr);
+	}
+	public static Optional<Document> parseResponseHtml(MessageDto messageDto) {
+		if(!isHtml(messageDto.getMimeType())) {
+			return Optional.empty();
+		}
+		return parseResponseHtml(messageDto.getResponseStr());
+	}
+	private static Optional<Document> parseResponseHtml(String response) {
+		return Optional.of(Jsoup.parse(HttpUtil.extractMessageBody(response)));
+	}
+	private static boolean isHtml(String mimeType) {
+		return "HTML".equals(mimeType);
 	}
 
 }

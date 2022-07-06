@@ -9,6 +9,7 @@ public enum ResponseParameterType {
 	BODY			((byte) 1, false, "Body"),
 	JSON			((byte) 6, false, "Body(JSON)"),
 	COOKIE			((byte) 2, true,  "Cookie"),
+	HTML_TAG		((byte)95, true,  "HTML tag"),
 	REGEX			((byte)99, true,  "Regex");
 
 	private final byte id;

@@ -15,6 +15,7 @@ public enum RequestParameterType {
 	XML				((byte) 3, false, IParameter.PARAM_XML,            "Body(XML)"),
 	XML_ATTR		((byte) 4, false, IParameter.PARAM_XML_ATTR,       "Body(XML(Attr))"),
 	COOKIE			((byte) 2, true,  IParameter.PARAM_COOKIE,         "Cookie"),
+	HEADER			((byte)80, true,  (byte)80,                        "Header"),
 	REGEX			((byte)99, true,  (byte)99,                        "Regex");
 
 	private final byte id;
