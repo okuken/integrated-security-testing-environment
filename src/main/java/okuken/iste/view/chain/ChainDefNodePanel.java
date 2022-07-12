@@ -141,7 +141,7 @@ public class ChainDefNodePanel extends JPanel {
 		JPanel messagePanel = new JPanel(new BorderLayout(0, 0));
 		splitPane.setRightComponent(messagePanel);
 		
-		messageEditorPanel = new MessageEditorPanel(null, !parentChainDefPanel.judgeIsAuthChain(), false, parentChainDefPanel.getSelectedMessageEditorsLayoutType());
+		messageEditorPanel = new MessageEditorPanel(null, true, false, parentChainDefPanel.getSelectedMessageEditorsLayoutType());
 		messagePanel.add(messageEditorPanel, BorderLayout.CENTER);
 		messageEditorPanel.setPreferredSize(MESSAGE_EDITOR_PREFERRED_SIZE);
 		

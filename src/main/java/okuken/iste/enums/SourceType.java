@@ -7,7 +7,7 @@ import com.google.common.collect.Maps;
 
 public enum SourceType {
 	VAR                ((byte) 0, "Var"          , false),
-	AUTH_ACCOUNT_TABLE ((byte) 1, "Account table", true);
+	AUTH_ACCOUNT_TABLE ((byte) 1, "Account table", false);
 
 	private final byte id;
 	private final String caption;
