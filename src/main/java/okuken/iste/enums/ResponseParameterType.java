@@ -37,6 +37,17 @@ public enum ResponseParameterType {
 		return caption;
 	}
 
+	public ExtractType getExtractType() {
+		switch (this) {
+		case REGEX:
+			return ExtractType.REGEX;
+		case HTML_TAG:
+			return ExtractType.HTML_TAG;
+		default:
+			return null;
+		}
+	}
+
 	private static final Map<Byte, ResponseParameterType> idToEnumMap;
 	static {
 		idToEnumMap = Maps.newHashMap();

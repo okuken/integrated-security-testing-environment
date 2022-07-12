@@ -216,27 +216,46 @@ public class MessageUtil {
 		}
 	}
 
+	public static String extractResponseHtmlTagValue(String responseStr, String settingString) {
+		return extractResponseHtmlTagValueImpl(parseResponseHtml(responseStr), settingString);
+	}
 	public static String extractResponseHtmlTagValue(byte[] response, String settingString) {
-		var docOptional = parseResponseHtml(response);
+		return extractResponseHtmlTagValueImpl(parseResponseHtml(response), settingString);
+	}
+	private static String extractResponseHtmlTagValueImpl(Optional<Document> docOptional, String settingString) {
 		if(docOptional.isEmpty()) {
 			return null;
 		}
 		var doc = docOptional.get();
 
-		var separaterIndex = settingString.lastIndexOf(MessageChainTokenTransferSettingDto.SETTING_SEPARATER);
-		if(separaterIndex < 0 || separaterIndex >= settingString.length() - 1) {
+		if(!judgeIsValidExtractHtmlTagSetting(settingString)) {
 			return null;
 		}
+		var separaterIndex = settingString.lastIndexOf(MessageChainTokenTransferSettingDto.SETTING_SEPARATER);
 		var selector = settingString.substring(0, separaterIndex);
 		var valueAttrName = settingString.substring(separaterIndex + 1);
 
-		var element = doc.selectFirst(selector);
-		if(element == null) {
+		try {
+			var element = doc.selectFirst(selector);
+			if(element == null) {
+				return null;
+			}
+	
+			var ret = element.attr(valueAttrName);
+			return StringUtils.isNotEmpty(ret) ? ret : null;
+
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
 			return null;
 		}
+	}
 
-		var ret = element.attr(valueAttrName);
-		return StringUtils.isNotEmpty(ret) ? ret : null;
+	public static boolean judgeIsValidExtractHtmlTagSetting(String settingString) {
+		var separaterIndex = settingString.lastIndexOf(MessageChainTokenTransferSettingDto.SETTING_SEPARATER);
+		if(separaterIndex < 0 || separaterIndex >= settingString.length() - 1) {
+			return false;
+		}
+		return true;
 	}
 
 	public static short extractResponseStatus(byte[] response) {
@@ -273,13 +292,16 @@ public class MessageUtil {
 		}).collect(Collectors.toList());
 	}
 
-	public static Optional<Document> parseResponseHtml(byte[] response) {
+	public static Optional<String> convertToResponseHtmlString(byte[] response) {
 		var responseInfo = BurpUtil.getHelpers().analyzeResponse(response);
 		if(!isHtml(responseInfo.getStatedMimeType())) {
 			return Optional.empty();
 		}
-		var responseStr = HttpUtil.convertMessageBytesToString(response, responseInfo.getHeaders(), responseInfo.getBodyOffset());
-		return parseResponseHtml(responseStr);
+		return Optional.of(HttpUtil.convertMessageBytesToString(response, responseInfo.getHeaders(), responseInfo.getBodyOffset()));
+	}
+
+	public static Optional<Document> parseResponseHtml(byte[] response) {
+		return parseResponseHtml(convertToResponseHtmlString(response).orElse(""));
 	}
 	public static Optional<Document> parseResponseHtml(MessageDto messageDto) {
 		if(!isHtml(messageDto.getMimeType())) {
@@ -288,7 +310,16 @@ public class MessageUtil {
 		return parseResponseHtml(messageDto.getResponseStr());
 	}
 	private static Optional<Document> parseResponseHtml(String response) {
-		return Optional.of(Jsoup.parse(HttpUtil.extractMessageBody(response)));
+		if(StringUtils.isEmpty(response)) {
+			return Optional.empty();
+		}
+
+		try {
+			return Optional.of(Jsoup.parse(HttpUtil.extractMessageBody(response)));
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			return Optional.empty();
+		}
 	}
 	private static boolean isHtml(String mimeType) {
 		return "HTML".equals(mimeType);

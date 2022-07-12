@@ -374,8 +374,8 @@ public class ChainDefNodePanel extends JPanel {
 
 	public void setMessage(IHttpRequestResponse message, boolean chainResponse) {
 		messageEditorPanel.setMessage(message, true);
-		requestParamsPanel.refreshAllRegexResult();
-		responseParamsPanel.refreshAllRegexResult();
+		requestParamsPanel.refreshAllExtractResult();
+		responseParamsPanel.refreshAllExtractResult();
 		if(chainResponse) {
 			chainResponseListeners.forEach(listener -> listener.accept(message));
 		}
@@ -383,13 +383,13 @@ public class ChainDefNodePanel extends JPanel {
 
 	private void setMessage(MessageDto messageDto, boolean keepCaretPosition) {
 		messageEditorPanel.setMessage(messageDto, keepCaretPosition);
-		requestParamsPanel.refreshAllRegexResult();
-		responseParamsPanel.refreshAllRegexResult();
+		requestParamsPanel.refreshAllExtractResult();
+		responseParamsPanel.refreshAllExtractResult();
 	}
 
 	private void setResponse(byte[] response) {
 		messageEditorPanel.setResponse(response);
-		responseParamsPanel.refreshAllRegexResult();
+		responseParamsPanel.refreshAllExtractResult();
 	}
 
 	void addReqp(MessageChainNodeReqpDto reqpDto) {

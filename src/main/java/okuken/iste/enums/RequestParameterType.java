@@ -48,6 +48,15 @@ public enum RequestParameterType {
 		return caption;
 	}
 
+	public ExtractType getExtractType() {
+		switch (this) {
+		case REGEX:
+			return ExtractType.REGEX;
+		default:
+			return null;
+		}
+	}
+
 	private static final Map<Byte, RequestParameterType> idToEnumMap;
 	static {
 		idToEnumMap = Maps.newHashMap();

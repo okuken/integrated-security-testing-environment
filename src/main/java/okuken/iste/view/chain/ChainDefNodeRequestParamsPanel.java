@@ -12,27 +12,28 @@ import com.google.common.collect.Lists;
 import okuken.iste.consts.Captions;
 import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.enums.EncodeType;
+import okuken.iste.enums.ExtractType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SourceType;
 import okuken.iste.util.RegexUtil;
 import okuken.iste.view.common.ColumnDef;
-import okuken.iste.view.common.SimpleTableRegexPanel;
+import okuken.iste.view.common.SimpleTableExtractPanel;
 
-public class ChainDefNodeRequestParamsPanel extends SimpleTableRegexPanel<MessageChainNodeReqpDto> {
+public class ChainDefNodeRequestParamsPanel extends SimpleTableExtractPanel<MessageChainNodeReqpDto> {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final Class<?> DTO_CLASS = MessageChainNodeReqpDto.class;
-	private static final int PARAM_TYPE = 0, PARAM_NAME = 1, SOURCE_TYPE = 2, SOURCE_NAME = 3, ENCODE = 4, REGEX_RESULT = 5;
+	private static final int PARAM_TYPE = 0, PARAM_NAME = 1, SOURCE_TYPE = 2, SOURCE_NAME = 3, ENCODE = 4, EXTRACT_RESULT = 5;
 	private static final List<ColumnDef> columns = Arrays.asList(
 		new ColumnDef(PARAM_TYPE,  "Type",            75, true, "getParamType",  "setParamType",  RequestParameterType.class, DTO_CLASS),
 		new ColumnDef(PARAM_NAME,  "Name / Regex",   200, true, "getParamName",  "setParamName",  String.class, DTO_CLASS),
 		new ColumnDef(SOURCE_TYPE, "Source type",     75, true, "getSourceType", "setSourceType", SourceType.class, DTO_CLASS),
 		new ColumnDef(SOURCE_NAME, "Source name",    105, true, "getSourceName", "setSourceName", String.class, DTO_CLASS),
 		new ColumnDef(ENCODE,      "Encode",          45, true, "getEncode",     "setEncode",     EncodeType.class, DTO_CLASS),
-		new ColumnDef(REGEX_RESULT,"(Regex result)", 100));
+		new ColumnDef(EXTRACT_RESULT,"(Extract result)",100));
 
-	private static final List<Integer> REGEX_LISTENER_COLUMNS = Lists.newArrayList(PARAM_TYPE, PARAM_NAME);
+	private static final List<Integer> EXTRACT_LISTENER_COLUMNS = Lists.newArrayList(PARAM_TYPE, PARAM_NAME);
 
 	private ChainDefNodePanel parentChainDefNodePanel;
 
@@ -98,23 +99,27 @@ public class ChainDefNodeRequestParamsPanel extends SimpleTableRegexPanel<Messag
 
 
 	@Override
-	protected List<Integer> getRegexListenerColumns() {
-		return REGEX_LISTENER_COLUMNS;
+	protected List<Integer> getExtractListenerColumns() {
+		return EXTRACT_LISTENER_COLUMNS;
 	}
 	@Override
-	protected int getRegexResultColumn() {
-		return REGEX_RESULT;
+	protected int getExtractResultColumn() {
+		return EXTRACT_RESULT;
 	}
 	@Override
-	protected boolean isRegexRow(MessageChainNodeReqpDto dto) {
-		return dto.getParamType() == RequestParameterType.REGEX;
+	protected boolean isExtractRow(MessageChainNodeReqpDto dto) {
+		return getExtractType(dto) != null;
 	}
 	@Override
-	protected String getRegex(MessageChainNodeReqpDto dto) {
+	protected ExtractType getExtractType(MessageChainNodeReqpDto dto) {
+		return dto.getParamType().getExtractType();
+	}
+	@Override
+	protected String getExtractString(MessageChainNodeReqpDto dto) {
 		return dto.getParamName();
 	}
 	@Override
-	protected String getTestTarget() {
+	protected String getTestTarget(MessageChainNodeReqpDto dto) {
 		return RegexUtil.convertToStringForRegex(parentChainDefNodePanel.getRequest());
 	}
 

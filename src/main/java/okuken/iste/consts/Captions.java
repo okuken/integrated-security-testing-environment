@@ -259,7 +259,7 @@ public class Captions {
 	public static final String MESSAGE_SAVED = "Saved.";
 	public static final String MESSAGE_DONE = "Done.";
 
-	public static final String MESSAGE_REGEX_ERROR = "**ERROR**";
+	public static final String MESSAGE_EXTRACT_ERROR = "**ERROR**";
 	public static final String MESSAGE_VERSION_LATEST = "ISTE is up to date.";
 	public static final String MESSAGE_VERSION_NOT_LATEST = "%s has been released. Please download and try it!";
 
@@ -274,6 +274,8 @@ public class Captions {
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE_EMPTY = "No Cookies.";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN = "Select transfer target tokens        * hidden(input) and meta tags are listed as candidates";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN_EMPTY = "No Tokens.";
+	public static final String MESSAGE_INPUT_INVALID_EXTRACT_REGEX = "Regex must include just one group.\n e.g. hoge=([^&]+)&";
+	public static final String MESSAGE_INPUT_INVALID_EXTRACT_HTML_TAG = "HTML tag settings must be in \"HTML tag selector;attribute name of value\" format.";
 	public static final String MESSAGE_DELETE_ITEM = "Are you sure you want to delete the selected item?";
 	public static final String MESSAGE_EXIT_WITHOUT_SAVE = "Edits are not saved. Discard them?";
 	public static final String MESSAGE_CHOOSE_EXPORT_FILE = "Export";
