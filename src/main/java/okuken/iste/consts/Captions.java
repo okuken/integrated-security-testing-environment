@@ -6,7 +6,8 @@ public class Captions {
 	public static final String EXTENSION_NAME_FULL = "ISTE: Integrated Security Testing Environment";
 
 	public static final String OMIT_STRING = "...";
-	public static final String CHECK = "\u2714";
+	public static final String CHECK = "\u2713";
+	public static final String CHAIN = new String(new int[] {0x1f517}, 0, 1);
 
 	public static final String DOCKOUT = "\u2197";
 	public static final String DOCKOUT_TT = "Undock";

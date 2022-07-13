@@ -5,11 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.table.AbstractTableModel;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageDto;
 
@@ -24,6 +26,7 @@ public class MessageTableModel extends AbstractTableModel {
 			MessageTableColumn.METHOD,
 			MessageTableColumn.PATH,
 			MessageTableColumn.QUERY,
+			MessageTableColumn.CHAIN,
 			MessageTableColumn.NAME,
 			MessageTableColumn.REMARK,
 			MessageTableColumn.AUTH,
@@ -76,6 +79,17 @@ public class MessageTableModel extends AbstractTableModel {
 			this.rows.clear();
 			fireTableRowsDeleted(0, rowCount - 1);
 		}
+	}
+
+	public void refreshRow(Integer messageId) {
+		var rowIndexOptional = IntStream.range(0, rows.size()).filter(i -> messageId.equals(rows.get(i).getId())).findFirst();
+		if(rowIndexOptional.isEmpty()) {
+			return;
+		}
+		var rowIndex = rowIndexOptional.getAsInt();
+
+		rows.get(rowIndex).setMessageChainIds(null);
+		fireTableRowsUpdated(rowIndex, rowIndex);
 	}
 
 	public List<MessageDto> getRows() {
@@ -171,6 +185,9 @@ public class MessageTableModel extends AbstractTableModel {
 			var value = COLUMNS[columnIndex].getGetter().invoke(row);
 			if(COLUMNS[columnIndex].getType() == String.class) {
 				return Optional.ofNullable(value).orElse("");
+			}
+			if(COLUMNS[columnIndex].getType() == Boolean.class) {
+				return (boolean)value ? Captions.CHAIN : "";
 			}
 			return value;
 		} catch (Exception e) {

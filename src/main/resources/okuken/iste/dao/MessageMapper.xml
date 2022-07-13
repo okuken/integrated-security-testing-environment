@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="okuken.iste.dao.MessageMapper">
+  <resultMap id="MessageJoinResultMap" type="okuken.iste.entity.Message">
+    <id     column="ID"                property="id"             jdbcType="INTEGER" />
+    <result column="FK_PROJECT_ID"     property="fkProjectId"    jdbcType="INTEGER" />
+    <result column="FK_MESSAGE_RAW_ID" property="fkMessageRawId" jdbcType="INTEGER" />
+    <result column="NAME"              property="name"           jdbcType="VARCHAR" />
+    <result column="REMARK"            property="remark"         jdbcType="VARCHAR" />
+    <result column="AUTH_MATRIX"       property="authMatrix"     jdbcType="VARCHAR" />
+    <result column="PRIORITY"          property="priority"       jdbcType="VARCHAR" />
+    <result column="PROGRESS"          property="progress"       jdbcType="INTEGER" />
+    <result column="PROGRESS_MEMO"     property="progressMemo"   jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT01"    property="progressExt01"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT02"    property="progressExt02"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT03"    property="progressExt03"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT04"    property="progressExt04"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT05"    property="progressExt05"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT06"    property="progressExt06"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT07"    property="progressExt07"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT08"    property="progressExt08"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT09"    property="progressExt09"  jdbcType="VARCHAR" />
+    <result column="PROGRESS_EXT10"    property="progressExt10"  jdbcType="VARCHAR" />
+    <result column="URL"               property="url"            jdbcType="VARCHAR" />
+    <result column="METHOD"            property="method"         jdbcType="VARCHAR" />
+    <result column="PARAMS"            property="params"         jdbcType="INTEGER" />
+    <result column="STATUS"            property="status"         jdbcType="INTEGER" />
+    <result column="LENGTH"            property="length"         jdbcType="INTEGER" />
+    <result column="MIME_TYPE"         property="mimeType"       jdbcType="VARCHAR" />
+    <result column="COOKIES"           property="cookies"        jdbcType="VARCHAR" />
+    <result column="DELETE_FLG"        property="deleteFlg"      jdbcType="INTEGER" />
+    <result column="PRC_DATE"          property="prcDate"        jdbcType="VARCHAR" />
+    <collection property="messageChains" ofType="okuken.iste.entity.auto.MessageChain" columnPrefix="mc_">
+        <id     column="FK_MESSAGE_ID" property="fkMessageId" jdbcType="INTEGER" />
+        <id     column="ID"            property="id"          jdbcType="INTEGER" />
+        <result column="NODE_ORDER"    property="nodeOrder"   jdbcType="VARCHAR" />
+        <result column="PRC_DATE"      property="prcDate"     jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+</mapper>

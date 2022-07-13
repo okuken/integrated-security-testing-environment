@@ -137,8 +137,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		chainButton.setMnemonic(KeyEvent.VK_C);
 		chainButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				var chainDefPanel = new ChainDefPanel(orgMessageDto, Controller.getInstance().getMessageChainIdByBaseMessageId(orgMessageDto.getId()));
-				chainDefPanel.setPopupFrame(UiUtil.popup(orgMessageDto.getName() + Captions.REPEATER_POPUP_TITLE_SUFFIX_CHAIN, chainDefPanel, chainButton, we -> {chainDefPanel.cancel();}));
+				ChainDefPanel.openChainFrame(orgMessageDto, chainButton);
 			}
 		});
 		controlRightPanel.add(chainButton);

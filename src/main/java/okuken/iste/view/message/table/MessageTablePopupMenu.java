@@ -182,8 +182,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		openChainMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().forEach(orgMessageDto -> {
-					var chainDefPanel = new ChainDefPanel(orgMessageDto, Controller.getInstance().getMessageChainIdByBaseMessageId(orgMessageDto.getId()));
-					chainDefPanel.setPopupFrame(UiUtil.popup(orgMessageDto.getName() + Captions.REPEATER_POPUP_TITLE_SUFFIX_CHAIN, chainDefPanel, table, we -> {chainDefPanel.cancel();}));
+					ChainDefPanel.openChainFrame(orgMessageDto, table);
 				});
 			}
 		});

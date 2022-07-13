@@ -39,6 +39,7 @@ import okuken.iste.view.message.editor.MessageEditorsLayoutType;
 import okuken.iste.view.message.editor.MessageEditorsLayoutTypeSelectorPanel;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -818,6 +819,20 @@ public class ChainDefPanel extends JPanel {
 
 	public void setPopupFrame(JFrame popupFrame) {
 		this.popupFrame = popupFrame;
+	}
+
+	public static void openChainFrame(MessageDto messageDto, Component triggerComponent) {
+		var chainId = Controller.getInstance().getMessageChainIdByBaseMessageId(messageDto.getId());
+		openChainFrame(messageDto, chainId, triggerComponent, messageDto.getName() + Captions.REPEATER_POPUP_TITLE_SUFFIX_CHAIN);
+	}
+
+	public static void openChainFrame(Integer chainId, Component triggerComponent, String title) {
+		openChainFrame(null, chainId, triggerComponent, title);
+	}
+
+	private static void openChainFrame(MessageDto messageDto, Integer chainId, Component triggerComponent, String title) {
+		var chainDefPanel = new ChainDefPanel(messageDto, chainId);
+		chainDefPanel.setPopupFrame(UiUtil.popup(title, chainDefPanel, triggerComponent, we -> {chainDefPanel.cancel();}));
 	}
 
 }

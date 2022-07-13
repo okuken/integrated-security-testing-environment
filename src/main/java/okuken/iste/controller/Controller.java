@@ -471,6 +471,8 @@ public class Controller {
 		if(isAuthChain) {
 			ConfigLogic.getInstance().getAuthConfig().setAuthMessageChainDto(messageChainDto);
 			clearAuthAccountsSession();
+		} else {
+			messageTableModel.refreshRow(messageChainDto.getMessageId());
 		}
 	}
 

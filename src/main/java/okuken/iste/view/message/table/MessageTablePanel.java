@@ -2,6 +2,8 @@ package okuken.iste.view.message.table;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -33,6 +35,7 @@ import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MessageFilterLogic;
 import okuken.iste.util.UiUtil;
+import okuken.iste.view.chain.ChainDefPanel;
 
 public class MessageTablePanel extends JPanel {
 
@@ -72,6 +75,21 @@ public class MessageTablePanel extends JPanel {
 			}
 		};
 		table.setComponentPopupMenu(new MessageTablePopupMenu(this, table));
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() != 2) {
+					return;
+				}
+				var rowIndex = table.rowAtPoint(e.getPoint());
+				if(rowIndex < 0) {
+					return;
+				}
+
+				var messageDto = tableModel.getRow(table.convertRowIndexToModel(rowIndex));
+				ChainDefPanel.openChainFrame(messageDto, table);
+			}
+		});
 		UiUtil.setupStopEditingOnFocusLost(table);
 		setupTable();
 		Controller.getInstance().setMessageTable(table);	
@@ -129,6 +147,9 @@ public class MessageTablePanel extends JPanel {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 				Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				var columnType = tableModel.getColumnType(table.convertColumnIndexToModel(column));
+
+				setHorizontalAlignment(columnType.getHorizontalAlignment());
 
 				if(isSelected) {
 					setBorder(selectedRowBorder);
@@ -140,7 +161,7 @@ public class MessageTablePanel extends JPanel {
 					return renderer;
 				}
 
-				if(tableModel.getColumnType(table.convertColumnIndexToModel(column)).isProgressDetail() &&
+				if(columnType.isProgressDetail() &&
 					(StringUtils.startsWith((CharSequence) value, "/") || StringUtils.startsWith((CharSequence) value, "-"))) { //personal spec...
 					setBackground(SecurityTestingProgress.DONE.getColor());
 				} else {

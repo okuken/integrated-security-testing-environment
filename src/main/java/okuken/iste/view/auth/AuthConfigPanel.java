@@ -9,7 +9,6 @@ import javax.swing.JButton;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.UiUtil;
 import okuken.iste.view.chain.ChainDefPanel;
 
 import java.awt.event.ActionListener;
@@ -34,8 +33,7 @@ public class AuthConfigPanel extends JPanel {
 		loginRequestConfigPanel.add(chainEditButton);
 		chainEditButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				var chainDefPanel = new ChainDefPanel(null, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId());
-				chainDefPanel.setPopupFrame(UiUtil.popup(Captions.AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN, chainDefPanel, chainEditButton, we -> {chainDefPanel.cancel();}));
+				ChainDefPanel.openChainFrame(ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId(), chainEditButton, Captions.AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN);
 			}
 		});
 		

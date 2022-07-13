@@ -13,6 +13,7 @@ import okuken.iste.annotations.TemplateReference;
 import okuken.iste.consts.Sizes;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MemoLogic;
+import okuken.iste.logic.MessageChainLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.util.HttpUtil;
@@ -63,6 +64,8 @@ public class MessageDto {
 	private IHttpRequestResponse repeatMasterMessage;
 
 	private List<MessageRepeatDto> repeatList;
+
+	private List<Integer> messageChainIds;
 
 	@TemplateReference(key = "Protocol")
 	public String getProtocol() {
@@ -422,6 +425,20 @@ public class MessageDto {
 			repeatList = Lists.newArrayList();
 		}
 		repeatList.add(repeatDto);
+	}
+
+	private List<Integer> getMessageChainIds() {
+		if(messageChainIds == null) {
+			var chainId = MessageChainLogic.getInstance().getMessageChainIdByBaseMessageId(id);
+			messageChainIds = chainId != null ? Lists.newArrayList(chainId) : Lists.newArrayList(); 
+		}
+		return messageChainIds;
+	}
+	public boolean hasChain() {
+		return !getMessageChainIds().isEmpty();
+	}
+	public void setMessageChainIds(List<Integer> messageChainIds) {
+		this.messageChainIds = messageChainIds;
 	}
 
 	@Override
