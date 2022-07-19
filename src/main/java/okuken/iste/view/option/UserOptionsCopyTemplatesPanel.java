@@ -48,7 +48,7 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 				UiUtil.repaint(mainPanel);
 				SwingUtilities.invokeLater(() -> {
 					templatePanel.focus();
-					UiUtil.scrollFor(templatePanel, mainScrollPane);
+					UiUtil.scrollSmoothSlowFor(templatePanel, mainScrollPane);
 				});
 			}
 		});

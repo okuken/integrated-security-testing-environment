@@ -3,6 +3,7 @@ package okuken.iste.util;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.StringSelection;
@@ -147,6 +148,49 @@ public class UiUtil {
 
 	public static final void scrollFor(Component component, JScrollPane scrollPane) {
 		scrollPane.getViewport().setViewPosition(component.getLocation());
+	}
+
+	public static final void scrollSmoothFor(Component component, JScrollPane scrollPane) {
+		scrollSmoothFor(component, scrollPane, 300);
+	}
+	public static final void scrollSmoothSlowFor(Component component, JScrollPane scrollPane) {
+		scrollSmoothFor(component, scrollPane, 500);
+	}
+
+	public static final void scrollSmoothFor(Component component, JScrollPane scrollPane, int totalMs) {
+		scrollSmoothFor(component, scrollPane, 20, totalMs);
+	}
+	public static final void scrollSmoothFor(Component component, JScrollPane scrollPane, int periodMs, int totalMs) {
+		var start = scrollPane.getViewport().getViewPosition();
+		var goal = component.getLocation();
+		var distance = goal.y - start.y;
+
+		var count = totalMs / periodMs;
+		var counter = IntStream.range(0, count).iterator();
+		var before = new Point(start.x, start.y);
+		new javax.swing.Timer(periodMs, e -> {
+			if(!counter.hasNext()) {
+				((javax.swing.Timer)e.getSource()).stop();
+				return;
+			}
+			var i = counter.next();
+
+			if(i > 0) {
+				var current = scrollPane.getViewport().getViewPosition();
+				if(current.equals(before)) {
+					((javax.swing.Timer)e.getSource()).stop();
+					return;
+				}
+				before.setLocation(current);
+			}
+
+			var d = (int)(distance * easeOut(((double)i + 1) / count));
+			scrollPane.getViewport().setViewPosition(new Point(start.x, start.y + d));
+
+		}).start();
+	}
+	private static double easeOut(double x) {
+		return x * (2 - x);
 	}
 
 	public static void highlightTab(Component tabComponent) {

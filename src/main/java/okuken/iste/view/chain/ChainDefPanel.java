@@ -406,7 +406,7 @@ public class ChainDefPanel extends JPanel {
 		nodeLabel.addLabelMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				UiUtil.scrollFor(nodePanel, nodesScrollPane);
+				UiUtil.scrollSmoothFor(nodePanel, nodesScrollPane);
 			}
 		});
 		nodeLabelsPanel.add(nodeLabel, getChainDefNodePanels().indexOf(nodePanel));
@@ -588,7 +588,7 @@ public class ChainDefPanel extends JPanel {
 		}
 
 		if(!forBreaking || autoScrollWhenBreaking) {
-			UiUtil.scrollFor(chainDefNodePanel, nodesScrollPane);
+			UiUtil.scrollSmoothFor(chainDefNodePanel, nodesScrollPane);
 		}
 	}
 
