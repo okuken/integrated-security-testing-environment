@@ -17,14 +17,20 @@ public class ChainDefNodeLabelPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final int NAME_LABEL_LENGTH = 7;
+
 	private MessageDto orgMessageDto;
 
+	private JLabel nameLabel;
 	private JLabel orgLabel;
 	private JLabel resultLabel;
 
 	public ChainDefNodeLabelPanel(ChainDefNodePanel nodePanel) {
 		setLayout(new GridLayout(0, 1, 0, 0));
 		setOpaque(true);
+		
+		nameLabel = new JLabel();
+		add(nameLabel);
 		
 		orgLabel = new JLabel();
 		add(orgLabel);
@@ -56,9 +62,15 @@ public class ChainDefNodeLabelPanel extends JPanel {
 
 	private void refreshByMessageSelection(MessageDto orgMessageDto) {
 		this.orgMessageDto = orgMessageDto;
+		var longStr = orgMessageDto.toString();
+		var shortStr = orgMessageDto.toStringShort(NAME_LABEL_LENGTH);
+
+		nameLabel.setText(shortStr);
+		nameLabel.setToolTipText(longStr);
 		orgLabel.setText(String.format("%s(%d)", orgMessageDto.getStatusStr(), orgMessageDto.getLength()));
-		orgLabel.setToolTipText(orgMessageDto.toString());
-		resultLabel.setToolTipText(orgMessageDto.toString());
+		orgLabel.setToolTipText(longStr);
+		resultLabel.setText(null);
+		resultLabel.setToolTipText(longStr);
 	}
 
 	private void refreshByChainResponse(IHttpRequestResponse message) {
@@ -80,6 +92,7 @@ public class ChainDefNodeLabelPanel extends JPanel {
 	}
 
 	void addLabelMouseListener(MouseListener listener) {
+		nameLabel.addMouseListener(listener);
 		orgLabel.addMouseListener(listener);
 		resultLabel.addMouseListener(listener);
 	}

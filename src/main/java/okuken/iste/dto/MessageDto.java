@@ -441,6 +441,10 @@ public class MessageDto {
 		this.messageChainIds = messageChainIds;
 	}
 
+	public String toStringShort(int length) {
+		return UiUtil.omitStringTail(Optional.ofNullable(name).orElse("").replaceAll("[\\s　]", ""), length);
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%s [%s]", 
