@@ -307,6 +307,12 @@ public class UiUtil {
 	public static void stopEditing(JTable table) {
 		if(table.isEditing()) {
 			table.getCellEditor().stopCellEditing();
+
+			invokeLater(() -> {
+				if(!getParentFrame(table).isFocused()) {
+					focus(table);
+				}
+			});
 		}
 	}
 
