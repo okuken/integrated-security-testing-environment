@@ -764,6 +764,10 @@ public class ChainDefPanel extends JPanel {
 						breakingMessageChainRepeatDto = null;
 						refreshControlsState();
 						timesCountdownLabel.setText(Captions.CHAIN_DEF_RUN_DONE);
+
+						if(judgeIsAuthChain() && authAccountDto != null) {
+							Controller.getInstance().applyNewAuthSession(authAccountDto, messageChainRepeatDto);
+						}
 					});
 				}
 			}

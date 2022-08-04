@@ -446,6 +446,11 @@ public class Controller {
 		});
 	}
 
+	public void applyNewAuthSession(AuthAccountDto authAccountDto, MessageChainRepeatDto messageChainRepeatDto) {
+		AuthLogic.getInstance().updateSessionIds(authAccountDto, messageChainRepeatDto);
+		ConfigLogic.getInstance().setAuthAccountSessionIds(authAccountDto);
+	}
+
 	private void clearAuthAccountsSession() {
 		AuthLogic.getInstance().clearAuthAccountsSession();
 		ConfigLogic.getInstance().reloadAuthAccountDtos();

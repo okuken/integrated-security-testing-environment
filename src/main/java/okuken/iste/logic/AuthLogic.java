@@ -17,6 +17,7 @@ import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageChainDto;
+import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.entity.auto.AuthAccount;
 import okuken.iste.entity.auto.AuthApplyConfig;
 import okuken.iste.entity.auto.AuthConfig;
@@ -239,38 +240,40 @@ public class AuthLogic {
 	}
 
 	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, Consumer<AuthAccountDto> callback) {
-		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), callback, false);
+		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), callback);
 	}
-	private void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<AuthAccountDto> callback, boolean isTest) {
+	private void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<AuthAccountDto> callback) {
 		MessageChainLogic.getInstance().sendMessageChain(authMessageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
 			if(index + 1 < authMessageChainDto.getNodes().size()) {
 				return;
 			}
 
-			authAccountDto.setSessionIds(
-				ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().stream().map(authApplyConfigDto -> {
-					switch (authApplyConfigDto.getSourceType()) {
-					case VAR:
-						if(!messageChainRepeatDto.getVars().containsKey(authApplyConfigDto.getSourceName())) {
-							return null;
-						}
-						return messageChainRepeatDto.getVars().get(authApplyConfigDto.getSourceName());
-					case AUTH_ACCOUNT_TABLE:
-						return authAccountDto.getField(authApplyConfigDto.getSourceName());
-					default:
-						throw new IllegalArgumentException(authApplyConfigDto.getSourceType().name());
-					}
-				}).collect(Collectors.toList()));
-
-			if(!isTest) {
-				saveAuthAccount(authAccountDto, false);
-			}
+			updateSessionIds(authAccountDto, messageChainRepeatDto);
 
 			if(callback != null) {
 				callback.accept(authAccountDto);
 			}
 
 		}, true, false, null);
+	}
+
+	public void updateSessionIds(AuthAccountDto authAccountDto, MessageChainRepeatDto messageChainRepeatDto) {
+		authAccountDto.setSessionIds(
+			ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().stream().map(authApplyConfigDto -> {
+				switch (authApplyConfigDto.getSourceType()) {
+				case VAR:
+					if(!messageChainRepeatDto.getVars().containsKey(authApplyConfigDto.getSourceName())) {
+						return null;
+					}
+					return messageChainRepeatDto.getVars().get(authApplyConfigDto.getSourceName());
+				case AUTH_ACCOUNT_TABLE:
+					return authAccountDto.getField(authApplyConfigDto.getSourceName());
+				default:
+					throw new IllegalArgumentException(authApplyConfigDto.getSourceType().name());
+				}
+			}).collect(Collectors.toList()));
+
+		saveAuthAccount(authAccountDto, false);
 	}
 
 }
