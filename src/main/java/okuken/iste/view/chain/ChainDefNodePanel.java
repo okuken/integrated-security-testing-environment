@@ -22,6 +22,7 @@ import okuken.iste.view.message.editor.MessageEditorsLayoutType;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -77,6 +78,9 @@ public class ChainDefNodePanel extends JPanel {
 	private JCheckBox skipCheckBox;
 
 	private MessageEditorPanel messageEditorPanel;
+
+	private JPanel nodeControlPanel;
+	private JButton btnDelete;
 
 	private boolean refreshingFlag = false;
 
@@ -235,7 +239,7 @@ public class ChainDefNodePanel extends JPanel {
 		JPanel leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);
 		
-		JPanel nodeControlPanel = new JPanel(new GridLayout(0, 1, 0, 0));
+		nodeControlPanel = new JPanel(new GridLayout(0, 1, 0, 0));
 		leftPanel.add(nodeControlPanel);
 		
 		JButton btnUp = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_UP);
@@ -258,15 +262,16 @@ public class ChainDefNodePanel extends JPanel {
 		
 		nodeControlPanel.add(UiUtil.createSpacer());
 		
-		JButton btnDelete = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_DELETE);
+		btnDelete = new JButton(Captions.CHAIN_DEF_NODE_BUTTON_DELETE);
 		btnDelete.setToolTipText(Captions.CHAIN_DEF_NODE_BUTTON_DELETE_TT);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				removeNode();
 			}
 		});
-		btnDelete.setEnabled(!isMainNode);
 		nodeControlPanel.add(btnDelete);
+		
+		setControlEnabled(true);
 		
 		initPanel(nodeDto);
 	}
@@ -329,6 +334,12 @@ public class ChainDefNodePanel extends JPanel {
 	}
 	public void expandSettingPanel() {
 		splitPane.setDividerLocation(0.4);
+	}
+
+	public void setControlEnabled(boolean enable) {
+		Arrays.stream(nodeControlPanel.getComponents())
+			.filter(c -> c instanceof JButton)
+			.forEach(button -> button.setEnabled(isMainNode && button == btnDelete ? false : enable));
 	}
 
 	private void upNode() {

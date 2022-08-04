@@ -361,6 +361,9 @@ public class ChainDefPanel extends JPanel {
 		startButton.setEnabled(!isRunning);
 		stepButton.setEnabled(!isRunning);
 		terminateButton.setEnabled(isRunningOrBreaking);
+
+		getAddButtons().forEach(button -> button.setEnabled(!isRunningOrBreaking));
+		getChainDefNodePanels().forEach(nodePanel -> nodePanel.setControlEnabled(!isRunningOrBreaking));
 	}
 
 	MessageChainDto getLoadedMessageChainDto() {
@@ -613,6 +616,13 @@ public class ChainDefPanel extends JPanel {
 
 	private Optional<ChainDefNodePanel> getMainChainDefNodePanel() {
 		return getChainDefNodePanels().stream().filter(ChainDefNodePanel::isMainNode).findFirst();
+	}
+
+	private List<JButton> getAddButtons() {
+		return Arrays.asList(nodesPanel.getComponents()).stream()
+				.filter(component -> !(component instanceof ChainDefNodePanel))
+				.map(buttonPanel -> (JButton)((JPanel)buttonPanel).getComponents()[0])
+				.collect(Collectors.toList());
 	}
 
 	private MessageChainDto makeChainDto() {
