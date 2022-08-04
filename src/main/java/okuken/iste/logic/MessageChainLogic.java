@@ -1,11 +1,16 @@
 package okuken.iste.logic;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
+
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
+import okuken.iste.consts.Captions;
+import okuken.iste.dao.auto.MessageChainDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageChainMapper;
 import okuken.iste.dao.auto.MessageChainNodeDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageChainNodeReqpDynamicSqlSupport;
@@ -22,6 +27,7 @@ import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.dto.MessageChainNodeRespDto;
 import okuken.iste.dto.MessageChainPresetVarDto;
 import okuken.iste.dto.MessageChainRepeatDto;
+import okuken.iste.dto.MessageDto;
 import okuken.iste.entity.auto.MessageChain;
 import okuken.iste.entity.auto.MessageChainNode;
 import okuken.iste.entity.auto.MessageChainNodeReqp;
@@ -213,13 +219,47 @@ public class MessageChainLogic {
 			var messageChainMapper = session.getMapper(MessageChainMapper.class);
 
 			var entity = messageChainMapper.selectOne(c -> c
-					.where(MessageChainNodeDynamicSqlSupport.fkMessageId, isEqualTo(messageId)));
+					.where(MessageChainDynamicSqlSupport.fkMessageId, isEqualTo(messageId)));
 
 			if(entity.isPresent()) {
 				return entity.get().getId();
 			}
 			return null;
 		});
+	}
+
+	private List<Integer> getMessageChainIdsByNodeMessageId(Integer nodeMessageId) {
+		return DbUtil.withSession(session -> {
+			var messageChainNodeMapper = session.getMapper(MessageChainNodeMapper.class);
+
+			var nodes = messageChainNodeMapper.select(c -> c
+					.where(MessageChainNodeDynamicSqlSupport.fkMessageId, isEqualTo(nodeMessageId)));
+
+			return nodes.stream().map(entity -> entity.getFkMessageChainId()).sorted().distinct().collect(Collectors.toList());
+		});
+	}
+
+	public List<String> getMessageChainOwnerNamesByNodeMessageWhithoutItself(MessageDto message) {
+		var parentChainIds = getMessageChainIdsByNodeMessageId(message.getId());
+		if(parentChainIds.isEmpty() || (parentChainIds.size() == 1 && parentChainIds.get(0).equals(message.getMessageChainId()))) {
+			return Lists.newArrayList();
+		}
+
+		return parentChainIds.stream()
+			.filter(id -> !id.equals(message.getMessageChainId()))
+			.map(id -> {
+				var mainNodeOptional = MessageChainLogic.getInstance().loadMessageChain(id).getMainNode();
+				if(mainNodeOptional.isEmpty()) {
+					return Captions.AUTH_CONFIG_CHAIN;
+				}
+				var mainNodeMessageDto = mainNodeOptional.get().getMessageDto();
+				if(mainNodeMessageDto.isDeleteFlg()) {
+					return null;
+				}
+				return mainNodeMessageDto.toString();
+			})
+			.filter(s -> s != null)
+			.collect(Collectors.toList());
 	}
 
 	public MessageChainRepeatDto sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory, MessageChainRepeatDto breakingMessageChainRepeatDto) {

@@ -51,6 +51,8 @@ public class MessageDto {
 	private String mimeType;
 	private String cookies;
 
+	private boolean deleteFlg;
+
 	private List<MessageRequestParamDto> messageParamList;
 
 	private List<MessageCookieDto> messageCookieList;
@@ -314,6 +316,12 @@ public class MessageDto {
 	public void setCookies(String cookies) {
 		this.cookies = cookies;
 	}
+	public boolean isDeleteFlg() {
+		return deleteFlg;
+	}
+	public void setDeleteFlg(boolean deleteFlg) {
+		this.deleteFlg = deleteFlg;
+	}
 	public List<MessageRequestParamDto> getMessageParamList() {
 		if(messageParamList == null) {
 			MessageLogic.getInstance().loadMessageDetail(this);
@@ -436,6 +444,12 @@ public class MessageDto {
 	}
 	public boolean hasChain() {
 		return !getMessageChainIds().isEmpty();
+	}
+	public Integer getMessageChainId() {
+		if(!hasChain()) {
+			return null;
+		}
+		return getMessageChainIds().get(0);
 	}
 	public void setMessageChainIds(List<Integer> messageChainIds) {
 		this.messageChainIds = messageChainIds;

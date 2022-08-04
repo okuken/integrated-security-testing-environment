@@ -13,6 +13,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 import burp.IHttpRequestResponse;
@@ -214,8 +216,34 @@ public class Controller {
 		refreshRepeatTablePanel(targetMessageDto);
 	}
 
-	public void deleteMessages() {
+	public String deleteMessages() {
 		var selectedRowIndexs = getSelectedRowIndexs();
+
+		var err = selectedRowIndexs.stream()
+				.map(messageTableModel::getRow)
+				.map(message -> {
+					var parentChainNames = MessageChainLogic.getInstance().getMessageChainOwnerNamesByNodeMessageWhithoutItself(message);
+					if(parentChainNames.isEmpty()) {
+						return "";
+					}
+					return new StringBuilder()
+							.append("\"")
+							.append(message.toString())
+							.append("\" is included by chain:")
+							.append(System.lineSeparator())
+							.append(parentChainNames.stream().map(n -> " - " + n).collect(Collectors.joining(System.lineSeparator())))
+							.toString();
+				})
+				.collect(Collectors.joining(System.lineSeparator()));
+
+		if(!StringUtils.isBlank(err)) {
+			return new StringBuilder()
+					.append("Failed to delete.")
+					.append(System.lineSeparator())
+					.append(err)
+					.toString();
+		}
+
 		Collections.reverse(selectedRowIndexs);
 
 		for(var rowIndex: selectedRowIndexs) {
@@ -226,6 +254,7 @@ public class Controller {
 
 		applyMessageFilter();
 		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
+		return null;
 	}
 
 	private void refreshComponentsDependentOnMessages(List<MessageDto> messageDtos) {

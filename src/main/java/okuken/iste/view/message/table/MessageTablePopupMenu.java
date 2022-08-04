@@ -278,7 +278,10 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		UiUtil.setupTablePopupMenuItem(deleteItemMenuItem, table, KEYSTROKE_DELETE_ITEM, new AbstractAction() {
 			public void actionPerformedSafe(ActionEvent e) {
 				if(UiUtil.getConfirmAnswerDefaultCancel(Captions.MESSAGE_DELETE_ITEM, deleteItemMenuItem)) {
-					Controller.getInstance().deleteMessages();
+					var errMessage = Controller.getInstance().deleteMessages();
+					if(errMessage != null) {
+						UiUtil.showMessage(errMessage, deleteItemMenuItem);
+					}
 				}
 			}
 		});

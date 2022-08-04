@@ -184,6 +184,7 @@ public class Captions {
 	public static final String AUTH_CONFIG_TABLE_TITLE_ACCOUNTS = "Accounts";
 	public static final String AUTH_CONFIG_TABLE_TITLE_APPLY_CONFIG = "How to apply vars provided by authentication request chain to each repeat requests";
 
+	public static final String AUTH_CONFIG_CHAIN = "Authentication request chain";
 	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN = "Edit authentication request chain";
 	public static final String AUTH_CONFIG_BUTTON_EDIT_CHAIN_TT = "Open authentication request chain window";
 	public static final String AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN = "Auth config - Edit request chain";

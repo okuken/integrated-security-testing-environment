@@ -303,6 +303,8 @@ public class MessageLogic {
 		dto.setCookies(message.getCookies());
 		dto.setMessageRawId(message.getFkMessageRawId());
 
+		dto.setDeleteFlg(message.isDeleteFlg());
+
 		dto.setMessageChainIds(message.getMessageChains().stream().map(chain -> chain.getId()).collect(Collectors.toList()));
 
 		return dto;
