@@ -29,7 +29,6 @@ public class MessageChainRepeatDto {
 
 	public void applyBreakingInfo(MessageChainRepeatDto breakingMessageChainRepeatDto) {
 		breaking = breakingMessageChainRepeatDto.isBreaking();
-		authAccountDto = breakingMessageChainRepeatDto.getAuthAccountDto();
 		currentIndex = breakingMessageChainRepeatDto.getCurrentIndex();
 		messageRepeatDtos.addAll(breakingMessageChainRepeatDto.getMessageRepeatDtos());
 		vars.putAll(breakingMessageChainRepeatDto.getVars());

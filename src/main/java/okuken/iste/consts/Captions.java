@@ -145,11 +145,11 @@ public class Captions {
 	public static final String CHAIN_DEF_TABLE_TITLE_RESPONSE_MEMORIZATION = "Response memorization";
 
 	public static final String CHAIN_DEF_RUN = " \u25b6 ";
-	public static final String CHAIN_DEF_RUN_TT = "Start or resume request chain [Alt+D]";
+	public static final String CHAIN_DEF_RUN_TT = "Start or resume request chain {Shift: with refresh session} [Alt+S]";
 	public static final String CHAIN_DEF_TERMINATE = " \u23f9 ";
 	public static final String CHAIN_DEF_TERMINATE_TT = "Terminate request chain [Alt+T]";
 	public static final String CHAIN_DEF_STEP = " \u2b07 ";
-	public static final String CHAIN_DEF_STEP_TT = "Step request chain [Alt+S]";
+	public static final String CHAIN_DEF_STEP_TT = "Step request chain {Shift: with refresh session} [Alt+F]";
 	public static final String CHAIN_DEF_RUN_DONE = "Done.";
 	public static final String CHAIN_DEF_RUN_TERMINATE_FORCE = "Forced termination.";
 

@@ -146,21 +146,21 @@ public class ChainDefPanel extends JPanel {
 		
 		stepButton = new JButton(Captions.CHAIN_DEF_STEP);
 		stepButton.setToolTipText(Captions.CHAIN_DEF_STEP_TT);
-		stepButton.setMnemonic(KeyEvent.VK_S);
+		stepButton.setMnemonic(KeyEvent.VK_F);
 		operationCenterPanel.add(stepButton);
 		stepButton.addActionListener(new AbstractAction() {
 			@Override public void actionPerformedSafe(ActionEvent e) {
-				start(true);
+				start(true, UiUtil.judgeIsForceRefresh(e));
 			}
 		});
 		
 		startButton = new JButton(Captions.CHAIN_DEF_RUN);
 		startButton.setToolTipText(Captions.CHAIN_DEF_RUN_TT);
-		startButton.setMnemonic(KeyEvent.VK_D);
+		startButton.setMnemonic(KeyEvent.VK_S);
 		operationCenterPanel.add(startButton);
 		startButton.addActionListener(new AbstractAction() {
 			@Override public void actionPerformedSafe(ActionEvent e) {
-				start(false);
+				start(false, UiUtil.judgeIsForceRefresh(e));
 			}
 		});
 		
@@ -631,7 +631,7 @@ public class ChainDefPanel extends JPanel {
 		return chainDto;
 	}
 
-	private void start(boolean isStep) {
+	private void start(boolean isStep, boolean isForceAuthSessionRefresh) {
 		var chainDto = makeChainDto();
 		var error = ValidationUtil.validate(chainDto);
 		if(error.isPresent()) {
@@ -644,14 +644,14 @@ public class ChainDefPanel extends JPanel {
 		stepButton.setEnabled(false);
 
 		if(breakingMessageChainRepeatDto != null) {
-			resume(chainDto, isStep);
+			resume(chainDto, isStep, isForceAuthSessionRefresh);
 		} else {
-			run(chainDto, isStep);
+			run(chainDto, isStep, isForceAuthSessionRefresh);
 		}
 		refreshControlsState();
 	}
 
-	private void run(MessageChainDto chainDto, boolean isStep) {
+	private void run(MessageChainDto chainDto, boolean isStep, boolean isForceAuthSessionRefresh) {
 		var chainDefNodePanels = getChainDefNodePanels();
 		if(chainDefNodePanels.isEmpty()) {
 			return;
@@ -666,7 +666,7 @@ public class ChainDefPanel extends JPanel {
 			return;
 		}
 
-		if(authAccountDto != null && authAccountDto.isSessionIdsEmpty()) {
+		if(authAccountDto != null && (isForceAuthSessionRefresh || authAccountDto.isSessionIdsEmpty())) {
 			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
 				runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
 			});
@@ -675,11 +675,23 @@ public class ChainDefPanel extends JPanel {
 		runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
 	}
 
-	private void resume(MessageChainDto chainDto, boolean isStep) {
+	private void resume(MessageChainDto chainDto, boolean isStep, boolean isForceAuthSessionRefresh) {
 		var chainDefNodePanels = getChainDefNodePanels();
 		var times = Integer.parseInt(timesCountdownLabel.getText());
 
-		runImpl(chainDefNodePanels, chainDto, null, times, isStep);
+		var authAccountDto = authAccountSelectorPanel.getSelectedAuthAccountDto();
+		if(judgeIsAuthChain()) {
+			runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
+			return;
+		}
+
+		if(authAccountDto != null && isForceAuthSessionRefresh) {
+			Controller.getInstance().fetchNewAuthSession(authAccountDto, x -> {
+				runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
+			});
+			return;
+		}
+		runImpl(chainDefNodePanels, chainDto, authAccountDto, times, isStep);
 	}
 
 	private void runImpl(List<ChainDefNodePanel> chainDefNodePanels, MessageChainDto messageChainDto, AuthAccountDto authAccountDto, int times, boolean isStep) {
