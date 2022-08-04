@@ -53,11 +53,6 @@ public class MessageChainLogic {
 	 * insert or update.
 	 */
 	public void saveMessageChain(MessageChainDto chainDto, boolean isAuthChain) {
-
-		if(isAuthChain) {
-			chainDto.getNodes().forEach(node -> node.setBreakpoint(false));
-		}
-
 		String now = SqlUtil.now();
 		DbUtil.withTransaction(session -> {
 			var messageChainMapper = session.getMapper(MessageChainMapper.class);

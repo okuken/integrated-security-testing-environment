@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
+import okuken.iste.consts.Captions;
 import okuken.iste.dao.auto.AuthAccountDynamicSqlSupport;
 import okuken.iste.dao.auto.AuthAccountMapper;
 import okuken.iste.dao.auto.AuthApplyConfigDynamicSqlSupport;
@@ -28,6 +29,7 @@ import okuken.iste.enums.SourceType;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.ReflectionUtil;
 import okuken.iste.util.SqlUtil;
+import okuken.iste.view.chain.ChainDefPanel;
 
 public class AuthLogic {
 
@@ -243,6 +245,15 @@ public class AuthLogic {
 		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), callback);
 	}
 	private void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<AuthAccountDto> callback) {
+
+		if(authMessageChainDto.getNodes().stream().anyMatch(node -> node.isBreakpoint())) {
+			ChainDefPanel.openAutoStartChainModalFrame(ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId(), Captions.AUTH_CONFIG_CHAIN, authAccountDto);
+			if(callback != null) {
+				callback.accept(authAccountDto);
+			}
+			return;
+		}
+
 		MessageChainLogic.getInstance().sendMessageChain(authMessageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
 			if(index + 1 < authMessageChainDto.getNodes().size()) {
 				return;

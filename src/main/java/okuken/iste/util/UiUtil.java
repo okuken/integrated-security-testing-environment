@@ -39,6 +39,7 @@ import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -512,6 +513,18 @@ public class UiUtil {
 		popupFrame.setVisible(true);
 
 		return popupFrame;
+	}
+
+	public static void showModalFrame(String title, Container contentPane) {
+		var parentFrame = BurpUtil.getBurpSuiteJFrame();
+
+		var dialog = new JDialog(parentFrame, title, true);
+		dialog.setContentPane(contentPane);
+		dialog.setBounds(parentFrame.getBounds());
+		dialog.setLocationRelativeTo(parentFrame);
+
+		BurpUtil.getCallbacks().customizeUiComponent(dialog);
+		dialog.setVisible(true);
 	}
 
 	public static void showMessage(String message, Component triggerComponent) {

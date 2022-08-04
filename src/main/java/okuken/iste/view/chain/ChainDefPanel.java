@@ -97,6 +97,9 @@ public class ChainDefPanel extends JPanel {
 	private JPanel nodeLabelsPanel; 
 	private ChainDefPresetVarsPanel presetVarsPanel;
 	private MessageEditorsLayoutTypeSelectorPanel messageEditorsLayoutTypeSelectorPanel;
+	private JPanel controlPanel;
+
+	private boolean autoStartMode;
 
 	public ChainDefPanel(MessageDto messageDto, Integer messageChainId) {
 		this(messageDto, messageChainId, Lists.newArrayList(messageDto), false);
@@ -245,7 +248,7 @@ public class ChainDefPanel extends JPanel {
 		collapseButton.setToolTipText(Captions.CHAIN_DEF_SPLIT_COLLAPSE_TT);
 		collapseButton.addActionListener(new AbstractAction() {
 			@Override public void actionPerformedSafe(ActionEvent e) {
-				getChainDefNodePanels().stream().forEach(ChainDefNodePanel::collapseSettingPanel);
+				collapseSettingPanels();
 			}
 		});
 		layoutControlPanel.add(collapseButton);
@@ -261,9 +264,7 @@ public class ChainDefPanel extends JPanel {
 		
 		layoutControlPanel.add(UiUtil.createSpacer());
 		
-		messageEditorsLayoutTypeSelectorPanel = new MessageEditorsLayoutTypeSelectorPanel(type -> {
-			getChainDefNodePanels().stream().forEach(nodePanel -> nodePanel.changeMessageEditorsLayout(type));
-		});
+		messageEditorsLayoutTypeSelectorPanel = new MessageEditorsLayoutTypeSelectorPanel(this::changeMessageEditorsLayout);
 		FlowLayout flowLayout_5 = (FlowLayout) messageEditorsLayoutTypeSelectorPanel.getLayout();
 		flowLayout_5.setHgap(0);
 		layoutControlPanel.add(messageEditorsLayoutTypeSelectorPanel);
@@ -290,7 +291,7 @@ public class ChainDefPanel extends JPanel {
 		nodesScrollPane.setViewportView(nodesPanel);
 		nodesPanel.setLayout(new BoxLayout(nodesPanel, BoxLayout.PAGE_AXIS));
 		
-		JPanel controlPanel = new JPanel();
+		controlPanel = new JPanel();
 		add(controlPanel, BorderLayout.SOUTH);
 		controlPanel.setLayout(new BorderLayout(0, 0));
 		
@@ -595,6 +596,14 @@ public class ChainDefPanel extends JPanel {
 		}
 	}
 
+	private void collapseSettingPanels() {
+		getChainDefNodePanels().stream().forEach(ChainDefNodePanel::collapseSettingPanel);
+	}
+
+	private void changeMessageEditorsLayout(MessageEditorsLayoutType type) {
+		getChainDefNodePanels().stream().forEach(nodePanel -> nodePanel.changeMessageEditorsLayout(type));
+	}
+
 	AuthAccountDto getSelectedAuthAccountDto() {
 		return authAccountSelectorPanel.getSelectedAuthAccountDto();
 	}
@@ -768,6 +777,10 @@ public class ChainDefPanel extends JPanel {
 						if(judgeIsAuthChain() && authAccountDto != null) {
 							Controller.getInstance().applyNewAuthSession(authAccountDto, messageChainRepeatDto);
 						}
+
+						if(autoStartMode) {
+							UiUtil.getParentFrame(this).dispose();
+						}
 					});
 				}
 			}
@@ -830,12 +843,14 @@ public class ChainDefPanel extends JPanel {
 	}
 
 	public void cancel() {
-		if(saveButton.isEnabled() && !UiUtil.getConfirmAnswerDefaultCancel(Captions.MESSAGE_EXIT_WITHOUT_SAVE, saveButton)) {
+		if(!autoStartMode && saveButton.isEnabled() && !UiUtil.getConfirmAnswerDefaultCancel(Captions.MESSAGE_EXIT_WITHOUT_SAVE, saveButton)) {
 			return;
 		}
 
 		authAccountSelectorPanel.unloaded();
-		UiUtil.closePopup(popupFrame);
+		if(popupFrame != null) {
+			UiUtil.closePopup(popupFrame);
+		}
 	}
 
 	private void afterEdit() {
@@ -859,6 +874,20 @@ public class ChainDefPanel extends JPanel {
 	private static void openChainFrame(MessageDto messageDto, Integer chainId, Component triggerComponent, String title) {
 		var chainDefPanel = new ChainDefPanel(messageDto, chainId);
 		chainDefPanel.setPopupFrame(UiUtil.popup(title, chainDefPanel, triggerComponent, we -> {chainDefPanel.cancel();}));
+	}
+
+	public static void openAutoStartChainModalFrame(Integer chainId, String title, AuthAccountDto authAccountDto) {
+		var chainDefPanel = new ChainDefPanel(null, chainId);
+		chainDefPanel.autoStartMode = true;
+
+		chainDefPanel.authAccountSelectorPanel.setSelectedAuthAccount(authAccountDto, true);
+		chainDefPanel.collapseSettingPanels();
+		chainDefPanel.changeMessageEditorsLayout(MessageEditorsLayoutType.VERTICAL_SPLIT);
+		chainDefPanel.controlPanel.setVisible(false);
+		chainDefPanel.start(false, false);
+
+		UiUtil.showModalFrame(title, chainDefPanel);
+		chainDefPanel.cancel();
 	}
 
 }

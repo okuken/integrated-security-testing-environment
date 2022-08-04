@@ -143,6 +143,13 @@ public class AuthAccountSelectorPanel extends JPanel {
 		return dto.getId();
 	}
 
+	public void setSelectedAuthAccount(AuthAccountDto authAccountDto, boolean fix) {
+		authAccountComboBox.setSelectedItem(authAccountDto);
+		if(fix) {
+			authAccountComboBox.setEnabled(false);
+		}
+	}
+
 	public void unloaded() {
 		ConfigLogic.getInstance().removeAuthAccountChangeListener(authAccountChangeListener);
 		ConfigLogic.getInstance().removeAuthAccountSessionChangeListener(authAccountSessionChangeListener);
