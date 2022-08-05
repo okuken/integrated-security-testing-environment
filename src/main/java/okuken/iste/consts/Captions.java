@@ -96,6 +96,7 @@ public class Captions {
 	public static final String TABLE_CONTEXT_MENU_COPY_URL_WITHOUTQUERY = "Copy URL without Query";
 	public static final String TABLE_CONTEXT_MENU_COPY_TABLE = "Copy as table";
 	public static final String TABLE_CONTEXT_MENU_COPY_BY_TEMPLATE_PREFIX = "Copy ";
+	public static final String TABLE_CONTEXT_MENU_PASTE_TABLE = "Paste as table (insert)";
 
 	public static final String TABLE_CELL_EDITOR_INPUT = "Input";
 	public static final String TABLE_CELL_EDITOR_REPLACE = "Replace(Regex)";

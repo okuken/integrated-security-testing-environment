@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -98,6 +100,7 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		columns.stream().forEach(column -> {
 			table.getColumnModel().getColumn(column.getIndex()).setPreferredWidth(column.getWidth());
 		});
+		table.setComponentPopupMenu(new SimpleTablePopupMenu<T>(this));
 		tablePanel.add(table.getTableHeader(), BorderLayout.NORTH);
 		tablePanel.add(table);
 		
@@ -170,12 +173,16 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		afterInit(table, tableModel);
 	}
 
+	boolean isStringTable() {
+		return !columns.stream().anyMatch(column -> column.getType() != String.class);
+	}
+
 	private List<Integer> getSelectedRowIndexsReversed() {
 		List<Integer> selectedRows = getSelectedRowIndexs();
 		Collections.reverse(selectedRows);
 		return selectedRows;
 	}
-	private List<Integer> getSelectedRowIndexs() {
+	List<Integer> getSelectedRowIndexs() {
 		return Arrays.stream(table.getSelectedRows())
 				.mapToObj(Integer::valueOf)
 				.collect(Collectors.toList());
@@ -185,30 +192,46 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 				.map(dtos::get)
 				.collect(Collectors.toList());
 	}
+	List<List<String>> getSelectedRowsAsTable() {
+		return getSelectedRows().stream()
+				.map(this::convertDtoToObjectArray)
+				.map(objArray -> Arrays.stream(objArray).map(o -> Optional.ofNullable(o).orElse("").toString()).collect(Collectors.toList()))
+				.collect(Collectors.toList());
+	}
+
+	void setSelection(int start, int end) {
+		table.getSelectionModel().setSelectionInterval(start, end);
+	}
+
+	int getAddTargetIndex(boolean insert) {
+		if(!insert) {
+			return dtos.size();
+		}
+
+		var selectedIndexes = getSelectedRowIndexs();
+		if(selectedIndexes.isEmpty()) {
+			return dtos.size();
+		}
+
+		return selectedIndexes.get(0);
+	}
 
 	private void addRow(boolean insert) {
 		if(dtos.size() >= getMaxRowSize()) {
 			return; //TODO: show error message
 		}
 
-		var insertIndex = dtos.size();
-		if(insert) {
-			var selectedIndexes = getSelectedRowIndexs();
-			if(!selectedIndexes.isEmpty()) {
-				insertIndex = selectedIndexes.get(0);
-			}
-		}
-
-		addRow(createRowDto(), insertIndex);
+		addRow(createRowDto(), getAddTargetIndex(insert));
 	}
 	public void addRow(T dto) {
-		addRow(dto, dtos.size());
+		addRow(dto, getAddTargetIndex(false));
 	}
 	public void addRow(T dto, int index) {
 		dtos.add(index, dto);
 		tableModel.insertRow(index, convertDtoToObjectArray(dto));
 		afterAddRow(dto);
 		afterEdit();
+		setSelection(index, index);
 	}
 	private Object[] convertDtoToObjectArray(T dto) {
 		return columns.stream().map(column -> {
@@ -222,6 +245,20 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 				return null;
 			}
 		}).toArray();
+	}
+
+	T convertStringRowToDto(List<String> row) {
+		var dto = createRowDto();
+		IntStream.range(0, columns.size()).forEach(i -> {
+			try {
+				if(i < row.size()) {
+					columns.get(i).getSetter().invoke(dto, row.get(i));
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		return dto;
 	}
 
 	private void upRows(List<Integer> selectedRowsReversed) {

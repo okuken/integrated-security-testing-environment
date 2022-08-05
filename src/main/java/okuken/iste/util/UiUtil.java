@@ -6,6 +6,7 @@ import java.awt.Desktop;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
@@ -267,6 +269,15 @@ public class UiUtil {
 				messageTextArea.setCaretPosition(messageTextArea.getDocument().getLength());
 			}
 		}, false, StandardCharsets.US_ASCII);
+	}
+
+	public static final Optional<String> getFromClipboard() {
+		try {
+			return Optional.of((String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			return Optional.empty();
+		}
 	}
 
 	public static final void copyToClipboard(String content) {
