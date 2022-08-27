@@ -34,9 +34,10 @@ public class ChainDefTokenTransferSettingPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private Element element;
-	private String baseSelector;
-	private List<MessageRequestParamDto> chainRequestParams;
+	private final Element element;
+	private final String tag;
+	private final String baseSelector;
+	private final List<MessageRequestParamDto> chainRequestParams;
 
 	private JCheckBox tagCheckBox;
 	private JLabel keyAttrNameLabel;
@@ -50,8 +51,8 @@ public class ChainDefTokenTransferSettingPanel extends JPanel {
 		this.element = element;
 		this.baseSelector = baseSelector;
 		this.chainRequestParams = chainRequestParams;
+		tag = element.toString();
 		
-		var tag = element.toString();
 		tagCheckBox = new JCheckBox(tag);
 		tagCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -196,6 +197,10 @@ public class ChainDefTokenTransferSettingPanel extends JPanel {
 
 	boolean isSelected() {
 		return tagCheckBox.isSelected();
+	}
+
+	String getTag() {
+		return tag;
 	}
 
 	MessageChainTokenTransferSettingDto createDto() {

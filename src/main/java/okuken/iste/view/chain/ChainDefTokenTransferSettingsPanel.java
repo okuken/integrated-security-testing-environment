@@ -20,6 +20,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.JLabel;
 
 public class ChainDefTokenTransferSettingsPanel extends JPanel {
 
@@ -32,12 +39,39 @@ public class ChainDefTokenTransferSettingsPanel extends JPanel {
 	private MessageChainDto chainDto;
 
 	private VerticalFlowPanel mainPanel;
+	private JTextField searchTextField;
 
 	public ChainDefTokenTransferSettingsPanel(MessageChainDto chainDto) {
 		this.chainDto = chainDto;
 		
 		setPreferredSize(new Dimension(600, 400));
 		setLayout(new BorderLayout(0, 0));
+		
+		JPanel headerPanel = new JPanel();
+		FlowLayout flowLayout_1 = (FlowLayout) headerPanel.getLayout();
+		flowLayout_1.setAlignment(FlowLayout.LEFT);
+		add(headerPanel, BorderLayout.NORTH);
+		
+		JLabel searchLabel = new JLabel(Captions.SEARCH);
+		headerPanel.add(searchLabel);
+		
+		searchTextField = new JTextField();
+		headerPanel.add(searchTextField);
+		searchTextField.setColumns(15);
+		
+		headerPanel.add(UiUtil.createSpacer());
+		
+		JLabel noteLabel = new JLabel(Captions.MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN_NOTE);
+		headerPanel.add(noteLabel);
+		
+		searchTextField.getDocument().addDocumentListener(new DocumentListener() {
+			public void removeUpdate(DocumentEvent e) {apply();}
+			public void insertUpdate(DocumentEvent e) {apply();}
+			public void changedUpdate(DocumentEvent e) {apply();}
+			private void apply() {
+				applyFilter();
+			}
+		});
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBorder(null);
@@ -77,6 +111,18 @@ public class ChainDefTokenTransferSettingsPanel extends JPanel {
 					});
 			});
 		}
+	}
+
+	private void applyFilter() {
+		var searchString = searchTextField.getText();
+		var showAll = searchString.isEmpty();
+
+		Arrays.stream(mainPanel.getComponents())
+			.filter(c -> c instanceof ChainDefTokenTransferSettingPanel)
+			.map(c -> (ChainDefTokenTransferSettingPanel)c)
+			.forEach(panel -> {
+				panel.setVisible(showAll || StringUtils.containsIgnoreCase(panel.getTag(), searchString));
+			});
 	}
 
 	public List<MessageChainTokenTransferSettingDto> showDialog(Component parent) {

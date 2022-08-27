@@ -8,6 +8,7 @@ public class Captions {
 	public static final String OMIT_STRING = "...";
 	public static final String CHECK = "\u2713";
 	public static final String CHAIN = new String(new int[] {0x1f517}, 0, 1);
+	public static final String SEARCH = new String(new int[] {0x1f50d}, 0, 1);
 
 	public static final String DOCKOUT = "\u2197";
 	public static final String DOCKOUT_TT = "Undock";
@@ -275,7 +276,8 @@ public class Captions {
 	public static final String MESSAGE_AUTH_CHAIN_EXIST = "Auth chain already exists. Override it?";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE = "Select transfer target cookies";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_COOKIE_EMPTY = "No Cookies.";
-	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN = "Select transfer target tokens        * hidden(input) and meta tags are listed as candidates";
+	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN = "Select transfer target tokens";
+	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN_NOTE = "* hidden(input) and meta tags are listed as candidates";
 	public static final String MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN_EMPTY = "No Tokens.";
 	public static final String MESSAGE_INPUT_INVALID_EXTRACT_REGEX = "Regex must include just one group.\n e.g. hoge=([^&]+)&";
 	public static final String MESSAGE_INPUT_INVALID_EXTRACT_HTML_TAG = "HTML tag settings must be in \"HTML tag selector;attribute name of value\" format.";
