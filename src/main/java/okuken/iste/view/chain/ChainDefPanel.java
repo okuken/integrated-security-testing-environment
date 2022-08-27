@@ -70,6 +70,7 @@ public class ChainDefPanel extends JPanel {
 
 	private MessageDto messageDto;
 	private Integer messageChainId;
+	private String messageChainPrcDate;
 
 	private MessageChainDto loadedMessageChainDto;
 
@@ -342,6 +343,7 @@ public class ChainDefPanel extends JPanel {
 		loadedMessageChainDto.getNodes().stream().forEach(nodeDto -> {
 			addNodeTail(nodeDto);
 		});
+		messageChainPrcDate = loadedMessageChainDto.getPrcDate();
 
 		presetVarsPanel.refreshPanel();
 		refreshControlsState();
@@ -828,6 +830,12 @@ public class ChainDefPanel extends JPanel {
 	}
 
 	private void save() {
+		if(messageChainPrcDate != null && !messageChainPrcDate.equals(Controller.getInstance().getMessageChainPrcDate(messageChainId))) {
+			if(!UiUtil.getConfirmAnswerDefaultCancel(Captions.MESSAGE_DUPLICATE_UPDATE, this)) {
+				return;
+			}
+		}
+
 		var messageChainDto = makeChainDto();
 		var error = ValidationUtil.validate(messageChainDto);
 		if(error.isPresent()) {
@@ -837,6 +845,7 @@ public class ChainDefPanel extends JPanel {
 
 		Controller.getInstance().saveMessageChain(messageChainDto, judgeIsAuthChain());
 		messageChainId = messageChainDto.getId();
+		messageChainPrcDate = messageChainDto.getPrcDate();
 
 		UiUtil.showTemporaryMessage(saveMessageLabel, Captions.MESSAGE_SAVED);
 		saveButton.setEnabled(false);

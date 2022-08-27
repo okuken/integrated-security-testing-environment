@@ -491,6 +491,10 @@ public class Controller {
 		return loadMessageChain(chainId);
 	}
 
+	public String getMessageChainPrcDate(Integer messageId) {
+		return MessageChainLogic.getInstance().getPrcDate(messageId);
+	}
+
 	public Integer getMessageChainIdByBaseMessageId(Integer messageId) {
 		return MessageChainLogic.getInstance().getMessageChainIdByBaseMessageId(messageId);
 	}

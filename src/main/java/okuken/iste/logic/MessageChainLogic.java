@@ -131,6 +131,8 @@ public class MessageChainLogic {
 				messageChainPreVarMapper.insert(presetVarEntity);
 				presetVarDto.setId(presetVarEntity.getId());
 			});
+
+			chainDto.setPrcDate(now);
 		});
 	}
 
@@ -147,6 +149,7 @@ public class MessageChainLogic {
 			var ret = new MessageChainDto();
 			ret.setId(chain.getId());
 			ret.setMessageId(chain.getFkMessageId());
+			ret.setPrcDate(chain.getPrcDate());
 
 			var nodes = messageChainNodeMapper.select(c -> c
 					.where(MessageChainNodeDynamicSqlSupport.fkMessageChainId, isEqualTo(ret.getId()))
@@ -206,6 +209,19 @@ public class MessageChainLogic {
 					}).collect(Collectors.toList()));
 
 			return ret;
+		});
+	}
+
+	public String getPrcDate(Integer chainId) {
+		return DbUtil.withSession(session -> {
+			var messageChainMapper = session.getMapper(MessageChainMapper.class);
+
+			var entity = messageChainMapper.selectByPrimaryKey(chainId);
+
+			if(entity.isPresent()) {
+				return entity.get().getPrcDate();
+			}
+			return null;
 		});
 	}
 

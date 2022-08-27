@@ -17,6 +17,8 @@ public class MessageChainDto {
 	@Valid
 	private List<MessageChainPresetVarDto> presetVars = Lists.newArrayList();
 
+	private String prcDate;
+
 
 	public Integer getId() {
 		return id;
@@ -41,6 +43,12 @@ public class MessageChainDto {
 	}
 	public void setPresetVars(List<MessageChainPresetVarDto> presetVars) {
 		this.presetVars = presetVars;
+	}
+	public String getPrcDate() {
+		return prcDate;
+	}
+	public void setPrcDate(String prcDate) {
+		this.prcDate = prcDate;
 	}
 
 	public Optional<MessageChainNodeDto> getMainNode() {

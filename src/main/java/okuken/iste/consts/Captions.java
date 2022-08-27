@@ -262,6 +262,7 @@ public class Captions {
 	public static final String MESSAGE_EMPTY = "          ";
 	public static final String MESSAGE_SAVED = "Saved.";
 	public static final String MESSAGE_DONE = "Done.";
+	public static final String MESSAGE_DUPLICATE_UPDATE = "It has already been updated by another window. Override it?";
 
 	public static final String MESSAGE_EXTRACT_ERROR = "**ERROR**";
 	public static final String MESSAGE_VERSION_LATEST = "ISTE is up to date.";
