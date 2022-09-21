@@ -15,34 +15,33 @@ ISTE puts you in a flow state.
 | Feature　　　　　 | Explanation | Remark |
 | :-- | :-- | :-- |
 | URL list | A feature to manage URLs to be tested in a project. It also provides features such as editing names and remarks, sorting and filtering, copying to clipboard in TSV or template format, and various Send-To menus. | Since URLs and raw logs are linked and saved in the DB (SQLite), there is no need to map the URL list and raw logs, which occurs when creating a URL list in a spreadsheet, etc. |
-| Notes | Notes for each project, each URL, and each repeat. | You can write notes while viewing the raw log, and they will be linked to the raw log and saved in the DB. The notes are saved when they are focused out. |
+| Notes | Notes for each project, each URL, and each repeat. You can also set up note templates. | You can write notes while viewing the raw log, and they will be linked to the raw log and saved in the DB. The notes are saved when they are focused out. |
 | Progress management | Provides a column to enter the progress in the URL list. Automatic coloring and filtering based on progress is possible. | No more time consuming double maintenance and formatting of the URL list and progress list. Filtering operations are light. |
 | Repeat history | For each URL in the URL list, it provides a feature of issuing repeat request and managing history. | Eliminate frustration about repeater history. |
+| Master for repeat | For each URL in the URL list, this feature defines a base request (Master) for repeat, which can be used as the base for request editing. | It is useful to save the request that you want to use as a base when repeatedly testing while changing the payload. |
 
 ### Advanced Features
 
 | Feature　　　　　 | Explanation | Remark |
 | :-- | :-- | :-- |
-| Master for repeat | For each URL in the URL list, this feature defines a base request (Master) for repeat, which can be used as the base for request editing. | It is useful to save the request that you want to use as a base when repeatedly testing while changing the payload. |
 | **Repeat as a specific account** | A feature to issue repeat request as a specific account of the target system. It also provides a button to refresh the session. | Powerful support for testing of broken access control! |
 | Account management | A feature to manages the accounts of the target system. | Registered accounts can be used in "Repeat as a specific account". |
-| Authentication settings | A feature to define the authentication flow of the target system and how to apply values provided by authentication flow to each repeat requests. | The entity of the authentication flow is the request chain described below. |
+| Authentication settings | A feature to define the authentication flow of the target system and how to apply values provided by authentication flow to each repeat requests. | The entity of the authentication flow is the request chain described below. Cases that require manual input, e.g., SMS authentication, can also be handled by setting breakpoints. |
+| **Request chain** | For each URL in the URL list, the feature to define a request chain, i.e., a sequence of multiple requests and parameter transfer, and issue it repeatedly. Flexible execution control, including series of executions, step executions, breakpoints, and re-issue of single nodes. | Automates the work of maintaining the consistency of the issue order and transferring parameters, which usually requires care when repeating! |
 
+[Account management & Authentication settings]
 ![ISTE > Auth](docs/images/auth.png)
-
 ![ISTE > Auth > Edit chain](docs/images/auth_chain.png)
+[Request chain]
+![ISTE > List > Chain](docs/images/chain.png)
 
 ### Experimental Features
 
 | Feature　　　　　 | Explanation | Remark |
 | :-- | :-- | :-- |
-| Request chain | For each URL in the URL list, the feature to define a request chain, i.e., a sequence of multiple requests and parameter transfer, and issue it repeatedly. | Currently, it is not easy to use. There are many improvements I would like to make, such as making the transfer setting items configurable with combo boxes, semi-automating the settings, allowing step-by-step execution, etc. |
 | Export notes | A feature to export notes in a simple Markdown format. | I haven't been able to take a lot of things into account, but it's the least I can do when I want to share my notes with others. Also, since the search function of the notes is not implemented yet, you can use it to export and search with a text editor. |
-| Plugin | Provides an extension point for ISTE. | The features of ISTE will basically be implemented in ISTE itself, but extremely personal features, such as the ability to link with self-made applications, will be implemented as plug-ins. see: [ISTE Plugin API](https://github.com/okuken/iste-plugin-api) |
 
-![iste_demo_02_chain](https://user-images.githubusercontent.com/942241/115988586-6b422680-a5f5-11eb-9031-de10310ed97f.gif)
-
-#### Exploit Features
+### Exploit Features
 
 CAUTION: Please note that this group of features must not be executed without the permission of the administrator of the target system.
 
@@ -50,11 +49,18 @@ CAUTION: Please note that this group of features must not be executed without th
 | :-- | :-- | :-- |
 | Blind SQL Injection | A feature that automates the process of retrieving data using a detected Blind SQL Injection vulnerability. The purpose of this feature is to make it clear to the administrator of the target system that the vulnerability is available. | This is a feature for experts, with priority given to versatility. This feature performs a binary search using ASCII codes as the search range. |
 
+[Blind SQL Injection]
 ![iste_demo_03_bsqli](https://user-images.githubusercontent.com/942241/115988605-785f1580-a5f5-11eb-93f2-1ad9004cf9f0.gif)
+
+### ISTE Extender API
+
+| Feature　　　　　 | Explanation | Remark |
+| :-- | :-- | :-- |
+| Plugin | Provides an extension point for ISTE. | The features of ISTE will basically be implemented in ISTE itself, but extremely personal features, such as the ability to link with self-made applications, will be implemented as plug-ins. see: [ISTE Plugin API](https://github.com/okuken/iste-plugin-api) and [ISTE Plugin Sample](https://github.com/okuken/iste-plugin-sample) |
 
 ## Prerequisites
 
-[Burp Suite Professional](https://portswigger.net/burp/pro) or [Burp Suite Community Edition](https://portswigger.net/burp/communitydownload)
+[Burp Suite Community Edition](https://portswigger.net/burp/communitydownload) or [Burp Suite Professional](https://portswigger.net/burp/pro)
 
 ## Installing ISTE
 
@@ -103,9 +109,13 @@ CAUTION: Please note that this group of features must not be executed without th
       * Basically, enter the user ID in Field 1 and the password in Field 2.
    * Define the authentication flow
       1. Click the "Edit authentication request chain" button to open the request chain window.
+         * Alternatively, it is recommended to select the requests required for the authentication flow in the URL list table in ISTE > List and press "Create auth chain" in the context menu to open the request chain window with the requests already added.
       1. Add the necessary requests to the authentication flow and set up parameter transfer as needed.
+         * [Experimental] Cookie transfer settings can be made semi-automatically by clicking the Cookie button in the Semi-auto setting column at the top of the screen. Tokens and other information which are included as hidden and meta tag can be transferred by clicking the Token button.
       1. For requests with user ID and password as parameters, add the settings to the "Request manipulation" table, specifying the "Account table" in the "Source type" column and the field number in the "Source name", e.g. 1 for user ID, 2 for password, etc.
-      1. If you want to check the behavior, click the Run button. Be aware that requests will be issued to the target system.
+         * If necessary, specify URL-encode in the Encode column.
+      1. For requests that require manual value entry ,e.g. SMS authentication, check the Breakpoint checkbox ON.
+      1. If you want to check the behavior, select an account in the Account combo box at the top of the screen and click the start button (▶). Be aware that requests will be issued to the target system.
       1. Set the session ID and other values obtained as a result of the authentication to the "Response memorization" table.
       1. When you have finished setting the flow, click the Save button and close the window.
    * Define how to apply values provided by authentication request chain to each repeat requests
@@ -118,6 +128,26 @@ CAUTION: Please note that this group of features must not be executed without th
    * Select the URL to be repeated in ISTE > List, open the Repeat tab at the bottom of the screen, select an account in the Account combo box, and click the Send button.
    * If you want to refresh the session, click the Refresh button next to the Account combo box.
    * If you want to refresh the session and repeat it, hold down the Shift key and click the Send button.
+
+#### Using Request chain
+1. In ISTE > List, create a request chain using the following procedure
+   1. Select the requests to be included in the request chain and press "Create chain" in the context menu. A dialog box for selecting the main request, which is the main request to be diagnosed in the request chain, is displayed, and when you select it, the new request chain window is displayed.
+      * The request chain is stored referred by the main request.
+      * Only one request chain can be saved with a certain request as the main request. If a request for which a request chain has already been saved is selected as the main request, a warning dialog box will be displayed asking whether it can be overwritten or not.
+   1. Configure parameter transfer settings as needed
+      * [Experimental] Cookie transfer settings can be made semi-automatically by clicking the Cookie button in the Semi-auto setting column at the top of the screen. Tokens and other information which are included as hidden and meta tag can be transferred by clicking the Token button.
+      * If you want to apply preset values to the request instead of values included in the response, define them in the "Preset vars" table at the top of the screen.
+   1. Press the Save button to save chain.
+1. Execute request chain
+   1. Open request chain window
+      * Double-click on a request with a predefined request chain (with 🔗 in the Chain column) in the URL list, or click "Open chain" in the context menu, or the Chain button in the Repeater tab.
+      * You can execute in new chain window described above.
+   1. If necessary, edit requests and select an account in the Account combo box at the top of the screen
+   1. Execute request chain by click the Start button (▶)
+      * Use the Step button (⬇) if you want to proceed with each request while checking results and editing subsequent requests.
+      * If you want to pause before executing a specific request, check the Breakpoint checkbox.
+      * If you want to skip issue of a specific request, check the Skip checkbox.
+      * If you want to issue a specific request multiple times alone, use the Send button of the target request.
 
 ## Notes
 
