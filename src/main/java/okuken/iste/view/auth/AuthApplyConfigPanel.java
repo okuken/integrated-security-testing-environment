@@ -82,12 +82,24 @@ public class AuthApplyConfigPanel extends SimpleTablePanel<AuthApplyConfigDto> {
 
 	@Override
 	protected void afterAddRow(AuthApplyConfigDto dto) {
-		Controller.getInstance().saveAuthApplyConfig(dto, !dto.isSourceReady());
+		Controller.getInstance().saveNewAuthApplyConfig(dto, !dto.isSourceReady(), getRows());
 	}
 
 	@Override
 	protected void afterRemoveRow(AuthApplyConfigDto dto) {
-		Controller.getInstance().deleteAuthApplyConfigs(Arrays.asList(dto), !dto.isSourceReady());
+	}
+
+	@Override
+	protected void afterRemoveRows(List<AuthApplyConfigDto> dtos) {
+		Controller.getInstance().deleteAuthApplyConfigs(dtos, !dtos.stream().anyMatch(AuthApplyConfigDto::isSourceReady), getRows());
+	}
+	@Override
+	protected void afterUpRows(List<AuthApplyConfigDto> dtos) {
+		Controller.getInstance().saveAuthApplyConfigsOrder(getRows());
+	}
+	@Override
+	protected void afterDownRows(List<AuthApplyConfigDto> dtos) {
+		Controller.getInstance().saveAuthApplyConfigsOrder(getRows());
 	}
 
 	@Override

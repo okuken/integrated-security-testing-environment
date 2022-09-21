@@ -14,6 +14,8 @@
         <columnOverride column="DELETE_FLG" javaType="boolean" />
         <columnOverride column="MAIN_FLG"   javaType="Boolean" />
         <columnOverride column="CHAIN_FLG"  javaType="Boolean" />
+        <columnOverride column="BREAKPOINT" javaType="Boolean" />
+        <columnOverride column="SKIP"       javaType="Boolean" />
         <columnOverride column="REQUEST"    javaType="byte[]" jdbcType="BINARY" />
         <columnOverride column="RESPONSE"   javaType="byte[]" jdbcType="BINARY" />
     </table>

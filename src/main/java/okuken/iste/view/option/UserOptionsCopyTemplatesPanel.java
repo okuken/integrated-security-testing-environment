@@ -2,6 +2,7 @@ package okuken.iste.view.option;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -30,6 +31,7 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 
 	private JLabel saveMessageLabel;
 	private JPanel mainPanel;
+	private JScrollPane mainScrollPane;
 
 	public UserOptionsCopyTemplatesPanel() {
 		setLayout(new BorderLayout(0, 0));
@@ -42,8 +44,12 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 		JButton addButton = new JButton(Captions.ADD);
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addTemplatePanel();
+				var templatePanel = addTemplatePanel();
 				UiUtil.repaint(mainPanel);
+				SwingUtilities.invokeLater(() -> {
+					templatePanel.focus();
+					UiUtil.scrollSmoothSlowFor(templatePanel, mainScrollPane);
+				});
 			}
 		});
 		controlPanel.add(addButton);
@@ -89,7 +95,7 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 		
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new GridLayout(0, 1, 0, 0));
-		JScrollPane mainScrollPane = new JScrollPane(mainPanel);
+		mainScrollPane = new JScrollPane(mainPanel);
 		centerPanel.add(mainScrollPane, BorderLayout.CENTER);
 		
 		
@@ -108,18 +114,44 @@ public class UserOptionsCopyTemplatesPanel extends JPanel {
 		Controller.getInstance().refreshMessageTablePopupMenu();
 	}
 
-	private void addTemplatePanel() {
-		addTemplatePanel(null, null, null);
+	private UserOptionsCopyTemplatePanel addTemplatePanel() {
+		return addTemplatePanel(null, null, null);
 	}
-	private void addTemplatePanel(String name, String template, String mnemonic) {
+	private UserOptionsCopyTemplatePanel addTemplatePanel(String name, String template, String mnemonic) {
 		var templatePanel = new UserOptionsCopyTemplatePanel(this, name, template, mnemonic);
 		templatePanels.add(templatePanel);
 		mainPanel.add(templatePanel);
+		return templatePanel;
 	}
 
 	void removeTemplatePanel(UserOptionsCopyTemplatePanel templatePanel) {
 		mainPanel.remove(templatePanel);
 		templatePanels.remove(templatePanel);
+
+		UiUtil.repaint(mainPanel);
+	}
+
+	void upTemplatePanel(UserOptionsCopyTemplatePanel templatePanel) {
+		var currentIndex = templatePanels.indexOf(templatePanel);
+		changeOrder(currentIndex - 1, currentIndex);
+	}
+
+	void downTemplatePanel(UserOptionsCopyTemplatePanel templatePanel) {
+		var currentIndex = templatePanels.indexOf(templatePanel);
+		changeOrder(currentIndex, currentIndex + 1);
+	}
+
+	private void changeOrder(int index1, int index2) {
+		if(index1 < 0 || index2 >= templatePanels.size()) {
+			return;
+		}
+
+		var target = templatePanels.get(index2);
+		mainPanel.remove(target);
+		templatePanels.remove(target);
+
+		mainPanel.add(target, index1);
+		templatePanels.add(index1, target);
 
 		UiUtil.repaint(mainPanel);
 	}

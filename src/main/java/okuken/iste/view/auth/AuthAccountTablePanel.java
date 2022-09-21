@@ -62,12 +62,24 @@ public class AuthAccountTablePanel extends SimpleTablePanel<AuthAccountDto> {
 
 	@Override
 	protected void afterAddRow(AuthAccountDto dto) {
-		Controller.getInstance().saveAuthAccount(dto, false);
+		Controller.getInstance().saveNewAuthAccount(dto, false, getRows());
 	}
 
 	@Override
 	protected void afterRemoveRow(AuthAccountDto dto) {
-		Controller.getInstance().deleteAuthAccounts(Arrays.asList(dto));
+	}
+
+	@Override
+	protected void afterRemoveRows(List<AuthAccountDto> dtos) {
+		Controller.getInstance().deleteAuthAccounts(dtos, getRows());
+	}
+	@Override
+	protected void afterUpRows(List<AuthAccountDto> dtos) {
+		Controller.getInstance().saveAuthAccountsOrder(getRows());
+	}
+	@Override
+	protected void afterDownRows(List<AuthAccountDto> dtos) {
+		Controller.getInstance().saveAuthAccountsOrder(getRows());
 	}
 
 	@Override

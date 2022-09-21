@@ -7,16 +7,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.mybatis.dynamic.sql.SqlBuilder;
+import org.mybatis.dynamic.sql.BasicColumn;
+import org.mybatis.dynamic.sql.SqlColumn;
+import org.mybatis.dynamic.sql.render.RenderingStrategies;
+import org.mybatis.dynamic.sql.select.QueryExpressionDSL.JoinSpecificationFinisher;
+import org.mybatis.dynamic.sql.select.SelectModel;
+import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
+
+import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
 import com.google.common.collect.Lists;
 
 import burp.IHttpRequestResponse;
 import burp.IHttpService;
 import burp.IParameter;
+import okuken.iste.dao.auto.MessageChainDynamicSqlSupport;
+import okuken.iste.dao.auto.MessageChainMapper;
 import okuken.iste.dao.auto.MessageDynamicSqlSupport;
-import okuken.iste.dao.auto.MessageMapper;
+import okuken.iste.dao.MessageMapper;
 import okuken.iste.dao.auto.MessageOrdDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageOrdMapper;
 import okuken.iste.dao.auto.MessageParamMapper;
@@ -28,7 +38,7 @@ import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRequestParamDto;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.dto.burp.HttpServiceMock;
-import okuken.iste.entity.auto.Message;
+import okuken.iste.entity.Message;
 import okuken.iste.entity.auto.MessageOrd;
 import okuken.iste.entity.auto.MessageParam;
 import okuken.iste.entity.auto.MessageRaw;
@@ -222,22 +232,44 @@ public class MessageLogic {
 	}
 
 	public MessageDto loadMessage(Integer id) {
-		return DbUtil.withSession(session -> {
-				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
-				return convertMessageEntityToDto(messageMapper.selectByPrimaryKey(id).get());
+		Message message = 
+			DbUtil.withSession(session -> {
+				@SuppressWarnings("unchecked")
+				SelectStatementProvider selectStatement = ((SelectModel)createBaseSelectStatement()
+						.where(MessageDynamicSqlSupport.id, isEqualTo(id))
+						.build())
+						.render(RenderingStrategies.MYBATIS3);
+
+				return session.getMapper(MessageMapper.class).selectOneJoin(selectStatement);
 			});
+
+		return convertMessageEntityToDto(message);
 	}
 
 	public List<MessageDto> loadMessages() {
 		List<Message> messages = 
 			DbUtil.withSession(session -> {
-				MessageMapper messageMapper = session.getMapper(MessageMapper.class);
-				return messageMapper.select(c ->
-						c.where(MessageDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId()),
-							SqlBuilder.and(MessageDynamicSqlSupport.deleteFlg, SqlBuilder.isFalse())));
+				@SuppressWarnings("unchecked")
+				SelectStatementProvider selectStatement = ((SelectModel)createBaseSelectStatement()
+						.where(MessageDynamicSqlSupport.fkProjectId, isEqualTo(ConfigLogic.getInstance().getProjectId()),
+							and(MessageDynamicSqlSupport.deleteFlg, isFalse()))
+						.build())
+						.render(RenderingStrategies.MYBATIS3);
+
+				return session.getMapper(MessageMapper.class).selectManyJoin(selectStatement);
 			});
 
 		return messages.stream().map(message -> convertMessageEntityToDto(message)).collect(Collectors.toList());
+	}
+
+	@SuppressWarnings("rawtypes")
+	private JoinSpecificationFinisher createBaseSelectStatement() {
+		return select(ArrayUtils.addAll(
+				Arrays.stream(MessageMapper.selectList).map(c->c.as(((SqlColumn<?>)c).name())).collect(Collectors.toList()).toArray(new BasicColumn[0]),
+				Arrays.stream(MessageChainMapper.selectList).map(c->c.as("mc_" + ((SqlColumn<?>)c).name())).collect(Collectors.toList()).toArray(new BasicColumn[0])))
+			.from(MessageDynamicSqlSupport.message)
+			.leftJoin(MessageChainDynamicSqlSupport.messageChain)
+				.on(MessageDynamicSqlSupport.message.id, equalTo(MessageChainDynamicSqlSupport.messageChain.fkMessageId));
 	}
 
 	//TODO: converter
@@ -270,6 +302,11 @@ public class MessageLogic {
 		dto.setMimeType(message.getMimeType());
 		dto.setCookies(message.getCookies());
 		dto.setMessageRawId(message.getFkMessageRawId());
+
+		dto.setDeleteFlg(message.isDeleteFlg());
+
+		dto.setMessageChainIds(message.getMessageChains().stream().map(chain -> chain.getId()).collect(Collectors.toList()));
+
 		return dto;
 	}
 
@@ -277,7 +314,7 @@ public class MessageLogic {
 		return DbUtil.withSession(session -> {
 			MessageOrdMapper messageOrdMapper = session.getMapper(MessageOrdMapper.class);
 			Optional<MessageOrd> messageOrd = messageOrdMapper
-					.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId, SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+					.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId, isEqualTo(ConfigLogic.getInstance().getProjectId())));
 
 			if(messageOrd.isEmpty()) {
 				return Lists.newArrayList();
@@ -302,7 +339,7 @@ public class MessageLogic {
 
 			Optional<MessageOrd> messageOrd = messageOrdMapper
 					.selectOne(c -> c.where(MessageOrdDynamicSqlSupport.fkProjectId,
-							SqlBuilder.isEqualTo(ConfigLogic.getInstance().getProjectId())));
+							isEqualTo(ConfigLogic.getInstance().getProjectId())));
 
 			//TODO: auto convert, share impl
 			if (messageOrd.isPresent()) {
@@ -340,7 +377,7 @@ public class MessageLogic {
 			DbUtil.withSession(session -> {
 				MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
 				return messageRawMapper
-						.selectOne(c -> c.where(MessageRawDynamicSqlSupport.id, SqlBuilder.isEqualTo(messageRawId)))
+						.selectOne(c -> c.where(MessageRawDynamicSqlSupport.id, isEqualTo(messageRawId)))
 						.get();
 			});
 
@@ -353,7 +390,7 @@ public class MessageLogic {
 				MessageRepeatMasterMapper messageRepeatMasterMapper = session.getMapper(MessageRepeatMasterMapper.class);
 				MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
 
-				var messageRepeatMaster = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(messageDto.getId())));
+				var messageRepeatMaster = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, isEqualTo(messageDto.getId())));
 				if(messageRepeatMaster.isEmpty()) {
 					return null;
 				}
@@ -377,7 +414,7 @@ public class MessageLogic {
 			MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
 			MessageRepeatMasterMapper messageRepeatMasterMapper = session.getMapper(MessageRepeatMasterMapper.class);
 
-			var messageRepeatMasterOptional = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, SqlBuilder.isEqualTo(messageDto.getId())));
+			var messageRepeatMasterOptional = messageRepeatMasterMapper.selectOne(c -> c.where(MessageRepeatMasterDynamicSqlSupport.fkMessageId, isEqualTo(messageDto.getId())));
 			if(messageRepeatMasterOptional.isPresent()) {
 				var messageRaw = messageRawMapper.selectByPrimaryKey(messageRepeatMasterOptional.get().getFkMessageRawId()).get();
 				messageRaw.setRequest(messageDto.getRepeatMasterMessage().getRequest());

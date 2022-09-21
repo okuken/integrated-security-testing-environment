@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -15,7 +18,10 @@ import burp.IParameter;
 import burp.IResponseInfo;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageChainNodeReqpDto;
+import okuken.iste.dto.MessageChainTokenTransferSettingDto;
 import okuken.iste.dto.MessageCookieDto;
+import okuken.iste.dto.MessageDto;
+import okuken.iste.dto.MessageRequestParamDto;
 import okuken.iste.dto.MessageResponseParamDto;
 import okuken.iste.dto.PayloadDto;
 import okuken.iste.enums.RequestParameterType;
@@ -33,6 +39,10 @@ public class MessageUtil {
 
 		if(paramType == RequestParameterType.REGEX) {
 			return applyRegexPayload(request, paramName, paramValue);
+		}
+
+		if(paramType == RequestParameterType.HEADER) {
+			return applyHeaderPayload(request, paramName, paramValue);
 		}
 
 		if(!BurpUtil.getHelpers().analyzeRequest(request).getParameters().stream().anyMatch(p -> 
@@ -62,6 +72,15 @@ public class MessageUtil {
 		var ret = BurpUtil.getHelpers().removeParameter(request, parameter);
 		ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
 		return BurpUtil.getHelpers().addParameter(ret, parameter);
+	}
+
+	private static byte[] applyHeaderPayload(byte[] request, String headerName, String value) {
+		var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
+
+		var headerPrefix = headerName + ": ";
+		var appliedHeaders = requestInfo.getHeaders().stream().map(header -> header.startsWith(headerPrefix) ? headerPrefix + value : header).collect(Collectors.toList());
+		var body = HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset());
+		return BurpUtil.getHelpers().buildHttpMessage(appliedHeaders, body);
 	}
 
 //	private static byte[] applyHeaderPayload(byte[] request, IParameter parameter) {
@@ -132,6 +151,34 @@ public class MessageUtil {
 		return BurpUtil.getHelpers().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
 	}
 
+	public static List<MessageRequestParamDto> extractRequestParams(List<MessageDto> messageDtos) {
+		return messageDtos.stream()
+				.flatMap(messageDto -> extractRequestParams(messageDto).stream())
+				.sorted()
+				.distinct()
+				.collect(Collectors.toList());
+	}
+	public static List<MessageRequestParamDto> extractRequestParams(MessageDto messageDto) {
+		var parameters = messageDto.getRequestInfo().getParameters().stream()
+				.filter(MessageUtil::isRequestParameter)
+				.map(param -> new MessageRequestParamDto(RequestParameterType.getByBurpId(param.getType()), param.getName()));
+
+		var headers = messageDto.getRequestInfo().getHeaders().stream()
+				.map(header -> header.split(":"))
+				.filter(headerSplitted -> headerSplitted.length >= 2)
+				.map(headerSplitted -> headerSplitted[0].trim())
+				.filter(headerName -> !StringUtils.equals(headerName, "Cookie"))
+				.map(headerName -> new MessageRequestParamDto(RequestParameterType.HEADER, headerName));
+
+		return Stream.concat(parameters, headers).sorted().distinct().collect(Collectors.toList());
+	}
+	private static boolean isRequestParameter(IParameter param) {
+		var paramType = param.getType();
+		return paramType == RequestParameterType.URL.getBurpId() ||
+				paramType == RequestParameterType.BODY.getBurpId();
+	}
+
+
 	/**
 	 * CAUTION: not support to extract multibyte character
 	 */
@@ -140,7 +187,10 @@ public class MessageUtil {
 			throw new IllegalArgumentException("The parameter type is not extractable: " + paramType);
 		}
 		if(paramType == ResponseParameterType.REGEX) {
-			return RegexUtil.extractOneGroup(new String(response, ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET), paramName);
+			return RegexUtil.extractOneGroup(response, paramName);
+		}
+		if(paramType == ResponseParameterType.HTML_TAG) {
+			return extractResponseHtmlTagValue(response, paramName);
 		}
 
 		var paramOptional = extractResponseCandidateParams(response, paramType).stream()
@@ -164,6 +214,48 @@ public class MessageUtil {
 			default:
 				return Lists.newArrayList();
 		}
+	}
+
+	public static String extractResponseHtmlTagValue(String responseStr, String settingString) {
+		return extractResponseHtmlTagValueImpl(parseResponseHtml(responseStr), settingString);
+	}
+	public static String extractResponseHtmlTagValue(byte[] response, String settingString) {
+		return extractResponseHtmlTagValueImpl(parseResponseHtml(response), settingString);
+	}
+	private static String extractResponseHtmlTagValueImpl(Optional<Document> docOptional, String settingString) {
+		if(docOptional.isEmpty()) {
+			return null;
+		}
+		var doc = docOptional.get();
+
+		if(!judgeIsValidExtractHtmlTagSetting(settingString)) {
+			return null;
+		}
+		var separaterIndex = settingString.lastIndexOf(MessageChainTokenTransferSettingDto.SETTING_SEPARATER);
+		var selector = settingString.substring(0, separaterIndex);
+		var valueAttrName = settingString.substring(separaterIndex + 1);
+
+		try {
+			var element = doc.selectFirst(selector);
+			if(element == null) {
+				return null;
+			}
+	
+			var ret = element.attr(valueAttrName);
+			return StringUtils.isNotEmpty(ret) ? ret : null;
+
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			return null;
+		}
+	}
+
+	public static boolean judgeIsValidExtractHtmlTagSetting(String settingString) {
+		var separaterIndex = settingString.lastIndexOf(MessageChainTokenTransferSettingDto.SETTING_SEPARATER);
+		if(separaterIndex < 0 || separaterIndex >= settingString.length() - 1) {
+			return false;
+		}
+		return true;
 	}
 
 	public static short extractResponseStatus(byte[] response) {
@@ -198,6 +290,39 @@ public class MessageUtil {
 			dto.setType(ResponseParameterType.JSON);
 			return dto;
 		}).collect(Collectors.toList());
+	}
+
+	public static Optional<String> convertToResponseHtmlString(byte[] response) {
+		var responseInfo = BurpUtil.getHelpers().analyzeResponse(response);
+		if(!isHtml(responseInfo.getStatedMimeType())) {
+			return Optional.empty();
+		}
+		return Optional.of(HttpUtil.convertMessageBytesToString(response, responseInfo.getHeaders(), responseInfo.getBodyOffset()));
+	}
+
+	public static Optional<Document> parseResponseHtml(byte[] response) {
+		return parseResponseHtml(convertToResponseHtmlString(response).orElse(""));
+	}
+	public static Optional<Document> parseResponseHtml(MessageDto messageDto) {
+		if(!isHtml(messageDto.getMimeType())) {
+			return Optional.empty();
+		}
+		return parseResponseHtml(messageDto.getResponseStr());
+	}
+	private static Optional<Document> parseResponseHtml(String response) {
+		if(StringUtils.isEmpty(response)) {
+			return Optional.empty();
+		}
+
+		try {
+			return Optional.of(Jsoup.parse(HttpUtil.extractMessageBody(response)));
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			return Optional.empty();
+		}
+	}
+	private static boolean isHtml(String mimeType) {
+		return "HTML".equals(mimeType);
 	}
 
 }

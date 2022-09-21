@@ -83,7 +83,9 @@ public class MessageTableTransferHandler extends TransferHandler {
 			@SuppressWarnings("unchecked")
 			List<MessageDto> messageDtos = (List<MessageDto>) support.getTransferable().getTransferData(DATA_FLAVOR_MESSAGES);
 			messageTableModel.insertRows(this.targetIndex, messageDtos);
-			table.getSelectionModel().addSelectionInterval(this.targetIndex, this.targetIndex + messageDtos.size() - 1);
+
+			int viewTargetIndex = table.convertRowIndexToView(this.targetIndex);
+			table.getSelectionModel().addSelectionInterval(viewTargetIndex, viewTargetIndex + messageDtos.size() - 1);
 			return true;
 		} catch (UnsupportedFlavorException | IOException ex) {
 			return false;

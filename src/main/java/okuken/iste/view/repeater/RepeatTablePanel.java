@@ -16,6 +16,8 @@ import okuken.iste.controller.Controller;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.util.SqlUtil;
+import okuken.iste.util.UiUtil;
+
 import java.awt.BorderLayout;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -107,6 +109,8 @@ public class RepeatTablePanel extends JPanel {
 
 		table.setComponentPopupMenu(new RepeatTablePopupMenu(this));
 
+		UiUtil.setupStopEditingOnFocusLost(table);
+
 		tableModel = (DefaultTableModel)table.getModel();
 	}
 
@@ -127,6 +131,7 @@ public class RepeatTablePanel extends JPanel {
 	}
 
 	public void setup(List<MessageRepeatDto> repeaterHistory) {
+		UiUtil.stopEditing(table);
 		clearRows();
 		this.repeaterHistory = repeaterHistory;
 		IntStream.range(0, repeaterHistory.size()).mapToObj(this::convertHistoryIndexToRow).forEach(tableModel::addRow);

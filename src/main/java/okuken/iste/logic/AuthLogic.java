@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
+import okuken.iste.consts.Captions;
 import okuken.iste.dao.auto.AuthAccountDynamicSqlSupport;
 import okuken.iste.dao.auto.AuthAccountMapper;
 import okuken.iste.dao.auto.AuthApplyConfigDynamicSqlSupport;
@@ -17,15 +18,18 @@ import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageChainDto;
+import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.entity.auto.AuthAccount;
 import okuken.iste.entity.auto.AuthApplyConfig;
 import okuken.iste.entity.auto.AuthConfig;
 import okuken.iste.enums.EncodeType;
+import okuken.iste.enums.OrderType;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SourceType;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.ReflectionUtil;
 import okuken.iste.util.SqlUtil;
+import okuken.iste.view.chain.ChainDefPanel;
 
 public class AuthLogic {
 
@@ -96,7 +100,7 @@ public class AuthLogic {
 						.orderBy(AuthAccountDynamicSqlSupport.id));
 			});
 
-		return entitys.stream().map(entity -> {
+		var authAccountDtos = entitys.stream().map(entity -> {
 			AuthAccountDto dto = new AuthAccountDto();
 			dto.setId(entity.getId());
 			ReflectionUtil.setNumberedFields(dto, AuthAccountDto.FIELD_SETTER_FORMAT, AuthAccountDto.FIELD_START_NUM, AuthAccountDto.FIELD_END_NUM, String.class, entity, AuthAccountDto.FIELD_GETTER_FORMAT);
@@ -104,6 +108,8 @@ public class AuthLogic {
 			dto.setSessionIds(ReflectionUtil.getNumberedFieldsAsList(entity, AuthAccountDto.SESSIONID_GETTER_FORMAT, AuthAccountDto.SESSIONID_START_NUM, AuthAccountDto.SESSIONID_END_NUM));
 			return dto;
 		}).collect(Collectors.toList());
+
+		return OrderLogic.getInstance().sortByOrder(authAccountDtos, OrderType.AUTH_ACCOUNT);
 	}
 
 	public void deleteAuthAccounts(List<AuthAccountDto> dtos) {
@@ -118,7 +124,7 @@ public class AuthLogic {
 
 	public AuthConfigDto initAuthConfig() {
 		var messageChainDto = new MessageChainDto();
-		MessageChainLogic.getInstance().saveMessageChain(messageChainDto);
+		MessageChainLogic.getInstance().saveMessageChain(messageChainDto, true);
 
 		var authConfigDto = new AuthConfigDto();
 		authConfigDto.setAuthMessageChainDto(messageChainDto);
@@ -167,8 +173,7 @@ public class AuthLogic {
 			dto.setId(entity.getId());
 			dto.setAuthMessageChainId(entity.getFkMessageChainId());
 
-			dto.setAuthApplyConfigDtos(
-				authApplyConfigMapper.select(c -> c
+			var authApplyConfigDtos = authApplyConfigMapper.select(c -> c
 					.where(AuthApplyConfigDynamicSqlSupport.fkAuthConfigId, isEqualTo(dto.getId()))
 					.orderBy(AuthApplyConfigDynamicSqlSupport.id))
 					.stream().map(applyEntity -> {
@@ -181,7 +186,8 @@ public class AuthLogic {
 						applyDto.setSourceName(applyEntity.getSourceName());
 						applyDto.setEncode(EncodeType.getById(Integer.parseInt(Optional.ofNullable(applyEntity.getEncode()).orElse("0"))));
 						return applyDto;
-					}).collect(Collectors.toList()));
+					}).collect(Collectors.toList());
+			dto.setAuthApplyConfigDtos(OrderLogic.getInstance().sortByOrder(authApplyConfigDtos, OrderType.AUTH_APPLY_CONFIG));
 
 			return dto;
 		});
@@ -236,38 +242,49 @@ public class AuthLogic {
 	}
 
 	public void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, Consumer<AuthAccountDto> callback) {
-		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), callback, false);
+		sendLoginRequestAndSetSessionId(authAccountDto, ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto(), callback);
 	}
-	private void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<AuthAccountDto> callback, boolean isTest) {
+	private void sendLoginRequestAndSetSessionId(AuthAccountDto authAccountDto, MessageChainDto authMessageChainDto, Consumer<AuthAccountDto> callback) {
+
+		if(authMessageChainDto.getNodes().stream().anyMatch(node -> node.isBreakpoint())) {
+			ChainDefPanel.openAutoStartChainModalFrame(ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainId(), Captions.AUTH_CONFIG_CHAIN, authAccountDto);
+			if(callback != null) {
+				callback.accept(authAccountDto);
+			}
+			return;
+		}
+
 		MessageChainLogic.getInstance().sendMessageChain(authMessageChainDto, authAccountDto, (messageChainRepeatDto, index) -> {
 			if(index + 1 < authMessageChainDto.getNodes().size()) {
 				return;
 			}
 
-			authAccountDto.setSessionIds(
-				ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().stream().map(authApplyConfigDto -> {
-					switch (authApplyConfigDto.getSourceType()) {
-					case VAR:
-						if(!messageChainRepeatDto.getVars().containsKey(authApplyConfigDto.getSourceName())) {
-							return null;
-						}
-						return messageChainRepeatDto.getVars().get(authApplyConfigDto.getSourceName());
-					case AUTH_ACCOUNT_TABLE:
-						return authAccountDto.getField(authApplyConfigDto.getSourceName());
-					default:
-						throw new IllegalArgumentException(authApplyConfigDto.getSourceType().name());
-					}
-				}).collect(Collectors.toList()));
-
-			if(!isTest) {
-				saveAuthAccount(authAccountDto, false);
-			}
+			updateSessionIds(authAccountDto, messageChainRepeatDto);
 
 			if(callback != null) {
 				callback.accept(authAccountDto);
 			}
 
-		}, true, false);
+		}, true, false, null);
+	}
+
+	public void updateSessionIds(AuthAccountDto authAccountDto, MessageChainRepeatDto messageChainRepeatDto) {
+		authAccountDto.setSessionIds(
+			ConfigLogic.getInstance().getAuthConfig().getAuthApplyConfigDtos().stream().map(authApplyConfigDto -> {
+				switch (authApplyConfigDto.getSourceType()) {
+				case VAR:
+					if(!messageChainRepeatDto.getVars().containsKey(authApplyConfigDto.getSourceName())) {
+						return null;
+					}
+					return messageChainRepeatDto.getVars().get(authApplyConfigDto.getSourceName());
+				case AUTH_ACCOUNT_TABLE:
+					return authAccountDto.getField(authApplyConfigDto.getSourceName());
+				default:
+					throw new IllegalArgumentException(authApplyConfigDto.getSourceType().name());
+				}
+			}).collect(Collectors.toList()));
+
+		saveAuthAccount(authAccountDto, false);
 	}
 
 }

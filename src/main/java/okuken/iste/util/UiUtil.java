@@ -2,33 +2,47 @@ package okuken.iste.util;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Desktop;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -40,8 +54,12 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.JTextComponent;
@@ -63,6 +81,14 @@ public class UiUtil {
 				BurpUtil.printStderr(e);
 			}
 		});
+	}
+
+	public static final String getLookAndFeelName() {
+		var lookAndFeel = UIManager.getLookAndFeel();
+		if(lookAndFeel == null) {
+			return "";
+		}
+		return lookAndFeel.toString();
 	}
 
 	public static final Window getParentFrame(Component component) {
@@ -91,9 +117,96 @@ public class UiUtil {
 		component.repaint();
 	}
 
+	public static void withKeepCaretPosition(JTextComponent textComponent, Runnable procedure) {
+		if(textComponent == null) {
+			procedure.run();
+			return;
+		}
+
+		var hasFocus = textComponent.hasFocus();
+		var caretPosition = textComponent.getCaretPosition();
+
+		procedure.run();
+
+		try {
+			var textLength = textComponent.getText().length();
+
+			if(caretPosition < textLength) {
+				textComponent.setCaretPosition(caretPosition);
+			} else {
+				textComponent.setCaretPosition(textLength);
+			}
+
+			if(hasFocus) {
+				focus(textComponent);
+			}
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+		}
+	}
+
+	public static final void focus(JComponent component) {
+		component.requestFocusInWindow();
+	}
+
+	public static final void scrollFor(Component component, JScrollPane scrollPane) {
+		scrollPane.getViewport().setViewPosition(component.getLocation());
+	}
+
+	public static final void scrollSmoothFor(Component component, JScrollPane scrollPane) {
+		scrollSmoothFor(component, scrollPane, 300);
+	}
+	public static final void scrollSmoothSlowFor(Component component, JScrollPane scrollPane) {
+		scrollSmoothFor(component, scrollPane, 500);
+	}
+
+	public static final void scrollSmoothFor(Component component, JScrollPane scrollPane, int totalMs) {
+		scrollSmoothFor(component, scrollPane, 20, totalMs);
+	}
+	public static final void scrollSmoothFor(Component component, JScrollPane scrollPane, int periodMs, int totalMs) {
+		var start = scrollPane.getViewport().getViewPosition();
+		var goal = component.getLocation();
+		var distance = goal.y - start.y;
+
+		var count = totalMs / periodMs;
+		var counter = IntStream.range(0, count).iterator();
+		var before = new Point(start.x, start.y);
+		new javax.swing.Timer(periodMs, e -> {
+			if(!counter.hasNext()) {
+				((javax.swing.Timer)e.getSource()).stop();
+				return;
+			}
+			var i = counter.next();
+
+			if(i > 0) {
+				var current = scrollPane.getViewport().getViewPosition();
+				if(current.equals(before)) {
+					((javax.swing.Timer)e.getSource()).stop();
+					return;
+				}
+				before.setLocation(current);
+			}
+
+			var d = (int)(distance * easeOut(((double)i + 1) / count));
+			scrollPane.getViewport().setViewPosition(new Point(start.x, start.y + d));
+
+		}).start();
+	}
+	private static double easeOut(double x) {
+		return x * (2 - x);
+	}
+
+	public static void highlightTab(Component tabComponent) {
+		JTabbedPane parentTabbedPane = (JTabbedPane)tabComponent.getParent();
+		parentTabbedPane.setForegroundAt(parentTabbedPane.indexOfComponent(tabComponent), Colors.CHARACTER_HIGHLIGHT);
+	}
+
 	public static final JLabel createTemporaryMessageArea() {
 		var ret = new JLabel(Captions.MESSAGE_EMPTY);
 		ret.setForeground(Colors.CHARACTER_HIGHLIGHT);
+		invokeLater(() -> {
+			setupHtmlEnable(ret);
+		});
 		return ret;
 	}
 	public static final void showTemporaryMessage(JLabel messageArea, String message) {
@@ -108,6 +221,43 @@ public class UiUtil {
 		}, 1000);
 	}
 
+	public static void setupHtmlEnable(JLabel label) {
+		label.putClientProperty("html.disable", Boolean.FALSE);
+	}
+
+	public static final JLabel createSpacer() {
+		return createSpacer(1);
+	}
+	public static final JLabel createSpacerM() {
+		return createSpacer(2);
+	}
+	private static final JLabel createSpacer(int size) {
+		var spaceStr = IntStream.range(0, size).mapToObj(i -> "  ").collect(Collectors.joining());
+		return new JLabel(spaceStr);
+	}
+
+	public static final JEditorPane createLinkLabel(String url) {
+		return createLinkLabel(url, url);
+	}
+	public static final JEditorPane createLinkLabel(String caption, String url) {
+		JEditorPane ret = new JEditorPane("text/html", String.format("<a href=\"%s\">%s</a>", url, caption));
+		ret.setEditable(false);
+		ret.setBorder(new EmptyBorder(0, 0, 0, 0));
+		ret.addHyperlinkListener(new HyperlinkListener() {
+			public void hyperlinkUpdate(HyperlinkEvent e) {
+				if(!HyperlinkEvent.EventType.ACTIVATED.equals(e.getEventType())) {
+					return;
+				}
+				try {
+					Desktop.getDesktop().browse(URI.create(url));
+				} catch (Exception ex) {
+					BurpUtil.printStderr(ex);
+				}
+			}
+		});
+		return ret;
+	}
+
 	/**
 	 * CAUTION: support ASCII only
 	 */
@@ -119,6 +269,15 @@ public class UiUtil {
 				messageTextArea.setCaretPosition(messageTextArea.getDocument().getLength());
 			}
 		}, false, StandardCharsets.US_ASCII);
+	}
+
+	public static final Optional<String> getFromClipboard() {
+		try {
+			return Optional.of((String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
+		} catch (Exception e) {
+			BurpUtil.printStderr(e);
+			return Optional.empty();
+		}
 	}
 
 	public static final void copyToClipboard(String content) {
@@ -146,6 +305,32 @@ public class UiUtil {
 				copyToClipboard(val != null ? val.toString() : "");
 			}
 		});
+	}
+
+	public static void setupStopEditingOnFocusLost(JTable table) {
+		table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+		((DefaultCellEditor)table.getDefaultEditor(Object.class)).getComponent().addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				stopEditing(table);
+			}
+		});
+	}
+	public static void stopEditing(JTable table) {
+		if(table.isEditing()) {
+			table.getCellEditor().stopCellEditing();
+
+			invokeLater(() -> {
+				if(!getParentFrame(table).isFocused()) {
+					focus(table);
+				}
+			});
+		}
+	}
+
+	public static void setupShortcutKey(JComponent component, KeyStroke keyStroke, Action action) {
+		component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(keyStroke, keyStroke);
+		component.getActionMap().put(keyStroke, action);
 	}
 
 	public static void setupTablePopupMenuItem(JMenuItem menuItem, JTable table, KeyStroke keyStroke, Action action) {
@@ -224,6 +409,9 @@ public class UiUtil {
 	}
 
 	public static boolean judgeIsForceRefresh(ActionEvent e) {
+		return judgeIsShiftDown(e);
+	}
+	public static boolean judgeIsShiftDown(ActionEvent e) {
 		return (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
 	}
 
@@ -232,6 +420,29 @@ public class UiUtil {
 		verticalScrollBar.setValue(verticalScrollBar.getMinimum());
 		var horizontalScrollBar = scrollPane.getHorizontalScrollBar();
 		horizontalScrollBar.setValue(horizontalScrollBar.getMinimum());
+	}
+
+	public static void setupScrollPaneMouseWheelDispatch(JScrollPane scrollPane, JScrollPane parentScrollPane) {
+		scrollPane.setWheelScrollingEnabled(false);
+		scrollPane.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				parentScrollPane.dispatchEvent(e);
+			}
+		});
+	}
+
+	public static void setOpaqueChildComponents(Container container, boolean opaque) {
+		Arrays.stream(container.getComponents()).forEach(c -> setOpaqueChildComponentsImpl(c, opaque));
+	}
+	private static void setOpaqueChildComponentsImpl(Component component, boolean opaque) {
+		if(component instanceof JComponent) {
+			((JComponent)component).setOpaque(opaque);
+		}
+		if(component instanceof Container) {
+			Arrays.stream(((Container)component).getComponents()).forEach(child -> {
+				setOpaqueChildComponentsImpl(child, opaque); //recursive
+			});
+		}
 	}
 
 
@@ -315,6 +526,18 @@ public class UiUtil {
 		return popupFrame;
 	}
 
+	public static void showModalFrame(String title, Container contentPane) {
+		var parentFrame = BurpUtil.getBurpSuiteJFrame();
+
+		var dialog = new JDialog(parentFrame, title, true);
+		dialog.setContentPane(contentPane);
+		dialog.setBounds(parentFrame.getBounds());
+		dialog.setLocationRelativeTo(parentFrame);
+
+		BurpUtil.getCallbacks().customizeUiComponent(dialog);
+		dialog.setVisible(true);
+	}
+
 	public static void showMessage(String message, Component triggerComponent) {
 		JOptionPane.showMessageDialog(getParentFrame(triggerComponent), message, Captions.EXTENSION_NAME_FULL, JOptionPane.ERROR_MESSAGE);
 	}
@@ -344,7 +567,7 @@ public class UiUtil {
 			@Override
 			public void ancestorAdded(AncestorEvent event) {
 				var component = event.getComponent();
-				component.requestFocusInWindow();
+				focus(component);
 				component.removeAncestorListener(this);
 			}
 			@Override

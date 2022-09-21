@@ -5,10 +5,13 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -35,6 +38,8 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 	protected List<T> dtos = Lists.newArrayList();
 	protected JTable table;
 	protected DefaultTableModel tableModel;
+
+	private List<Runnable> editListeners = Lists.newArrayList();
 
 	@SuppressWarnings("serial")
 	public SimpleTablePanel() {
@@ -68,29 +73,38 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 			}
 			@Override
 			public void setValueAt(Object val, int rowIndex, int columnIndex) {
-				var column = columns.get(columnIndex);
+				if(rowIndex >= dtos.size()) {
+					return;
+				}
 				var dto = dtos.get(rowIndex);
+				var column = columns.get(columnIndex);
 
 				try {
-					if(val.equals(column.getGetter().invoke(dto))) { //case: no change
-						return;
+					if(column.getGetter() != null && column.getSetter() != null) {
+						if(val.equals(column.getGetter().invoke(dto))) { //case: no change
+							return;
+						}
+						column.getSetter().invoke(dto, val);
 					}
-					column.getSetter().invoke(dto, val);
-
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new RuntimeException(e);
 				}
 
 				afterSetValueAt(val, rowIndex, columnIndex, dto);
+				if(column.isEditable()) {
+					afterEdit();
+				}
 				super.setValueAt(val, rowIndex, columnIndex);
 			}
 		});
 		columns.stream().forEach(column -> {
 			table.getColumnModel().getColumn(column.getIndex()).setPreferredWidth(column.getWidth());
 		});
+		table.setComponentPopupMenu(new SimpleTablePopupMenu<T>(this));
 		tablePanel.add(table.getTableHeader(), BorderLayout.NORTH);
 		tablePanel.add(table);
 		
+		UiUtil.setupStopEditingOnFocusLost(table);
 		UiUtil.setupCtrlCAsCopyCell(table);
 		SwingUtilities.invokeLater(() -> {
 			table.setBorder(new LineBorder(Colors.TABLE_BORDER));
@@ -117,21 +131,41 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		flowLayout_1.setAlignment(FlowLayout.RIGHT);
 		headerPanel.add(headerRightPanel, BorderLayout.EAST);
 		
+		JButton upRowButton = new JButton(Captions.TABLE_CONTROL_BUTTON_UP);
+		upRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_UP_TT);
+		upRowButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				upRows(getSelectedRowIndexsReversed());
+			}
+		});
+		headerRightPanel.add(upRowButton);
+		
+		JButton downRowButton = new JButton(Captions.TABLE_CONTROL_BUTTON_DOWN);
+		downRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_DOWN_TT);
+		downRowButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				downRows(getSelectedRowIndexsReversed());
+			}
+		});
+		headerRightPanel.add(downRowButton);
+		
+		headerRightPanel.add(UiUtil.createSpacer());
+		
 		JButton deleteRowButton = new JButton(Captions.TABLE_CONTROL_BUTTON_DELETE);
+		deleteRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_DELETE_TT);
 		deleteRowButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				List<Integer> selectedRows = getSelectedRowIndexs();
-				Collections.reverse(selectedRows);
-				removeRows(selectedRows);
+				removeRows(getSelectedRowIndexsReversed());
 			}
 		});
 		
 		headerRightPanel.add(deleteRowButton);
 		
 		JButton addRowButton = new JButton(Captions.TABLE_CONTROL_BUTTON_ADD);
+		addRowButton.setToolTipText(Captions.TABLE_CONTROL_BUTTON_ADD_TT);
 		addRowButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addRow();
+				addRow(UiUtil.judgeIsShiftDown(e));
 			}
 		});
 		headerRightPanel.add(addRowButton);
@@ -139,7 +173,16 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		afterInit(table, tableModel);
 	}
 
-	private List<Integer> getSelectedRowIndexs() {
+	boolean isStringTable() {
+		return !columns.stream().anyMatch(column -> column.getType() != String.class);
+	}
+
+	private List<Integer> getSelectedRowIndexsReversed() {
+		List<Integer> selectedRows = getSelectedRowIndexs();
+		Collections.reverse(selectedRows);
+		return selectedRows;
+	}
+	List<Integer> getSelectedRowIndexs() {
 		return Arrays.stream(table.getSelectedRows())
 				.mapToObj(Integer::valueOf)
 				.collect(Collectors.toList());
@@ -149,21 +192,53 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 				.map(dtos::get)
 				.collect(Collectors.toList());
 	}
+	List<List<String>> getSelectedRowsAsTable() {
+		return getSelectedRows().stream()
+				.map(this::convertDtoToObjectArray)
+				.map(objArray -> Arrays.stream(objArray).map(o -> Optional.ofNullable(o).orElse("").toString()).collect(Collectors.toList()))
+				.collect(Collectors.toList());
+	}
 
-	private void addRow() {
+	void setSelection(int start, int end) {
+		table.getSelectionModel().setSelectionInterval(start, end);
+	}
+
+	int getAddTargetIndex(boolean insert) {
+		if(!insert) {
+			return dtos.size();
+		}
+
+		var selectedIndexes = getSelectedRowIndexs();
+		if(selectedIndexes.isEmpty()) {
+			return dtos.size();
+		}
+
+		return selectedIndexes.get(0);
+	}
+
+	private void addRow(boolean insert) {
 		if(dtos.size() >= getMaxRowSize()) {
 			return; //TODO: show error message
 		}
-		addRow(createRowDto());
+
+		addRow(createRowDto(), getAddTargetIndex(insert));
 	}
 	public void addRow(T dto) {
-		dtos.add(dto);
-		tableModel.addRow(convertDtoToObjectArray(dto));
+		addRow(dto, getAddTargetIndex(false));
+	}
+	public void addRow(T dto, int index) {
+		dtos.add(index, dto);
+		tableModel.insertRow(index, convertDtoToObjectArray(dto));
 		afterAddRow(dto);
+		afterEdit();
+		setSelection(index, index);
 	}
 	private Object[] convertDtoToObjectArray(T dto) {
 		return columns.stream().map(column -> {
 			try {
+				if(column.getGetter() == null) {
+					return "";
+				}
 				return column.getGetter().invoke(dto);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();
@@ -172,15 +247,84 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		}).toArray();
 	}
 
-	private void removeRows(List<Integer> selectedRowsReversed) {
+	T convertStringRowToDto(List<String> row) {
+		var dto = createRowDto();
+		IntStream.range(0, columns.size()).forEach(i -> {
+			try {
+				if(i < row.size()) {
+					columns.get(i).getSetter().invoke(dto, row.get(i));
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		return dto;
+	}
+
+	private void upRows(List<Integer> selectedRowsReversed) {
+		if(selectedRowsReversed.isEmpty()) {
+			return;
+		}
+
+		var top = selectedRowsReversed.get(selectedRowsReversed.size() - 1);
+		var target = top - 1 >= 0 ? top - 1 : top;
+
+		var movedDtos = moveRows(target, selectedRowsReversed);
+
+		afterUpRows(movedDtos);
+		afterEdit();
+	}
+
+	private void downRows(List<Integer> selectedRowsReversed) {
+		if(selectedRowsReversed.isEmpty()) {
+			return;
+		}
+
+		var bottom = selectedRowsReversed.get(0);
+		var finalTarget = bottom + 1 < dtos.size() ? bottom + 1 : bottom;
+		var target = finalTarget - selectedRowsReversed.size() + 1;
+
+		var movedDtos = moveRows(target, selectedRowsReversed);
+
+		afterDownRows(movedDtos);
+		afterEdit();
+	}
+
+	private List<T> moveRows(int to, List<Integer> selectedRowsReversed) {
+		var movingDtos = new ArrayList<T>();
 		selectedRowsReversed.forEach(selectedRow -> {
 			var dto = dtos.get(selectedRow);
 
+			movingDtos.add(dto);
+			dtos.remove(dto);
+			tableModel.removeRow(selectedRow);
+		});
+
+		movingDtos.forEach(movingDto -> {
+			dtos.add(to, movingDto);
+			tableModel.insertRow(to, convertDtoToObjectArray(movingDto));
+		});
+
+		table.getSelectionModel().addSelectionInterval(to, to + selectedRowsReversed.size() - 1);
+
+		return movingDtos;
+	}
+
+	private void removeRows(List<Integer> selectedRowsReversed) {
+		List<T> removedRows = Lists.newArrayList();
+
+		selectedRowsReversed.forEach(selectedRow -> {
+			var dto = dtos.get(selectedRow);
+
+			removedRows.add(dto);
 			dtos.remove(dto);
 			tableModel.removeRow(selectedRow);
 
 			afterRemoveRow(dto);
 		});
+
+		afterRemoveRows(removedRows);
+		afterEdit();
 	}
 
 	/**
@@ -210,6 +354,22 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 		loadRows();
 	}
 
+	public void setValueAt(Object value, int row, int col) {
+		tableModel.setValueAt(value, row, col);
+	}
+
+	public void stopEditing() {
+		UiUtil.stopEditing(table);
+	}
+
+	public void addEditListener(Runnable listener) {
+		editListeners.add(listener);
+	}
+
+	private void afterEdit() {
+		editListeners.forEach(Runnable::run);
+	}
+
 	public List<T> getRows() {
 		return dtos;
 	}
@@ -217,6 +377,10 @@ public abstract class SimpleTablePanel<T> extends JPanel {
 	protected int getMaxRowSize() {
 		return Integer.MAX_VALUE;
 	}
+
+	protected void afterUpRows(List<T> dtos) {}
+	protected void afterDownRows(List<T> dtos) {}
+	protected void afterRemoveRows(List<T> dtos) {}
 
 	abstract protected List<ColumnDef> getColumnDefs();
 	abstract protected String getTableCaption();

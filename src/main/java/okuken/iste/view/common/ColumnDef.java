@@ -12,6 +12,17 @@ public class ColumnDef {
 	private final Method setter;
 	private final Class<?> type;
 
+	public ColumnDef(int index, String caption, int width) {
+		this.index = index;
+		this.caption = caption;
+		this.width = width;
+
+		editable = false;
+		getter = null;
+		setter = null;
+		type = String.class;
+	}
+
 	public ColumnDef(int index, String caption, int width, boolean editable, String getterName, String setterName, Class<?> type, Class<?> dtoClass) {
 		this.index = index;
 		this.caption = caption;

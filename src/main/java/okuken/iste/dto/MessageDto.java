@@ -13,6 +13,7 @@ import okuken.iste.annotations.TemplateReference;
 import okuken.iste.consts.Sizes;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.MemoLogic;
+import okuken.iste.logic.MessageChainLogic;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.util.HttpUtil;
@@ -50,6 +51,8 @@ public class MessageDto {
 	private String mimeType;
 	private String cookies;
 
+	private boolean deleteFlg;
+
 	private List<MessageRequestParamDto> messageParamList;
 
 	private List<MessageCookieDto> messageCookieList;
@@ -63,6 +66,8 @@ public class MessageDto {
 	private IHttpRequestResponse repeatMasterMessage;
 
 	private List<MessageRepeatDto> repeatList;
+
+	private List<Integer> messageChainIds;
 
 	@TemplateReference(key = "Protocol")
 	public String getProtocol() {
@@ -311,6 +316,12 @@ public class MessageDto {
 	public void setCookies(String cookies) {
 		this.cookies = cookies;
 	}
+	public boolean isDeleteFlg() {
+		return deleteFlg;
+	}
+	public void setDeleteFlg(boolean deleteFlg) {
+		this.deleteFlg = deleteFlg;
+	}
 	public List<MessageRequestParamDto> getMessageParamList() {
 		if(messageParamList == null) {
 			MessageLogic.getInstance().loadMessageDetail(this);
@@ -401,6 +412,9 @@ public class MessageDto {
 		}
 		return repeatMasterMessage;
 	}
+	public IHttpRequestResponse getMasterMessage() {
+		return Optional.ofNullable(getRepeatMasterMessage()).orElse(getMessage());
+	}
 	public void setRepeatMasterMessage(IHttpRequestResponse repeatMasterMessage) {
 		this.repeatMasterMessage = repeatMasterMessage;
 	}
@@ -419,6 +433,30 @@ public class MessageDto {
 			repeatList = Lists.newArrayList();
 		}
 		repeatList.add(repeatDto);
+	}
+
+	private List<Integer> getMessageChainIds() {
+		if(messageChainIds == null) {
+			var chainId = MessageChainLogic.getInstance().getMessageChainIdByBaseMessageId(id);
+			messageChainIds = chainId != null ? Lists.newArrayList(chainId) : Lists.newArrayList(); 
+		}
+		return messageChainIds;
+	}
+	public boolean hasChain() {
+		return !getMessageChainIds().isEmpty();
+	}
+	public Integer getMessageChainId() {
+		if(!hasChain()) {
+			return null;
+		}
+		return getMessageChainIds().get(0);
+	}
+	public void setMessageChainIds(List<Integer> messageChainIds) {
+		this.messageChainIds = messageChainIds;
+	}
+
+	public String toStringShort(int length) {
+		return UiUtil.omitStringTail(Optional.ofNullable(name).orElse("").replaceAll("[\\s　]", ""), length);
 	}
 
 	@Override

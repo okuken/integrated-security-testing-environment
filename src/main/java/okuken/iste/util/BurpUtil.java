@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
@@ -19,11 +20,18 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.table.TableModel;
+import javax.swing.text.JTextComponent;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Lists;
 
 import burp.IBurpExtenderCallbacks;
 import burp.IExtensionHelpers;
 import burp.IHttpService;
+import burp.IMessageEditor;
 import burp.ITab;
 import okuken.iste.consts.Colors;
 import okuken.iste.dto.burp.HttpRequestResponseMock;
@@ -123,6 +131,23 @@ public class BurpUtil {
 		return burpSuiteProjectName;
 	}
 
+	public static final Optional<Boolean> isDarkTheme() {
+		var lookAndFeelName = UiUtil.getLookAndFeelName();
+		if(isDarkThemeImpl(lookAndFeelName)) {
+			return Optional.of(Boolean.TRUE);
+		}
+		if(isLightThemeImpl(lookAndFeelName)) {
+			return Optional.of(Boolean.FALSE);
+		}
+		return Optional.empty();
+	}
+	private static final boolean isDarkThemeImpl(String lookAndFeelName) {
+		return StringUtils.contains(StringUtils.upperCase(lookAndFeelName), "DARK");
+	}
+	private static final boolean isLightThemeImpl(String lookAndFeelName) {
+		return StringUtils.contains(StringUtils.upperCase(lookAndFeelName), "LIGHT");
+	}
+
 	private static JTable burpSuiteProxyHttpHistoryTable;
 	public static boolean isBurpSuiteProxyHttpHistoryTableExtracted() {
 		return burpSuiteProxyHttpHistoryTable != null;
@@ -168,6 +193,32 @@ public class BurpUtil {
 	public static Integer extractProxyHttpHistoryNumber(TableModel burpSuiteProxyHttpHistoryTableModel, int tableModelRowIndex) {
 		return (Integer)burpSuiteProxyHttpHistoryTableModel.getValueAt(tableModelRowIndex, 0); // value of "#" column
 	}
+
+
+	public static JTextComponent extractMessageEditorTextComponent(IMessageEditor messageEditor) {
+		List<JTextComponent> ret = Lists.newArrayList();
+		extractMessageEditorTextComponentImpl(messageEditor.getComponent(), ret);
+		if(ret.isEmpty()) {
+			printStderr("extractMessageEditorTextComponent failed.");
+			return null;
+		}
+		return ret.get(0);
+	}
+	private static void extractMessageEditorTextComponentImpl(Component component, List<JTextComponent> ret) {
+		if(!ret.isEmpty()) {
+			return;
+		}
+		if(component instanceof JTextArea) {
+			ret.add((JTextArea)component);
+			return;
+		}
+		if(component instanceof Container) {
+			for(var childComponent: ((Container)component).getComponents()) {
+				extractMessageEditorTextComponentImpl(childComponent, ret); //recursive
+			}
+		}
+	}
+
 
 	private static Boolean professionalEdition;
 	public static boolean isProfessionalEdition() {

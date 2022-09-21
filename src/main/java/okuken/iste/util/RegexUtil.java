@@ -3,6 +3,8 @@ package okuken.iste.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okuken.iste.consts.Captions;
+
 public class RegexUtil {
 
 	public static boolean judgeHasJustOneGroup(String regex) {
@@ -11,7 +13,7 @@ public class RegexUtil {
 	public static String judgeHasJustOneGroupAndReturnErrorMsg(String regex) {
 		try {
 			if(!judgeHasJustOneGroup(regex)) {
-				return "Regex must include just one group.\n e.g. hoge=([^&]+)&";
+				return Captions.MESSAGE_INPUT_INVALID_EXTRACT_REGEX;
 			}
 		} catch (Exception e) {
 			return e.toString();
@@ -31,6 +33,9 @@ public class RegexUtil {
 			.toString();
 	}
 
+	public static String extractOneGroup(byte[] bytes, String regex) {
+		return extractOneGroup(convertToStringForRegex(bytes), regex);
+	}
 	public static String extractOneGroup(String str, String regex) {
 		return extractOneGroup(str, Pattern.compile(regex));
 	}
@@ -40,6 +45,10 @@ public class RegexUtil {
 			return null;
 		}
 		return matcher.group(1);
+	}
+
+	public static String convertToStringForRegex(byte[] bytes) {
+		return new String(bytes, ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET);
 	}
 
 }

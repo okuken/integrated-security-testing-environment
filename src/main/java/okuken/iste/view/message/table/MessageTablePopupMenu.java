@@ -23,7 +23,9 @@ import okuken.iste.plugin.PluginPopupMenuListener;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractAction;
+import okuken.iste.view.chain.ChainDefPanel;
 import okuken.iste.view.message.editor.MessageCellEditorDialog;
+import okuken.iste.view.message.selector.MessageSelectorForCreateChain;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -176,6 +178,58 @@ public class MessageTablePopupMenu extends JPopupMenu {
 
 		add(new JPopupMenu.Separator());
 
+		JMenuItem openChainMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_OPEN_CHAIN);
+		openChainMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Controller.getInstance().getSelectedMessages().forEach(orgMessageDto -> {
+					ChainDefPanel.openChainFrame(orgMessageDto, table);
+				});
+			}
+		});
+		add(openChainMenuItem);
+
+		JMenuItem createChainMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_CREATE_CHAIN);
+		createChainMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var selectedMessages = Controller.getInstance().getSelectedMessages();
+				var targetMessage = selectedMessages.size() == 1 ? selectedMessages.get(0) : MessageSelectorForCreateChain.showDialog(selectedMessages);
+				if(targetMessage == null) {
+					return;
+				}
+
+				var chain = Controller.getInstance().getMessageChainByBaseMessageId(targetMessage.getId());
+				if(chain != null && chain.isEditedByUser()) {
+					if(!UiUtil.getConfirmAnswer(Captions.MESSAGE_SELECT_CREATE_CHAIN_TARGET_EXIST, table)) {
+						return;
+					}
+				}
+
+				var chainDefPanel = new ChainDefPanel(targetMessage, chain != null ? chain.getId() : null, selectedMessages, true);
+				chainDefPanel.setPopupFrame(UiUtil.popup(targetMessage.getName() + Captions.REPEATER_POPUP_TITLE_SUFFIX_CHAIN, chainDefPanel, table, we -> {chainDefPanel.cancel();}));
+			}
+		});
+		add(createChainMenuItem);
+
+		JMenuItem createAuthChainMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_CREATE_AUTH_CHAIN);
+		createAuthChainMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				var selectedMessages = Controller.getInstance().getSelectedMessages();
+
+				var chain = ConfigLogic.getInstance().getAuthConfig().getAuthMessageChainDto();
+				if(chain.isEditedByUser()) {
+					if(!UiUtil.getConfirmAnswer(Captions.MESSAGE_AUTH_CHAIN_EXIST, table)) {
+						return;
+					}
+				}
+
+				var chainDefPanel = new ChainDefPanel(null, chain.getId(), selectedMessages, true);
+				chainDefPanel.setPopupFrame(UiUtil.popup(Captions.AUTH_CONFIG_POPUP_TITLE_EDIT_CHAIN, chainDefPanel, table, we -> {chainDefPanel.cancel();}));
+			}
+		});
+		add(createAuthChainMenuItem);
+
+		add(new JPopupMenu.Separator());
+
 		JMenuItem editCellMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_EDIT_CELL);
 		UiUtil.setupTablePopupMenuItem(editCellMenuItem, table, KEYSTROKE_EDIT_CELL, new AbstractAction() {
 			public void actionPerformedSafe(ActionEvent e) {
@@ -224,7 +278,10 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		UiUtil.setupTablePopupMenuItem(deleteItemMenuItem, table, KEYSTROKE_DELETE_ITEM, new AbstractAction() {
 			public void actionPerformedSafe(ActionEvent e) {
 				if(UiUtil.getConfirmAnswerDefaultCancel(Captions.MESSAGE_DELETE_ITEM, deleteItemMenuItem)) {
-					Controller.getInstance().deleteMessages();
+					var errMessage = Controller.getInstance().deleteMessages();
+					if(errMessage != null) {
+						UiUtil.showMessage(errMessage, deleteItemMenuItem);
+					}
 				}
 			}
 		});

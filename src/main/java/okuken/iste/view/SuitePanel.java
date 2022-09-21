@@ -4,6 +4,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -11,12 +12,16 @@ import javax.swing.event.ChangeListener;
 import com.google.common.collect.Lists;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 import javax.swing.JSplitPane;
 
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
 import okuken.iste.util.UiUtil;
+import okuken.iste.view.about.AboutPanel;
 import okuken.iste.view.auth.AuthPanel;
 import okuken.iste.view.header.MainHeaderPanel;
 import okuken.iste.view.memo.MessageMemoPanel;
@@ -34,6 +39,8 @@ import java.util.List;
 public class SuitePanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final KeyStroke KEYSTROKE_SEARCH = KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK, false);
 
 	private JTabbedPane mainTabbedPane;
 	private JFrame dockoutFrame;
@@ -142,6 +149,9 @@ public class SuitePanel extends JPanel {
 		mainTabbedPane.addTab(Captions.TAB_PLUGINS, null, pluginsPanel, null);
 		Controller.getInstance().setPluginsPanel(pluginsPanel);
 		
+		JPanel aboutPanel = new AboutPanel();
+		mainTabbedPane.addTab(Captions.TAB_ABOUT, null, aboutPanel, null);
+		
 		mainTabbedPane.addTab(Captions.DOCKOUT, null);
 		mainTabbedPane.setToolTipTextAt(getDockoutTabIndex(), Captions.DOCKOUT_TT);
 		mainTabbedPane.addChangeListener(new ChangeListener() {
@@ -150,6 +160,14 @@ public class SuitePanel extends JPanel {
 				if(mainTabbedPane.getSelectedIndex() == getDockoutTabIndex()) {
 					dockoutOrDockin();
 				}
+			}
+		});
+		
+		
+		UiUtil.setupShortcutKey(mainPanel, KEYSTROKE_SEARCH, new AbstractAction() {
+			@Override
+			public void actionPerformedSafe(ActionEvent e) {
+				mainHeaderPanel.focusOnSearch();
 			}
 		});
 		

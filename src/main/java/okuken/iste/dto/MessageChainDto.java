@@ -5,12 +5,19 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
+import jakarta.validation.Valid;
+
 public class MessageChainDto {
 
 	private Integer id;
 	private Integer messageId; //base message
 
+	@Valid
 	private List<MessageChainNodeDto> nodes = Lists.newArrayList();
+	@Valid
+	private List<MessageChainPresetVarDto> presetVars = Lists.newArrayList();
+
+	private String prcDate;
 
 
 	public Integer getId() {
@@ -31,8 +38,25 @@ public class MessageChainDto {
 	public void setNodes(List<MessageChainNodeDto> nodes) {
 		this.nodes = nodes;
 	}
+	public List<MessageChainPresetVarDto> getPresetVars() {
+		return presetVars;
+	}
+	public void setPresetVars(List<MessageChainPresetVarDto> presetVars) {
+		this.presetVars = presetVars;
+	}
+	public String getPrcDate() {
+		return prcDate;
+	}
+	public void setPrcDate(String prcDate) {
+		this.prcDate = prcDate;
+	}
 
 	public Optional<MessageChainNodeDto> getMainNode() {
 		return nodes.stream().filter(MessageChainNodeDto::isMain).findFirst();
 	}
+
+	public boolean isEditedByUser() {
+		return !presetVars.isEmpty() || !nodes.isEmpty();
+	}
+
 }

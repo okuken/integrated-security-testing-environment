@@ -9,6 +9,7 @@ public enum ResponseParameterType {
 	BODY			((byte) 1, false, "Body"),
 	JSON			((byte) 6, false, "Body(JSON)"),
 	COOKIE			((byte) 2, true,  "Cookie"),
+	HTML_TAG		((byte)95, true,  "HTML tag"),
 	REGEX			((byte)99, true,  "Regex");
 
 	private final byte id;
@@ -34,6 +35,17 @@ public enum ResponseParameterType {
 	@Override
 	public String toString() {
 		return caption;
+	}
+
+	public ExtractType getExtractType() {
+		switch (this) {
+		case REGEX:
+			return ExtractType.REGEX;
+		case HTML_TAG:
+			return ExtractType.HTML_TAG;
+		default:
+			return null;
+		}
 	}
 
 	private static final Map<Byte, ResponseParameterType> idToEnumMap;

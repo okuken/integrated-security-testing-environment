@@ -118,6 +118,42 @@ class HttpUtilTest {
 	}
 
 	@Test
+	void extractMessageBody() {
+		assertEquals("<html><body>hoge</body></html>", HttpUtil.extractMessageBody(
+				"HTTP/1.1 200 OK\r\n" +
+				"Content-Length: 30\r\n" +
+				"\r\n" +
+				"<html><body>hoge</body></html>"));
+	}
+	@Test
+	void extractMessageBody_empty() {
+		assertEquals("", HttpUtil.extractMessageBody(
+				"HTTP/1.1 200 OK\r\n" +
+				"Content-Length: 0\r\n" +
+				"\r\n"));
+	}
+	@Test
+	void extractMessageBody_separater_none() {
+		assertEquals("", HttpUtil.extractMessageBody(
+				"HTTP/1.1 200 OK\r\n" +
+				"Content-Length: 0\r\n"));
+	}
+	@Test
+	void extractMessageBody_separater_multiple() {
+		assertEquals(
+				"<html><body>hoge\r\n" +
+				"\r\n" +
+				"fuga</body></html>"
+				, HttpUtil.extractMessageBody(
+				"HTTP/1.1 200 OK\r\n" +
+				"Content-Length: 38\r\n" +
+				"\r\n" +
+				"<html><body>hoge\r\n" +
+				"\r\n" +
+				"fuga</body></html>"));
+	}
+
+	@Test
 	void convertMessageBytesToString_multipart() {
 		var data = Lists.newArrayList(
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "POST /example HTTP/1.1"),
@@ -128,22 +164,22 @@ class HttpUtilTest {
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "------0123456789abcdefghijklmnopqrstuvwxyz"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Type: text/plain; charset=utf-8"), // UTF-8
 			new StringWithCharset(StandardCharsets.ISO_8859_1, ""),
-			new StringWithCharset(StandardCharsets.UTF_8,      "Ç†Ç¢Ç§Ç¶Ç®"),
+			new StringWithCharset(StandardCharsets.UTF_8,      "„ÅÇ„ÅÑ„ÅÜ„Åà„Åä"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "------0123456789abcdefghijklmnopqrstuvwxyz"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Type: text/plain; charset=sjis"), // SJIS
 			new StringWithCharset(StandardCharsets.ISO_8859_1, ""),
-			new StringWithCharset(Charset.forName("SJIS"),      "Ç†Ç¢Ç§Ç¶Ç®"),
+			new StringWithCharset(Charset.forName("SJIS"),      "„ÅÇ„ÅÑ„ÅÜ„Åà„Åä"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "------0123456789abcdefghijklmnopqrstuvwxyz"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Type: text/plain"), // without charset param
 			new StringWithCharset(StandardCharsets.ISO_8859_1, ""),
-			new StringWithCharset(StandardCharsets.UTF_8,      "Ç†Ç¢Ç§Ç¶Ç®"),
+			new StringWithCharset(StandardCharsets.UTF_8,      "„ÅÇ„ÅÑ„ÅÜ„Åà„Åä"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "------0123456789abcdefghijklmnopqrstuvwxyz"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Type: multipart/form-data; boundary=----ABCDEFG"), //nested multipart
 			new StringWithCharset(StandardCharsets.ISO_8859_1, ""),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "------ABCDEFG"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Type: text/plain; charset=utf-8"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, ""),
-			new StringWithCharset(StandardCharsets.UTF_8,      "Ç†Ç¢Ç§Ç¶Ç®"),
+			new StringWithCharset(StandardCharsets.UTF_8,      "„ÅÇ„ÅÑ„ÅÜ„Åà„Åä"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "------ABCDEFG--"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "------0123456789abcdefghijklmnopqrstuvwxyz--")
 		);
@@ -199,7 +235,7 @@ class HttpUtilTest {
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "--" + boundary),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "Content-Type: text/plain; charset=utf-8"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, ""),
-			new StringWithCharset(StandardCharsets.UTF_8,      "Ç†Ç¢Ç§Ç¶Ç®"),
+			new StringWithCharset(StandardCharsets.UTF_8,      "„ÅÇ„ÅÑ„ÅÜ„Åà„Åä"),
 			new StringWithCharset(StandardCharsets.ISO_8859_1, "--" + boundary + "--")
 		);
 

@@ -2,9 +2,9 @@ package okuken.iste.view.auth;
 
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import okuken.iste.consts.Captions;
-import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 
@@ -12,6 +12,9 @@ import java.awt.FlowLayout;
 import java.util.List;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class AuthPanel extends AbstractDockoutableTabPanel {
 
@@ -34,26 +37,43 @@ public class AuthPanel extends AbstractDockoutableTabPanel {
 		headerPanel.add(dockoutButton);
 		setupDockout();
 		
+		JScrollPane bodyScrollPane = new JScrollPane();
+		bodyScrollPane.setBorder(null);
+		add(bodyScrollPane, BorderLayout.CENTER);
+		
 		bodyPanel = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) bodyPanel.getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
-		add(bodyPanel, BorderLayout.CENTER);
+		bodyScrollPane.setViewportView(bodyPanel);
 		
 		authAccountTablePanel = new AuthAccountTablePanel();
-		bodyPanel.add(authAccountTablePanel);
 		
 		authConfigPanel = new AuthConfigPanel();
-		bodyPanel.add(authConfigPanel);
+		
+		GroupLayout gl_bodyPanel = new GroupLayout(bodyPanel);
+		gl_bodyPanel.setHorizontalGroup(
+			gl_bodyPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_bodyPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_bodyPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(authAccountTablePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(authConfigPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
+		);
+		gl_bodyPanel.setVerticalGroup(
+			gl_bodyPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_bodyPanel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(authAccountTablePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(authConfigPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+		);
+		bodyPanel.setLayout(gl_bodyPanel);
 		
 	}
 
 	public void refreshPanel(List<MessageDto> messageDtos) {
 		authAccountTablePanel.refreshPanel();
 		authConfigPanel.refreshPanel();
-	}
-
-	public List<AuthAccountDto> getSelectedAuthAccounts() {
-		return authAccountTablePanel.getSelectedRows();
 	}
 
 	@Override

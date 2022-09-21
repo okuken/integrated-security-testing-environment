@@ -13,13 +13,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 import burp.IHttpRequestResponse;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
-import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.dto.MessageDto;
@@ -27,6 +28,7 @@ import okuken.iste.dto.MessageFilterDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.ProjectMemoDto;
+import okuken.iste.enums.OrderType;
 import okuken.iste.logic.AuthLogic;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ExportLogic;
@@ -34,6 +36,7 @@ import okuken.iste.logic.MemoLogic;
 import okuken.iste.logic.MessageChainLogic;
 import okuken.iste.logic.MessageFilterLogic;
 import okuken.iste.logic.MessageLogic;
+import okuken.iste.logic.OrderLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.plugin.PluginInfo;
@@ -213,8 +216,34 @@ public class Controller {
 		refreshRepeatTablePanel(targetMessageDto);
 	}
 
-	public void deleteMessages() {
+	public String deleteMessages() {
 		var selectedRowIndexs = getSelectedRowIndexs();
+
+		var err = selectedRowIndexs.stream()
+				.map(messageTableModel::getRow)
+				.map(message -> {
+					var parentChainNames = MessageChainLogic.getInstance().getMessageChainOwnerNamesByNodeMessageWhithoutItself(message);
+					if(parentChainNames.isEmpty()) {
+						return "";
+					}
+					return new StringBuilder()
+							.append("\"")
+							.append(message.toString())
+							.append("\" is included by chain:")
+							.append(System.lineSeparator())
+							.append(parentChainNames.stream().map(n -> " - " + n).collect(Collectors.joining(System.lineSeparator())))
+							.toString();
+				})
+				.collect(Collectors.joining(System.lineSeparator()));
+
+		if(!StringUtils.isBlank(err)) {
+			return new StringBuilder()
+					.append("Failed to delete.")
+					.append(System.lineSeparator())
+					.append(err)
+					.toString();
+		}
+
 		Collections.reverse(selectedRowIndexs);
 
 		for(var rowIndex: selectedRowIndexs) {
@@ -225,6 +254,7 @@ public class Controller {
 
 		applyMessageFilter();
 		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
+		return null;
 	}
 
 	private void refreshComponentsDependentOnMessages(List<MessageDto> messageDtos) {
@@ -309,10 +339,6 @@ public class Controller {
 		userOptionsMiscPanel.refresh();
 	}
 
-	public void refreshComponentsDependOnAuthConfig() {
-		repeaterPanel.refreshAuthAccountsComboBox();
-	}
-
 	public List<MessageRepeatDto> getSelectedMessageRepeats() {
 		return repeaterPanel.getSelectedMessageRepeatDtos();
 	}
@@ -320,16 +346,15 @@ public class Controller {
 		return repeaterPanel.getOrgMessageDto();
 	}
 
-	public AuthAccountDto getSelectedAuthAccountOnRepeater() {
-		return repeaterPanel.getSelectedAuthAccountDto();
-	}
-
-	public void sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory) {
-		MessageChainLogic.getInstance().sendMessageChain(messageChainDto, authAccountDto, callback, forAuth, needSaveHistory);
+	public MessageChainRepeatDto sendMessageChain(MessageChainDto messageChainDto, AuthAccountDto authAccountDto, BiConsumer<MessageChainRepeatDto, Integer> callback, boolean forAuth, boolean needSaveHistory, MessageChainRepeatDto breakingMessageChainRepeatDto) {
+		return MessageChainLogic.getInstance().sendMessageChain(messageChainDto, authAccountDto, callback, forAuth, needSaveHistory, breakingMessageChainRepeatDto);
 	}
 
 	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback) {
-		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, false, true);
+		return sendRepeaterRequest(request, authAccountDto, orgMessageDto, callback, true);
+	}
+	public MessageRepeatDto sendRepeaterRequest(byte[] request, AuthAccountDto authAccountDto, MessageDto orgMessageDto, Consumer<MessageRepeatDto> callback, boolean needSaveHistory) {
+		return RepeaterLogic.getInstance().sendRequest(request, authAccountDto, orgMessageDto, callback, false, needSaveHistory);
 	}
 
 	public void sendRepeaterRequest(boolean forceAuthSessionRefresh) {
@@ -388,57 +413,86 @@ public class Controller {
 	}
 
 	public List<AuthAccountDto> getAuthAccounts() {
-		return AuthLogic.getInstance().loadAuthAccounts();
+		return ConfigLogic.getInstance().getAuthAccountDtos();
+	}
+	public void saveNewAuthAccount(AuthAccountDto newAuthAccountDto, boolean keepOldSessionId, List<AuthAccountDto> allAuthAccountDtos) {
+		AuthLogic.getInstance().saveAuthAccount(newAuthAccountDto, keepOldSessionId);
+		saveAuthAccountsOrderImpl(allAuthAccountDtos);
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
 	}
 	public void saveAuthAccount(AuthAccountDto authAccountDto, boolean keepOldSessionId) {
 		AuthLogic.getInstance().saveAuthAccount(authAccountDto, keepOldSessionId);
-		refreshComponentsDependOnAuthConfig();
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
 	}
-	public void deleteAuthAccounts(List<AuthAccountDto> authAccountDtos) {
-		AuthLogic.getInstance().deleteAuthAccounts(authAccountDtos);
-		refreshComponentsDependOnAuthConfig();
+	public void deleteAuthAccounts(List<AuthAccountDto> deleteAuthAccountDtos, List<AuthAccountDto> restAuthAccountDtos) {
+		AuthLogic.getInstance().deleteAuthAccounts(deleteAuthAccountDtos);
+		saveAuthAccountsOrderImpl(restAuthAccountDtos);
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
+	}
+	public void saveAuthAccountsOrder(List<AuthAccountDto> authAccountDtos) {
+		saveAuthAccountsOrderImpl(authAccountDtos);
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
+	}
+	private void saveAuthAccountsOrderImpl(List<AuthAccountDto> authAccountDtos) {
+		OrderLogic.getInstance().saveOrder(authAccountDtos, OrderType.AUTH_ACCOUNT);
 	}
 
 	public void fetchNewAuthSession(AuthAccountDto authAccountDto, Consumer<AuthAccountDto> callback) {
 		AuthLogic.getInstance().sendLoginRequestAndSetSessionId(authAccountDto, x -> {
-			repeaterPanel.refreshAuthSessionValueLabel();
+			ConfigLogic.getInstance().setAuthAccountSessionIds(x);
 			if(callback != null) {
 				callback.accept(x);
 			}
 		});
 	}
 
+	public void applyNewAuthSession(AuthAccountDto authAccountDto, MessageChainRepeatDto messageChainRepeatDto) {
+		AuthLogic.getInstance().updateSessionIds(authAccountDto, messageChainRepeatDto);
+		ConfigLogic.getInstance().setAuthAccountSessionIds(authAccountDto);
+	}
+
 	private void clearAuthAccountsSession() {
 		AuthLogic.getInstance().clearAuthAccountsSession();
-		refreshComponentsDependOnAuthConfig();
+		ConfigLogic.getInstance().reloadAuthAccountDtos();
 	}
 
-	public AuthConfigDto getAuthConfig() {
-		var ret = AuthLogic.getInstance().loadAuthConfig();
-		var messageChainDto = MessageChainLogic.getInstance().loadMessageChain(ret.getAuthMessageChainId());
-		ret.setAuthMessageChainDto(messageChainDto);
-		return ret;
+	public void saveNewAuthApplyConfig(AuthApplyConfigDto authApplyConfigDto, boolean keepOldSessionId, List<AuthApplyConfigDto> allAuthApplyConfigDtos) {
+		AuthLogic.getInstance().saveAuthApplyConfig(authApplyConfigDto);
+		saveAuthApplyConfigsOrderImpl(allAuthApplyConfigDtos);
+		if(!keepOldSessionId) {
+			clearAuthAccountsSession();
+		}
 	}
-
 	public void saveAuthApplyConfig(AuthApplyConfigDto authApplyConfigDto, boolean keepOldSessionId) {
 		AuthLogic.getInstance().saveAuthApplyConfig(authApplyConfigDto);
 		if(!keepOldSessionId) {
 			clearAuthAccountsSession();
 		}
 	}
-	public void deleteAuthApplyConfigs(List<AuthApplyConfigDto> authApplyConfigDtos, boolean keepOldSessionId) {
+	public void deleteAuthApplyConfigs(List<AuthApplyConfigDto> authApplyConfigDtos, boolean keepOldSessionId, List<AuthApplyConfigDto> restAuthApplyConfigDtos) {
 		AuthLogic.getInstance().deleteAuthApplyConfigs(authApplyConfigDtos);
+		saveAuthApplyConfigsOrderImpl(restAuthApplyConfigDtos);
 		if(!keepOldSessionId) {
 			clearAuthAccountsSession();
 		}
 	}
+	public void saveAuthApplyConfigsOrder(List<AuthApplyConfigDto> authApplyConfigDtos) {
+		saveAuthApplyConfigsOrderImpl(authApplyConfigDtos);
+	}
+	private void saveAuthApplyConfigsOrderImpl(List<AuthApplyConfigDto> authApplyConfigDtos) {
+		OrderLogic.getInstance().saveOrder(authApplyConfigDtos, OrderType.AUTH_APPLY_CONFIG);
+	}
 
-	public AuthAccountDto getSelectedAuthAccountOnAuthConfig() {
-		var selectedAuthAccounts = authPanel.getSelectedAuthAccounts();
-		if(selectedAuthAccounts.isEmpty()) {
+	public MessageChainDto getMessageChainByBaseMessageId(Integer messageId) {
+		var chainId = getMessageChainIdByBaseMessageId(messageId);
+		if(chainId == null) {
 			return null;
 		}
-		return selectedAuthAccounts.get(0);
+		return loadMessageChain(chainId);
+	}
+
+	public String getMessageChainPrcDate(Integer messageId) {
+		return MessageChainLogic.getInstance().getPrcDate(messageId);
 	}
 
 	public Integer getMessageChainIdByBaseMessageId(Integer messageId) {
@@ -450,11 +504,13 @@ public class Controller {
 	}
 
 	public void saveMessageChain(MessageChainDto messageChainDto, boolean isAuthChain) {
-		MessageChainLogic.getInstance().saveMessageChain(messageChainDto);
+		MessageChainLogic.getInstance().saveMessageChain(messageChainDto, isAuthChain);
 
 		if(isAuthChain) {
 			ConfigLogic.getInstance().getAuthConfig().setAuthMessageChainDto(messageChainDto);
 			clearAuthAccountsSession();
+		} else {
+			messageTableModel.refreshRow(messageChainDto.getMessageId());
 		}
 	}
 
@@ -496,7 +552,6 @@ public class Controller {
 		applyMessageFilter();
 		this.projectMemoPanel.refreshPanel();
 		this.authPanel.refreshPanel(messageDtos);
-		refreshComponentsDependOnAuthConfig();
 		refreshComponentsDependentOnMessages(messageDtos);
 	}
 

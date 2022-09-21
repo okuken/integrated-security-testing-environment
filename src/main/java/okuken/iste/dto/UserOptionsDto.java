@@ -27,6 +27,8 @@ public class UserOptionsDto {
 	@Persistent(key = "useKeyboardShortcutWithClick")
 	private boolean useKeyboardShortcutWithClick;
 
+	@Persistent(key = "useAutoCheckUpdate", environmentDependent = true)
+	private boolean useAutoCheckUpdate;
 
 	@Persistent(key = "lastSelectedProjectName", environmentDependent = true)
 	private String lastSelectedProjectName;
@@ -70,6 +72,12 @@ public class UserOptionsDto {
 	}
 	public void setUseKeyboardShortcutWithClick(boolean useKeyboardShortcutWithClick) {
 		this.useKeyboardShortcutWithClick = useKeyboardShortcutWithClick;
+	}
+	public boolean isUseAutoCheckUpdate() {
+		return useAutoCheckUpdate;
+	}
+	public void setUseAutoCheckUpdate(boolean useAutoCheckUpdate) {
+		this.useAutoCheckUpdate = useAutoCheckUpdate;
 	}
 	public String getLastSelectedProjectName() {
 		return lastSelectedProjectName;
