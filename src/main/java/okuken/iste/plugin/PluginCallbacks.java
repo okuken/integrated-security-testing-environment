@@ -13,7 +13,7 @@ import okuken.iste.plugin.api.IIsteImportMessage;
 import okuken.iste.plugin.api.IIstePluginCallbacks;
 import okuken.iste.plugin.api.IIstePluginHelpers;
 import okuken.iste.plugin.api.IIstePluginTab;
-import okuken.iste.util.BurpUtil;
+import okuken.iste.util.BurpApiUtil;
 
 class PluginCallbacks implements IIstePluginCallbacks {
 
@@ -93,11 +93,11 @@ class PluginCallbacks implements IIstePluginCallbacks {
 
 	@Override
 	public OutputStream getStdout() {
-		return BurpUtil.getCallbacks().getStdout();
+		return BurpApiUtil.i().getStdout();
 	}
 	@Override
 	public OutputStream getStderr() {
-		return BurpUtil.getCallbacks().getStderr();
+		return BurpApiUtil.i().getStderr();
 	}
 
 	@Override

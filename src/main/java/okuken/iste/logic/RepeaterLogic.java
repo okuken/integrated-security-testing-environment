@@ -17,24 +17,24 @@ import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 
-import burp.IHttpRequestResponse;
-import burp.IParameter;
-import burp.IRequestInfo;
-import burp.IResponseInfo;
 import okuken.iste.dao.auto.MessageRawMapper;
 import okuken.iste.dao.auto.MessageRepeatDynamicSqlSupport;
 import okuken.iste.dao.MessageRepeatMapper;
 import okuken.iste.dao.auto.MessageRepeatRedirDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageRepeatRedirMapper;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.HttpRequestInfoDto;
+import okuken.iste.dto.HttpRequestResponseDto;
+import okuken.iste.dto.HttpResponseInfoDto;
+import okuken.iste.dto.HttpServiceDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
 import okuken.iste.dto.PayloadDto;
-import okuken.iste.dto.burp.HttpRequestResponseMock;
-import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.entity.auto.MessageRaw;
+import okuken.iste.enums.RequestParameterType;
 import okuken.iste.entity.MessageRepeat;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.EncodeUtil;
@@ -71,7 +71,7 @@ public class RepeaterLogic {
 
 		MessageRepeatDto repeatDto = new MessageRepeatDto();
 		repeatDto.setOrgMessageId(orgMessageDto.getId());
-		repeatDto.setMessage(new HttpRequestResponseMock(request, null, orgMessageDto.getMessage().getHttpService()));
+		repeatDto.setMessage(new HttpRequestResponseDto(request, null, orgMessageDto.getMessage().getHttpService()));
 		repeatDto.setSendDate(Calendar.getInstance().getTime());
 		repeatDto.setDifference("");//TODO: impl
 		if(judgeIsNeedApplyAuthAccount(forAuth, authAccountDto)) {
@@ -87,7 +87,7 @@ public class RepeaterLogic {
 			try {
 				long timerStart = System.currentTimeMillis();
 	
-				IHttpRequestResponse response = BurpUtil.getCallbacks().makeHttpRequest(
+				var response = BurpApiUtil.i().makeHttpRequest(
 						orgMessageDto.getMessage().getHttpService(),
 						request);
 	
@@ -138,11 +138,11 @@ public class RepeaterLogic {
 		return ret;
 	}
 
-	public void saveAsRepeatHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages) {
+	public void saveAsRepeatHistory(MessageDto targetMessageDto, List<HttpRequestResponseDto> messages) {
 		messages.stream().map(message -> {
 			var repeatDto = new MessageRepeatDto();
 			repeatDto.setOrgMessageId(targetMessageDto.getId());
-			repeatDto.setMessage(new HttpRequestResponseMock(message.getRequest(), message.getResponse(), message.getHttpService()));
+			repeatDto.setMessage(new HttpRequestResponseDto(message.getRequest(), message.getResponse(), message.getHttpService()));
 			repeatDto.setStatus(MessageUtil.extractResponseStatus(message.getResponse()));
 			repeatDto.setLength(MessageUtil.extractResponseLength(message.getResponse()));
 			repeatDto.setMemo(message.getComment());
@@ -268,8 +268,8 @@ public class RepeaterLogic {
 	}
 
 	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] aRequest, byte[] aResponse, MessageDto orgMessageDto, Consumer<MessageRepeatRedirectDto> callback) {
-		var requestInfo = BurpUtil.getHelpers().analyzeRequest(aRequest);
-		var responseInfo = BurpUtil.getHelpers().analyzeResponse(aResponse);
+		var requestInfo = BurpApiUtil.i().analyzeRequest(aRequest);
+		var responseInfo = BurpApiUtil.i().analyzeResponse(aResponse);
 		URL redirectUrl;
 		try {
 			redirectUrl = new URL(extractLocationHeaderValue(responseInfo));
@@ -289,8 +289,8 @@ public class RepeaterLogic {
 			try {
 				long timerStart = System.currentTimeMillis();
 	
-				IHttpRequestResponse response = BurpUtil.getCallbacks().makeHttpRequest(
-						new HttpServiceMock(redirectUrl.getHost(), redirectUrl.getPort(), redirectUrl.getProtocol()),
+				var response = BurpApiUtil.i().makeHttpRequest(
+						new HttpServiceDto(redirectUrl.getHost(), redirectUrl.getPort(), redirectUrl.getProtocol()),
 						request);
 	
 				long timerEnd = System.currentTimeMillis();
@@ -315,7 +315,7 @@ public class RepeaterLogic {
 
 		return redirectDto;
 	}
-	private String extractLocationHeaderValue(IResponseInfo responseInfo) {
+	private String extractLocationHeaderValue(HttpResponseInfoDto responseInfo) {
 		var locationHeaderPrefix = "Location:";
 
 		var locationHeaders = responseInfo.getHeaders().stream().filter(header -> header.startsWith(locationHeaderPrefix)).collect(Collectors.toList());
@@ -325,7 +325,7 @@ public class RepeaterLogic {
 
 		return locationHeaders.get(0).substring(locationHeaderPrefix.length()).trim();
 	}
-	private byte[] applyCookieForRedirect(byte[] request, URL redirectUrl, IRequestInfo beforeRequestInfo, IResponseInfo beforeResponseInfo) {
+	private byte[] applyCookieForRedirect(byte[] request, URL redirectUrl, HttpRequestInfoDto beforeRequestInfo, HttpResponseInfoDto beforeResponseInfo) {
 		var ret = request;
 		var orgUrl = beforeRequestInfo.getUrl(); //TODO: this throw exception. should impl by compare domain and port
 
@@ -336,19 +336,19 @@ public class RepeaterLogic {
 		//[CAUTION] check path is impossible because request doesn't have the path attribute of cookies...
 		//apply cookie params in request
 		var beforeRequestCookieParams = beforeRequestInfo.getParameters().stream()
-				.filter(parameter -> parameter.getType() == IParameter.PARAM_COOKIE)
-				.map(cookie -> BurpUtil.getHelpers().buildParameter(cookie.getName(), cookie.getValue(), cookie.getType()))
+				.filter(parameter -> parameter.getType() == RequestParameterType.COOKIE.getBurpId())
+				.map(cookie -> BurpApiUtil.i().buildParameter(cookie.getName(), cookie.getValue(), cookie.getType()))
 				.collect(Collectors.toList());
 
 		for(var cookieParam: beforeRequestCookieParams) {
-			ret = BurpUtil.getHelpers().addParameter(ret, cookieParam);
+			ret = BurpApiUtil.i().addParameter(ret, cookieParam);
 		}
 
 
 		//apply cookie params in response
 		var beforeResponseCookieParams = beforeResponseInfo.getCookies().stream()
 				.filter(cookie -> redirectUrl.getPath().startsWith(cookie.getPath()))
-				.map(cookie -> BurpUtil.getHelpers().buildParameter(cookie.getName(), cookie.getValue(), IParameter.PARAM_COOKIE))
+				.map(cookie -> BurpApiUtil.i().buildParameter(cookie.getName(), cookie.getValue(), RequestParameterType.COOKIE.getBurpId()))
 				.collect(Collectors.toList());
 
 		for(var targetCookieParam: beforeResponseCookieParams) {

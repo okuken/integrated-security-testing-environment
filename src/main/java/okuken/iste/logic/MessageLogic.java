@@ -20,9 +20,6 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
 
 import com.google.common.collect.Lists;
 
-import burp.IHttpRequestResponse;
-import burp.IHttpService;
-import burp.IParameter;
 import okuken.iste.dao.auto.MessageChainDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageChainMapper;
 import okuken.iste.dao.auto.MessageDynamicSqlSupport;
@@ -34,10 +31,11 @@ import okuken.iste.dao.auto.MessageRawDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageRawMapper;
 import okuken.iste.dao.auto.MessageRepeatMasterDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageRepeatMasterMapper;
+import okuken.iste.dto.HttpRequestParameterDto;
+import okuken.iste.dto.HttpRequestResponseDto;
+import okuken.iste.dto.HttpServiceDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRequestParamDto;
-import okuken.iste.dto.burp.HttpRequestResponseMock;
-import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.entity.Message;
 import okuken.iste.entity.auto.MessageOrd;
 import okuken.iste.entity.auto.MessageParam;
@@ -45,7 +43,7 @@ import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.entity.auto.MessageRepeatMaster;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SecurityTestingProgress;
-import okuken.iste.util.BurpUtil;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.MessageUtil;
 import okuken.iste.util.SqlUtil;
@@ -58,15 +56,12 @@ public class MessageLogic {
 		return instance;
 	}
 
-	public MessageDto convertHttpRequestResponseToDto(IHttpRequestResponse httpRequestResponse) { //TODO: externalize to converter
-
-		IHttpRequestResponse message = convertOriginalToMock(httpRequestResponse);
-
+	public MessageDto convertHttpRequestResponseToDto(HttpRequestResponseDto httpRequestResponse) {
 		MessageDto dto = new MessageDto();
-		dto.setMessage(message);
-		dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(message));
+		dto.setMessage(httpRequestResponse);
+		dto.setRequestInfo(BurpApiUtil.i().analyzeRequest(httpRequestResponse));
 
-		dto.setName(convertCommentToName(message.getComment()));
+		dto.setName(convertCommentToName(httpRequestResponse.getComment()));
 		dto.setProgress(SecurityTestingProgress.NOT_YET);
 		dto.setMethod(dto.getRequestInfo().getMethod());
 		dto.setUrl(dto.getRequestInfo().getUrl());
@@ -76,8 +71,8 @@ public class MessageLogic {
 		dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
 				.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
 
-		if(message.getResponse() != null) {
-			dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(message.getResponse()));
+		if(httpRequestResponse.getResponse() != null) {
+			dto.setResponseInfo(BurpApiUtil.i().analyzeResponse(httpRequestResponse.getResponse()));
 			dto.setStatus(dto.getResponseInfo().getStatusCode());
 			dto.setLength(dto.getMessage().getResponse().length);
 			dto.setMimeType(dto.getResponseInfo().getStatedMimeType());
@@ -104,27 +99,14 @@ public class MessageLogic {
 				.collect(Collectors.joining(". "));
 	}
 
-	private IHttpRequestResponse convertOriginalToMock(IHttpRequestResponse httpRequestResponse) {
-		IHttpService httpService = httpRequestResponse.getHttpService();
-		IHttpRequestResponse ret = new HttpRequestResponseMock(
-				httpRequestResponse.getRequest(),
-				httpRequestResponse.getResponse(),
-				new HttpServiceMock(httpService.getHost(), httpService.getPort(), httpService.getProtocol()));
-
-		ret.setComment(httpRequestResponse.getComment());
-		ret.setHighlight(httpRequestResponse.getHighlight());
-
-		return ret;
-	}
-
-	private IHttpRequestResponse convertEntityToMock(MessageRaw messageRaw) {
-		return new HttpRequestResponseMock(
+	private HttpRequestResponseDto convertEntityToDto(MessageRaw messageRaw) {
+		return new HttpRequestResponseDto(
 				messageRaw.getRequest(),
 				messageRaw.getResponse(),
-				new HttpServiceMock(messageRaw.getHost(), messageRaw.getPort(), messageRaw.getProtocol()));
+				new HttpServiceDto(messageRaw.getHost(), messageRaw.getPort(), messageRaw.getProtocol()));
 	}
 
-	public MessageRequestParamDto convertParameterToDto(IParameter parameter) { //TODO: externalize to converter
+	public MessageRequestParamDto convertParameterToDto(HttpRequestParameterDto parameter) {
 		MessageRequestParamDto dto = new MessageRequestParamDto();
 		dto.setType(RequestParameterType.getByBurpId(parameter.getType()));
 		dto.setName(parameter.getName());
@@ -358,21 +340,21 @@ public class MessageLogic {
 	}
 
 	public void loadMessageDetail(MessageDto dto) {
-		IHttpRequestResponse httpRequestResponse = loadMessageDetail(dto.getMessageRawId());
+		var httpRequestResponse = loadMessageDetail(dto.getMessageRawId());
 
 		dto.setMessage(httpRequestResponse);
-		dto.setRequestInfo(BurpUtil.getHelpers().analyzeRequest(httpRequestResponse)); //TODO: share implementation...
+		dto.setRequestInfo(BurpApiUtil.i().analyzeRequest(httpRequestResponse));
 		dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
 				.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
 
 		if(httpRequestResponse.getResponse() != null) {
-			dto.setResponseInfo(BurpUtil.getHelpers().analyzeResponse(httpRequestResponse.getResponse()));
+			dto.setResponseInfo(BurpApiUtil.i().analyzeResponse(httpRequestResponse.getResponse()));
 			dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
 					.map(MessageUtil::convertCookieToDto).collect(Collectors.toList()));
 		}
 	}
 
-	public IHttpRequestResponse loadMessageDetail(Integer messageRawId) {
+	public HttpRequestResponseDto loadMessageDetail(Integer messageRawId) {
 		MessageRaw messageRaw =
 			DbUtil.withSession(session -> {
 				MessageRawMapper messageRawMapper = session.getMapper(MessageRawMapper.class);
@@ -381,7 +363,7 @@ public class MessageLogic {
 						.get();
 			});
 
-		return convertEntityToMock(messageRaw);
+		return convertEntityToDto(messageRaw);
 	}
 
 	public void loadRepeatMaster(MessageDto messageDto) {
@@ -401,7 +383,7 @@ public class MessageLogic {
 			});
 
 		if(messageRaw != null) {
-			messageDto.setRepeatMasterMessage(convertEntityToMock(messageRaw));
+			messageDto.setRepeatMasterMessage(convertEntityToDto(messageRaw));
 		}
 	}
 

@@ -9,12 +9,13 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.text.JTextComponent;
 
-import burp.IHttpRequestResponse;
-import burp.IHttpService;
-import burp.IMessageEditor;
-import burp.IMessageEditorController;
 import okuken.iste.consts.Captions;
+import okuken.iste.dto.HttpMessageEditor;
+import okuken.iste.dto.HttpMessageEditorController;
+import okuken.iste.dto.HttpRequestResponseDto;
+import okuken.iste.dto.HttpServiceDto;
 import okuken.iste.dto.MessageDto;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
@@ -22,12 +23,12 @@ public class MessageEditorPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private IMessageEditor requestMessageEditor;
+	private HttpMessageEditor requestMessageEditor;
 	private JTextComponent requestMessageEditorTextComponent;
 
-	private IMessageEditor responseMessageEditor;
+	private HttpMessageEditor responseMessageEditor;
 
-	private IHttpService httpService;
+	private HttpServiceDto httpService;
 
 	private JSplitPane splitPane;
 	private JTabbedPane tabbedPane;
@@ -38,10 +39,10 @@ public class MessageEditorPanel extends JPanel {
 	public MessageEditorPanel(boolean requestEditable, boolean responseEditable) {
 		this(null, requestEditable, responseEditable);
 	}
-	public MessageEditorPanel(IMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable) {
+	public MessageEditorPanel(HttpMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable) {
 		this(aMessageEditorController, requestEditable, responseEditable, MessageEditorsLayoutType.HORIZONTAL_SPLIT);
 	}
-	public MessageEditorPanel(IMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable, MessageEditorsLayoutType type) {
+	public MessageEditorPanel(HttpMessageEditorController aMessageEditorController, boolean requestEditable, boolean responseEditable, MessageEditorsLayoutType type) {
 		setLayout(new BorderLayout(0, 0));
 
 		var messageEditorController = aMessageEditorController;
@@ -49,8 +50,8 @@ public class MessageEditorPanel extends JPanel {
 			messageEditorController = createDefaultMessageEditorController();
 		}
 
-		requestMessageEditor = BurpUtil.getCallbacks().createMessageEditor(messageEditorController, requestEditable);
-		responseMessageEditor = BurpUtil.getCallbacks().createMessageEditor(messageEditorController, responseEditable);
+		requestMessageEditor = BurpApiUtil.i().createMessageEditor(messageEditorController, requestEditable);
+		responseMessageEditor = BurpApiUtil.i().createMessageEditor(messageEditorController, responseEditable);
 
 		setupMessageEditorsLayout(type);
 	}
@@ -84,10 +85,10 @@ public class MessageEditorPanel extends JPanel {
 		UiUtil.repaint(this);
 	}
 
-	private IMessageEditorController createDefaultMessageEditorController() {
-		return new IMessageEditorController() {
+	private HttpMessageEditorController createDefaultMessageEditorController() {
+		return new HttpMessageEditorController() {
 			@Override
-			public IHttpService getHttpService() {
+			public HttpServiceDto getHttpService() {
 				return httpService;
 			}
 			@Override
@@ -120,7 +121,7 @@ public class MessageEditorPanel extends JPanel {
 		return responseMessageEditor.getMessage();
 	}
 
-	public IHttpService getHttpService() {
+	public HttpServiceDto getHttpService() {
 		return httpService;
 	}
 
@@ -149,10 +150,10 @@ public class MessageEditorPanel extends JPanel {
 		setMessage(dto.getMessage(), keepCaretPosition);
 	}
 
-	public void setMessage(IHttpRequestResponse message) {
+	public void setMessage(HttpRequestResponseDto message) {
 		setMessage(message, false);
 	}
-	public void setMessage(IHttpRequestResponse message, boolean keepCaretPosition) {
+	public void setMessage(HttpRequestResponseDto message, boolean keepCaretPosition) {
 		setRequest(message.getRequest(), keepCaretPosition);
 		setResponse(message.getResponse());
 		httpService = message.getHttpService();

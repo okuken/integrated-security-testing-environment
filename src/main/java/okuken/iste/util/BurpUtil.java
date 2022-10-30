@@ -28,69 +28,52 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
-import burp.IBurpExtenderCallbacks;
-import burp.IExtensionHelpers;
-import burp.IHttpService;
-import burp.IMessageEditor;
-import burp.ITab;
 import okuken.iste.consts.Colors;
-import okuken.iste.dto.burp.HttpRequestResponseMock;
+import okuken.iste.dto.HttpMessageEditor;
+import okuken.iste.dto.HttpRequestResponseDto;
+import okuken.iste.dto.HttpServiceDto;
 
 public class BurpUtil {
 
-	private static IBurpExtenderCallbacks burpExtenderCallbacks;
-
-	public static void init(IBurpExtenderCallbacks burpExtenderCallbacks) {
-		BurpUtil.burpExtenderCallbacks = burpExtenderCallbacks;
-	}
-
-	public static IBurpExtenderCallbacks getCallbacks() {
-		return burpExtenderCallbacks;
-	}
-
-	public static IExtensionHelpers getHelpers() {
-		return getCallbacks().getHelpers();
-	}
-
-	public static boolean isInScope(byte[] request, IHttpService httpService) {
-		return isInScope(getHelpers().analyzeRequest(new HttpRequestResponseMock(request, null, httpService)).getUrl());
+	public static boolean isInScope(byte[] request, HttpServiceDto httpService) {
+		return isInScope(BurpApiUtil.i().analyzeRequest(new HttpRequestResponseDto(request, null, httpService)).getUrl());
 	}
 	public static boolean isInScope(URL url) {
-		return burpExtenderCallbacks.isInScope(url);
+		return BurpApiUtil.i().isInScope(url);
 	}
 
 	public static void printEventLog(String msg) {
 		System.err.println(msg);
-		burpExtenderCallbacks.issueAlert(msg);
+		BurpApiUtil.i().issueAlert(msg);
 	}
 
 	public static void printStderr(Exception e) {
 		e.printStackTrace();
-		e.printStackTrace(new PrintWriter(burpExtenderCallbacks.getStderr(), true));
+		e.printStackTrace(new PrintWriter(BurpApiUtil.i().getStderr(), true));
 	}
 	public static void printStderr(String msg) {
 		var errMsg = "[ISTE]ERROR: " + msg;
 		System.err.println(errMsg);
-		burpExtenderCallbacks.printError(errMsg);
+		BurpApiUtil.i().printError(errMsg);
 	}
 
 	public static PrintStream getStdoutPrintStream() {
-		return new PrintStream(burpExtenderCallbacks.getStdout());
+		return new PrintStream(BurpApiUtil.i().getStdout());
 	}
 
-	public static void highlightTab(ITab suiteTab) {
-		JTabbedPane parentTabbedPane = (JTabbedPane)suiteTab.getUiComponent().getParent();
-		parentTabbedPane.setBackgroundAt(indexOf(suiteTab, parentTabbedPane), Colors.CHARACTER_HIGHLIGHT);
+	public static void highlightTab(Component suiteTabUiComponent) {
+		JTabbedPane parentTabbedPane = (JTabbedPane)suiteTabUiComponent.getParent();
+		parentTabbedPane.setBackgroundAt(indexOf(suiteTabUiComponent, parentTabbedPane), Colors.CHARACTER_HIGHLIGHT);
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				parentTabbedPane.setBackgroundAt(indexOf(suiteTab, parentTabbedPane), getDefaultForegroundColor());
+				parentTabbedPane.setBackgroundAt(indexOf(suiteTabUiComponent, parentTabbedPane), getDefaultForegroundColor());
 			}
 		}, 5000);
 	}
-	private static int indexOf(ITab suiteTab, JTabbedPane tabbedPane) {
+	private static int indexOf(Component suiteTabUiComponent, JTabbedPane tabbedPane) {
 		for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-			if (tabbedPane.getComponentAt(i) == suiteTab.getUiComponent()) {
+			if (tabbedPane.getComponentAt(i) == suiteTabUiComponent) {
 				return i;
 			}
 		}
@@ -99,12 +82,12 @@ public class BurpUtil {
 
 	public static Color getDefaultForegroundColor() {
 		var dummyUiComponent = new JLabel("dummy");
-		burpExtenderCallbacks.customizeUiComponent(dummyUiComponent);
+		BurpApiUtil.i().customizeUiComponent(dummyUiComponent);
 		return dummyUiComponent.getForeground();
 	}
 
 	public static String getBurpSuiteVersion() {
-		return Arrays.stream(burpExtenderCallbacks.getBurpVersion()).collect(Collectors.joining(" "));
+		return Arrays.stream(BurpApiUtil.i().getBurpVersion()).collect(Collectors.joining(" "));
 	}
 
 	public static JFrame getBurpSuiteJFrame() {
@@ -195,7 +178,7 @@ public class BurpUtil {
 	}
 
 
-	public static JTextComponent extractMessageEditorTextComponent(IMessageEditor messageEditor) {
+	public static JTextComponent extractMessageEditorTextComponent(HttpMessageEditor messageEditor) {
 		List<JTextComponent> ret = Lists.newArrayList();
 		extractMessageEditorTextComponentImpl(messageEditor.getComponent(), ret);
 		if(ret.isEmpty()) {
@@ -223,7 +206,7 @@ public class BurpUtil {
 	private static Boolean professionalEdition;
 	public static boolean isProfessionalEdition() {
 		if(professionalEdition == null) {
-			professionalEdition = burpExtenderCallbacks.getBurpVersion()[0].contains("Professional");
+			professionalEdition = BurpApiUtil.i().getBurpVersion()[0].contains("Professional");
 		}
 		return professionalEdition;
 	}

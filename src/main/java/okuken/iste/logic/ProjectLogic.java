@@ -11,6 +11,7 @@ import okuken.iste.dao.auto.ProjectDynamicSqlSupport;
 import okuken.iste.dao.auto.ProjectMapper;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.entity.auto.Project;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.SqlUtil;
@@ -43,7 +44,7 @@ public class ProjectLogic {
 		if(autoSelect && burpSuiteProjectName != null) {
 			projectSelectorDialog.setSelectNewProject();
 		}
-		BurpUtil.getCallbacks().customizeUiComponent(projectSelectorDialog);
+		BurpApiUtil.i().customizeUiComponent(projectSelectorDialog);
 		projectSelectorDialog.setLocationRelativeTo(burpFrame);
 		projectSelectorDialog.setVisible(true);
 		ProjectDto projectDto = projectSelectorDialog.getSelectedProject();

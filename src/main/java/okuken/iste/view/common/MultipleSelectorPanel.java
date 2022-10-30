@@ -6,7 +6,7 @@ import javax.swing.JScrollPane;
 import com.google.common.collect.Lists;
 
 import okuken.iste.consts.Colors;
-import okuken.iste.util.BurpUtil;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.UiUtil;
 
 import java.awt.GridLayout;
@@ -66,7 +66,7 @@ public class MultipleSelectorPanel<T> extends JPanel {
 	}
 
 	public List<T> showDialog(String title, Component parent) {
-		BurpUtil.getCallbacks().customizeUiComponent(this);
+		BurpApiUtil.i().customizeUiComponent(this);
 
 		if(UiUtil.showOptionDialog(
 				parent,

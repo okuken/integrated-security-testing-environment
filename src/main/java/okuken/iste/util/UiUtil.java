@@ -520,7 +520,7 @@ public class UiUtil {
 			@Override public void windowActivated(WindowEvent e) {}
 		});
 
-		BurpUtil.getCallbacks().customizeUiComponent(popupFrame);
+		BurpApiUtil.i().customizeUiComponent(popupFrame);
 		popupFrame.setVisible(true);
 
 		return popupFrame;
@@ -534,7 +534,7 @@ public class UiUtil {
 		dialog.setBounds(parentFrame.getBounds());
 		dialog.setLocationRelativeTo(parentFrame);
 
-		BurpUtil.getCallbacks().customizeUiComponent(dialog);
+		BurpApiUtil.i().customizeUiComponent(dialog);
 		dialog.setVisible(true);
 	}
 

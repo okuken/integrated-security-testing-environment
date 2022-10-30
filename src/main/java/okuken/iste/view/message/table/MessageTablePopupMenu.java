@@ -20,6 +20,7 @@ import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.TemplateLogic;
 import okuken.iste.plugin.PluginPopupMenuListener;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractAction;
@@ -99,7 +100,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 					.filter(messageDto -> messageDto.getMessage().getResponse() != null)
 					.filter(messageDto -> BurpUtil.isInScope(messageDto.getUrl()))
 					.forEach(messageDto -> 
-						BurpUtil.getCallbacks().doPassiveScan(
+						BurpApiUtil.i().doPassiveScan(
 							messageDto.getMessage().getHttpService().getHost(),
 							messageDto.getMessage().getHttpService().getPort(),
 							judgeIsUseHttps(messageDto),
@@ -116,7 +117,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 				Controller.getInstance().getSelectedMessages().stream()
 					.filter(messageDto -> BurpUtil.isInScope(messageDto.getUrl()))
 					.forEach(messageDto -> 
-						BurpUtil.getCallbacks().doActiveScan(
+						BurpApiUtil.i().doActiveScan(
 							messageDto.getMessage().getHttpService().getHost(),
 							messageDto.getMessage().getHttpService().getPort(),
 							judgeIsUseHttps(messageDto),
@@ -132,7 +133,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		UiUtil.setupTablePopupMenuItem(sendToIntruderMenuItem, table, KEYSTROKE_SENDTO_INTRUDER, new AbstractAction() {
 			public void actionPerformedSafe(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream().forEach(messageDto -> 
-					BurpUtil.getCallbacks().sendToIntruder(
+					BurpApiUtil.i().sendToIntruder(
 							messageDto.getMessage().getHttpService().getHost(),
 							messageDto.getMessage().getHttpService().getPort(),
 							judgeIsUseHttps(messageDto),
@@ -145,7 +146,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		UiUtil.setupTablePopupMenuItem(sendToRepeaterMenuItem, table, KEYSTROKE_SENDTO_REPEATER, new AbstractAction() {
 			public void actionPerformedSafe(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream().forEach(messageDto -> 
-					BurpUtil.getCallbacks().sendToRepeater(
+					BurpApiUtil.i().sendToRepeater(
 							messageDto.getMessage().getHttpService().getHost(),
 							messageDto.getMessage().getHttpService().getPort(),
 							judgeIsUseHttps(messageDto),
@@ -159,7 +160,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		sendToComparerRequestMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream().forEach(
-						messageDto -> BurpUtil.getCallbacks().sendToComparer(messageDto.getMessage().getRequest()));
+						messageDto -> BurpApiUtil.i().sendToComparer(messageDto.getMessage().getRequest()));
 			}
 		});
 		add(sendToComparerRequestMenuItem);
@@ -168,7 +169,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 		sendToComparerResponseMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Controller.getInstance().getSelectedMessages().stream().forEach(
-						messageDto -> BurpUtil.getCallbacks().sendToComparer(messageDto.getMessage().getResponse()));
+						messageDto -> BurpApiUtil.i().sendToComparer(messageDto.getMessage().getResponse()));
 			}
 		});
 		add(sendToComparerResponseMenuItem);
@@ -267,7 +268,7 @@ public class MessageTablePopupMenu extends JPopupMenu {
 				}
 
 				var messageCellEditorDialog = new MessageCellEditorDialog(burpFrame, selectedMessages, columnType);
-				BurpUtil.getCallbacks().customizeUiComponent(messageCellEditorDialog);
+				BurpApiUtil.i().customizeUiComponent(messageCellEditorDialog);
 				messageCellEditorDialog.setLocationRelativeTo(burpFrame);
 				messageCellEditorDialog.setVisible(true);
 			}

@@ -7,6 +7,9 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.base.Strings;
 
+import burp.api.montoya.BurpExtension;
+import burp.api.montoya.MontoyaApi;
+import burp.api.montoya.misc.ExtensionUnloadHandler;
 import burp.IBurpExtender;
 import burp.IBurpExtenderCallbacks;
 import burp.IExtensionStateListener;
@@ -16,6 +19,7 @@ import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.logic.RepeaterLogic;
 import okuken.iste.plugin.PluginManager;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.ThreadUtil;
@@ -24,16 +28,26 @@ import okuken.iste.view.ContextMenuFactory;
 import okuken.iste.view.KeyStrokeManager;
 import okuken.iste.view.SuiteTab;
 
-public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExtensionStateListener {
+public class IntegratedSecurityTestingEnvironment implements /*BurpExtension, */ExtensionUnloadHandler, IBurpExtender, IExtensionStateListener {
+
+//	@Override
+//	public void initialize(MontoyaApi api) {
+//		BurpApiUtil.init(api);
+//		initImpl();
+//	}
+
 	@Override
 	public void registerExtenderCallbacks(IBurpExtenderCallbacks burpExtenderCallbacks) {
-		BurpUtil.init(burpExtenderCallbacks);
+		BurpApiUtil.init(burpExtenderCallbacks);
+		initImpl();
+	}
 
-		burpExtenderCallbacks.setExtensionName(Captions.EXTENSION_NAME_FULL);
+	private void initImpl() {
+		BurpApiUtil.i().setExtensionName(Captions.EXTENSION_NAME_FULL);
 
-		burpExtenderCallbacks.registerContextMenuFactory(ContextMenuFactory.create());
+		BurpApiUtil.i().registerContextMenuFactory(ContextMenuFactory.create());
 
-		burpExtenderCallbacks.registerExtensionStateListener(this);
+		BurpApiUtil.i().registerExtensionStateListener(this);
 
 		setupDatabase();
 		ProjectLogic.getInstance().selectProject();
@@ -46,7 +60,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender, IExt
 			controller.loadDatabase();
 			controller.loadPlugins();
 
-			burpExtenderCallbacks.addSuiteTab(suiteTab);
+			BurpApiUtil.i().addSuiteTab(suiteTab);
 
 			SwingUtilities.invokeLater(() -> {
 				controller.initSizeRatioOfParts();

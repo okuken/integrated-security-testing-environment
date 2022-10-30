@@ -11,7 +11,7 @@ public class EncodeUtil {
 
 		switch (encode) {
 		case URL:
-			return BurpUtil.getHelpers().urlEncode(value);
+			return BurpApiUtil.i().urlEncode(value);
 		default:
 			return value;
 		}

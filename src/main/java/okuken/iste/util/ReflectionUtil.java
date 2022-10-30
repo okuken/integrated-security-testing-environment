@@ -112,6 +112,15 @@ public class ReflectionUtil {
 		return new Gson().fromJson(valueStr, type);
 	}
 
+	public static <T> T copyProperties(T dest, Object src) {
+		try {
+			BeanUtils.copyProperties(dest, src);
+			return dest;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static Class<?> getArrayClass(String elemClassName) throws ClassNotFoundException {
 		return Class.forName(String.format("[L%s;", elemClassName));
 	}

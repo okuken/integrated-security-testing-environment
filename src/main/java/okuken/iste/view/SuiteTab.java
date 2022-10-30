@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import burp.ITab;
 import okuken.iste.consts.Captions;
-import okuken.iste.util.BurpUtil;
+import okuken.iste.util.BurpApiUtil;
 
 public class SuiteTab implements ITab {
 
@@ -12,7 +12,7 @@ public class SuiteTab implements ITab {
 
 	public SuiteTab() {
 		SuitePanel suitePanel = new SuitePanel();
-		BurpUtil.getCallbacks().customizeUiComponent(suitePanel);
+		BurpApiUtil.i().customizeUiComponent(suitePanel);
 		this.suitePanel = suitePanel;
 	}
 

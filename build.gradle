@@ -32,6 +32,7 @@ repositories {
 
 dependencies {
     compileOnly 'net.portswigger.burp.extender:burp-extender-api:2.3'
+    implementation 'net.portswigger.burp.extender:montoya-api:0.9.25' // for the time being, use "implementation"
 //    testRuntimeOnly files(System.getProperty("user.home") + '\\AppData\\Local\\Programs\\BurpSuitePro\\burpsuite_pro.jar') // set your local path to burpsuite jar
     testRuntimeOnly files(System.getProperty("user.home") + '\\AppData\\Local\\Programs\\BurpSuiteCommunity\\burpsuite_community.jar')
 

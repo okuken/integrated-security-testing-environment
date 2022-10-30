@@ -3,7 +3,6 @@ package okuken.iste.dto;
 import java.util.Date;
 import java.util.List;
 
-import burp.IHttpRequestResponse;
 import okuken.iste.logic.MessageLogic;
 
 public class MessageRepeatDto {
@@ -21,7 +20,7 @@ public class MessageRepeatDto {
 	private String memo;
 
 	private Integer messageRawId;
-	private IHttpRequestResponse message;
+	private HttpRequestResponseDto message;
 
 	private Integer orgMessageId;
 
@@ -83,13 +82,13 @@ public class MessageRepeatDto {
 	public void setMessageRawId(Integer messageRawId) {
 		this.messageRawId = messageRawId;
 	}
-	public IHttpRequestResponse getMessage() {
+	public HttpRequestResponseDto getMessage() {
 		if (message == null) {
 			message = MessageLogic.getInstance().loadMessageDetail(messageRawId);
 		}
 		return message;
 	}
-	public void setMessage(IHttpRequestResponse message) {
+	public void setMessage(HttpRequestResponseDto message) {
 		this.message = message;
 	}
 	public Integer getOrgMessageId() {

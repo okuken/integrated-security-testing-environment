@@ -2,7 +2,6 @@ package okuken.iste.dto;
 
 import java.util.Date;
 
-import burp.IHttpRequestResponse;
 import okuken.iste.logic.MessageLogic;
 
 public class MessageRepeatRedirectDto {
@@ -15,7 +14,7 @@ public class MessageRepeatRedirectDto {
 	private Integer time;
 
 	private Integer messageRawId;
-	private IHttpRequestResponse message;
+	private HttpRequestResponseDto message;
 
 	public Integer getId() {
 		return id;
@@ -53,13 +52,13 @@ public class MessageRepeatRedirectDto {
 	public void setMessageRawId(Integer messageRawId) {
 		this.messageRawId = messageRawId;
 	}
-	public IHttpRequestResponse getMessage() {
+	public HttpRequestResponseDto getMessage() {
 		if (message == null) {
 			message = MessageLogic.getInstance().loadMessageDetail(messageRawId);
 		}
 		return message;
 	}
-	public void setMessage(IHttpRequestResponse message) {
+	public void setMessage(HttpRequestResponseDto message) {
 		this.message = message;
 	}
 

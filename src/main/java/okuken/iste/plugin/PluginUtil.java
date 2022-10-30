@@ -11,12 +11,11 @@ import javax.swing.JMenuItem;
 
 import com.google.common.collect.Lists;
 
-import burp.IHttpRequestResponse;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.HttpRequestResponseDto;
+import okuken.iste.dto.HttpServiceDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
-import okuken.iste.dto.burp.HttpRequestResponseMock;
-import okuken.iste.dto.burp.HttpServiceMock;
 import okuken.iste.enums.SecurityTestingProgress;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.MessageLogic;
@@ -184,11 +183,11 @@ public class PluginUtil {
 		return ret;
 	}
 
-	private static IHttpRequestResponse convertIsteMessageToHttpRequestResponse(IIsteMessage isteMessage) {
-		return new HttpRequestResponseMock(
+	private static HttpRequestResponseDto convertIsteMessageToHttpRequestResponse(IIsteMessage isteMessage) {
+		return new HttpRequestResponseDto(
 				isteMessage.getRequest(),
 				isteMessage.getResponse(),
-				new HttpServiceMock(
+				new HttpServiceDto(
 						isteMessage.getHost(),
 						isteMessage.getPort(),
 						isteMessage.getProtocol()));

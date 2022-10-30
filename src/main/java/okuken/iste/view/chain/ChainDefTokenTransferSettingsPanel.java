@@ -8,7 +8,7 @@ import okuken.iste.consts.Captions;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.dto.MessageChainTokenTransferSettingDto;
-import okuken.iste.util.BurpUtil;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.MessageUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.common.VerticalFlowPanel;
@@ -130,7 +130,7 @@ public class ChainDefTokenTransferSettingsPanel extends JPanel {
 			UiUtil.showMessage(Captions.MESSAGE_SELECT_SEMIAUTO_SETTING_TARGET_TOKEN_EMPTY, this);
 			return null;
 		}
-		BurpUtil.getCallbacks().customizeUiComponent(this);
+		BurpApiUtil.i().customizeUiComponent(this);
 
 		if(UiUtil.showOptionDialog(
 				parent,

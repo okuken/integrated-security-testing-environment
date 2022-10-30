@@ -11,8 +11,8 @@ import javax.swing.KeyStroke;
 
 import com.google.common.collect.Lists;
 
-import burp.IHttpRequestResponse;
 import okuken.iste.controller.Controller;
+import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.message.selector.MessageSelectorForSendToHistory;
@@ -53,7 +53,7 @@ public class KeyStrokeManager {
 
 				var selectedIndexes = getSelectedProxyHistoryIndexes();
 				UiUtil.invokeLater(() -> {
-					Controller.getInstance().sendMessagesToSuiteTab(getProxyHistory(selectedIndexes));
+					Controller.getInstance().sendMessagesToSuiteTab(BurpApiUtil.i().getProxyHistory(selectedIndexes));
 				});
 			}
 		});
@@ -68,8 +68,8 @@ public class KeyStrokeManager {
 
 				var selectedIndexes = getSelectedProxyHistoryIndexes();
 				UiUtil.invokeLater(() -> {
-					var selectedMessages = getProxyHistory(selectedIndexes);
-					var targetMessageDto = MessageSelectorForSendToHistory.showDialog(selectedMessages.toArray(new IHttpRequestResponse[0]));
+					var selectedMessages = BurpApiUtil.i().getProxyHistory(selectedIndexes);
+					var targetMessageDto = MessageSelectorForSendToHistory.showDialog(selectedMessages);
 					if(targetMessageDto == null) {
 						return;
 					}
@@ -119,14 +119,6 @@ public class KeyStrokeManager {
 				.collect(Collectors.toList());
 	}
 
-	private List<IHttpRequestResponse> getProxyHistory(List<Integer> indexes) {
-		var proxyHistory = BurpUtil.getCallbacks().getProxyHistory();
-		return indexes.stream()
-			.map(index -> proxyHistory[index])
-			.filter(message -> message.getRequest() != null)
-			.collect(Collectors.toList());
-	}
-
 	private boolean judgeIsReadyToCalculateDeletedProxyHttpHistoryNumbers() {
 		if(!judgeIsShowAll()) {
 			UiUtil.showMessage("To use Ctrl+Alt-Q, you need to set all filters off, so please open \"Filter settings\" and click \"Show all\" button.", BurpUtil.getBurpSuiteProxyHttpHistoryTable());
@@ -136,7 +128,7 @@ public class KeyStrokeManager {
 	}
 	private boolean judgeIsShowAll() {
 		return BurpUtil.getBurpSuiteProxyHttpHistoryTable().getRowCount() == 
-				BurpUtil.getCallbacks().getProxyHistory().length;
+				BurpApiUtil.i().getProxyHistorySize();
 	}
 	private List<Integer> calculateDeletedProxyHttpHistoryNumbers() {
 		var proxyHistoryTableModel = BurpUtil.getBurpSuiteProxyHttpHistoryTable().getModel();
