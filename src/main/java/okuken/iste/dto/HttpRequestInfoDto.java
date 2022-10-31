@@ -5,48 +5,40 @@ import java.util.List;
 
 public class HttpRequestInfoDto {
 
-	private String method;
-	private URL url;
-	private List<String> headers;
-	private List<HttpRequestParameterDto> parameters;
-	private int bodyOffset;
-	private byte contentType;
+	private final String method;
+	private final URL url;
+	private final List<String> headers;
+	private final List<HttpRequestParameterDto> parameters;
+	private final int bodyOffset;
+	private final byte contentType;
+
+	public HttpRequestInfoDto(String method, URL url, List<String> headers, List<HttpRequestParameterDto> parameters,
+			int bodyOffset, byte contentType) {
+		this.method = method;
+		this.url = url;
+		this.headers = headers;
+		this.parameters = parameters;
+		this.bodyOffset = bodyOffset;
+		this.contentType = contentType;
+	}
 
 	public String getMethod() {
 		return method;
 	}
-	public void setMethod(String method) {
-		this.method = method;
-	}
 	public URL getUrl() {
 		return url;
-	}
-	public void setUrl(URL url) {
-		this.url = url;
 	}
 	public List<String> getHeaders() {
 		return headers;
 	}
-	public void setHeaders(List<String> headers) {
-		this.headers = headers;
-	}
 	public List<HttpRequestParameterDto> getParameters() {
 		return parameters;
-	}
-	public void setParameters(List<HttpRequestParameterDto> parameters) {
-		this.parameters = parameters;
 	}
 	public int getBodyOffset() {
 		return bodyOffset;
 	}
-	public void setBodyOffset(int bodyOffset) {
-		this.bodyOffset = bodyOffset;
-	}
 	public byte getContentType() {
 		return contentType;
-	}
-	public void setContentType(byte contentType) {
-		this.contentType = contentType;
 	}
 
 }

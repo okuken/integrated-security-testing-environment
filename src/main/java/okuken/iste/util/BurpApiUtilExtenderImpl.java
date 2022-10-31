@@ -131,19 +131,23 @@ public class BurpApiUtilExtenderImpl extends BurpApiUtil {
 	@Override
 	public HttpRequestInfoDto analyzeRequest(HttpRequestResponseDto request) {
 		var requestInfo = helper.analyzeRequest(convertHttpRequestResponseDtoToOrg(request));
-		return convertToDto(requestInfo);
+		return convertToDto(requestInfo, true);
 	}
 	@Override
 	public HttpRequestInfoDto analyzeRequest(byte[] request) {
 		var requestInfo = helper.analyzeRequest(request);
-		return convertToDto(requestInfo);
+		return convertToDto(requestInfo, false);
 	}
-	private HttpRequestInfoDto convertToDto(IRequestInfo requestInfo) {
-		var ret = ReflectionUtil.copyProperties(new HttpRequestInfoDto(), requestInfo);
-		ret.setParameters(requestInfo.getParameters().stream()
-				.map(param -> ReflectionUtil.copyProperties(new HttpRequestParameterDto(), param))
-				.collect(Collectors.toList()));
-		return ret;
+	private HttpRequestInfoDto convertToDto(IRequestInfo requestInfo, boolean hasHttpServiceInfo) {
+		return new HttpRequestInfoDto(
+				requestInfo.getMethod(),
+				hasHttpServiceInfo ? requestInfo.getUrl() : null,
+				requestInfo.getHeaders(),
+				requestInfo.getParameters().stream()
+					.map(param -> ReflectionUtil.copyProperties(new HttpRequestParameterDto(), param))
+					.collect(Collectors.toList()),
+				requestInfo.getBodyOffset(),
+				requestInfo.getContentType());
 	}
 
 	@Override
@@ -152,11 +156,15 @@ public class BurpApiUtilExtenderImpl extends BurpApiUtil {
 		return convertToDto(responseInfo);
 	}
 	private HttpResponseInfoDto convertToDto(IResponseInfo responseInfo) {
-		var ret = ReflectionUtil.copyProperties(new HttpResponseInfoDto(), responseInfo);
-		ret.setCookies(responseInfo.getCookies().stream()
-				.map(cookie -> ReflectionUtil.copyProperties(new HttpCookieDto(), cookie))
-				.collect(Collectors.toList()));
-		return ret;
+		return new HttpResponseInfoDto(
+				responseInfo.getHeaders(),
+				responseInfo.getBodyOffset(),
+				responseInfo.getStatusCode(),
+				responseInfo.getCookies().stream()
+					.map(cookie -> ReflectionUtil.copyProperties(new HttpCookieDto(), cookie))
+					.collect(Collectors.toList()),
+				responseInfo.getStatedMimeType(),
+				responseInfo.getInferredMimeType());
 	}
 
 	@Override
