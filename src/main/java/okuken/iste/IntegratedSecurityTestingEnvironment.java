@@ -7,28 +7,20 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.base.Strings;
 
-import burp.api.montoya.BurpExtension;
-import burp.api.montoya.MontoyaApi;
-import burp.api.montoya.misc.ExtensionUnloadHandler;
 import burp.IBurpExtender;
 import burp.IBurpExtenderCallbacks;
-import burp.IExtensionStateListener;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ProjectLogic;
-import okuken.iste.logic.RepeaterLogic;
-import okuken.iste.plugin.PluginManager;
 import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
-import okuken.iste.util.ThreadUtil;
-import okuken.iste.util.UiUtil;
 import okuken.iste.view.ContextMenuFactory;
 import okuken.iste.view.KeyStrokeManager;
 import okuken.iste.view.SuiteTab;
 
-public class IntegratedSecurityTestingEnvironment implements /*BurpExtension, */ExtensionUnloadHandler, IBurpExtender, IExtensionStateListener {
+public class IntegratedSecurityTestingEnvironment implements /*BurpExtension, */ IBurpExtender {
 
 //	@Override
 //	public void initialize(MontoyaApi api) {
@@ -47,7 +39,7 @@ public class IntegratedSecurityTestingEnvironment implements /*BurpExtension, */
 
 		BurpApiUtil.i().registerContextMenuFactory(ContextMenuFactory.create());
 
-		BurpApiUtil.i().registerExtensionStateListener(this);
+		BurpApiUtil.i().registerExtensionStateListener(new ExtensionStateListener());
 
 		setupDatabase();
 		ProjectLogic.getInstance().selectProject();
@@ -91,17 +83,6 @@ public class IntegratedSecurityTestingEnvironment implements /*BurpExtension, */
 	private boolean judgeNeedChooseDbFilePath(String dbFilePath) {
 		return Strings.isNullOrEmpty(dbFilePath) ||
 				!new File(dbFilePath).exists();
-	}
-
-	@Override
-	public void extensionUnloaded() {
-		RepeaterLogic.getInstance().shutdownExecutorService();
-		ThreadUtil.shutdownExecutorService();
-		PluginManager.getInstance().unloadAllPlugins();
-		DatabaseManager.getInstance().unloadDatabase();
-		KeyStrokeManager.getInstance().unloadKeyStroke();
-		UiUtil.disposeDockoutFrames();
-		UiUtil.disposePopupFrames();
 	}
 
 }

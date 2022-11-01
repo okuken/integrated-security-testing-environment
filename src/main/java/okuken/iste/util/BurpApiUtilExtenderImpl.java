@@ -13,8 +13,8 @@ import burp.IHttpService;
 import burp.IMessageEditorController;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
+import okuken.iste.ExtensionStateListener;
 import okuken.iste.dto.HttpMessageEditorController;
-import okuken.iste.IntegratedSecurityTestingEnvironment;
 import okuken.iste.dto.HttpCookieDto;
 import okuken.iste.dto.HttpMessageEditor;
 import okuken.iste.dto.HttpRequestInfoDto;
@@ -70,7 +70,7 @@ public class BurpApiUtilExtenderImpl extends BurpApiUtil {
 		callbacks.registerContextMenuFactory(factory);
 	}
 	@Override
-	public void registerExtensionStateListener(IntegratedSecurityTestingEnvironment listener) {
+	public void registerExtensionStateListener(ExtensionStateListener listener) {
 		callbacks.registerExtensionStateListener(listener);
 	}
 	@Override
@@ -130,7 +130,7 @@ public class BurpApiUtilExtenderImpl extends BurpApiUtil {
 
 	@Override
 	public HttpRequestInfoDto analyzeRequest(HttpRequestResponseDto request) {
-		var requestInfo = helper.analyzeRequest(convertHttpRequestResponseDtoToOrg(request));
+		var requestInfo = helper.analyzeRequest(request);
 		return convertToDto(requestInfo, true);
 	}
 	@Override
@@ -266,51 +266,6 @@ public class BurpApiUtilExtenderImpl extends BurpApiUtil {
 		ret.setHighlight(httpRequestResponse.getHighlight());
 
 		return ret;
-	}
-
-	private IHttpRequestResponse convertHttpRequestResponseDtoToOrg(HttpRequestResponseDto dto) {
-		return new IHttpRequestResponse() {
-			@Override
-			public void setResponse(byte[] message) {
-				dto.setResponse(message);
-			}
-			@Override
-			public void setRequest(byte[] message) {
-				dto.setRequest(message);
-			}
-			@Override
-			public void setHttpService(IHttpService httpService) {
-				dto.setHttpService(new HttpServiceDto(httpService.getHost(), httpService.getPort(), httpService.getProtocol()));
-			}
-			@Override
-			public void setHighlight(String color) {
-				dto.setHighlight(color);
-			}
-			@Override
-			public void setComment(String comment) {
-				dto.setComment(comment);
-			}
-			@Override
-			public byte[] getResponse() {
-				return dto.getResponse();
-			}
-			@Override
-			public byte[] getRequest() {
-				return dto.getRequest();
-			}
-			@Override
-			public IHttpService getHttpService() {
-				return dto.getHttpService();
-			}
-			@Override
-			public String getHighlight() {
-				return dto.getHighlight();
-			}
-			@Override
-			public String getComment() {
-				return dto.getComment();
-			}
-		};
 	}
 
 }

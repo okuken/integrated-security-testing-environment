@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.List;
 
 import burp.api.montoya.MontoyaApi;
-import okuken.iste.IntegratedSecurityTestingEnvironment;
+import okuken.iste.ExtensionStateListener;
 import okuken.iste.dto.HttpMessageEditor;
 import okuken.iste.dto.HttpMessageEditorController;
 import okuken.iste.dto.HttpRequestInfoDto;
@@ -63,7 +63,7 @@ public class BurpApiUtilMontoyaImpl extends BurpApiUtil {
 		api.userInterface().registerContextMenuItemsProvider(factory);
 	}
 	@Override
-	public void registerExtensionStateListener(IntegratedSecurityTestingEnvironment listener) {
+	public void registerExtensionStateListener(ExtensionStateListener listener) {
 		api.misc().registerExtensionUnloadHandler(listener);
 	}
 	@Override

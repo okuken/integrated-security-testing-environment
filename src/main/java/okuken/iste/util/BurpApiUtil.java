@@ -2,13 +2,14 @@ package okuken.iste.util;
 
 import java.awt.Component;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.List;
 
 import burp.IBurpExtenderCallbacks;
 import burp.api.montoya.MontoyaApi;
 
+import okuken.iste.ExtensionStateListener;
 import okuken.iste.dto.HttpMessageEditorController;
-import okuken.iste.IntegratedSecurityTestingEnvironment;
 import okuken.iste.dto.HttpMessageEditor;
 import okuken.iste.dto.HttpRequestInfoDto;
 import okuken.iste.dto.HttpRequestParameterDto;
@@ -51,13 +52,13 @@ public abstract class BurpApiUtil {
 	public abstract void setExtensionName(String name);
 	public abstract void addSuiteTab(SuiteTab tab);
 	public abstract void registerContextMenuFactory(ContextMenuFactory factory);
-	public abstract void registerExtensionStateListener(IntegratedSecurityTestingEnvironment listener);
+	public abstract void registerExtensionStateListener(ExtensionStateListener listener);
 	public abstract void unloadExtension();
 
 	public abstract void saveExtensionSetting(String name, String value);
 	public abstract String loadExtensionSetting(String name);
 
-	public abstract boolean isInScope(java.net.URL url);
+	public abstract boolean isInScope(URL url);
 
 	public abstract void sendToRepeater(String host, int port, boolean useHttps, byte[] request, String tabCaption);
 	public abstract void sendToIntruder(String host, int port, boolean useHttps, byte[] request);

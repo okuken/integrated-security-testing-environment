@@ -26,4 +26,9 @@ public class HttpServiceDto implements IHttpService {
 		return protocol;
 	}
 
+	@Override
+	public HttpServiceDto clone() {
+		return new HttpServiceDto(host, port, protocol);
+	}
+
 }
