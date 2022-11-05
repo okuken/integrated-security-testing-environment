@@ -12,8 +12,6 @@ import javax.swing.JMenuItem;
 
 import burp.IContextMenuFactory;
 import burp.IContextMenuInvocation;
-import burp.api.montoya.ui.contextmenu.ContextMenuEvent;
-import burp.api.montoya.ui.contextmenu.ContextMenuItemsProvider;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.HttpRequestResponseDto;
@@ -21,7 +19,7 @@ import okuken.iste.logic.ConfigLogic;
 import okuken.iste.util.BurpApiUtil;
 import okuken.iste.view.message.selector.MessageSelectorForSendToHistory;
 
-public class ContextMenuFactory implements ContextMenuItemsProvider, IContextMenuFactory {
+public class ContextMenuFactory implements IContextMenuFactory {
 
 	private static final int AUTO_SEND_TO_ISTE_MASK = InputEvent.CTRL_DOWN_MASK;
 	private static final int AUTO_SEND_TO_ISTE_HISTORY_MASK = InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK;
@@ -29,15 +27,6 @@ public class ContextMenuFactory implements ContextMenuItemsProvider, IContextMen
 	private ContextMenuFactory() {}
 	public static ContextMenuFactory create() {
 		return new ContextMenuFactory();
-	}
-
-	@Override
-	public List<JMenuItem> provideMenuItems(ContextMenuEvent event) {
-		var selectedMessages = event.selectedRequestResponses();
-		if(selectedMessages.isEmpty()) {
-			return null;
-		}
-		return createMenuItemsImpl(selectedMessages.stream(), event.inputEvent().getModifiersEx(), event);
 	}
 
 	@Override

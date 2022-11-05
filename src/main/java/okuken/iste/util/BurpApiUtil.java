@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.List;
 
 import burp.IBurpExtenderCallbacks;
-import burp.api.montoya.MontoyaApi;
 
 import okuken.iste.ExtensionStateListener;
 import okuken.iste.dto.HttpMessageEditorController;
@@ -23,10 +22,6 @@ public abstract class BurpApiUtil {
 
 	private static BurpApiUtil instance;
 
-	public static void init(MontoyaApi montoyaApi) {
-		checkDuplication();
-		instance = new BurpApiUtilMontoyaImpl(montoyaApi);
-	}
 	public static void init(IBurpExtenderCallbacks burpExtenderCallbacks) {
 		checkDuplication();
 		instance = new BurpApiUtilExtenderImpl(burpExtenderCallbacks);

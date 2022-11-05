@@ -20,13 +20,7 @@ import okuken.iste.view.ContextMenuFactory;
 import okuken.iste.view.KeyStrokeManager;
 import okuken.iste.view.SuiteTab;
 
-public class IntegratedSecurityTestingEnvironment implements /*BurpExtension, */ IBurpExtender {
-
-//	@Override
-//	public void initialize(MontoyaApi api) {
-//		BurpApiUtil.init(api);
-//		initImpl();
-//	}
+public class IntegratedSecurityTestingEnvironment implements IBurpExtender {
 
 	@Override
 	public void registerExtenderCallbacks(IBurpExtenderCallbacks burpExtenderCallbacks) {
