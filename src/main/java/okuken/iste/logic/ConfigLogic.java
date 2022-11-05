@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import okuken.iste.annotations.Persistent;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.PluginProjectOptionDto;
@@ -59,7 +60,7 @@ public class ConfigLogic {
 		Arrays.asList(UserOptionsDto.class.getDeclaredFields()).stream()
 			.filter(field -> field.isAnnotationPresent(Persistent.class))
 			.forEach(field -> {
-				var valueStr = BurpUtil.getCallbacks().loadExtensionSetting(field.getAnnotation(Persistent.class).key());
+				var valueStr = BurpApiClient.i().loadExtensionSetting(field.getAnnotation(Persistent.class).key());
 				if(valueStr == null) {
 					return;
 				}
@@ -125,7 +126,7 @@ public class ConfigLogic {
 	}
 	private void saveUserOption(String fieldName, Object value, String valueStr) {
 		try {
-			BurpUtil.getCallbacks().saveExtensionSetting(UserOptionsDto.class.getDeclaredField(fieldName).getAnnotation(Persistent.class).key(), valueStr);
+			BurpApiClient.i().saveExtensionSetting(UserOptionsDto.class.getDeclaredField(fieldName).getAnnotation(Persistent.class).key(), valueStr);
 			BeanUtils.setProperty(getUserOptions(), fieldName, value);
 		} catch (NoSuchFieldException | SecurityException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
@@ -177,7 +178,7 @@ public class ConfigLogic {
 		Arrays.asList(UserOptionsDto.class.getDeclaredFields()).stream()
 			.filter(field -> field.isAnnotationPresent(Persistent.class))
 			.map(field -> field.getAnnotation(Persistent.class).key())
-			.forEach(key -> BurpUtil.getCallbacks().saveExtensionSetting(key, null));
+			.forEach(key -> BurpApiClient.i().saveExtensionSetting(key, null));
 	}
 
 

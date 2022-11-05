@@ -17,10 +17,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
-import burp.IHttpRequestResponse;
 import okuken.iste.DatabaseManager;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthApplyConfigDto;
+import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.dto.MessageDto;
@@ -194,8 +194,8 @@ public class Controller {
 	}
 
 
-	public void sendMessagesToSuiteTab(List<IHttpRequestResponse> messages) {
-		BurpUtil.highlightTab(suiteTab);
+	public void sendMessagesToSuiteTab(List<HttpRequestResponseDto> messages) {
+		BurpUtil.highlightTab(suiteTab.getUiComponent());
 		addMessages(messages.stream()
 				.map(message -> MessageLogic.getInstance().convertHttpRequestResponseToDto(message))
 				.collect(Collectors.toList()));
@@ -210,8 +210,8 @@ public class Controller {
 		refreshComponentsDependentOnMessages(this.messageTableModel.getRows());
 	}
 
-	public void sendMessagesToSuiteTabHistory(MessageDto targetMessageDto, List<IHttpRequestResponse> messages) {
-		BurpUtil.highlightTab(suiteTab);
+	public void sendMessagesToSuiteTabHistory(MessageDto targetMessageDto, List<HttpRequestResponseDto> messages) {
+		BurpUtil.highlightTab(suiteTab.getUiComponent());
 		RepeaterLogic.getInstance().saveAsRepeatHistory(targetMessageDto, messages);
 		refreshRepeatTablePanel(targetMessageDto);
 	}

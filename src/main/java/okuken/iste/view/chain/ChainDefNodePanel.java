@@ -10,11 +10,11 @@ import okuken.iste.consts.Colors;
 import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.dto.MessageChainNodeRespDto;
 import okuken.iste.dto.MessageDto;
-import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.enums.IsteColor;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.message.editor.MessageEditorPanel;
@@ -32,8 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.border.LineBorder;
 
 import com.google.common.collect.Lists;
-
-import burp.IHttpRequestResponse;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -56,7 +54,7 @@ public class ChainDefNodePanel extends JPanel {
 
 	private List<Runnable> editListeners = Lists.newArrayList();
 	private List<Consumer<MessageDto>> messageSelectionChangeListeners = Lists.newArrayList();
-	private List<Consumer<IHttpRequestResponse>> chainResponseListeners = Lists.newArrayList();
+	private List<Consumer<HttpRequestResponseDto>> chainResponseListeners = Lists.newArrayList();
 	private List<Consumer<Color>> colorChangeListeners = Lists.newArrayList();
 	private List<Runnable> nodeRemoveListeners = Lists.newArrayList();
 
@@ -225,7 +223,7 @@ public class ChainDefNodePanel extends JPanel {
 		saveAsMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				var orgMessageDto = getSelectedMessageDto();
-				orgMessageDto.setRepeatMasterMessage(new HttpRequestResponseMock(
+				orgMessageDto.setRepeatMasterMessage(new HttpRequestResponseDto(
 						messageEditorPanel.getRequest(),
 						messageEditorPanel.getResponse(),
 						orgMessageDto.getMessage().getHttpService()));
@@ -383,7 +381,7 @@ public class ChainDefNodePanel extends JPanel {
 		return messageEditorPanel.getResponse();
 	}
 
-	public void setMessage(IHttpRequestResponse message, boolean chainResponse) {
+	public void setMessage(HttpRequestResponseDto message, boolean chainResponse) {
 		messageEditorPanel.setMessage(message, true);
 		requestParamsPanel.refreshAllExtractResult();
 		responseParamsPanel.refreshAllExtractResult();
@@ -504,7 +502,7 @@ public class ChainDefNodePanel extends JPanel {
 	void addMessageSelectionChangeListener(Consumer<MessageDto> listener) {
 		messageSelectionChangeListeners.add(listener);
 	}
-	void addChainResponseListener(Consumer<IHttpRequestResponse> listener) {
+	void addChainResponseListener(Consumer<HttpRequestResponseDto> listener) {
 		chainResponseListeners.add(listener);
 	}
 	void addColorChangeListener(Consumer<Color> listener) {

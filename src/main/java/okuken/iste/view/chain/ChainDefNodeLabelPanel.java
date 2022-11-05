@@ -3,10 +3,10 @@ package okuken.iste.view.chain;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import burp.IHttpRequestResponse;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Colors;
+import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.MessageDto;
-import okuken.iste.util.BurpUtil;
 
 import java.awt.GridLayout;
 import java.awt.event.MouseListener;
@@ -73,14 +73,14 @@ public class ChainDefNodeLabelPanel extends JPanel {
 		resultLabel.setToolTipText(longStr);
 	}
 
-	private void refreshByChainResponse(IHttpRequestResponse message) {
+	private void refreshByChainResponse(HttpRequestResponseDto message) {
 		var response = message.getResponse();
 		if(response == null) {
 			resultLabel.setText(null);
 			return;
 		}
 
-		var responseInfo = BurpUtil.getHelpers().analyzeResponse(response);
+		var responseInfo = BurpApiClient.i().analyzeResponse(response);
 		var status = Short.toString(responseInfo.getStatusCode());
 		resultLabel.setText(String.format("%s(%d)", status, response.length));
 

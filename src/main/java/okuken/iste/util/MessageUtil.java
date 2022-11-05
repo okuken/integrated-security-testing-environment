@@ -13,10 +13,11 @@ import org.jsoup.nodes.Document;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
-import burp.ICookie;
-import burp.IParameter;
-import burp.IResponseInfo;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.HttpCookieDto;
+import okuken.iste.dto.HttpRequestParameterDto;
+import okuken.iste.dto.HttpResponseInfoDto;
 import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.dto.MessageChainTokenTransferSettingDto;
 import okuken.iste.dto.MessageCookieDto;
@@ -45,17 +46,17 @@ public class MessageUtil {
 			return applyHeaderPayload(request, paramName, paramValue);
 		}
 
-		if(!BurpUtil.getHelpers().analyzeRequest(request).getParameters().stream().anyMatch(p -> 
+		if(!BurpApiClient.i().analyzeRequest(request).getParameters().stream().anyMatch(p -> 
 				p.getType() == paramType.getBurpId() && StringUtils.equals(p.getName(), paramName))) {
 			return request;
 		}
 
-		var parameter = BurpUtil.getHelpers().buildParameter(paramName, paramValue, paramType.getBurpId());
+		var parameter = BurpApiClient.i().buildParameter(paramName, paramValue, paramType.getBurpId());
 		switch (paramType) {
 		case COOKIE:
 			return applyCookiePayload(request, parameter);
 		default:
-			return BurpUtil.getHelpers().updateParameter(request, parameter);
+			return BurpApiClient.i().updateParameter(request, parameter);
 		}
 	}
 
@@ -68,19 +69,19 @@ public class MessageUtil {
 		return updateContentLength(appliedRequestStr.getBytes(ByteUtil.DEFAULT_SINGLE_BYTE_CHARSET));
 	}
 
-	public static byte[] applyCookiePayload(byte[] request, IParameter parameter) {
-		var ret = BurpUtil.getHelpers().removeParameter(request, parameter);
+	public static byte[] applyCookiePayload(byte[] request, HttpRequestParameterDto parameter) {
+		var ret = BurpApiClient.i().removeParameter(request, parameter);
 		ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
-		return BurpUtil.getHelpers().addParameter(ret, parameter);
+		return BurpApiClient.i().addParameter(ret, parameter);
 	}
 
 	private static byte[] applyHeaderPayload(byte[] request, String headerName, String value) {
-		var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
+		var requestInfo = BurpApiClient.i().analyzeRequest(request);
 
 		var headerPrefix = headerName + ": ";
 		var appliedHeaders = requestInfo.getHeaders().stream().map(header -> header.startsWith(headerPrefix) ? headerPrefix + value : header).collect(Collectors.toList());
 		var body = HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset());
-		return BurpUtil.getHelpers().buildHttpMessage(appliedHeaders, body);
+		return BurpApiClient.i().buildHttpMessage(appliedHeaders, body);
 	}
 
 //	private static byte[] applyHeaderPayload(byte[] request, IParameter parameter) {
@@ -147,8 +148,8 @@ public class MessageUtil {
 	}
 
 	public static byte[] updateContentLength(byte[] request) {
-		var requestInfo = BurpUtil.getHelpers().analyzeRequest(request);
-		return BurpUtil.getHelpers().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
+		var requestInfo = BurpApiClient.i().analyzeRequest(request);
+		return BurpApiClient.i().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
 	}
 
 	public static List<MessageRequestParamDto> extractRequestParams(List<MessageDto> messageDtos) {
@@ -172,7 +173,7 @@ public class MessageUtil {
 
 		return Stream.concat(parameters, headers).sorted().distinct().collect(Collectors.toList());
 	}
-	private static boolean isRequestParameter(IParameter param) {
+	private static boolean isRequestParameter(HttpRequestParameterDto param) {
 		var paramType = param.getType();
 		return paramType == RequestParameterType.URL.getBurpId() ||
 				paramType == RequestParameterType.BODY.getBurpId();
@@ -204,13 +205,13 @@ public class MessageUtil {
 	private static List<MessageResponseParamDto> extractResponseCandidateParams(byte[] response, ResponseParameterType paramType) {
 		switch (paramType) {
 			case COOKIE:
-				return BurpUtil.getHelpers().analyzeResponse(response).getCookies().stream()
+				return BurpApiClient.i().analyzeResponse(response).getCookies().stream()
 					.map(MessageUtil::convertCookieToDto)
 					.collect(Collectors.toList());
 			case JSON:
 				return convertJsonResponseToDto(
 						response,
-						BurpUtil.getHelpers().analyzeResponse(response));
+						BurpApiClient.i().analyzeResponse(response));
 			default:
 				return Lists.newArrayList();
 		}
@@ -259,14 +260,14 @@ public class MessageUtil {
 	}
 
 	public static short extractResponseStatus(byte[] response) {
-		return response != null ? BurpUtil.getHelpers().analyzeResponse(response).getStatusCode() : -1;
+		return response != null ? BurpApiClient.i().analyzeResponse(response).getStatusCode() : -1;
 	}
 
 	public static int extractResponseLength(byte[] response) {
 		return response != null ? response.length : 0;
 	}
 
-	public static MessageCookieDto convertCookieToDto(ICookie cookie) {
+	public static MessageCookieDto convertCookieToDto(HttpCookieDto cookie) {
 		MessageCookieDto cookieDto = new MessageCookieDto();
 		cookieDto.setDomain(cookie.getDomain());
 		cookieDto.setPath(cookie.getPath());
@@ -277,7 +278,7 @@ public class MessageUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<MessageResponseParamDto> convertJsonResponseToDto(byte[] response, IResponseInfo responseInfo) {
+	public static List<MessageResponseParamDto> convertJsonResponseToDto(byte[] response, HttpResponseInfoDto responseInfo) {
 		var responseBody = HttpUtil.extractMessageBody(response, responseInfo.getBodyOffset());
 		var responseBodyStr = new String(responseBody, Optional.ofNullable(ByteUtil.detectEncoding(response)).orElse(HttpUtil.DEFAULT_HTTP_BODY_CHARSET));
 		Map<String, Object> json = new Gson().fromJson(responseBodyStr, Map.class);
@@ -293,7 +294,7 @@ public class MessageUtil {
 	}
 
 	public static Optional<String> convertToResponseHtmlString(byte[] response) {
-		var responseInfo = BurpUtil.getHelpers().analyzeResponse(response);
+		var responseInfo = BurpApiClient.i().analyzeResponse(response);
 		if(!isHtml(responseInfo.getStatedMimeType())) {
 			return Optional.empty();
 		}

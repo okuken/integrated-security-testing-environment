@@ -1,7 +1,6 @@
 package okuken.iste.view.message.selector;
 
 import java.awt.Component;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -11,11 +10,11 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 
-import burp.IHttpRequestResponse;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.logic.MessageLogic;
 import okuken.iste.util.BurpUtil;
@@ -24,7 +23,7 @@ import okuken.iste.util.UiUtil;
 public class MessageSelectorForSendToHistory {
 
 	@SuppressWarnings("serial")
-	public static MessageDto showDialog(IHttpRequestResponse[] selectedMessages) {
+	public static MessageDto showDialog(List<HttpRequestResponseDto> selectedMessages) {
 		var messageDtos = Controller.getInstance().getMessages();
 		if(messageDtos.isEmpty()) {
 			return null;
@@ -63,8 +62,8 @@ public class MessageSelectorForSendToHistory {
 		return null;
 	}
 
-	private static List<Integer> extractCandidateIndexes(List<MessageDto> messageDtos, IHttpRequestResponse[] selectedMessages) {
-		var selectedMessageDtos = Arrays.asList(selectedMessages).stream()
+	private static List<Integer> extractCandidateIndexes(List<MessageDto> messageDtos, List<HttpRequestResponseDto> selectedMessages) {
+		var selectedMessageDtos = selectedMessages.stream()
 				.map(message -> MessageLogic.getInstance().convertHttpRequestResponseToDto(message))
 				.collect(Collectors.toList());
 

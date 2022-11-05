@@ -7,16 +7,15 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import burp.IHttpRequestResponse;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
-import okuken.iste.dto.burp.HttpRequestResponseMock;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 import okuken.iste.view.chain.ChainDefPanel;
@@ -122,7 +121,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		saveAsMasterButton.setToolTipText(Captions.REPEATER_BUTTON_SAVE_AS_MASTER_TT);
 		saveAsMasterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				orgMessageDto.setRepeatMasterMessage(new HttpRequestResponseMock(
+				orgMessageDto.setRepeatMasterMessage(new HttpRequestResponseDto(
 						messageEditorPanel.getRequest(),
 						messageEditorPanel.getResponse(),
 						orgMessageDto.getMessage().getHttpService()));
@@ -189,9 +188,9 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		messageEditorPanel.setMessage(messageDto, keepCaretPosition);
 		refreshFollowRedirectButton(messageDto.getStatus());
 	}
-	private void setMessage(IHttpRequestResponse message, boolean keepCaretPosition) {
+	private void setMessage(HttpRequestResponseDto message, boolean keepCaretPosition) {
 		messageEditorPanel.setMessage(message, keepCaretPosition);
-		refreshFollowRedirectButton(message.getResponse() != null ? BurpUtil.getHelpers().analyzeResponse(message.getResponse()).getStatusCode() : null);
+		refreshFollowRedirectButton(message.getResponse() != null ? BurpApiClient.i().analyzeResponse(message.getResponse()).getStatusCode() : null);
 	}
 
 	public void sendRequest(boolean forceAuthSessionRefresh) {
@@ -255,7 +254,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 		return orgMessageDto;
 	}
 
-	public IHttpRequestResponse getMasterMessage() {
+	public HttpRequestResponseDto getMasterMessage() {
 		return orgMessageDto.getMasterMessage();
 	}
 

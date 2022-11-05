@@ -10,24 +10,24 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
-import burp.ICookie;
-import burp.IParameter;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.AuthAccountDto;
+import okuken.iste.dto.HttpCookieDto;
+import okuken.iste.dto.HttpRequestParameterDto;
+import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.MessageChainDto;
 import okuken.iste.dto.MessageChainNodeDto;
 import okuken.iste.dto.MessageChainNodeReqpDto;
 import okuken.iste.dto.MessageChainNodeRespDto;
 import okuken.iste.dto.MessageChainRepeatDto;
 import okuken.iste.dto.MessageDto;
-import okuken.iste.dto.burp.HttpRequestResponseMock;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.ResponseParameterType;
 import okuken.iste.enums.SourceType;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.BurpUtil;
 import okuken.iste.util.MessageUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.util.ValidationUtil;
@@ -384,7 +384,7 @@ public class ChainDefPanel extends JPanel {
 		addButton.addActionListener(new AbstractAction() {
 			@Override public void actionPerformedSafe(ActionEvent e) {
 				var nodePanel = addNode(buttonPanel);
-				BurpUtil.getCallbacks().customizeUiComponent(nodePanel);
+				BurpApiClient.i().customizeUiComponent(nodePanel);
 				SwingUtilities.invokeLater(() -> {
 					focusNode(nodePanel, false);
 				});
@@ -494,7 +494,7 @@ public class ChainDefPanel extends JPanel {
 			//reqp
 			nodeDto.getMessageDto().getRequestInfo().getParameters().stream()
 					.filter(p -> p.getType() == RequestParameterType.COOKIE.getBurpId())
-					.map(IParameter::getName)
+					.map(HttpRequestParameterDto::getName)
 					.filter(selectedCookies::contains)
 					.filter(cookie -> !nodeDto.getReqps().stream() //unique
 										.filter(reqp -> reqp.getParamType() == RequestParameterType.COOKIE)
@@ -511,7 +511,7 @@ public class ChainDefPanel extends JPanel {
 			var responseInfo = nodeDto.getMessageDto().getResponseInfo();
 			if(responseInfo != null) {
 				responseInfo.getCookies().stream()
-					.map(ICookie::getName)
+					.map(HttpCookieDto::getName)
 					.filter(selectedCookies::contains)
 					.filter(cookie -> !nodeDto.getResps().stream() //unique
 										.filter(resp -> resp.getParamType() == ResponseParameterType.COOKIE)
@@ -746,7 +746,7 @@ public class ChainDefPanel extends JPanel {
 				var breakingAppliedRequestForView = messageChainRepeatDto.getBreakingAppliedRequestForView();
 				SwingUtilities.invokeLater(() -> {
 					var chainDefNodePanel = chainDefNodePanels.get(index);
-					chainDefNodePanel.setMessage(new HttpRequestResponseMock(breakingAppliedRequestForView, null, messageChainRepeatDto.getMessageChainDto().getNodes().get(index).getMessageDto().getMessage().getHttpService()), false);
+					chainDefNodePanel.setMessage(new HttpRequestResponseDto(breakingAppliedRequestForView, null, messageChainRepeatDto.getMessageChainDto().getNodes().get(index).getMessageDto().getMessage().getHttpService()), false);
 					setIsCurrentNode(chainDefNodePanels, index);
 					focusNode(chainDefNodePanel, true, true);
 					refreshControlsState();
