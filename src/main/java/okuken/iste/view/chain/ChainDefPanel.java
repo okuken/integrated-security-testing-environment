@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.controller.Controller;
@@ -27,7 +28,6 @@ import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.ResponseParameterType;
 import okuken.iste.enums.SourceType;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.MessageUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.util.ValidationUtil;
@@ -384,7 +384,7 @@ public class ChainDefPanel extends JPanel {
 		addButton.addActionListener(new AbstractAction() {
 			@Override public void actionPerformedSafe(ActionEvent e) {
 				var nodePanel = addNode(buttonPanel);
-				BurpApiUtil.i().customizeUiComponent(nodePanel);
+				BurpApiClient.i().customizeUiComponent(nodePanel);
 				SwingUtilities.invokeLater(() -> {
 					focusNode(nodePanel, false);
 				});

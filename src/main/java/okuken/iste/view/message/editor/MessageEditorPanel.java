@@ -9,13 +9,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.text.JTextComponent;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
-import okuken.iste.dto.HttpMessageEditor;
-import okuken.iste.dto.HttpMessageEditorController;
 import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.HttpServiceDto;
 import okuken.iste.dto.MessageDto;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 
@@ -50,8 +48,8 @@ public class MessageEditorPanel extends JPanel {
 			messageEditorController = createDefaultMessageEditorController();
 		}
 
-		requestMessageEditor = BurpApiUtil.i().createMessageEditor(messageEditorController, requestEditable);
-		responseMessageEditor = BurpApiUtil.i().createMessageEditor(messageEditorController, responseEditable);
+		requestMessageEditor = BurpApiClient.i().createMessageEditor(messageEditorController, requestEditable);
+		responseMessageEditor = BurpApiClient.i().createMessageEditor(messageEditorController, responseEditable);
 
 		setupMessageEditorsLayout(type);
 	}

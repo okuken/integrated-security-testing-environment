@@ -7,6 +7,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Positions;
 import okuken.iste.controller.Controller;
@@ -15,7 +16,6 @@ import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.dto.MessageRepeatDto;
 import okuken.iste.dto.MessageRepeatRedirectDto;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.AbstractDockoutableTabPanel;
 import okuken.iste.view.chain.ChainDefPanel;
@@ -190,7 +190,7 @@ public class RepeaterPanel extends AbstractDockoutableTabPanel {
 	}
 	private void setMessage(HttpRequestResponseDto message, boolean keepCaretPosition) {
 		messageEditorPanel.setMessage(message, keepCaretPosition);
-		refreshFollowRedirectButton(message.getResponse() != null ? BurpApiUtil.i().analyzeResponse(message.getResponse()).getStatusCode() : null);
+		refreshFollowRedirectButton(message.getResponse() != null ? BurpApiClient.i().analyzeResponse(message.getResponse()).getStatusCode() : null);
 	}
 
 	public void sendRequest(boolean forceAuthSessionRefresh) {

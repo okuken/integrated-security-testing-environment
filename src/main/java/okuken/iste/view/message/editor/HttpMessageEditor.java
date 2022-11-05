@@ -1,4 +1,4 @@
-package okuken.iste.dto;
+package okuken.iste.view.message.editor;
 
 import java.awt.Component;
 

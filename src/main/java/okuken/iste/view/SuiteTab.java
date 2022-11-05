@@ -3,8 +3,8 @@ package okuken.iste.view;
 import java.awt.Component;
 
 import burp.ITab;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
-import okuken.iste.util.BurpApiUtil;
 
 public class SuiteTab implements ITab {
 
@@ -12,7 +12,7 @@ public class SuiteTab implements ITab {
 
 	public SuiteTab() {
 		SuitePanel suitePanel = new SuitePanel();
-		BurpApiUtil.i().customizeUiComponent(suitePanel);
+		BurpApiClient.i().customizeUiComponent(suitePanel);
 		this.suitePanel = suitePanel;
 	}
 

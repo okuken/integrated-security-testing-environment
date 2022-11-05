@@ -4,12 +4,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.exploit.bsqli.view.BlindSqlInjectionPanel;
 import okuken.iste.plugin.PluginPopupMenuListener;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.UiUtil;
 
 import java.awt.event.ActionListener;
@@ -57,7 +57,7 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		sendToComparerRequestMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parentRepeatTablePanel.getSelectedRows().stream().forEach(
-						dto -> BurpApiUtil.i().sendToComparer(nvl(dto.getMessage().getRequest())));
+						dto -> BurpApiClient.i().sendToComparer(nvl(dto.getMessage().getRequest())));
 			}
 		});
 		add(sendToComparerRequestMenuItem);
@@ -65,9 +65,9 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		JMenuItem sendToComparerRequestWithOrgMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_TO_COMPARER_REQUEST_WITH_ORG);
 		sendToComparerRequestWithOrgMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BurpApiUtil.i().sendToComparer(nvl(getOrgMessage().getRequest()));
+				BurpApiClient.i().sendToComparer(nvl(getOrgMessage().getRequest()));
 				parentRepeatTablePanel.getSelectedRows().stream().forEach(
-						dto -> BurpApiUtil.i().sendToComparer(nvl(dto.getMessage().getRequest())));
+						dto -> BurpApiClient.i().sendToComparer(nvl(dto.getMessage().getRequest())));
 			}
 		});
 		add(sendToComparerRequestWithOrgMenuItem);
@@ -75,9 +75,9 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		JMenuItem sendToComparerRequestWithMasterMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_TO_COMPARER_REQUEST_WITH_MST);
 		sendToComparerRequestWithMasterMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BurpApiUtil.i().sendToComparer(nvl(getMasterMessage().getRequest()));
+				BurpApiClient.i().sendToComparer(nvl(getMasterMessage().getRequest()));
 				parentRepeatTablePanel.getSelectedRows().stream().forEach(
-						dto -> BurpApiUtil.i().sendToComparer(nvl(dto.getMessage().getRequest())));
+						dto -> BurpApiClient.i().sendToComparer(nvl(dto.getMessage().getRequest())));
 			}
 		});
 		add(sendToComparerRequestWithMasterMenuItem);
@@ -86,7 +86,7 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		sendToComparerResponseMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				parentRepeatTablePanel.getSelectedRows().stream().forEach(
-						dto -> BurpApiUtil.i().sendToComparer(nvl(dto.getMessage().getResponse())));
+						dto -> BurpApiClient.i().sendToComparer(nvl(dto.getMessage().getResponse())));
 			}
 		});
 		add(sendToComparerResponseMenuItem);
@@ -94,9 +94,9 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		JMenuItem sendToComparerResponseWithOrgMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_ORG);
 		sendToComparerResponseWithOrgMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BurpApiUtil.i().sendToComparer(nvl(getOrgMessage().getResponse()));
+				BurpApiClient.i().sendToComparer(nvl(getOrgMessage().getResponse()));
 				parentRepeatTablePanel.getSelectedRows().stream().forEach(
-						dto -> BurpApiUtil.i().sendToComparer(nvl(dto.getMessage().getResponse())));
+						dto -> BurpApiClient.i().sendToComparer(nvl(dto.getMessage().getResponse())));
 			}
 		});
 		add(sendToComparerResponseWithOrgMenuItem);
@@ -104,9 +104,9 @@ public class RepeatTablePopupMenu extends JPopupMenu {
 		JMenuItem sendToComparerResponseWithMasterMenuItem = new JMenuItem(Captions.TABLE_CONTEXT_MENU_SEND_TO_COMPARER_RESPONSE_WITH_MST);
 		sendToComparerResponseWithMasterMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BurpApiUtil.i().sendToComparer(nvl(getMasterMessage().getResponse()));
+				BurpApiClient.i().sendToComparer(nvl(getMasterMessage().getResponse()));
 				parentRepeatTablePanel.getSelectedRows().stream().forEach(
-						dto -> BurpApiUtil.i().sendToComparer(nvl(dto.getMessage().getResponse())));
+						dto -> BurpApiClient.i().sendToComparer(nvl(dto.getMessage().getResponse())));
 			}
 		});
 		add(sendToComparerResponseWithMasterMenuItem);

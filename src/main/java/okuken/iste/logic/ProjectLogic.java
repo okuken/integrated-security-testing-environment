@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
 import org.mybatis.dynamic.sql.select.SelectDSLCompleter;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.dao.auto.ProjectDynamicSqlSupport;
 import okuken.iste.dao.auto.ProjectMapper;
 import okuken.iste.dto.ProjectDto;
 import okuken.iste.entity.auto.Project;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.SqlUtil;
@@ -44,7 +44,7 @@ public class ProjectLogic {
 		if(autoSelect && burpSuiteProjectName != null) {
 			projectSelectorDialog.setSelectNewProject();
 		}
-		BurpApiUtil.i().customizeUiComponent(projectSelectorDialog);
+		BurpApiClient.i().customizeUiComponent(projectSelectorDialog);
 		projectSelectorDialog.setLocationRelativeTo(burpFrame);
 		projectSelectorDialog.setVisible(true);
 		ProjectDto projectDto = projectSelectorDialog.getSelectedProject();

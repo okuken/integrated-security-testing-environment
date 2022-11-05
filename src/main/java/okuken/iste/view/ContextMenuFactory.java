@@ -12,11 +12,11 @@ import javax.swing.JMenuItem;
 
 import burp.IContextMenuFactory;
 import burp.IContextMenuInvocation;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.view.message.selector.MessageSelectorForSendToHistory;
 
 public class ContextMenuFactory implements IContextMenuFactory {
@@ -40,7 +40,7 @@ public class ContextMenuFactory implements IContextMenuFactory {
 
 	private List<JMenuItem> createMenuItemsImpl(Stream<?> selectedMessages, int modifiersEx, Object event) {
 		var selectedMessageDtos = selectedMessages
-				.map(selectedMessage -> BurpApiUtil.i().convertHttpRequestResponseToDto(selectedMessage))
+				.map(selectedMessage -> BurpApiClient.i().convertHttpRequestResponseToDto(selectedMessage))
 				.collect(Collectors.toList());
 
 		if(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutWithClick()) {

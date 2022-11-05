@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.plugin.api.IIsteContextMenuFactory;
@@ -13,7 +14,6 @@ import okuken.iste.plugin.api.IIsteImportMessage;
 import okuken.iste.plugin.api.IIstePluginCallbacks;
 import okuken.iste.plugin.api.IIstePluginHelpers;
 import okuken.iste.plugin.api.IIstePluginTab;
-import okuken.iste.util.BurpApiUtil;
 
 class PluginCallbacks implements IIstePluginCallbacks {
 
@@ -93,11 +93,11 @@ class PluginCallbacks implements IIstePluginCallbacks {
 
 	@Override
 	public OutputStream getStdout() {
-		return BurpApiUtil.i().getStdout();
+		return BurpApiClient.i().getStdout();
 	}
 	@Override
 	public OutputStream getStderr() {
-		return BurpApiUtil.i().getStderr();
+		return BurpApiClient.i().getStderr();
 	}
 
 	@Override

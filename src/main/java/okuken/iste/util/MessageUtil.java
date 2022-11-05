@@ -13,6 +13,7 @@ import org.jsoup.nodes.Document;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.HttpCookieDto;
 import okuken.iste.dto.HttpRequestParameterDto;
@@ -45,17 +46,17 @@ public class MessageUtil {
 			return applyHeaderPayload(request, paramName, paramValue);
 		}
 
-		if(!BurpApiUtil.i().analyzeRequest(request).getParameters().stream().anyMatch(p -> 
+		if(!BurpApiClient.i().analyzeRequest(request).getParameters().stream().anyMatch(p -> 
 				p.getType() == paramType.getBurpId() && StringUtils.equals(p.getName(), paramName))) {
 			return request;
 		}
 
-		var parameter = BurpApiUtil.i().buildParameter(paramName, paramValue, paramType.getBurpId());
+		var parameter = BurpApiClient.i().buildParameter(paramName, paramValue, paramType.getBurpId());
 		switch (paramType) {
 		case COOKIE:
 			return applyCookiePayload(request, parameter);
 		default:
-			return BurpApiUtil.i().updateParameter(request, parameter);
+			return BurpApiClient.i().updateParameter(request, parameter);
 		}
 	}
 
@@ -69,18 +70,18 @@ public class MessageUtil {
 	}
 
 	public static byte[] applyCookiePayload(byte[] request, HttpRequestParameterDto parameter) {
-		var ret = BurpApiUtil.i().removeParameter(request, parameter);
+		var ret = BurpApiClient.i().removeParameter(request, parameter);
 		ret = HttpUtil.removeDustAtEndOfCookieHeader(ret); // bug recovery
-		return BurpApiUtil.i().addParameter(ret, parameter);
+		return BurpApiClient.i().addParameter(ret, parameter);
 	}
 
 	private static byte[] applyHeaderPayload(byte[] request, String headerName, String value) {
-		var requestInfo = BurpApiUtil.i().analyzeRequest(request);
+		var requestInfo = BurpApiClient.i().analyzeRequest(request);
 
 		var headerPrefix = headerName + ": ";
 		var appliedHeaders = requestInfo.getHeaders().stream().map(header -> header.startsWith(headerPrefix) ? headerPrefix + value : header).collect(Collectors.toList());
 		var body = HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset());
-		return BurpApiUtil.i().buildHttpMessage(appliedHeaders, body);
+		return BurpApiClient.i().buildHttpMessage(appliedHeaders, body);
 	}
 
 //	private static byte[] applyHeaderPayload(byte[] request, IParameter parameter) {
@@ -147,8 +148,8 @@ public class MessageUtil {
 	}
 
 	public static byte[] updateContentLength(byte[] request) {
-		var requestInfo = BurpApiUtil.i().analyzeRequest(request);
-		return BurpApiUtil.i().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
+		var requestInfo = BurpApiClient.i().analyzeRequest(request);
+		return BurpApiClient.i().buildHttpMessage(requestInfo.getHeaders(), HttpUtil.extractMessageBody(request, requestInfo.getBodyOffset()));
 	}
 
 	public static List<MessageRequestParamDto> extractRequestParams(List<MessageDto> messageDtos) {
@@ -204,13 +205,13 @@ public class MessageUtil {
 	private static List<MessageResponseParamDto> extractResponseCandidateParams(byte[] response, ResponseParameterType paramType) {
 		switch (paramType) {
 			case COOKIE:
-				return BurpApiUtil.i().analyzeResponse(response).getCookies().stream()
+				return BurpApiClient.i().analyzeResponse(response).getCookies().stream()
 					.map(MessageUtil::convertCookieToDto)
 					.collect(Collectors.toList());
 			case JSON:
 				return convertJsonResponseToDto(
 						response,
-						BurpApiUtil.i().analyzeResponse(response));
+						BurpApiClient.i().analyzeResponse(response));
 			default:
 				return Lists.newArrayList();
 		}
@@ -259,7 +260,7 @@ public class MessageUtil {
 	}
 
 	public static short extractResponseStatus(byte[] response) {
-		return response != null ? BurpApiUtil.i().analyzeResponse(response).getStatusCode() : -1;
+		return response != null ? BurpApiClient.i().analyzeResponse(response).getStatusCode() : -1;
 	}
 
 	public static int extractResponseLength(byte[] response) {
@@ -293,7 +294,7 @@ public class MessageUtil {
 	}
 
 	public static Optional<String> convertToResponseHtmlString(byte[] response) {
-		var responseInfo = BurpApiUtil.i().analyzeResponse(response);
+		var responseInfo = BurpApiClient.i().analyzeResponse(response);
 		if(!isHtml(responseInfo.getStatedMimeType())) {
 			return Optional.empty();
 		}

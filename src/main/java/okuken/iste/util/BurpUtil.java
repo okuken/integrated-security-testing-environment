@@ -28,37 +28,38 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Colors;
-import okuken.iste.dto.HttpMessageEditor;
 import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.HttpServiceDto;
+import okuken.iste.view.message.editor.HttpMessageEditor;
 
 public class BurpUtil {
 
 	public static boolean isInScope(byte[] request, HttpServiceDto httpService) {
-		return isInScope(BurpApiUtil.i().analyzeRequest(new HttpRequestResponseDto(request, null, httpService)).getUrl());
+		return isInScope(BurpApiClient.i().analyzeRequest(new HttpRequestResponseDto(request, null, httpService)).getUrl());
 	}
 	public static boolean isInScope(URL url) {
-		return BurpApiUtil.i().isInScope(url);
+		return BurpApiClient.i().isInScope(url);
 	}
 
 	public static void printEventLog(String msg) {
 		System.err.println(msg);
-		BurpApiUtil.i().issueAlert(msg);
+		BurpApiClient.i().issueAlert(msg);
 	}
 
 	public static void printStderr(Exception e) {
 		e.printStackTrace();
-		e.printStackTrace(new PrintWriter(BurpApiUtil.i().getStderr(), true));
+		e.printStackTrace(new PrintWriter(BurpApiClient.i().getStderr(), true));
 	}
 	public static void printStderr(String msg) {
 		var errMsg = "[ISTE]ERROR: " + msg;
 		System.err.println(errMsg);
-		BurpApiUtil.i().printError(errMsg);
+		BurpApiClient.i().printError(errMsg);
 	}
 
 	public static PrintStream getStdoutPrintStream() {
-		return new PrintStream(BurpApiUtil.i().getStdout());
+		return new PrintStream(BurpApiClient.i().getStdout());
 	}
 
 	public static void highlightTab(Component suiteTabUiComponent) {
@@ -82,12 +83,12 @@ public class BurpUtil {
 
 	public static Color getDefaultForegroundColor() {
 		var dummyUiComponent = new JLabel("dummy");
-		BurpApiUtil.i().customizeUiComponent(dummyUiComponent);
+		BurpApiClient.i().customizeUiComponent(dummyUiComponent);
 		return dummyUiComponent.getForeground();
 	}
 
 	public static String getBurpSuiteVersion() {
-		return Arrays.stream(BurpApiUtil.i().getBurpVersion()).collect(Collectors.joining(" "));
+		return Arrays.stream(BurpApiClient.i().getBurpVersion()).collect(Collectors.joining(" "));
 	}
 
 	public static JFrame getBurpSuiteJFrame() {
@@ -206,7 +207,7 @@ public class BurpUtil {
 	private static Boolean professionalEdition;
 	public static boolean isProfessionalEdition() {
 		if(professionalEdition == null) {
-			professionalEdition = BurpApiUtil.i().getBurpVersion()[0].contains("Professional");
+			professionalEdition = BurpApiClient.i().getBurpVersion()[0].contains("Professional");
 		}
 		return professionalEdition;
 	}

@@ -19,6 +19,7 @@ import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 
 import okuken.iste.dao.auto.MessageRawMapper;
 import okuken.iste.dao.auto.MessageRepeatDynamicSqlSupport;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.dao.MessageRepeatMapper;
 import okuken.iste.dao.auto.MessageRepeatRedirDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageRepeatRedirMapper;
@@ -34,7 +35,6 @@ import okuken.iste.dto.PayloadDto;
 import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.entity.MessageRepeat;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.EncodeUtil;
@@ -87,7 +87,7 @@ public class RepeaterLogic {
 			try {
 				long timerStart = System.currentTimeMillis();
 	
-				var response = BurpApiUtil.i().makeHttpRequest(
+				var response = BurpApiClient.i().makeHttpRequest(
 						orgMessageDto.getMessage().getHttpService(),
 						request);
 	
@@ -268,8 +268,8 @@ public class RepeaterLogic {
 	}
 
 	public MessageRepeatRedirectDto sendFollowRedirectRequest(byte[] aRequest, byte[] aResponse, MessageDto orgMessageDto, Consumer<MessageRepeatRedirectDto> callback) {
-		var requestInfo = BurpApiUtil.i().analyzeRequest(aRequest);
-		var responseInfo = BurpApiUtil.i().analyzeResponse(aResponse);
+		var requestInfo = BurpApiClient.i().analyzeRequest(aRequest);
+		var responseInfo = BurpApiClient.i().analyzeResponse(aResponse);
 		URL redirectUrl;
 		try {
 			redirectUrl = new URL(extractLocationHeaderValue(responseInfo));
@@ -289,7 +289,7 @@ public class RepeaterLogic {
 			try {
 				long timerStart = System.currentTimeMillis();
 	
-				var response = BurpApiUtil.i().makeHttpRequest(
+				var response = BurpApiClient.i().makeHttpRequest(
 						new HttpServiceDto(redirectUrl.getHost(), redirectUrl.getPort(), redirectUrl.getProtocol()),
 						request);
 	
@@ -337,18 +337,18 @@ public class RepeaterLogic {
 		//apply cookie params in request
 		var beforeRequestCookieParams = beforeRequestInfo.getParameters().stream()
 				.filter(parameter -> parameter.getType() == RequestParameterType.COOKIE.getBurpId())
-				.map(cookie -> BurpApiUtil.i().buildParameter(cookie.getName(), cookie.getValue(), cookie.getType()))
+				.map(cookie -> BurpApiClient.i().buildParameter(cookie.getName(), cookie.getValue(), cookie.getType()))
 				.collect(Collectors.toList());
 
 		for(var cookieParam: beforeRequestCookieParams) {
-			ret = BurpApiUtil.i().addParameter(ret, cookieParam);
+			ret = BurpApiClient.i().addParameter(ret, cookieParam);
 		}
 
 
 		//apply cookie params in response
 		var beforeResponseCookieParams = beforeResponseInfo.getCookies().stream()
 				.filter(cookie -> redirectUrl.getPath().startsWith(cookie.getPath()))
-				.map(cookie -> BurpApiUtil.i().buildParameter(cookie.getName(), cookie.getValue(), RequestParameterType.COOKIE.getBurpId()))
+				.map(cookie -> BurpApiClient.i().buildParameter(cookie.getName(), cookie.getValue(), RequestParameterType.COOKIE.getBurpId()))
 				.collect(Collectors.toList());
 
 		for(var targetCookieParam: beforeResponseCookieParams) {

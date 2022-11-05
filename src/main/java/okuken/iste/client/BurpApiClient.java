@@ -1,4 +1,4 @@
-package okuken.iste.util;
+package okuken.iste.client;
 
 import java.awt.Component;
 import java.io.OutputStream;
@@ -8,8 +8,6 @@ import java.util.List;
 import burp.IBurpExtenderCallbacks;
 
 import okuken.iste.ExtensionStateListener;
-import okuken.iste.dto.HttpMessageEditorController;
-import okuken.iste.dto.HttpMessageEditor;
 import okuken.iste.dto.HttpRequestInfoDto;
 import okuken.iste.dto.HttpRequestParameterDto;
 import okuken.iste.dto.HttpRequestResponseDto;
@@ -17,14 +15,16 @@ import okuken.iste.dto.HttpResponseInfoDto;
 import okuken.iste.dto.HttpServiceDto;
 import okuken.iste.view.ContextMenuFactory;
 import okuken.iste.view.SuiteTab;
+import okuken.iste.view.message.editor.HttpMessageEditor;
+import okuken.iste.view.message.editor.HttpMessageEditorController;
 
-public abstract class BurpApiUtil {
+public abstract class BurpApiClient {
 
-	private static BurpApiUtil instance;
+	private static BurpApiClient instance;
 
 	public static void init(IBurpExtenderCallbacks burpExtenderCallbacks) {
 		checkDuplication();
-		instance = new BurpApiUtilExtenderImpl(burpExtenderCallbacks);
+		instance = new BurpApiClientExtenderImpl(burpExtenderCallbacks);
 	}
 	private static void checkDuplication() {
 		if(instance != null) {
@@ -33,7 +33,7 @@ public abstract class BurpApiUtil {
 	}
 
 
-	public static BurpApiUtil i() {
+	public static BurpApiClient i() {
 		return instance;
 	}
 

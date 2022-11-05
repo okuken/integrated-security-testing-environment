@@ -11,8 +11,8 @@ import javax.swing.KeyStroke;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.controller.Controller;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.UiUtil;
 import okuken.iste.view.message.selector.MessageSelectorForSendToHistory;
@@ -53,7 +53,7 @@ public class KeyStrokeManager {
 
 				var selectedIndexes = getSelectedProxyHistoryIndexes();
 				UiUtil.invokeLater(() -> {
-					Controller.getInstance().sendMessagesToSuiteTab(BurpApiUtil.i().getProxyHistory(selectedIndexes));
+					Controller.getInstance().sendMessagesToSuiteTab(BurpApiClient.i().getProxyHistory(selectedIndexes));
 				});
 			}
 		});
@@ -68,7 +68,7 @@ public class KeyStrokeManager {
 
 				var selectedIndexes = getSelectedProxyHistoryIndexes();
 				UiUtil.invokeLater(() -> {
-					var selectedMessages = BurpApiUtil.i().getProxyHistory(selectedIndexes);
+					var selectedMessages = BurpApiClient.i().getProxyHistory(selectedIndexes);
 					var targetMessageDto = MessageSelectorForSendToHistory.showDialog(selectedMessages);
 					if(targetMessageDto == null) {
 						return;
@@ -128,7 +128,7 @@ public class KeyStrokeManager {
 	}
 	private boolean judgeIsShowAll() {
 		return BurpUtil.getBurpSuiteProxyHttpHistoryTable().getRowCount() == 
-				BurpApiUtil.i().getProxyHistorySize();
+				BurpApiClient.i().getProxyHistorySize();
 	}
 	private List<Integer> calculateDeletedProxyHttpHistoryNumbers() {
 		var proxyHistoryTableModel = BurpUtil.getBurpSuiteProxyHttpHistoryTable().getModel();

@@ -2,10 +2,10 @@ package okuken.iste.view.tool;
 
 import javax.swing.JPanel;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.UiUtil;
 
@@ -159,7 +159,7 @@ public class ExportToolsPanel extends JPanel {
 	private void clearUserOptions() {
 		if(UiUtil.getConfirmAnswerDefaultCancel(Captions.MESSAGE_CLEAR_USEROPTIONS, clearUserOptionsButton)) {
 			ConfigLogic.getInstance().clearUserOptions();
-			BurpApiUtil.i().unloadExtension();
+			BurpApiClient.i().unloadExtension();
 		}
 	}
 

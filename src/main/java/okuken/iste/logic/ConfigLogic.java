@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import okuken.iste.annotations.Persistent;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.dto.AuthAccountDto;
 import okuken.iste.dto.AuthConfigDto;
 import okuken.iste.dto.PluginProjectOptionDto;
@@ -25,7 +26,6 @@ import okuken.iste.dto.ProjectDto;
 import okuken.iste.dto.ProjectOptionsDto;
 import okuken.iste.dto.UserOptionsDto;
 import okuken.iste.plugin.PluginLoadInfo;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.util.ReflectionUtil;
@@ -60,7 +60,7 @@ public class ConfigLogic {
 		Arrays.asList(UserOptionsDto.class.getDeclaredFields()).stream()
 			.filter(field -> field.isAnnotationPresent(Persistent.class))
 			.forEach(field -> {
-				var valueStr = BurpApiUtil.i().loadExtensionSetting(field.getAnnotation(Persistent.class).key());
+				var valueStr = BurpApiClient.i().loadExtensionSetting(field.getAnnotation(Persistent.class).key());
 				if(valueStr == null) {
 					return;
 				}
@@ -126,7 +126,7 @@ public class ConfigLogic {
 	}
 	private void saveUserOption(String fieldName, Object value, String valueStr) {
 		try {
-			BurpApiUtil.i().saveExtensionSetting(UserOptionsDto.class.getDeclaredField(fieldName).getAnnotation(Persistent.class).key(), valueStr);
+			BurpApiClient.i().saveExtensionSetting(UserOptionsDto.class.getDeclaredField(fieldName).getAnnotation(Persistent.class).key(), valueStr);
 			BeanUtils.setProperty(getUserOptions(), fieldName, value);
 		} catch (NoSuchFieldException | SecurityException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
@@ -178,7 +178,7 @@ public class ConfigLogic {
 		Arrays.asList(UserOptionsDto.class.getDeclaredFields()).stream()
 			.filter(field -> field.isAnnotationPresent(Persistent.class))
 			.map(field -> field.getAnnotation(Persistent.class).key())
-			.forEach(key -> BurpApiUtil.i().saveExtensionSetting(key, null));
+			.forEach(key -> BurpApiClient.i().saveExtensionSetting(key, null));
 	}
 
 

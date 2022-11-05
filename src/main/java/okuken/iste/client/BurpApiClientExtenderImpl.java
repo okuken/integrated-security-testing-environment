@@ -1,4 +1,4 @@
-package okuken.iste.util;
+package okuken.iste.client;
 
 import java.awt.Component;
 import java.io.OutputStream;
@@ -9,28 +9,27 @@ import java.util.stream.Collectors;
 import burp.IBurpExtenderCallbacks;
 import burp.IExtensionHelpers;
 import burp.IHttpRequestResponse;
-import burp.IHttpService;
-import burp.IMessageEditorController;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
 import okuken.iste.ExtensionStateListener;
-import okuken.iste.dto.HttpMessageEditorController;
 import okuken.iste.dto.HttpCookieDto;
-import okuken.iste.dto.HttpMessageEditor;
 import okuken.iste.dto.HttpRequestInfoDto;
 import okuken.iste.dto.HttpRequestParameterDto;
 import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.HttpResponseInfoDto;
 import okuken.iste.dto.HttpServiceDto;
+import okuken.iste.util.ReflectionUtil;
 import okuken.iste.view.ContextMenuFactory;
 import okuken.iste.view.SuiteTab;
+import okuken.iste.view.message.editor.HttpMessageEditor;
+import okuken.iste.view.message.editor.HttpMessageEditorController;
 
-public class BurpApiUtilExtenderImpl extends BurpApiUtil {
+public class BurpApiClientExtenderImpl extends BurpApiClient {
 
 	private final IBurpExtenderCallbacks callbacks;
 	private final IExtensionHelpers helper;
 
-	BurpApiUtilExtenderImpl(IBurpExtenderCallbacks callbacks) {
+	BurpApiClientExtenderImpl(IBurpExtenderCallbacks callbacks) {
 		this.callbacks = callbacks;
 		helper = callbacks.getHelpers();
 	}
@@ -209,20 +208,7 @@ public class BurpApiUtilExtenderImpl extends BurpApiUtil {
 
 	@Override
 	public HttpMessageEditor createMessageEditor(HttpMessageEditorController controller, boolean editable) {
-		var messageEditor = callbacks.createMessageEditor(new IMessageEditorController() {
-			@Override
-			public byte[] getRequest() {
-				return controller.getRequest();
-			}
-			@Override
-			public byte[] getResponse() {
-				return controller.getResponse();
-			}
-			@Override
-			public IHttpService getHttpService() {
-				return controller.getHttpService();
-			}
-		}, editable);
+		var messageEditor = callbacks.createMessageEditor(controller, editable);
 
 		return new HttpMessageEditor() {
 			@Override

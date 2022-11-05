@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import okuken.iste.dao.auto.MessageChainDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageChainMapper;
 import okuken.iste.dao.auto.MessageDynamicSqlSupport;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.dao.MessageMapper;
 import okuken.iste.dao.auto.MessageOrdDynamicSqlSupport;
 import okuken.iste.dao.auto.MessageOrdMapper;
@@ -43,7 +44,6 @@ import okuken.iste.entity.auto.MessageRaw;
 import okuken.iste.entity.auto.MessageRepeatMaster;
 import okuken.iste.enums.RequestParameterType;
 import okuken.iste.enums.SecurityTestingProgress;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.DbUtil;
 import okuken.iste.util.MessageUtil;
 import okuken.iste.util.SqlUtil;
@@ -59,7 +59,7 @@ public class MessageLogic {
 	public MessageDto convertHttpRequestResponseToDto(HttpRequestResponseDto httpRequestResponse) {
 		MessageDto dto = new MessageDto();
 		dto.setMessage(httpRequestResponse);
-		dto.setRequestInfo(BurpApiUtil.i().analyzeRequest(httpRequestResponse));
+		dto.setRequestInfo(BurpApiClient.i().analyzeRequest(httpRequestResponse));
 
 		dto.setName(convertCommentToName(httpRequestResponse.getComment()));
 		dto.setProgress(SecurityTestingProgress.NOT_YET);
@@ -72,7 +72,7 @@ public class MessageLogic {
 				.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
 
 		if(httpRequestResponse.getResponse() != null) {
-			dto.setResponseInfo(BurpApiUtil.i().analyzeResponse(httpRequestResponse.getResponse()));
+			dto.setResponseInfo(BurpApiClient.i().analyzeResponse(httpRequestResponse.getResponse()));
 			dto.setStatus(dto.getResponseInfo().getStatusCode());
 			dto.setLength(dto.getMessage().getResponse().length);
 			dto.setMimeType(dto.getResponseInfo().getStatedMimeType());
@@ -343,12 +343,12 @@ public class MessageLogic {
 		var httpRequestResponse = loadMessageDetail(dto.getMessageRawId());
 
 		dto.setMessage(httpRequestResponse);
-		dto.setRequestInfo(BurpApiUtil.i().analyzeRequest(httpRequestResponse));
+		dto.setRequestInfo(BurpApiClient.i().analyzeRequest(httpRequestResponse));
 		dto.setMessageParamList(dto.getRequestInfo().getParameters().stream()
 				.map(parameter -> convertParameterToDto(parameter)).collect(Collectors.toList()));
 
 		if(httpRequestResponse.getResponse() != null) {
-			dto.setResponseInfo(BurpApiUtil.i().analyzeResponse(httpRequestResponse.getResponse()));
+			dto.setResponseInfo(BurpApiClient.i().analyzeResponse(httpRequestResponse.getResponse()));
 			dto.setMessageCookieList(dto.getResponseInfo().getCookies().stream()
 					.map(MessageUtil::convertCookieToDto).collect(Collectors.toList()));
 		}

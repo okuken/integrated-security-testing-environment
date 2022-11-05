@@ -9,11 +9,11 @@ import com.google.common.base.Strings;
 
 import burp.IBurpExtender;
 import burp.IBurpExtenderCallbacks;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ProjectLogic;
-import okuken.iste.util.BurpApiUtil;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
 import okuken.iste.view.ContextMenuFactory;
@@ -24,16 +24,16 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender {
 
 	@Override
 	public void registerExtenderCallbacks(IBurpExtenderCallbacks burpExtenderCallbacks) {
-		BurpApiUtil.init(burpExtenderCallbacks);
+		BurpApiClient.init(burpExtenderCallbacks);
 		initImpl();
 	}
 
 	private void initImpl() {
-		BurpApiUtil.i().setExtensionName(Captions.EXTENSION_NAME_FULL);
+		BurpApiClient.i().setExtensionName(Captions.EXTENSION_NAME_FULL);
 
-		BurpApiUtil.i().registerContextMenuFactory(ContextMenuFactory.create());
+		BurpApiClient.i().registerContextMenuFactory(ContextMenuFactory.create());
 
-		BurpApiUtil.i().registerExtensionStateListener(new ExtensionStateListener());
+		BurpApiClient.i().registerExtensionStateListener(new ExtensionStateListener());
 
 		setupDatabase();
 		ProjectLogic.getInstance().selectProject();
@@ -46,7 +46,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender {
 			controller.loadDatabase();
 			controller.loadPlugins();
 
-			BurpApiUtil.i().addSuiteTab(suiteTab);
+			BurpApiClient.i().addSuiteTab(suiteTab);
 
 			SwingUtilities.invokeLater(() -> {
 				controller.initSizeRatioOfParts();

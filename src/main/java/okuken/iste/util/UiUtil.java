@@ -67,6 +67,7 @@ import javax.swing.undo.UndoManager;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.view.AbstractAction;
@@ -520,7 +521,7 @@ public class UiUtil {
 			@Override public void windowActivated(WindowEvent e) {}
 		});
 
-		BurpApiUtil.i().customizeUiComponent(popupFrame);
+		BurpApiClient.i().customizeUiComponent(popupFrame);
 		popupFrame.setVisible(true);
 
 		return popupFrame;
@@ -534,7 +535,7 @@ public class UiUtil {
 		dialog.setBounds(parentFrame.getBounds());
 		dialog.setLocationRelativeTo(parentFrame);
 
-		BurpApiUtil.i().customizeUiComponent(dialog);
+		BurpApiClient.i().customizeUiComponent(dialog);
 		dialog.setVisible(true);
 	}
 
