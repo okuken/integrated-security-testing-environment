@@ -159,13 +159,12 @@ CAUTION: Please note that this group of features must not be executed without th
 ```
 git clone https://github.com/okuken/iste-plugin-api.git
 cd iste-plugin-api
-git checkout v0.1.0
-gradle jar
+gradlew
 cd ..
 
 git clone https://github.com/okuken/integrated-security-testing-environment.git
 cd integrated-security-testing-environment
-gradle buildISTE
+gradlew
 ```
 -> build/libs/iste-x.x.x.jar
 
