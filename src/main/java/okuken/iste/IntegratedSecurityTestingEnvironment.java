@@ -16,6 +16,7 @@ import okuken.iste.logic.ConfigLogic;
 import okuken.iste.logic.ProjectLogic;
 import okuken.iste.util.BurpUtil;
 import okuken.iste.util.FileUtil;
+import okuken.iste.util.UiUtil;
 import okuken.iste.view.ContextMenuFactory;
 import okuken.iste.view.KeyStrokeManager;
 import okuken.iste.view.SuiteTab;
@@ -48,13 +49,13 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender {
 
 			BurpApiClient.i().addSuiteTab(suiteTab);
 
-			SwingUtilities.invokeLater(() -> {
+			UiUtil.invokeLater(() -> {
 				controller.initSizeRatioOfParts();
 
 				if(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ()) {
 					KeyStrokeManager.getInstance().setupKeyStroke();
 				}
-			});
+			}, 2);
 		});
 	}
 

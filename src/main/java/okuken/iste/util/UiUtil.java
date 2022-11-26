@@ -74,6 +74,16 @@ import okuken.iste.view.AbstractAction;
 
 public class UiUtil {
 
+	public static final void invokeLater(Runnable doRun, int recursiveCount) {
+		if(recursiveCount <= 1) {
+			invokeLater(doRun);
+			return;
+		}
+
+		invokeLater(() -> {
+			invokeLater(doRun, recursiveCount - 1);
+		});
+	}
 	public static final void invokeLater(Runnable doRun) {
 		SwingUtilities.invokeLater(() -> {
 			try {
