@@ -6,14 +6,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JMenuItem;
 
 import burp.IContextMenuFactory;
 import burp.IContextMenuInvocation;
-import burp.IHttpRequestResponse;
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.logic.ConfigLogic;
 import okuken.iste.view.message.selector.MessageSelectorForSendToHistory;
 
@@ -29,28 +31,34 @@ public class ContextMenuFactory implements IContextMenuFactory {
 
 	@Override
 	public List<JMenuItem> createMenuItems(IContextMenuInvocation invocation) {
-		IHttpRequestResponse[] selectedMessages = invocation.getSelectedMessages();
+		var selectedMessages = invocation.getSelectedMessages();
 		if (selectedMessages == null) {
 			return null;
 		}
+		return createMenuItemsImpl(Arrays.stream(selectedMessages), invocation.getInputEvent().getModifiersEx(), invocation);
+	}
+
+	private List<JMenuItem> createMenuItemsImpl(Stream<?> selectedMessages, int modifiersEx, Object event) {
+		var selectedMessageDtos = selectedMessages
+				.map(selectedMessage -> BurpApiClient.i().convertHttpRequestResponseToDto(selectedMessage))
+				.collect(Collectors.toList());
 
 		if(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutWithClick()) {
-			var modifiersEx = invocation.getInputEvent().getModifiersEx();
 			if((modifiersEx & AUTO_SEND_TO_ISTE_HISTORY_MASK) == AUTO_SEND_TO_ISTE_HISTORY_MASK) {
-				doActionIfNotDuplicate(invocation, selectedMessages, this::sendToHistory);
+				doActionIfNotDuplicate(event, selectedMessageDtos, this::sendToHistory);
 				return null;
 			}
 			if((modifiersEx & AUTO_SEND_TO_ISTE_MASK) == AUTO_SEND_TO_ISTE_MASK) {
-				doActionIfNotDuplicate(invocation, selectedMessages, this::sendTo);
+				doActionIfNotDuplicate(event, selectedMessageDtos, this::sendTo);
 				return null;
 			}
 		}
 
-		return Arrays.asList(createSendToMenu(selectedMessages), createSendToHistoryMenu(selectedMessages));
+		return Arrays.asList(createSendToMenu(selectedMessageDtos), createSendToHistoryMenu(selectedMessageDtos));
 	}
 
-	private IContextMenuInvocation currentInvocation;
-	private void doActionIfNotDuplicate(IContextMenuInvocation invocation, IHttpRequestResponse[] selectedMessages, Consumer<IHttpRequestResponse[]> action) {
+	private Object currentInvocation;
+	private void doActionIfNotDuplicate(Object invocation, List<HttpRequestResponseDto> selectedMessages, Consumer<List<HttpRequestResponseDto>> action) {
 		if(invocation == currentInvocation) {
 			return;
 		}
@@ -58,7 +66,7 @@ public class ContextMenuFactory implements IContextMenuFactory {
 		action.accept(selectedMessages);
 	}
 
-	private JMenuItem createSendToMenu(IHttpRequestResponse[] selectedMessages) {
+	private JMenuItem createSendToMenu(List<HttpRequestResponseDto> selectedMessages) {
 		JMenuItem ret = new JMenuItem(Captions.CONTEXT_MENU_SEND_TO);
 		ret.setAccelerator(KeyStrokeManager.KEYSTROKE_SEND_TO_ISTE);
 
@@ -68,13 +76,13 @@ public class ContextMenuFactory implements IContextMenuFactory {
 
 		return ret;
 	}
-	private void sendTo(IHttpRequestResponse[] selectedMessages) {
-		Controller.getInstance().sendMessagesToSuiteTab(Arrays.stream(selectedMessages)
+	private void sendTo(List<HttpRequestResponseDto> selectedMessages) {
+		Controller.getInstance().sendMessagesToSuiteTab(selectedMessages.stream()
 				.filter(message -> message.getRequest() != null)
 				.collect(Collectors.toList()));
 	}
 
-	private JMenuItem createSendToHistoryMenu(IHttpRequestResponse[] selectedMessages) {
+	private JMenuItem createSendToHistoryMenu(List<HttpRequestResponseDto> selectedMessages) {
 		var ret = new JMenuItem(Captions.CONTEXT_MENU_SEND_TO_HISTORY);
 		ret.setAccelerator(KeyStrokeManager.KEYSTROKE_SEND_TO_ISTE_HISTORY);
 
@@ -84,7 +92,7 @@ public class ContextMenuFactory implements IContextMenuFactory {
 
 		return ret;
 	}
-	private void sendToHistory(IHttpRequestResponse[] selectedMessages) {
+	private void sendToHistory(List<HttpRequestResponseDto> selectedMessages) {
 		var targetMessageDto = MessageSelectorForSendToHistory.showDialog(selectedMessages);
 		if(targetMessageDto == null) {
 			return;
@@ -92,7 +100,7 @@ public class ContextMenuFactory implements IContextMenuFactory {
 
 		Controller.getInstance().sendMessagesToSuiteTabHistory(
 				targetMessageDto,
-				Arrays.stream(selectedMessages)
+				selectedMessages.stream()
 					.filter(message -> message.getRequest() != null)
 					.collect(Collectors.toList()));
 	}

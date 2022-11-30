@@ -6,9 +6,6 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
-import burp.IHttpRequestResponse;
-import burp.IRequestInfo;
-import burp.IResponseInfo;
 import okuken.iste.annotations.TemplateReference;
 import okuken.iste.consts.Sizes;
 import okuken.iste.enums.SecurityTestingProgress;
@@ -59,11 +56,11 @@ public class MessageDto {
 	private List<MessageResponseParamDto> responseJson;
 
 	private Integer messageRawId;
-	private IHttpRequestResponse message;
-	private IRequestInfo requestInfo;
-	private IResponseInfo responseInfo;
+	private HttpRequestResponseDto message;
+	private HttpRequestInfoDto requestInfo;
+	private HttpResponseInfoDto responseInfo;
 
-	private IHttpRequestResponse repeatMasterMessage;
+	private HttpRequestResponseDto repeatMasterMessage;
 
 	private List<MessageRepeatDto> repeatList;
 
@@ -355,7 +352,7 @@ public class MessageDto {
 	public void setMessageRawId(Integer messageRawId) {
 		this.messageRawId = messageRawId;
 	}
-	public IHttpRequestResponse getMessage() {
+	public HttpRequestResponseDto getMessage() {
 		if(message == null) {
 			MessageLogic.getInstance().loadMessageDetail(this);
 		}
@@ -391,31 +388,31 @@ public class MessageDto {
 		}
 		return HttpUtil.convertMessageBytesToString(response, responseInfo.getHeaders(), responseInfo.getBodyOffset());
 	}
-	public void setMessage(IHttpRequestResponse message) {
+	public void setMessage(HttpRequestResponseDto message) {
 		this.message = message;
 	}
-	public IRequestInfo getRequestInfo() {
+	public HttpRequestInfoDto getRequestInfo() {
 		return requestInfo;
 	}
-	public void setRequestInfo(IRequestInfo requestInfo) {
+	public void setRequestInfo(HttpRequestInfoDto requestInfo) {
 		this.requestInfo = requestInfo;
 	}
-	public IResponseInfo getResponseInfo() {
+	public HttpResponseInfoDto getResponseInfo() {
 		return responseInfo;
 	}
-	public void setResponseInfo(IResponseInfo responseInfo) {
+	public void setResponseInfo(HttpResponseInfoDto responseInfo) {
 		this.responseInfo = responseInfo;
 	}
-	public IHttpRequestResponse getRepeatMasterMessage() {
+	public HttpRequestResponseDto getRepeatMasterMessage() {
 		if(repeatMasterMessage == null) {
 			MessageLogic.getInstance().loadRepeatMaster(this);
 		}
 		return repeatMasterMessage;
 	}
-	public IHttpRequestResponse getMasterMessage() {
+	public HttpRequestResponseDto getMasterMessage() {
 		return Optional.ofNullable(getRepeatMasterMessage()).orElse(getMessage());
 	}
-	public void setRepeatMasterMessage(IHttpRequestResponse repeatMasterMessage) {
+	public void setRepeatMasterMessage(HttpRequestResponseDto repeatMasterMessage) {
 		this.repeatMasterMessage = repeatMasterMessage;
 	}
 

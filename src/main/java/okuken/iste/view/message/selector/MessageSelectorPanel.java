@@ -10,9 +10,9 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import burp.IHttpRequestResponse;
 import okuken.iste.consts.Sizes;
 import okuken.iste.controller.Controller;
+import okuken.iste.dto.HttpRequestResponseDto;
 import okuken.iste.dto.MessageDto;
 import okuken.iste.view.message.editor.MessageEditorPanel;
 import okuken.iste.view.message.editor.MessageEditorsLayoutType;
@@ -29,7 +29,7 @@ public class MessageSelectorPanel extends JPanel {
 	public MessageSelectorPanel() {
 		this(null, null, false);
 	}
-	public MessageSelectorPanel(Integer messageId, IHttpRequestResponse message, boolean popup) {
+	public MessageSelectorPanel(Integer messageId, HttpRequestResponseDto message, boolean popup) {
 		setLayout(new BorderLayout(0, 0));
 		
 		JPanel urlPanel = new JPanel();

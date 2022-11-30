@@ -1,5 +1,6 @@
 package okuken.iste.util;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.enums.EncodeType;
 
 public class EncodeUtil {
@@ -11,7 +12,7 @@ public class EncodeUtil {
 
 		switch (encode) {
 		case URL:
-			return BurpUtil.getHelpers().urlEncode(value);
+			return BurpApiClient.i().urlEncode(value);
 		default:
 			return value;
 		}

@@ -67,12 +67,23 @@ import javax.swing.undo.UndoManager;
 
 import com.google.common.collect.Lists;
 
+import okuken.iste.client.BurpApiClient;
 import okuken.iste.consts.Captions;
 import okuken.iste.consts.Colors;
 import okuken.iste.view.AbstractAction;
 
 public class UiUtil {
 
+	public static final void invokeLater(Runnable doRun, int recursiveCount) {
+		if(recursiveCount <= 1) {
+			invokeLater(doRun);
+			return;
+		}
+
+		invokeLater(() -> {
+			invokeLater(doRun, recursiveCount - 1);
+		});
+	}
 	public static final void invokeLater(Runnable doRun) {
 		SwingUtilities.invokeLater(() -> {
 			try {
@@ -520,7 +531,7 @@ public class UiUtil {
 			@Override public void windowActivated(WindowEvent e) {}
 		});
 
-		BurpUtil.getCallbacks().customizeUiComponent(popupFrame);
+		BurpApiClient.i().customizeUiComponent(popupFrame);
 		popupFrame.setVisible(true);
 
 		return popupFrame;
@@ -534,7 +545,7 @@ public class UiUtil {
 		dialog.setBounds(parentFrame.getBounds());
 		dialog.setLocationRelativeTo(parentFrame);
 
-		BurpUtil.getCallbacks().customizeUiComponent(dialog);
+		BurpApiClient.i().customizeUiComponent(dialog);
 		dialog.setVisible(true);
 	}
 
