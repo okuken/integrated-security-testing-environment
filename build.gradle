@@ -8,7 +8,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '7.1.1'
 }
 
-version '0.6.0'
+version '0.6.1'
 
 def cleanDbVersion = '0.6.0'
 
@@ -30,6 +30,7 @@ repositories {
     jcenter()
 }
 
+def sqliteJdbcVersion = '3.32.3.3'
 dependencies {
     compileOnly 'net.portswigger.burp.extender:burp-extender-api:2.3'
 //    testRuntimeOnly files(System.getProperty("user.home") + '\\AppData\\Local\\Programs\\BurpSuitePro\\burpsuite_pro.jar') // set your local path to burpsuite jar
@@ -43,7 +44,7 @@ dependencies {
 
     implementation 'org.mybatis:mybatis-migrations:3.3.11'
 
-    implementation 'org.xerial:sqlite-jdbc:3.32.3'
+    implementation "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}"
 
     implementation "org.aspectj:aspectjrt:1.9.5"
 
@@ -110,8 +111,8 @@ task generateDao {
 
     def mbgJarUrl = "https://repo1.maven.org/fromsearch?filepath=org/mybatis/generator/mybatis-generator-core/1.4.0/mybatis-generator-core-1.4.0.jar"
     def mbgJar = new File(buildModuleDir, "mybatis-generator-core-1.4.0.jar")
-    def jdbcJarUrl = "https://repo1.maven.org/fromsearch?filepath=org/xerial/sqlite-jdbc/3.32.3/sqlite-jdbc-3.32.3.jar"
-    def jdbcJar = new File(buildModuleDir, "sqlite-jdbc-3.32.3.jar")
+    def jdbcJarUrl = "https://repo1.maven.org/fromsearch?filepath=org/xerial/sqlite-jdbc/${sqliteJdbcVersion}/sqlite-jdbc-${sqliteJdbcVersion}.jar"
+    def jdbcJar = new File(buildModuleDir, "sqlite-jdbc-${sqliteJdbcVersion}.jar")
 
     doLast {
         download {
