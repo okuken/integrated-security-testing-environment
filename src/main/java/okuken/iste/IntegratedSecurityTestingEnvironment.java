@@ -55,7 +55,7 @@ public class IntegratedSecurityTestingEnvironment implements IBurpExtender {
 				if(ConfigLogic.getInstance().getUserOptions().isUseKeyboardShortcutQ()) {
 					KeyStrokeManager.getInstance().setupKeyStroke();
 				}
-			}, 2);
+			}, 3);
 		});
 	}
 
