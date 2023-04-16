@@ -1,6 +1,7 @@
 English / [Japanese](README.ja.md)
 
 # ISTE: Integrated Security Testing Environment
+[![Discord](https://dcbadge.vercel.app/api/server/tRS9MGFVG2?style=flat)](https://discord.gg/tRS9MGFVG2)
 
 ISTE is a Burp extension that provides total support for security testing of web applications.  
 ISTE puts you in a flow state.
