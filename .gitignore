@@ -2,6 +2,7 @@
 .project
 .classpath
 .gradle
+gradle.properties
 
 build
 buildModule

@@ -169,6 +169,8 @@ Webアプリケーションの脆弱性診断をトータルサポートする B
 
 ## Build ISTE
 
+JDK21が必要です。
+
 ```
 git clone https://github.com/okuken/iste-plugin-api.git
 cd iste-plugin-api

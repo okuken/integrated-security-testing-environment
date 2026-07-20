@@ -1,11 +1,11 @@
-// https://docs.gradle.org/6.1.1/userguide/java_library_plugin.html
+// https://docs.gradle.org/current/userguide/java_library_plugin.html
 
 plugins {
     id 'java-library'
-    id 'io.freefair.aspectj.post-compile-weaving' version '5.1.0'
-    id 'com.github.johnrengelman.shadow' version '6.0.0'
-    id 'de.undercouch.download' version '4.1.2'
-    id 'org.owasp.dependencycheck' version '7.1.1'
+    id 'io.freefair.aspectj.post-compile-weaving' version '9.5.0'
+    id 'com.gradleup.shadow' version '9.6.0'
+    id 'de.undercouch.download' version '5.7.0'
+    id 'org.owasp.dependencycheck' version '12.2.2'
 }
 
 version '0.6.2'
@@ -14,20 +14,23 @@ def cleanDbVersion = '0.6.0'
 
 shadowJar{
   mustRunAfter 'generateDao'
-  archiveName = "iste-${version}.${extension}"
+  archiveFileName.set("iste-${version}.jar")
   manifest {
     attributes 'Main-Class': 'okuken.iste.CommandLineInterface'
   }
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 def sqliteJdbcVersion = '3.32.3.3'
@@ -46,7 +49,7 @@ dependencies {
 
     implementation "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}"
 
-    implementation "org.aspectj:aspectjrt:1.9.5"
+    implementation "org.aspectj:aspectjrt:1.9.25.1"
 
     implementation "org.hibernate.validator:hibernate-validator:7.0.4.Final"
     implementation "org.glassfish:jakarta.el:4.0.2"
@@ -70,6 +73,24 @@ test {
 }
 
 
+def javaToolchains = project.extensions.getByType(JavaToolchainService)
+def launcher21 = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(21)
+}
+
+def runJava = { List<Object> args ->
+    def command = [launcher21.get().executablePath.asFile.absolutePath] + args.collect { it.toString() }
+    def process = new ProcessBuilder(command)
+            .redirectErrorStream(true)
+            .redirectInput(ProcessBuilder.Redirect.from(new File(System.getProperty('os.name').toLowerCase().contains('windows') ? 'NUL' : '/dev/null')))
+            .start()
+    process.inputStream.eachLine { println it }
+    def exitCode = process.waitFor()
+    if (exitCode != 0) {
+        throw new RuntimeException("Command failed with exit code ${exitCode}: ${command.join(' ')}")
+    }
+}
+
 def buildModuleDir = new File(projectDir, 'buildModule')
 def tmpDir = new File(buildDir, 'tmp')
 task createDir {
@@ -91,15 +112,13 @@ task makeCleanDb {
     def isteJarFile = new File(buildModuleDir, "iste-${cleanDbVersion}.jar")
 
     doLast {
-        download {
+        download.run {
             src isteJarUrl
             dest buildModuleDir
             overwrite false
         }
 
-        exec {
-            commandLine 'java', '-jar', isteJarFile, '-makeCleanDb', isteCleanDbFile, '-f'
-        }
+        runJava(['-jar', isteJarFile, '-makeCleanDb', isteCleanDbFile, '-f'])
     }
 }
 
@@ -109,13 +128,14 @@ task generateDao {
 
     def generatorConfig = new File(projectDir, "src/main/resources/generatorConfig.xml")
 
-    def mbgJarUrl = "https://repo1.maven.org/fromsearch?filepath=org/mybatis/generator/mybatis-generator-core/1.4.0/mybatis-generator-core-1.4.0.jar"
+    // FIX (unrelated to Gradle 9/JDK migration): the old "fromsearch?filepath=" URLs 404 against repo1.maven.org; use the real Maven Central layout.
+    def mbgJarUrl = "https://repo1.maven.org/maven2/org/mybatis/generator/mybatis-generator-core/1.4.0/mybatis-generator-core-1.4.0.jar"
     def mbgJar = new File(buildModuleDir, "mybatis-generator-core-1.4.0.jar")
-    def jdbcJarUrl = "https://repo1.maven.org/fromsearch?filepath=org/xerial/sqlite-jdbc/${sqliteJdbcVersion}/sqlite-jdbc-${sqliteJdbcVersion}.jar"
+    def jdbcJarUrl = "https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/${sqliteJdbcVersion}/sqlite-jdbc-${sqliteJdbcVersion}.jar"
     def jdbcJar = new File(buildModuleDir, "sqlite-jdbc-${sqliteJdbcVersion}.jar")
 
     doLast {
-        download {
+        download.run {
             src([mbgJarUrl, jdbcJarUrl])
             dest buildModuleDir
             overwrite false
@@ -123,9 +143,7 @@ task generateDao {
 
 //      ant.replace(file: generatorConfig, token: '@@@CLEAN_DB_FILE_PATH@@@', value: "${isteCleanDbFile}")
 
-        exec {
-            commandLine 'java', '-cp', "${jdbcJar};${mbgJar}", 'org.mybatis.generator.api.ShellRunner', '-configfile', generatorConfig, '-overwrite', '-verbose'
-        }
+        runJava(['-cp', "${jdbcJar};${mbgJar}", 'org.mybatis.generator.api.ShellRunner', '-configfile', generatorConfig, '-overwrite', '-verbose'])
     }
 }
 

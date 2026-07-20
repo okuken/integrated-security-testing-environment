@@ -157,6 +157,8 @@ CAUTION: Please note that this group of features must not be executed without th
 
 ## Build ISTE
 
+Requires JDK 21.
+
 ```
 git clone https://github.com/okuken/iste-plugin-api.git
 cd iste-plugin-api
