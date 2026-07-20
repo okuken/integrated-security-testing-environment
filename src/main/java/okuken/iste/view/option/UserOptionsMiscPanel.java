@@ -194,7 +194,9 @@ public class UserOptionsMiscPanel extends JPanel {
 			return;
 		}
 
-		KeyStrokeManager.getInstance().setupKeyStroke();
+		if(!KeyStrokeManager.getInstance().setupKeyStroke()) {
+			UiUtil.showMessage(Captions.USER_OPTIONS_USE_KEYBOARD_SHORTCUT_SETUP_FAILED, this);
+		}
 	}
 
 }

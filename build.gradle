@@ -8,7 +8,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '7.1.1'
 }
 
-version '0.6.1'
+version '0.6.2'
 
 def cleanDbVersion = '0.6.0'
 

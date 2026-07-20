@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
@@ -56,6 +57,11 @@ public class BurpUtil {
 		var errMsg = "[ISTE]ERROR: " + msg;
 		System.err.println(errMsg);
 		BurpApiClient.i().printError(errMsg);
+	}
+	public static void printStdout(String msg) {
+		var infoMsg = "[ISTE]INFO: " + msg;
+		System.out.println(infoMsg);
+		getStdoutPrintStream().println(infoMsg);
 	}
 
 	public static PrintStream getStdoutPrintStream() {
@@ -142,36 +148,102 @@ public class BurpUtil {
 		}
 		return burpSuiteProxyHttpHistoryTable;
 	}
+	private static final int PROXY_HTTP_HISTORY_TABLE_CANDIDATE_MIN_COLUMN_COUNT = 5;
+	private static final int PROXY_HTTP_HISTORY_TABLE_CONFIDENCE_THRESHOLD = 10;
+
 	public static void extractBurpSuiteProxyHttpHistoryTable() {
 		if(isBurpSuiteProxyHttpHistoryTableExtracted()) {
 			return;
 		}
 
-		var ret = new ArrayList<JTable>();
-		extractBurpSuiteProxyHttpHistoryTableImpl(getBurpSuiteJFrame(), ret);
-		if(ret.isEmpty()) {
-			printStderr("extractBurpSuiteProxyHttpHistoryTable failed. Burp version: " + getBurpSuiteVersion());
+		var candidates = new ArrayList<JTable>();
+		extractBurpSuiteProxyHttpHistoryTableImpl(getBurpSuiteJFrame(), candidates);
+		if(candidates.isEmpty()) {
+			printStderr("extractBurpSuiteProxyHttpHistoryTable failed(no candidate JTable found). Burp version: " + getBurpSuiteVersion());
 			return;
 		}
-		burpSuiteProxyHttpHistoryTable = ret.get(0);
+
+		var best = candidates.stream()
+				.max(Comparator.comparingInt(BurpUtil::scoreAsProxyHttpHistoryTableCandidate))
+				.get();
+		if(scoreAsProxyHttpHistoryTableCandidate(best) < PROXY_HTTP_HISTORY_TABLE_CONFIDENCE_THRESHOLD) {
+			printStderr("extractBurpSuiteProxyHttpHistoryTable failed(no confident candidate). Burp version: " + getBurpSuiteVersion()
+					+ ". Candidates: " + candidates.stream().map(BurpUtil::describeProxyHttpHistoryTableCandidate).collect(Collectors.joining(" | ")));
+			return;
+		}
+
+		burpSuiteProxyHttpHistoryTable = best;
+		printStdout("extractBurpSuiteProxyHttpHistoryTable succeeded: " + describeProxyHttpHistoryTableCandidate(best));
 	}
+	// Burp doesn't expose the HTTP history table via any public API, so this walks Burp's own (undocumented,
+	// version-dependent) Swing component tree. Rather than relying on a single hardcoded internal component
+	// name(which Burp is free to rename/obfuscate between versions), every JTable with a plausible column
+	// count is collected here and the most likely one is picked by scoreAsProxyHttpHistoryTableCandidate.
 	private static void extractBurpSuiteProxyHttpHistoryTableImpl(Component component, List<JTable> ret) {
-		if(!ret.isEmpty()) {
-			return;
-		}
 		if(component instanceof JTable) {
 			var table = (JTable)component;
-			if("proxyHistoryTable".equals(table.getName()) && table.getColumnCount() > 15) {
+			if(table.getColumnCount() > PROXY_HTTP_HISTORY_TABLE_CANDIDATE_MIN_COLUMN_COUNT) {
 				ret.add(table);
-				return;
 			}
 		}
 		if(component instanceof Container) {
 			for(var childComponent: ((Container)component).getComponents()) {
 				extractBurpSuiteProxyHttpHistoryTableImpl(childComponent, ret); //recursive
 			}
-			return;
 		}
+	}
+	private static int scoreAsProxyHttpHistoryTableCandidate(JTable table) {
+		var score = 0;
+
+		var tabTitles = getAncestorTabTitles(table);
+		if(tabTitles.stream().anyMatch(title -> StringUtils.containsIgnoreCase(title, "proxy"))
+				&& tabTitles.stream().anyMatch(title -> StringUtils.containsIgnoreCase(title, "history"))) {
+			score += 100; // structural: nested under Proxy > *history* tab. Tab titles are user-visible text, so unlike internal component names, they can't be silently renamed without the user noticing.
+		}
+
+		if("#".equals(String.valueOf(getColumnHeaderValue(table, 0)))) {
+			score += 10; // "#" row-number column, used elsewhere in this codebase(extractProxyHttpHistoryNumber) as column 0 of the history table.
+		}
+
+		if(table.getColumnCount() > 15) {
+			score += 5; // the original(pre-2023) heuristic; kept as a weak signal since Burp's history table has only grown more columns over time.
+		}
+
+		if(StringUtils.containsIgnoreCase(StringUtils.defaultString(table.getName()), "history")
+				|| StringUtils.containsIgnoreCase(StringUtils.defaultString(table.getName()), "proxy")) {
+			score += 3;
+		}
+
+		return score;
+	}
+	private static List<String> getAncestorTabTitles(Component component) {
+		var titles = new ArrayList<String>();
+		var child = component;
+		var parent = component.getParent();
+		while(parent != null) {
+			if(parent instanceof JTabbedPane) {
+				var tabbedPane = (JTabbedPane)parent;
+				var index = tabbedPane.indexOfComponent(child);
+				if(index >= 0) {
+					titles.add(StringUtils.defaultString(tabbedPane.getTitleAt(index)));
+				}
+			}
+			child = parent;
+			parent = parent.getParent();
+		}
+		return titles;
+	}
+	private static Object getColumnHeaderValue(JTable table, int columnIndex) {
+		try {
+			return table.getColumnModel().getColumn(columnIndex).getHeaderValue();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	private static String describeProxyHttpHistoryTableCandidate(JTable table) {
+		return String.format("[name=%s, columnCount=%d, column0Header=%s, score=%d, tabTitles=%s]",
+				table.getName(), table.getColumnCount(), getColumnHeaderValue(table, 0),
+				scoreAsProxyHttpHistoryTableCandidate(table), getAncestorTabTitles(table));
 	}
 
 	public static Integer extractProxyHttpHistoryNumber(TableModel burpSuiteProxyHttpHistoryTableModel, int tableModelRowIndex) {

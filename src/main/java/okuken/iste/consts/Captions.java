@@ -247,6 +247,9 @@ public class Captions {
 	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT = "Shortcut (Send to ISTE)";
 	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT_Q = "Enable keyboard shortcut \"Ctrl-Q\", \"Ctrl+Shift-Q\" and \"Ctrl+Alt-Q\" on ProxyHttpHistoryTable.";
 	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT_WITH_CLICK = "Enable right-click with \"Ctrl\" or \"Ctrl+Shift\" when ContextMenuCreation.";
+	public static final String USER_OPTIONS_USE_KEYBOARD_SHORTCUT_SETUP_FAILED = "Failed to enable the keyboard shortcut: ISTE couldn't locate Burp's Proxy HTTP history table.\n"
+			+ "This can happen if Burp Suite's internal UI has changed in a way ISTE doesn't recognize yet.\n"
+			+ "See the ISTE entry on the Extensions > Errors tab for details, and consider reporting this on the ISTE issue tracker.";
 
 	public static final String PLUGINS_BUTTON_ADD_PLUGIN = "Add";
 	public static final String PLUGINS_LOAD_FROM_CLASSPATH = "CLASSPATH";

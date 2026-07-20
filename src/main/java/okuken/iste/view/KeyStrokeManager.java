@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import com.google.common.collect.Lists;
@@ -36,14 +37,14 @@ public class KeyStrokeManager {
 	private List<Integer> deletedProxyHttpHistoryNumbers;
 
 	@SuppressWarnings("serial")
-	public void setupKeyStroke() {
+	public boolean setupKeyStroke() {
 		var proxyHttpHistoryTable = BurpUtil.getBurpSuiteProxyHttpHistoryTable();
 		if(proxyHttpHistoryTable == null) {
-			BurpUtil.printStderr("setupKeyStroke failed.");
-			return;
+			BurpUtil.printStderr("setupKeyStroke failed(couldn't locate Burp's Proxy HTTP history table).");
+			return false;
 		}
 
-		proxyHttpHistoryTable.getInputMap().put(KEYSTROKE_SEND_TO_ISTE, ACTIONKEY_SEND_TO_ISTE);
+		proxyHttpHistoryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KEYSTROKE_SEND_TO_ISTE, ACTIONKEY_SEND_TO_ISTE);
 		proxyHttpHistoryTable.getActionMap().put(ACTIONKEY_SEND_TO_ISTE, new AbstractAction() {
 			@Override
 			public void actionPerformedSafe(ActionEvent e) {
@@ -58,7 +59,7 @@ public class KeyStrokeManager {
 			}
 		});
 
-		proxyHttpHistoryTable.getInputMap().put(KEYSTROKE_SEND_TO_ISTE_HISTORY, ACTIONKEY_SEND_TO_ISTE_HISTORY);
+		proxyHttpHistoryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KEYSTROKE_SEND_TO_ISTE_HISTORY, ACTIONKEY_SEND_TO_ISTE_HISTORY);
 		proxyHttpHistoryTable.getActionMap().put(ACTIONKEY_SEND_TO_ISTE_HISTORY, new AbstractAction() {
 			@Override
 			public void actionPerformedSafe(ActionEvent e) {
@@ -79,7 +80,7 @@ public class KeyStrokeManager {
 			}
 		});
 
-		proxyHttpHistoryTable.getInputMap().put(KEYSTROKE_CALC_DELETED_HISTORY, ACTIONKEY_CALC_DELETED_HISTORY);
+		proxyHttpHistoryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KEYSTROKE_CALC_DELETED_HISTORY, ACTIONKEY_CALC_DELETED_HISTORY);
 		proxyHttpHistoryTable.getActionMap().put(ACTIONKEY_CALC_DELETED_HISTORY, new AbstractAction() {
 			@Override
 			public void actionPerformedSafe(ActionEvent e) {
@@ -88,17 +89,20 @@ public class KeyStrokeManager {
 				}
 
 				deletedProxyHttpHistoryNumbers = calculateDeletedProxyHttpHistoryNumbers();
-				UiUtil.showInfoMessage(String.format(
-							"Congratulations!\n"
-							+ "It's ready to use Ctrl-Q and Ctrl+Shift-Q now!!\n"
-							+ "\n"
-							+ "...But, if you delete another history, you must do Ctrl+Alt-Q again.\n"
-							+ "\n"
-							+ "[Detected deleted history #: %s]",
-							deletedProxyHttpHistoryNumbers.stream().map(i->i.toString()).collect(Collectors.joining(", "))),
-							BurpUtil.getBurpSuiteProxyHttpHistoryTable());
+				var message = "Congratulations!\n"
+						+ "It's ready to use Ctrl-Q and Ctrl+Shift-Q now!!\n"
+						+ "\n"
+						+ "...But, if you delete another history, you must do Ctrl+Alt-Q again.";
+				if(!deletedProxyHttpHistoryNumbers.isEmpty()) {
+					message += "\n\n[Detected deleted history #: "
+							+ deletedProxyHttpHistoryNumbers.stream().map(i->i.toString()).collect(Collectors.joining(", "))
+							+ "]";
+				}
+				UiUtil.showInfoMessage(message, BurpUtil.getBurpSuiteProxyHttpHistoryTable());
 			}
 		});
+
+		return true;
 	}
 
 	private boolean judgeIsReadyToGetSelectedProxyHistoryIndexes() {
@@ -151,13 +155,13 @@ public class KeyStrokeManager {
 		}
 		var proxyHistoryTable = BurpUtil.getBurpSuiteProxyHttpHistoryTable();
 
-		proxyHistoryTable.getInputMap().remove(KEYSTROKE_SEND_TO_ISTE);
+		proxyHistoryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).remove(KEYSTROKE_SEND_TO_ISTE);
 		proxyHistoryTable.getActionMap().remove(ACTIONKEY_SEND_TO_ISTE);
 
-		proxyHistoryTable.getInputMap().remove(KEYSTROKE_SEND_TO_ISTE_HISTORY);
+		proxyHistoryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).remove(KEYSTROKE_SEND_TO_ISTE_HISTORY);
 		proxyHistoryTable.getActionMap().remove(ACTIONKEY_SEND_TO_ISTE_HISTORY);
 
-		proxyHistoryTable.getInputMap().remove(KEYSTROKE_CALC_DELETED_HISTORY);
+		proxyHistoryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).remove(KEYSTROKE_CALC_DELETED_HISTORY);
 		proxyHistoryTable.getActionMap().remove(ACTIONKEY_CALC_DELETED_HISTORY);
 	}
 
